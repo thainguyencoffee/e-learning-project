@@ -1,2 +1,2 @@
-create database elearning;
+create database resource_server;
 create database keycloak;

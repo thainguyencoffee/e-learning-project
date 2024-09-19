@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
-class ApplicationTests {
+class ResourceServerApplicationTests {
 
     protected static KeycloakToken userToken;
     protected static KeycloakToken user2Token;

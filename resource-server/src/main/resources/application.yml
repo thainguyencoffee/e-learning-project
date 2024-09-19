@@ -4,7 +4,7 @@ spring:
   application:
     name: resource-server
   datasource:
-    url: jdbc:postgresql://localhost:5432/resource-server
+    url: jdbc:postgresql://localhost:5432/resource_server
     username: postgres
     password: changemeinprod
   security:

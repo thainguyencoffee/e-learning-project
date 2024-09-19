@@ -1,3 +1,7 @@
+# E-Learning Project
+
+[![Resource Server CI with Gradle](https://github.com/thainguyencoffee/e-learning-project/actions/workflows/commit-stage.yaml/badge.svg)](https://github.com/thainguyencoffee/e-l/actions/workflows/commit-stage.yaml)
+
 ### What you will need
 
 * Git
