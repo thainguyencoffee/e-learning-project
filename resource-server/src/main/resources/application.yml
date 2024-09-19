@@ -1,0 +1,21 @@
+server:
+  port: 9100
+spring:
+  application:
+    name: resource-server
+  datasource:
+    url: jdbc:postgresql://localhost:5432/resource-server
+    username: postgres
+    password: changemeinprod
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000/auth/realms/thainguyencoffee
+error:
+  handling:
+    exception-logging: no_logging
+    http-status-in-json-response: true
+    full-stacktrace-http-statuses: 5xx
+    log-levels:
+      5xx: ERROR
