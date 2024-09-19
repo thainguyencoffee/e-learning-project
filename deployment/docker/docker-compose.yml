@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: changemeinprod
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: "redis:7.0"
+    restart: always
+    ports:
+      - '6379:6379'
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    depends_on: [ postgres ]
+    restart: always
+    command: start-dev --import-realm --features=preview # Import configs provided at startup
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    environment:
+      KC_DB: postgres
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: changemeinprod
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_FEATURES: scripts
+      KEYCLOAK_ADMIN: admin
+      KC_HTTP_PORT: 8080
+      KC_HOSTNAME_URL: http://localhost:9000/auth
+      KC_HOSTNAME_ADMIN_URL: http://localhost:9000/auth
+      KEYCLOAK_ADMIN_PASSWORD: password
+      KC_HOSTNAME_STRICT_BACKCHANNEL: true
+      KC_HTTP_RELATIVE_PATH: /auth/
+    ports:
+      - '8080:8080'
