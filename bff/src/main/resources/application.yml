@@ -1,0 +1,82 @@
+bff-port: 9001
+bff-prefix: /bff
+schema: http
+hostname: localhost
+resource-server-port: 9100
+reverse-proxy-port: 9000
+reverse-proxy-uri: ${schema}://${hostname}:${reverse-proxy-port}
+authorization-server-prefix: /auth
+realm: thainguyencoffee
+issuer: ${reverse-proxy-uri}${authorization-server-prefix}/realms/${realm}
+client-id: thainguyencoffee-confidentials
+client-secret: qk2lxjuIPAUY0e9I1AMzQZLQf3YINJ80
+authorities-json-path: $.roles
+audience:
+
+server:
+  port: ${bff-port}
+
+spring:
+  application:
+    name: bff
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      routes:
+        - id: resource-server
+          uri: ${schema}://${hostname}:${resource-server-port}
+          predicates:
+            - Path=/api/**
+          filters:
+            - TokenRelay=
+            - SaveSession
+            - StripPrefix=1
+  # Security
+  security:
+    oauth2:
+      client:
+        provider:
+          thainguyencoffee:
+            issuer-uri: ${issuer}
+        registration:
+          thainguyencoffee:
+            provider: thainguyencoffee
+            authorization-grant-type: authorization_code
+            client-id: ${client-id}
+            client-secret: ${client-secret}
+            scope:
+              - openid
+              - profile
+              - email
+              - offline_access
+# Spring addons oidc
+com:
+  c4-soft:
+    springaddons:
+      oidc:
+        ops:
+          - iss: ${issuer}
+            authorities:
+              - path: ${authorities-json-path}
+            aud: ${audience}
+        # SecurityFilterChain with oauth2Login() (sessions and CSRF protection enabled)
+        client:
+          client-uri: ${reverse-proxy-uri}${bff-prefix}
+          security-matchers:
+            - /api/**
+            - /login/**
+            - /oauth2/**
+            - /logout/**
+          permit-all:
+            - /api/**
+            - /login/**
+            - /oauth2/**
+            - /logout/connect/back-channel/${realm}
+          csrf: cookie-accessible-from-js
+          oauth2-redirections:
+            rp-initiated-logout: ACCEPTED
+        # SecurityFilterChain with oauth2ResourceServer() (sessions and CSRF protection disabled)
+        resourceserver:
+          permit-all:
+            - /login-options
