@@ -1,6 +1,7 @@
 package com.elearning.course.application;
 
 import com.elearning.common.util.ResourceNotFoundException;
+import com.elearning.common.util.SomethingWentWrong;
 import com.elearning.course.domain.*;
 import com.elearning.discount.application.DiscountInvalidDateException;
 import com.elearning.discount.application.DiscountService;
@@ -30,6 +31,10 @@ public class CourseService {
     public Course findById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(Course.class, id));
+    }
+
+    public boolean isItMyCourse(Long courseId, String createdBy) {
+        return repository.existsCourseByIdAndCreatedBy(courseId, createdBy);
     }
 
     @Transactional
@@ -138,13 +143,18 @@ public class CourseService {
     }
 
     @Transactional
-    public void deleteCourse(Long id) {
-        Course course = findById(id);
-        if (!course.getSections().isEmpty()) {
-            throw new CourseHasSectionsException("Cannot delete course with id " + id + " because it has course sections");
-        }
+    public boolean deleteCourse(Long id) {
+        try {
+            Course course = findById(id);
+            if (!course.getSections().isEmpty()) {
+                throw new CourseHasSectionsException("Cannot delete course with id " + id + " because it has course sections");
+            }
 
-        repository.delete(course);
+            repository.delete(course);
+            return true;
+        } catch (Exception e) {
+            throw new SomethingWentWrong("Something went wrong delete course");
+        }
     }
 
 }
