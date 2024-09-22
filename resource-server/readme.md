@@ -14,3 +14,8 @@ cd ../reverse-proxy/ && ./gradlew bootRun
 ```bash
 cd ../bff/ && ./gradlew bootRun
 ```
+
+## Down docker compose
+```bash
+cd ../deployment/docker/ && docker compose down
+```
