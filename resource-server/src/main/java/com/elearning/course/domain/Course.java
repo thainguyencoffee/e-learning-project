@@ -53,6 +53,10 @@ public class Course {
         this.audience = audience;
     }
 
+    // not business logic :))
+    public Course() {
+    }
+
     public void applyDiscount(MonetaryAmount discountAmount) {
         if (discountAmount == null) {
             throw new IllegalArgumentException("Discount amount must not be null");

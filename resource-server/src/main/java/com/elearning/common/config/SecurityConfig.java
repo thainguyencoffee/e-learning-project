@@ -27,7 +27,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
 
                         // Require "teacher" role for all other requests
-                        .anyRequest().hasRole("teacher")
+                        .anyRequest().hasAnyRole("teacher", "admin")
                 )
                 // Configure OAuth2 resource server to use JWT tokens
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt

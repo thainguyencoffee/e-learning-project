@@ -4,8 +4,12 @@ import com.elearning.course.application.CourseRequestDTO;
 import com.elearning.course.application.CourseService;
 import com.elearning.course.domain.Course;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +27,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/courses", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -41,22 +46,40 @@ public class CourseController {
     }
 
     @PostMapping
-    public ResponseEntity<Long> post(@RequestBody @Valid final CourseRequestDTO courseRequestDTO) {
+    public ResponseEntity<Long> post(@RequestBody @Valid final CourseRequestDTO courseRequestDTO,
+                                     @AuthenticationPrincipal Jwt jwt) {
+        log.info("User {} attempt create course", jwt.getClaimAsString(StandardClaimNames.PREFERRED_USERNAME));
+
         final Long createdId = courseService.createCourse(courseRequestDTO);
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Long> put(@PathVariable(name = "id") final Long id,
-                                    @RequestBody @Valid final CourseRequestDTO courseRequestDTO) {
+                                    @RequestBody @Valid final CourseRequestDTO courseRequestDTO,
+                                    @AuthenticationPrincipal Jwt jwt) {
+        log.info("User {} attempt update course id {}", jwt.getClaimAsString(StandardClaimNames.PREFERRED_USERNAME), id);
+
+        verifyRoleWithCourse(id, jwt);
         courseService.updateCourse(id, courseRequestDTO);
         return ResponseEntity.ok(id);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable(name = "id") final Long id) {
+    public ResponseEntity<Void> delete(@PathVariable(name = "id") final Long id, @AuthenticationPrincipal Jwt jwt) {
+        log.info("User {} attempt delete course id {}", jwt.getClaimAsString(StandardClaimNames.PREFERRED_USERNAME), id);
+
+        verifyRoleWithCourse(id, jwt);
         courseService.deleteCourse(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private void verifyRoleWithCourse(final Long courseId, Jwt jwt) {
+        if (!jwt.getClaimAsStringList("roles").contains("admin")) {
+            if (!courseService.isItMyCourse(courseId, jwt.getClaimAsString(StandardClaimNames.PREFERRED_USERNAME))) {
+                throw new CoursePermissionException("You don't have permission to course id: " + courseId);
+            }
+        }
     }
 
 }
