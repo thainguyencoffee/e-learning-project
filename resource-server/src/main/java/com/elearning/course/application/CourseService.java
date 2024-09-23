@@ -144,17 +144,13 @@ public class CourseService {
 
     @Transactional
     public boolean deleteCourse(Long id) {
-        try {
-            Course course = findById(id);
-            if (!course.getSections().isEmpty()) {
-                throw new CourseHasSectionsException("Cannot delete course with id " + id + " because it has course sections");
-            }
-
-            repository.delete(course);
-            return true;
-        } catch (Exception e) {
-            throw new SomethingWentWrong("Something went wrong delete course");
+        Course course = findById(id);
+        if (!course.getSections().isEmpty()) {
+            throw new CourseHasSectionsException("Cannot delete course with id " + id + " because it has course sections");
         }
+
+        repository.delete(course);
+        return true;
     }
 
 }
