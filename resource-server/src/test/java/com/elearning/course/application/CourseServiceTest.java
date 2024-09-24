@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.elearning.common.util.ResourceNotFoundException;
+import com.elearning.common.exception.ResourceNotFoundException;
 import com.elearning.course.domain.*;
 import com.elearning.discount.application.DiscountService;
 import org.javamoney.moneta.Money;
@@ -45,10 +45,11 @@ class CourseServiceTest {
                 Set.of(new CourseSectionDTO(1L, "Section 1", "Description", Set.of(
                         new LessonDTO(1L, "Lesson 1", "https://lesson-link.com", "VIDEO")))),
                 null // No discount ID
+                , "foo.jpg"
         );
 
         Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")));
+                new Audience(false, Set.of("email1@example.com")), "foo.jpg");
         course.setId(1L);
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -70,10 +71,11 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of("email1@example.com")),
                 null, // Course sections are null
                 null // No discount ID
+                , "foo.jpg"
         );
 
         Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")));
+                new Audience(false, Set.of("email1@example.com")), "foo.jpg");
         course.setId(1L);
 
         // Mock repository behavior
@@ -97,11 +99,12 @@ class CourseServiceTest {
                 new AudienceDTO(true, Set.of("email1@example.com")), // isPublic = true, emailAuthorities not empty
                 null, // Course sections
                 null // No discount ID
+                , "foo.jpg"
         );
 
         // Course object to be saved
         Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(true, Set.of("email1@example.com")));
+                new Audience(true, Set.of("email1@example.com")), "foo.jpg");
         course.setId(1L);
 
         // Mock repository behavior
@@ -125,6 +128,7 @@ class CourseServiceTest {
                 new AudienceDTO(false, null), // isPublic = false, but emailAuthorities is null
                 null, // Course sections
                 null // No discount ID
+                , "foo.jpg"
         );
 
         // Act & Assert
@@ -141,6 +145,7 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of()), // isPublic = false, but emailAuthorities is empty
                 null, // Course sections
                 null // No discount ID
+                , "foo.jpg"
         );
 
         // Act & Assert
@@ -157,11 +162,12 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of("email1@example.com")), // isPublic = false, emailAuthorities not empty
                 null, // Course sections
                 null // No discount ID
+                , "foo.jpg"
         );
 
         // Course object to be saved
         Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")));
+                new Audience(false, Set.of("email1@example.com")), "foo.jpg");
         course.setId(1L);
 
         // Mock repository behavior
@@ -185,11 +191,12 @@ class CourseServiceTest {
                 new AudienceDTO(true, null), // isPublic = true, emailAuthorities is null
                 null, // Course sections
                 null // No discount ID
+                , "foo.jpg"
         );
 
         // Course object to be saved
         Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(true, null)); // Null emailAuthorities, but valid because isPublic = true
+                new Audience(true, null), "foo.jpg"); // Null emailAuthorities, but valid because isPublic = true
         course.setId(1L);
 
         // Mock repository behavior
@@ -215,10 +222,11 @@ class CourseServiceTest {
                 Set.of(new CourseSectionDTO(1L, "Section 1", "Description", Set.of(
                         new LessonDTO(1L, "Lesson 1", "https://lesson-link.com", "VIDEO")))),
                 1L // Discount ID
+                , "foo.jpg"
         );
 
         Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")));
+                new Audience(false, Set.of("email1@example.com")), "foo.jpg");
         course.setId(1L);
         MonetaryAmount discountedPrice = Money.of(20, "USD");
 
@@ -244,10 +252,11 @@ class CourseServiceTest {
                 Set.of(new CourseSectionDTO(1L, "Section 1", "Description", Set.of(
                         new LessonDTO(1L, "Lesson 1", "https://lesson-link.com", "VIDEO")))),
                 1L // Discount ID
+                , "foo.jpg"
         );
 
         Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")));
+                new Audience(false, Set.of("email1@example.com")), "foo.jpg");
         course.setId(1L);
 
         when(discountService.calculateDiscountForCourse(1L, Money.of(100, "USD")))
@@ -281,10 +290,11 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of("email1@example.com")),
                 sections,
                 null // No discount
+                , "foo.jpg"
         );
 
         Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")));
+                new Audience(false, Set.of("email1@example.com")), "foo.jpg");
         course.setId(1L);
 
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -304,6 +314,7 @@ class CourseServiceTest {
         Course existingCourse = new Course(
                 "Spring Boot Course", Money.of(100, "USD"), "Description of course",
                 new Audience(false, Set.of("email1@example.com"))
+                , "foo.jpg"
         );
 
         CourseSection existingSection = new CourseSection("Section 1");
@@ -322,6 +333,7 @@ class CourseServiceTest {
                 Set.of(new CourseSectionDTO(existingSectionId, "Updated Section 1", "Updated section description", Set.of(
                         new LessonDTO(existingSectionId, "Updated Lesson 1", "http://updatedlesson1.com", "TEXT")))),
                 null // No discount ID
+                , "foo.jpg"
         );
 
         when(repository.findById(1L)).thenReturn(Optional.of(existingCourse));
@@ -353,7 +365,7 @@ class CourseServiceTest {
         var existingLessonId = 1L;
         Course existingCourse = new Course(
                 "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com"))
+                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
         );
 
         CourseSection existingSection = new CourseSection("Section 1");
@@ -372,6 +384,7 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of("email1@example.com")),
                 null, // Course sections are null, meaning sections should remain unchanged
                 null  // No discount ID
+                , "foo.jpg"
         );
 
         // Mock repository behavior: find the existing course by ID
@@ -398,7 +411,7 @@ class CourseServiceTest {
         // Arrange
         Course existingCourse = new Course(
                 "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com"))
+                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
         );
 
         CourseRequestDTO updateRequestDTO = new CourseRequestDTO(
@@ -409,6 +422,7 @@ class CourseServiceTest {
                 Set.of(new CourseSectionDTO(null, "New Section", "New section description", Set.of(
                         new LessonDTO(null, "New Lesson", "http://newlesson.com", "VIDEO")))),
                 null // No discount ID
+                , "foo.jpg"
         );
 
         when(repository.findById(1L)).thenReturn(Optional.of(existingCourse));
@@ -448,7 +462,7 @@ class CourseServiceTest {
         // Create existing course with two sections and a section will be removed
         Course existingCourse = new Course(
                 "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com"))
+                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
         );
         CourseSection sectionToKeep = new CourseSection("Section 1");
         sectionToKeep.setId(sectionIdToKeep);
@@ -473,6 +487,7 @@ class CourseServiceTest {
                 Set.of(new CourseSectionDTO(sectionIdToKeep, "Section 1 Updated", "Updated section description", Set.of(
                         new LessonDTO(lessonIdToKeep, "Lesson 1 Updated", "http://updatedlesson1.com", "TEXT")))),
                 null // No discount ID
+                , "foo.jpg"
         );
 
         when(repository.findById(1L)).thenReturn(Optional.of(existingCourse));
@@ -504,6 +519,7 @@ class CourseServiceTest {
         Course existingCourse = new Course(
                 "Spring Boot Course", Money.of(100, "USD"), "Description of course",
                 new Audience(false, Set.of("email1@example.com"))
+                , "foo.jpg"
         );
 
         MonetaryAmount discountedPrice = Money.of(80, "USD");
@@ -515,6 +531,7 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of("email1@example.com")),
                 Set.of(new CourseSectionDTO(null, "Section 1", "Updated section description", Set.of())),
                 discountId // Discount ID
+                , "foo.jpg"
         );
 
         when(repository.findById(1L)).thenReturn(Optional.of(existingCourse));
@@ -538,6 +555,7 @@ class CourseServiceTest {
         Course existingCourse = new Course(
                 "Spring Boot Course", Money.of(100, "USD"), "Description of course",
                 new Audience(false, Set.of("email1@example.com"))
+                , "foo.jpg"
         );
 
         CourseRequestDTO updateRequestDTO = new CourseRequestDTO(
@@ -547,6 +565,7 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of("email1@example.com")),
                 Set.of(new CourseSectionDTO(null, "Section 1", "Updated section description", Set.of())),
                 discountId // Invalid Discount ID
+                , "foo.jpg"
         );
 
         when(repository.findById(1L)).thenReturn(Optional.of(existingCourse));
@@ -567,7 +586,7 @@ class CourseServiceTest {
     @Test
     void deleteCourse_removesCourseSuccessfully() {
         Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(true, null));
+                new Audience(true, null), "foo.jpg");
         course.setId(1L);
         when(repository.findById(1L)).thenReturn(Optional.of(course));
 
@@ -580,7 +599,7 @@ class CourseServiceTest {
     void deleteCourse_throwsExceptionWhenCourseHasSections() {
         CourseSection section = new CourseSection("Section 1");
         Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(true, null));
+                new Audience(true, null), "foo.jpg");
         course.addSection(section);
         course.setId(1L);
         when(repository.findById(1L)).thenReturn(Optional.of(course));
@@ -606,7 +625,7 @@ class CourseServiceTest {
 
         Course existingCourse = new Course(
                 "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com"))
+                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
         );
         existingCourse.setId(courseId);
 
@@ -617,6 +636,7 @@ class CourseServiceTest {
                 new AudienceDTO(true, Set.of("email1@example.com")), // isPublic = true, emailAuthorities not empty
                 null, // Course sections
                 null // No discount ID
+                , "foo.jpg"
         );
 
         // Mock repository behavior
@@ -637,7 +657,7 @@ class CourseServiceTest {
 
         Course existingCourse = new Course(
                 "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com"))
+                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
         );
         existingCourse.setId(courseId);
 
@@ -648,6 +668,7 @@ class CourseServiceTest {
                 new AudienceDTO(false, null), // isPublic = false, but emailAuthorities is null
                 null, // Course sections
                 null // No discount ID
+                , "foo.jpg"
         );
 
         // Mock repository behavior
@@ -664,7 +685,7 @@ class CourseServiceTest {
 
         Course existingCourse = new Course(
                 "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com"))
+                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
         );
         existingCourse.setId(courseId);
 
@@ -675,6 +696,7 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of()), // isPublic = false, but emailAuthorities is empty
                 null, // Course sections
                 null // No discount ID
+                , "foo.jpg"
         );
 
         // Mock repository behavior
@@ -691,7 +713,7 @@ class CourseServiceTest {
 
         Course existingCourse = new Course(
                 "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com"))
+                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
         );
         existingCourse.setId(courseId);
 
@@ -702,6 +724,7 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of("email1@example.com", "email2@example.com")), // isPublic = false, emailAuthorities not empty
                 null, // Course sections
                 null // No discount ID
+                , "foo.jpg"
         );
 
         // Mock repository behavior
@@ -722,7 +745,7 @@ class CourseServiceTest {
 
         Course existingCourse = new Course(
                 "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com"))
+                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
         );
         existingCourse.setId(courseId);
 
@@ -733,6 +756,7 @@ class CourseServiceTest {
                 new AudienceDTO(true, null), // isPublic = true, emailAuthorities is null
                 null, // Course sections
                 null // No discount ID
+                , "foo.jpg"
         );
 
         // Mock repository behavior

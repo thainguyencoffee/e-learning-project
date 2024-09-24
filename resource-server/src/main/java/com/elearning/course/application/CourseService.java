@@ -1,7 +1,6 @@
 package com.elearning.course.application;
 
-import com.elearning.common.util.ResourceNotFoundException;
-import com.elearning.common.util.SomethingWentWrong;
+import com.elearning.common.exception.ResourceNotFoundException;
 import com.elearning.course.domain.*;
 import com.elearning.discount.application.DiscountInvalidDateException;
 import com.elearning.discount.application.DiscountService;
@@ -42,7 +41,8 @@ public class CourseService {
         Course course = new Course(courseRequestDTO.title(),
                 courseRequestDTO.price(),
                 courseRequestDTO.description(),
-                new Audience(courseRequestDTO.audience().isPublic(), courseRequestDTO.audience().emailAuthorities()));
+                new Audience(courseRequestDTO.audience().isPublic(), courseRequestDTO.audience().emailAuthorities()),
+                courseRequestDTO.thumbnailUrl());
         if (courseRequestDTO.discountId() != null) {
             handleDiscountCalculate(course, courseRequestDTO.discountId());
         }
@@ -59,7 +59,7 @@ public class CourseService {
     public Course updateCourse(Long id, CourseRequestDTO courseRequestDTO) {
         Course course = findById(id);
         course.updateInfo(courseRequestDTO.title(), courseRequestDTO.price(), courseRequestDTO.description(),
-                new Audience(courseRequestDTO.audience().isPublic(), courseRequestDTO.audience().emailAuthorities()));
+                new Audience(courseRequestDTO.audience().isPublic(), courseRequestDTO.audience().emailAuthorities()), courseRequestDTO.thumbnailUrl());
 
         // Chỉ xử lý sections nếu không phải là null
         if (courseRequestDTO.sections() != null) {

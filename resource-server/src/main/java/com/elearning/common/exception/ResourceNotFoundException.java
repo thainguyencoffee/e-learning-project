@@ -1,4 +1,4 @@
-package com.elearning.common.util;
+package com.elearning.common.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

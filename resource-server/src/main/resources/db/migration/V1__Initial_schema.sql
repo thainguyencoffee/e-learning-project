@@ -10,6 +10,7 @@ create table course
 (
     id                 bigserial   not null,
     title              varchar(50) not null,
+    thumbnail_url      varchar(50) not null,
     description        text,
     is_public          boolean     not null,
     email_authorities  varchar(255)[],
@@ -26,20 +27,20 @@ create table course
 
 create table course_section
 (
-    id                 bigserial    not null,
-    title              varchar(255) not null,
-    course             bigint       not null references course (id) on DELETE cascade,
+    id     bigserial    not null,
+    title  varchar(255) not null,
+    course bigint       not null references course (id) on DELETE cascade,
     constraint fk_course_section primary key (id)
 );
 
 
 create table lesson
 (
-    id                 bigserial    not null,
-    title              varchar(255) not null,
-    type               varchar(255) not null,
-    link               varchar(255) not null,
-    course_section     bigint       not null references course_section (id) on DELETE cascade,
+    id             bigserial    not null,
+    title          varchar(255) not null,
+    type           varchar(255) not null,
+    link           varchar(255) not null,
+    course_section bigint       not null references course_section (id) on DELETE cascade,
     constraint fk_lesson primary key (id)
 );
 

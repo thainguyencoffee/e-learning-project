@@ -21,6 +21,7 @@ public class Course {
     @Id
     private Long id;
     private String title;
+    private String thumbnailUrl;
     @Embedded.Nullable
     private Audience audience;
     @MappedCollection(idColumn = "course")
@@ -40,17 +41,19 @@ public class Course {
     private Set<StudentRef> students = new HashSet<>();
     private Long discountId;
 
-    public Course(String title, MonetaryAmount price, String description, Audience audience) {
+    public Course(String title, MonetaryAmount price, String description, Audience audience, String thumbnailUrl) {
         Assert.hasText(title, "Title must not be empty");
         Assert.notNull(price, "Price must not be null");
         Assert.hasText(description, "Description must not be empty");
         Assert.notNull(audience, "Audience must not be null");
+        Assert.notNull(thumbnailUrl, "ThumbnailUrl must not be null");
 
         this.title = title;
         this.price = price;
         this.discountedPrice = getFinalPrice();
         this.description = description;
         this.audience = audience;
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     // not business logic :))
@@ -90,16 +93,18 @@ public class Course {
                 .orElse(null);
     }
 
-    public void updateInfo(String title, MonetaryAmount price, String description, Audience audience) {
+    public void updateInfo(String title, MonetaryAmount price, String description, Audience audience, String thumbnailUrl) {
         Assert.hasText(title, "Title must not be empty");
         Assert.notNull(price, "Price must not be null");
         Assert.hasText(description, "Description must not be empty");
         Assert.notNull(audience, "Audience must not be null");
+        Assert.notNull(thumbnailUrl, "ThumbnailUrl must not be null");
 
         this.title = title;
         this.price = price;
         this.discountedPrice = getFinalPrice();
         this.description = description;
         this.audience = audience;
+        this.thumbnailUrl = thumbnailUrl;
     }
 }
