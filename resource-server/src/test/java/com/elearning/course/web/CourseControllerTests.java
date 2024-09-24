@@ -1,10 +1,14 @@
 package com.elearning.course.web;
 
+import com.elearning.common.config.JacksonCustomizations;
 import com.elearning.common.config.SecurityConfig;
-import com.elearning.common.util.ResourceNotFoundException;
+import com.elearning.common.exception.ResourceNotFoundException;
+import com.elearning.course.application.AudienceDTO;
 import com.elearning.course.application.CourseRequestDTO;
 import com.elearning.course.application.CourseService;
 import com.elearning.course.domain.Course;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -27,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CourseController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JacksonCustomizations.class})
 class CourseControllerTests {
 
     @Autowired
@@ -35,6 +39,9 @@ class CourseControllerTests {
 
     @MockBean
     CourseService courseService;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Test
     void testGetCourses() throws Exception {
@@ -62,10 +69,13 @@ class CourseControllerTests {
         var username = "some_username";
 
         when(courseService.createCourse(any(CourseRequestDTO.class))).thenReturn(1L);
+        var courseDto = new CourseRequestDTO("foo", Money.of(100, "USD"), "foo description",
+                new AudienceDTO(true, Collections.emptySet()), Collections.emptySet(), null, "foo.jpg");
+        String requestBody = objectMapper.writeValueAsString(courseDto);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/courses")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\": \"New Course\"}")
+                        .content(requestBody)
                         .with(SecurityMockMvcRequestPostProcessors.jwt()
                                 .authorities(new SimpleGrantedAuthority("ROLE_teacher"))
                                 .jwt(builder -> builder
@@ -109,7 +119,12 @@ class CourseControllerTests {
 
     @Test
     void whenUpdateCourseWithAdminRoleThenReturn200() throws Exception {
+        // Arrange
         var username = "some_username";
+        var courseDto = new CourseRequestDTO("foo", Money.of(100, "USD"), "foo description",
+                new AudienceDTO(true, Collections.emptySet()), Collections.emptySet(), null, "foo.jpg");
+        String requestBody = objectMapper.writeValueAsString(courseDto);
+
         mockMvc.perform(MockMvcRequestBuilders.put("/courses/{id}", 1L)
                         .with(SecurityMockMvcRequestPostProcessors.jwt()
                                 .authorities(new SimpleGrantedAuthority("ROLE_admin"))
@@ -118,10 +133,7 @@ class CourseControllerTests {
                                         .claim("roles", "admin")
                                 )
                         ).contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                  "title": "Updated Course"
-                                }"""))
+                        .content(requestBody))
                 .andExpect(MockMvcResultMatchers.status().isOk());
         verify(courseService, times(1)).updateCourse(any(Long.class), any(CourseRequestDTO.class));
     }

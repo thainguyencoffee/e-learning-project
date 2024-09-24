@@ -1,13 +1,13 @@
 package com.elearning.course.application;
 
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Set;
 
+@ValidAudience
 public record AudienceDTO (
-        @NotNull Boolean isPublic,
-        @NotEmpty(message = "Email authorities must not be empty if isPublic is false")
+        @NotNull(message = "isPublic must not be null")
+        Boolean isPublic,
         Set<String> emailAuthorities
 ) {
 

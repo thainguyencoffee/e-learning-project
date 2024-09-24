@@ -15,7 +15,7 @@ class CourseTest {
     @BeforeEach
     void setUp() {
         Audience audience = new Audience(false, Set.of("email1@example.com"));
-        course = new Course("Java Basics", Money.of(100, "USD"), "A basic Java course", audience);
+        course = new Course("Java Basics", Money.of(100, "USD"), "A basic Java course", audience, "foo.jpg");
     }
 
     @Test
@@ -99,7 +99,7 @@ class CourseTest {
         // Update the course information
         Audience newAudience = new Audience(false, Set.of("email2@example.com"));
         MonetaryAmount newPrice = Money.of(150, "USD");
-        course.updateInfo("Advanced Java", newPrice, "Advanced Java course", newAudience);
+        course.updateInfo("Advanced Java", newPrice, "Advanced Java course", newAudience, "foo.jpg");
 
         // Assert the course information is updated
         assertEquals("Advanced Java", course.getTitle());
@@ -112,13 +112,15 @@ class CourseTest {
     void testUpdateCourseWithInvalidValues() {
         // Invalid title
         Exception titleException = assertThrows(IllegalArgumentException.class, () -> {
-            course.updateInfo("", Money.of(150, "USD"), "New description", new Audience(false, Set.of("email@example.com")));
+            course.updateInfo("", Money.of(150, "USD"), "New description",
+                    new Audience(false, Set.of("email@example.com")), "foo.jpg");
         });
         assertEquals("Title must not be empty", titleException.getMessage());
 
         // Invalid price
         Exception priceException = assertThrows(IllegalArgumentException.class, () -> {
-            course.updateInfo("Valid Title", null, "New description", new Audience(false, Set.of("email@example.com")));
+            course.updateInfo("Valid Title", null, "New description",
+                    new Audience(false, Set.of("email@example.com")), "foo.jpg");
         });
         assertEquals("Price must not be null", priceException.getMessage());
     }

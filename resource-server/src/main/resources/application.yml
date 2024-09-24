@@ -3,6 +3,10 @@ server:
 spring:
   application:
     name: resource-server
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
   datasource:
     url: jdbc:postgresql://localhost:5432/resource_server
     username: postgres
@@ -19,3 +23,9 @@ error:
     full-stacktrace-http-statuses: 5xx
     log-levels:
       5xx: ERROR
+digitalocean:
+  spaces:
+    endpoint: https://bookstore-bucket.sgp1.digitaloceanspaces.com
+    access-key: DO00XXYJDDAPT9EXWVF8
+    secret-key: ZY2YAo3WrW+Eq28oLYVW89mDwst//QLJyqiF4TMP+Vg
+    bucket-name: bookstore-bucket

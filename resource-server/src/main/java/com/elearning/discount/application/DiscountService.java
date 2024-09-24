@@ -1,6 +1,6 @@
 package com.elearning.discount.application;
 
-import com.elearning.common.util.ResourceNotFoundException;
+import com.elearning.common.exception.ResourceNotFoundException;
 import com.elearning.discount.domain.Discount;
 import com.elearning.discount.domain.DiscountRepository;
 import lombok.RequiredArgsConstructor;
