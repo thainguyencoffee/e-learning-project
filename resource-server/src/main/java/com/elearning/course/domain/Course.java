@@ -28,6 +28,7 @@ public class Course {
     private Set<CourseSection> sections = new HashSet<>();
     private MonetaryAmount price;
     private MonetaryAmount discountedPrice;
+    private Status status;
     private String description;
     @CreatedBy
     private String createdBy;
@@ -54,6 +55,7 @@ public class Course {
         this.description = description;
         this.audience = audience;
         this.thumbnailUrl = thumbnailUrl;
+        this.status = Status.DRAFT;
     }
 
     // not business logic :))

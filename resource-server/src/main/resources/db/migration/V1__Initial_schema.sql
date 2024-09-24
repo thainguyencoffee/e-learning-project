@@ -11,6 +11,7 @@ create table course
     id                 bigserial   not null,
     title              varchar(50) not null,
     thumbnail_url      varchar(50) not null,
+    status             varchar(50) not null,
     description        text,
     is_public          boolean     not null,
     email_authorities  varchar(255)[],
