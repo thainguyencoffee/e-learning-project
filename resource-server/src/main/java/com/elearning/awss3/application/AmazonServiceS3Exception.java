@@ -1,11 +1,12 @@
-package com.elearning.common.util;
+package com.elearning.awss3.application;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-public class SomethingWentWrong extends RuntimeException {
-    public SomethingWentWrong(String message) {
+public class AmazonServiceS3Exception extends RuntimeException {
+    public AmazonServiceS3Exception(String message) {
         super(message);
     }
+
 }
