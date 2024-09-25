@@ -7,6 +7,8 @@ import com.elearning.course.application.AudienceDTO;
 import com.elearning.course.application.CourseRequestDTO;
 import com.elearning.course.application.CourseService;
 import com.elearning.course.domain.Course;
+import com.elearning.course.domain.Language;
+import com.elearning.course.domain.Term;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Collections;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -87,7 +90,12 @@ class CourseControllerTests {
                 Collections.emptySet(),
                 null,
                 "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         String requestBody = objectMapper.writeValueAsString(courseDto);
@@ -155,7 +163,12 @@ class CourseControllerTests {
                 Collections.emptySet(),
                 null,
                 "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
         String requestBody = objectMapper.writeValueAsString(courseDto);
 
@@ -194,7 +207,12 @@ class CourseControllerTests {
                 Collections.emptySet(),
                 null,
                 "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
         String requestBody = objectMapper.writeValueAsString(courseDto);
 
@@ -233,7 +251,12 @@ class CourseControllerTests {
                 Collections.emptySet(),
                 null,
                 "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
         String requestBody = objectMapper.writeValueAsString(courseDto);
 

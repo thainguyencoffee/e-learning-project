@@ -40,10 +40,30 @@ class CourseJdbcTests {
         Set<CourseSection> sections2 = Set.of(new CourseSection("Section 2.1"), new CourseSection("Section 2.2"));
         Set<CourseSection> sections3 = Set.of(new CourseSection("Section 3.1"), new CourseSection("Section 3.2"));
         Set<CourseSection> sections4= Set.of(new CourseSection("Section 4.1"), new CourseSection("Section 4.2"));
-        Course course1 = new Course("Course 1", Money.of(100, USD), "Description 1", new Audience(true, null), "foo.jpg", UUID.randomUUID().toString());
-        Course course2 = new Course("Course 2", Money.of(200, USD), "Description 2", new Audience(false, Set.of("admin@elearning.com")), "foo.jpg", UUID.randomUUID().toString());
-        Course course3 = new Course("Course 3", Money.of(300, USD), "Description 3", new Audience(true, null), "foo.jpg", UUID.randomUUID().toString());
-        Course course4 = new Course("Course 4", Money.of(400, USD), "Description 4", new Audience(false, Set.of("student@elearning.com", "teacher@elearning.com")), "foo.jpg", UUID.randomUUID().toString());
+        Course course1 = new Course("Course 1", Money.of(100, USD), "Description 1", new Audience(true, null), "foo.jpg", UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1"));
+        Course course2 = new Course("Course 2", Money.of(200, USD), "Description 2", new Audience(false, Set.of("admin@elearning.com")), "foo.jpg", UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1"));
+        Course course3 = new Course("Course 3", Money.of(300, USD), "Description 3", new Audience(true, null), "foo.jpg", UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1"));
+        Course course4 = new Course("Course 4", Money.of(400, USD), "Description 4", new Audience(false, Set.of("student@elearning.com", "teacher@elearning.com")), "foo.jpg", UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1"));
         course1.setSections(sections1);
         course2.setSections(sections2);
         course3.setSections(sections3);

@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import javax.money.MonetaryAmount;
 import java.util.List;
@@ -55,11 +54,7 @@ public class CourseService {
     @Transactional
     public Course updateCourse(Long id, CourseRequestDTO courseRequestDTO) {
         Course course = findById(id);
-        course.updateInfo(courseRequestDTO.title(), courseRequestDTO.price(), courseRequestDTO.description(),
-                new Audience(courseRequestDTO.audience().isPublic(), courseRequestDTO.audience().emailAuthorities()), courseRequestDTO.thumbnailUrl());
-        // update teacherId
-        Assert.notNull(courseRequestDTO.teacherId(), "TeacherId must not be null");
-        course.setTeacherId(courseRequestDTO.teacherId());
+        course.updateInfo(courseRequestDTO.toCourse());
 
         // Chỉ xử lý sections nếu không phải là null
         if (courseRequestDTO.sections() != null) {

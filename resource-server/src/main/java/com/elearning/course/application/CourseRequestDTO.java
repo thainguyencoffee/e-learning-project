@@ -2,6 +2,8 @@ package com.elearning.course.application;
 
 import com.elearning.course.domain.Audience;
 import com.elearning.course.domain.Course;
+import com.elearning.course.domain.Language;
+import com.elearning.course.domain.Term;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,7 +24,14 @@ public record CourseRequestDTO(
         Long discountId,
         @NotBlank(message = "Thumbnail url is required")
         String thumbnailUrl,
-        String teacherId
+        String teacherId,
+        @NotNull(message = "Term is required")
+        Term term,
+        @NotNull(message = "Language is required")
+        Language language,
+        Set<Language> subtitles,
+        Set<String> benefits,
+        Set<String> prerequisites
 ) {
 
     // Phương thức tĩnh để tạo CourseRequestDTO từ CourseRequestDTO không có teacherId
@@ -35,7 +44,12 @@ public record CourseRequestDTO(
                 dto.sections(),
                 dto.discountId(),
                 dto.thumbnailUrl(),
-                teacherId
+                teacherId,
+                dto.term(),
+                dto.language(),
+                dto.subtitles(),
+                dto.benefits(),
+                dto.prerequisites()
         );
     }
 
@@ -46,7 +60,12 @@ public record CourseRequestDTO(
                 description,
                 new Audience(audience.isPublic(), audience.emailAuthorities()),
                 thumbnailUrl,
-                teacherId
+                teacherId,
+                term,
+                language,
+                subtitles,
+                benefits,
+                prerequisites
         );
     }
 }
