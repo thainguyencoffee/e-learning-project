@@ -17,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import javax.money.MonetaryAmount;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 class CourseServiceTest {
 
@@ -35,7 +36,7 @@ class CourseServiceTest {
     }
 
     @Test
-    void testCreateCourseWithoutDiscount() {
+    void testCreateCourseWithoutDiscountShouldSuccess() {
         // Arrange
         CourseRequestDTO courseRequestDTO = new CourseRequestDTO(
                 "Spring Boot Course",
@@ -45,24 +46,32 @@ class CourseServiceTest {
                 Set.of(new CourseSectionDTO(1L, "Section 1", "Description", Set.of(
                         new LessonDTO(1L, "Lesson 1", "https://lesson-link.com", "VIDEO")))),
                 null // No discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
-        Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")), "foo.jpg");
-        course.setId(1L);
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        courseService.createCourse(courseRequestDTO);
+        Course courseCreated = courseService.createCourse(courseRequestDTO);
 
-        // Assert
+        // Assert & Verify
         verify(repository, times(1)).save(any(Course.class));
         verify(discountService, times(0)).calculateDiscountForCourse(anyLong(), any());
+        assertThat(courseCreated).isNotNull();
+        assertThat(courseCreated.getDiscountedPrice()).isEqualTo(courseRequestDTO.price());
+        assertThat(courseCreated.getTitle()).isEqualTo(courseRequestDTO.title());
+        assertThat(courseCreated.getPrice()).isEqualTo(courseRequestDTO.price());
+        assertThat(courseCreated.getDescription()).isEqualTo(courseRequestDTO.description());
+        assertThat(courseCreated.getAudience().isPublic()).isEqualTo(courseRequestDTO.audience().isPublic());
+        assertThat(courseCreated.getAudience().emailAuthorities()).isEqualTo(courseRequestDTO.audience().emailAuthorities());
+        assertThat(courseCreated.getSections()).hasSize(1);
+        assertThat(courseCreated.getSections().iterator().next().getLessons()).hasSize(1);
+        assertThat(courseCreated.getTeacherId()).isEqualTo(courseRequestDTO.teacherId());
     }
 
     @Test
-    void testCreateCourseWithoutCourseSections() {
+    void testCreateCourseWithoutCourseSectionsShouldSuccess() {
         // Arrange
         CourseRequestDTO courseRequestDTO = new CourseRequestDTO(
                 "Spring Boot Course",
@@ -71,26 +80,36 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of("email1@example.com")),
                 null, // Course sections are null
                 null // No discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
-
-        Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")), "foo.jpg");
-        course.setId(1L);
 
         // Mock repository behavior
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        courseService.createCourse(courseRequestDTO);
+        var courseCreated = courseService.createCourse(courseRequestDTO);
 
         // Assert
         verify(repository, times(1)).save(any(Course.class)); // Ensure save is called once
         verify(discountService, times(0)).calculateDiscountForCourse(anyLong(), any()); // Discount should not be applied
+        assertThat(courseCreated).isNotNull();
+        assertThat(courseCreated.getDiscountedPrice()).isEqualTo(courseRequestDTO.price());
+        assertThat(courseCreated.getTitle()).isEqualTo(courseRequestDTO.title());
+        assertThat(courseCreated.getPrice()).isEqualTo(courseRequestDTO.price());
+        assertThat(courseCreated.getDescription()).isEqualTo(courseRequestDTO.description());
+        assertThat(courseCreated.getAudience().isPublic()).isEqualTo(courseRequestDTO.audience().isPublic());
+        assertThat(courseCreated.getAudience().emailAuthorities()).isEqualTo(courseRequestDTO.audience().emailAuthorities());
+        // Course sections should be null
+        assertThat(courseCreated.getSections()).isEmpty();
+        assertThat(courseCreated.getTeacherId()).isEqualTo(courseRequestDTO.teacherId());
     }
 
     @Test
-    void testCreateCourse_AudienceIsPublicWithNonEmptyAuthorities() {
+    void testCreateCourseWithAudienceIsPublicWithNonEmptyAuthorities() {
+        // Why isPublic = true and emailAuthorities is valid?
+        // Because don't want to clear the emailAuthorities when isPublic = true
+
         // Arrange
         CourseRequestDTO courseRequestDTO = new CourseRequestDTO(
                 "Spring Boot Course",
@@ -99,27 +118,33 @@ class CourseServiceTest {
                 new AudienceDTO(true, Set.of("email1@example.com")), // isPublic = true, emailAuthorities not empty
                 null, // Course sections
                 null // No discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
-
-        // Course object to be saved
-        Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(true, Set.of("email1@example.com")), "foo.jpg");
-        course.setId(1L);
 
         // Mock repository behavior
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        courseService.createCourse(courseRequestDTO);
+        Course courseCreated = courseService.createCourse(courseRequestDTO);
 
         // Assert
         verify(repository, times(1)).save(any(Course.class)); // Ensure save is called once
         verify(discountService, times(0)).calculateDiscountForCourse(anyLong(), any()); // Discount should not be applied
+        assertThat(courseCreated).isNotNull();
+        assertThat(courseCreated.getDiscountedPrice()).isEqualTo(courseRequestDTO.price());
+        assertThat(courseCreated.getTitle()).isEqualTo(courseRequestDTO.title());
+        assertThat(courseCreated.getPrice()).isEqualTo(courseRequestDTO.price());
+        assertThat(courseCreated.getDescription()).isEqualTo(courseRequestDTO.description());
+        assertThat(courseCreated.getAudience().isPublic()).isEqualTo(courseRequestDTO.audience().isPublic());
+        assertThat(courseCreated.getAudience().emailAuthorities()).isEqualTo(courseRequestDTO.audience().emailAuthorities());
+        // Course sections should be null
+        assertThat(courseCreated.getSections()).isEmpty();
+        assertThat(courseCreated.getTeacherId()).isEqualTo(courseRequestDTO.teacherId());
     }
 
     @Test
-    void testCreateCourse_AudienceIsNotPublicWithNullAuthorities_ShouldThrowException() {
+    void testCreateCourseWithAudienceIsNotPublicWithNullAuthoritiesShouldThrowException() {
         // Arrange
         CourseRequestDTO courseRequestDTO = new CourseRequestDTO(
                 "Spring Boot Course",
@@ -128,7 +153,8 @@ class CourseServiceTest {
                 new AudienceDTO(false, null), // isPublic = false, but emailAuthorities is null
                 null, // Course sections
                 null // No discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
         // Act & Assert
@@ -136,7 +162,7 @@ class CourseServiceTest {
     }
 
     @Test
-    void testCreateCourse_AudienceIsNotPublicWithEmptyAuthorities_ShouldThrowException() {
+    void testCreateCourseWithAudienceIsNotPublicWithEmptyAuthoritiesShouldThrowException() {
         // Arrange
         CourseRequestDTO courseRequestDTO = new CourseRequestDTO(
                 "Spring Boot Course",
@@ -145,7 +171,8 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of()), // isPublic = false, but emailAuthorities is empty
                 null, // Course sections
                 null // No discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
         // Act & Assert
@@ -153,7 +180,7 @@ class CourseServiceTest {
     }
 
     @Test
-    void testCreateCourse_AudienceIsNotPublicWithNonEmptyAuthorities() {
+    void testCreateCourseWithAudienceIsNotPublicWithNonEmptyAuthorities() {
         // Arrange
         CourseRequestDTO courseRequestDTO = new CourseRequestDTO(
                 "Spring Boot Course",
@@ -162,13 +189,9 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of("email1@example.com")), // isPublic = false, emailAuthorities not empty
                 null, // Course sections
                 null // No discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
-
-        // Course object to be saved
-        Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")), "foo.jpg");
-        course.setId(1L);
 
         // Mock repository behavior
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -182,21 +205,23 @@ class CourseServiceTest {
     }
 
     @Test
-    void testCreateCourse_AudienceIsPublicWithNullAuthorities() {
+    void testCreateCourseWithAudienceIsPublicWithNullAuthorities() {
         // Arrange
         CourseRequestDTO courseRequestDTO = new CourseRequestDTO(
                 "Spring Boot Course",
                 Money.of(100, "USD"),
                 "Description of course",
-                new AudienceDTO(true, null), // isPublic = true, emailAuthorities is null
+                // Null emailAuthorities, but valid because isPublic = true
+                // isPublic = true, emailAuthorities is null
+                new AudienceDTO(true, null),
                 null, // Course sections
                 null // No discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
         // Course object to be saved
-        Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(true, null), "foo.jpg"); // Null emailAuthorities, but valid because isPublic = true
+        Course course = courseRequestDTO.toCourse();
         course.setId(1L);
 
         // Mock repository behavior
@@ -210,9 +235,8 @@ class CourseServiceTest {
         verify(discountService, times(0)).calculateDiscountForCourse(anyLong(), any()); // Discount should not be applied
     }
 
-
     @Test
-    void testCreateCourseWithDiscount() {
+    void testCreateCourseWithDiscountShouldSuccess() {
         // Arrange
         CourseRequestDTO courseRequestDTO = new CourseRequestDTO(
                 "Spring Boot Course",
@@ -222,11 +246,11 @@ class CourseServiceTest {
                 Set.of(new CourseSectionDTO(1L, "Section 1", "Description", Set.of(
                         new LessonDTO(1L, "Lesson 1", "https://lesson-link.com", "VIDEO")))),
                 1L // Discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
-        Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")), "foo.jpg");
+        Course course = courseRequestDTO.toCourse();
         course.setId(1L);
         MonetaryAmount discountedPrice = Money.of(20, "USD");
 
@@ -234,15 +258,26 @@ class CourseServiceTest {
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        courseService.createCourse(courseRequestDTO);
+        Course courseCreated = courseService.createCourse(courseRequestDTO);
 
         // Assert
         verify(discountService, times(1)).calculateDiscountForCourse(1L, Money.of(100, "USD"));
         verify(repository, times(1)).save(any(Course.class));
+        assertThat(courseCreated).isNotNull();
+        assertThat(courseCreated.getTitle()).isEqualTo(courseRequestDTO.title());
+        assertThat(courseCreated.getPrice()).isEqualTo(courseRequestDTO.price());
+        // Discounted price should be applied and value = 20 USD
+        assertThat(courseCreated.getDiscountedPrice()).isEqualTo(courseRequestDTO.price().subtract(discountedPrice));
+        assertThat(courseCreated.getDescription()).isEqualTo(courseRequestDTO.description());
+        assertThat(courseCreated.getAudience().isPublic()).isEqualTo(courseRequestDTO.audience().isPublic());
+        assertThat(courseCreated.getAudience().emailAuthorities()).isEqualTo(courseRequestDTO.audience().emailAuthorities());
+        assertThat(courseCreated.getSections()).hasSize(1);
+        assertThat(courseCreated.getSections().iterator().next().getLessons()).hasSize(1);
+        assertThat(courseCreated.getTeacherId()).isEqualTo(courseRequestDTO.teacherId());
     }
 
     @Test
-    void testCreateCourseWithInvalidDiscount() {
+    void testCreateCourseWithDiscountNotFoundShouldSuccess() {
         // Arrange
         CourseRequestDTO courseRequestDTO = new CourseRequestDTO(
                 "Spring Boot Course",
@@ -252,11 +287,11 @@ class CourseServiceTest {
                 Set.of(new CourseSectionDTO(1L, "Section 1", "Description", Set.of(
                         new LessonDTO(1L, "Lesson 1", "https://lesson-link.com", "VIDEO")))),
                 1L // Discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
-        Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")), "foo.jpg");
+        Course course = courseRequestDTO.toCourse();
         course.setId(1L);
 
         when(discountService.calculateDiscountForCourse(1L, Money.of(100, "USD")))
@@ -264,16 +299,30 @@ class CourseServiceTest {
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        courseService.createCourse(courseRequestDTO);
+        Course courseCreated = courseService.createCourse(courseRequestDTO);
 
         // Assert
         verify(discountService, times(1)).calculateDiscountForCourse(1L, Money.of(100, "USD"));
         verify(repository, times(1)).save(any(Course.class));
+        // verifyNoMoreInteractions should ok because has exception thrown
         verifyNoMoreInteractions(discountService);
+        verify(discountService, times(1)).calculateDiscountForCourse(1L, Money.of(100, "USD"));
+        verify(repository, times(1)).save(any(Course.class));
+        assertThat(courseCreated).isNotNull();
+        assertThat(courseCreated.getTitle()).isEqualTo(courseRequestDTO.title());
+        assertThat(courseCreated.getPrice()).isEqualTo(courseRequestDTO.price());
+        // Discounted price should be applied and value = 20 USD
+        assertThat(courseCreated.getDiscountedPrice()).isEqualTo(courseRequestDTO.price());
+        assertThat(courseCreated.getDescription()).isEqualTo(courseRequestDTO.description());
+        assertThat(courseCreated.getAudience().isPublic()).isEqualTo(courseRequestDTO.audience().isPublic());
+        assertThat(courseCreated.getAudience().emailAuthorities()).isEqualTo(courseRequestDTO.audience().emailAuthorities());
+        assertThat(courseCreated.getSections()).hasSize(1);
+        assertThat(courseCreated.getSections().iterator().next().getLessons()).hasSize(1);
+        assertThat(courseCreated.getTeacherId()).isEqualTo(courseRequestDTO.teacherId());
     }
 
     @Test
-    void testCreateCourseWithMultipleSectionsAndLessons() {
+    void testCreateCourseWithMultipleSectionsAndLessonsShouldSuccess() {
         // Arrange
         Set<LessonDTO> lessons1 = Set.of(new LessonDTO(1L, "Lesson 1", "http://lesson1.com", "VIDEO"));
         Set<LessonDTO> lessons2 = Set.of(new LessonDTO(2L, "Lesson 2", "http://lesson2.com", "TEXT"));
@@ -290,32 +339,51 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of("email1@example.com")),
                 sections,
                 null // No discount
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
-
-        Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")), "foo.jpg");
-        course.setId(1L);
 
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        courseService.createCourse(courseRequestDTO);
+        Course courseCreated = courseService.createCourse(courseRequestDTO);
 
         // Assert
         verify(repository, times(1)).save(any(Course.class));
+
+        // verifyNoMoreInteractions should ok because no more interactions with discountService
+        verifyNoMoreInteractions(discountService);
+        verify(repository, times(1)).save(any(Course.class));
+        assertThat(courseCreated).isNotNull();
+        assertThat(courseCreated.getTitle()).isEqualTo(courseRequestDTO.title());
+        assertThat(courseCreated.getPrice()).isEqualTo(courseRequestDTO.price());
+        // Discounted price should be applied and value = 20 USD
+        assertThat(courseCreated.getDiscountedPrice()).isEqualTo(courseRequestDTO.price());
+        assertThat(courseCreated.getDescription()).isEqualTo(courseRequestDTO.description());
+        assertThat(courseCreated.getAudience().isPublic()).isEqualTo(courseRequestDTO.audience().isPublic());
+        assertThat(courseCreated.getAudience().emailAuthorities()).isEqualTo(courseRequestDTO.audience().emailAuthorities());
+        assertThat(courseCreated.getSections()).hasSize(2);
+        assertThat(courseCreated.getSections().iterator().next().getLessons()).hasSize(1);
+        assertThat(courseCreated.getTeacherId()).isEqualTo(courseRequestDTO.teacherId());
     }
 
     @Test
-    void testUpdateCourse_ModifySectionsAndLessons() {
+    void testUpdateCourseThenUpdateSectionsAndLessons() {
         // Arrange
         var existingSectionId = 1L;
         var existingLessonId = 1L;
+        var oldDiscountId = 1L;
+        var newDiscountId = 2L;
         Course existingCourse = new Course(
-                "Spring Boot Course", Money.of(100, "USD"), "Description of course",
+                "Spring Boot Course",
+                Money.of(100, "USD"),
+                "Description of course",
                 new Audience(false, Set.of("email1@example.com"))
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
+        existingCourse.setDiscountId(oldDiscountId);
+        existingCourse.setDiscountedPrice(Money.of(80, "USD"));
 
         CourseSection existingSection = new CourseSection("Section 1");
         existingSection.setId(existingSectionId);
@@ -332,11 +400,16 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of("email1@example.com")),
                 Set.of(new CourseSectionDTO(existingSectionId, "Updated Section 1", "Updated section description", Set.of(
                         new LessonDTO(existingSectionId, "Updated Lesson 1", "http://updatedlesson1.com", "TEXT")))),
-                null // No discount ID
-                , "foo.jpg"
+                newDiscountId // Update discount then should apply new discount
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
         when(repository.findById(1L)).thenReturn(Optional.of(existingCourse));
+        // mock discount for id = 2
+        MonetaryAmount discountedPrice = Money.of(20, "USD");
+
+        when(discountService.calculateDiscountForCourse(newDiscountId, updateRequestDTO.price())).thenReturn(discountedPrice);
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
@@ -344,8 +417,17 @@ class CourseServiceTest {
 
         // Assert
         assertNotNull(updatedCourse);
-        assertEquals("Updated Spring Boot Course", updatedCourse.getTitle());
-        assertEquals(Money.of(150, "USD"), updatedCourse.getPrice());
+        assertEquals(updatedCourse.getPrice(), updateRequestDTO.price());
+        // original price after update: 150 - 20 = 130 USD
+        assertThat(updatedCourse.getDiscountedPrice()).isEqualTo(updateRequestDTO.price().subtract(discountedPrice));
+        assertThat(updatedCourse.getTitle()).isEqualTo(updateRequestDTO.title());
+        assertThat(updatedCourse.getDescription()).isEqualTo(updateRequestDTO.description());
+        assertThat(updatedCourse.getAudience().isPublic()).isEqualTo(updateRequestDTO.audience().isPublic());
+        assertThat(updatedCourse.getAudience().emailAuthorities()).isEqualTo(updateRequestDTO.audience().emailAuthorities());
+        assertThat(updatedCourse.getSections()).hasSize(1);
+        assertThat(updatedCourse.getSections().iterator().next().getLessons()).hasSize(1);
+        // teacher id should be updated
+        assertThat(updatedCourse.getTeacherId()).isEqualTo(updateRequestDTO.teacherId());
 
         CourseSection updatedSection = updatedCourse.findSectionById(1L);
         assertNotNull(updatedSection);
@@ -360,13 +442,18 @@ class CourseServiceTest {
     @Test
     void testUpdateCourseWithoutCourseSections() {
         // Arrange
-        // Arrange
         var existingSectionId = 1L;
         var existingLessonId = 1L;
         Course existingCourse = new Course(
-                "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
+                "Spring Boot Course",
+                Money.of(100, "USD"),
+                "Description of course",
+                new Audience(false, Set.of("email1@example.com")),
+                "foo.jpg",
+                UUID.randomUUID().toString()
         );
+        existingCourse.setDiscountId(1L);
+        existingCourse.setDiscountedPrice(Money.of(80, "USD"));
 
         CourseSection existingSection = new CourseSection("Section 1");
         existingSection.setId(existingSectionId);
@@ -384,7 +471,8 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of("email1@example.com")),
                 null, // Course sections are null, meaning sections should remain unchanged
                 null  // No discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
         // Mock repository behavior: find the existing course by ID
@@ -403,15 +491,31 @@ class CourseServiceTest {
         verify(repository, times(1)).save(any(Course.class));
 
         // Không có giảm giá thì service calculateDiscountForCourse không được gọi
-        verify(discountService, times(0)).calculateDiscountForCourse(anyLong(), any());
+        verifyNoMoreInteractions(discountService);
+
+        assertEquals(updatedCourse.getPrice(), courseRequestDTO.price());
+        assertThat(updatedCourse.getDiscountedPrice()).isEqualTo(courseRequestDTO.price());
+        assertThat(updatedCourse.getTitle()).isEqualTo(courseRequestDTO.title());
+        assertThat(updatedCourse.getDescription()).isEqualTo(courseRequestDTO.description());
+        assertThat(updatedCourse.getAudience().isPublic()).isEqualTo(courseRequestDTO.audience().isPublic());
+        assertThat(updatedCourse.getAudience().emailAuthorities()).isEqualTo(courseRequestDTO.audience().emailAuthorities());
+        assertThat(updatedCourse.getSections()).hasSize(1);
+        assertThat(updatedCourse.getSections().iterator().next().getLessons()).hasSize(1);
+        // teacher id should be updated
+        assertThat(updatedCourse.getTeacherId()).isEqualTo(courseRequestDTO.teacherId());
     }
 
+
     @Test
-    void testUpdateCourse_AddNewSectionAndLesson() {
+    void testUpdateCourseThenAddNewSectionAndLesson() {
         // Arrange
         Course existingCourse = new Course(
-                "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
+                "Spring Boot Course",
+                Money.of(100, "USD"),
+                "Description of course",
+                new Audience(false, Set.of("email1@example.com")),
+                "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
         CourseRequestDTO updateRequestDTO = new CourseRequestDTO(
@@ -422,7 +526,8 @@ class CourseServiceTest {
                 Set.of(new CourseSectionDTO(null, "New Section", "New section description", Set.of(
                         new LessonDTO(null, "New Lesson", "http://newlesson.com", "VIDEO")))),
                 null // No discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
         when(repository.findById(1L)).thenReturn(Optional.of(existingCourse));
@@ -450,19 +555,32 @@ class CourseServiceTest {
 
         assertNotNull(newLesson);
         assertEquals("http://newlesson.com", newLesson.getLink());
+
+        assertEquals(updatedCourse.getPrice(), updateRequestDTO.price());
+        assertThat(updatedCourse.getDiscountedPrice()).isEqualTo(updateRequestDTO.price());
+        assertThat(updatedCourse.getTitle()).isEqualTo(updateRequestDTO.title());
+        assertThat(updatedCourse.getDescription()).isEqualTo(updateRequestDTO.description());
+        assertThat(updatedCourse.getAudience().isPublic()).isEqualTo(updateRequestDTO.audience().isPublic());
+        assertThat(updatedCourse.getAudience().emailAuthorities()).isEqualTo(updateRequestDTO.audience().emailAuthorities());
+        assertThat(updatedCourse.getSections()).hasSize(1);
+        assertThat(updatedCourse.getSections().iterator().next().getLessons()).hasSize(1);
+        // teacher id should be updated
+        assertThat(updatedCourse.getTeacherId()).isEqualTo(updateRequestDTO.teacherId());
     }
 
-
     @Test
-    void testUpdateCourse_RemoveSectionAndLessonNotInDTO() {
+    void testUpdateCourseRemoveSectionAndLessonNotInDTO() {
         // Arrange
         var sectionIdToKeep = 1L;
         var lessonIdToKeep = 1L;
-
         // Create existing course with two sections and a section will be removed
         Course existingCourse = new Course(
-                "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
+                "Spring Boot Course",
+                Money.of(100, "USD"),
+                "Description of course",
+                new Audience(false, Set.of("email1@example.com")),
+                "foo.jpg",
+                UUID.randomUUID().toString()
         );
         CourseSection sectionToKeep = new CourseSection("Section 1");
         sectionToKeep.setId(sectionIdToKeep);
@@ -487,7 +605,8 @@ class CourseServiceTest {
                 Set.of(new CourseSectionDTO(sectionIdToKeep, "Section 1 Updated", "Updated section description", Set.of(
                         new LessonDTO(lessonIdToKeep, "Lesson 1 Updated", "http://updatedlesson1.com", "TEXT")))),
                 null // No discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
         when(repository.findById(1L)).thenReturn(Optional.of(existingCourse));
@@ -510,52 +629,29 @@ class CourseServiceTest {
 
         // Ensure sectionToRemove and its lesson were removed
         assertNull(updatedCourse.findSectionById(2L));
+
+        assertEquals(updatedCourse.getPrice(), updateRequestDTO.price());
+        assertThat(updatedCourse.getDiscountedPrice()).isEqualTo(updateRequestDTO.price()); // No discount applied
+        assertThat(updatedCourse.getTitle()).isEqualTo(updateRequestDTO.title());
+        assertThat(updatedCourse.getDescription()).isEqualTo(updateRequestDTO.description());
+        assertThat(updatedCourse.getAudience().isPublic()).isEqualTo(updateRequestDTO.audience().isPublic());
+        assertThat(updatedCourse.getAudience().emailAuthorities()).isEqualTo(updateRequestDTO.audience().emailAuthorities());
+        assertThat(updatedCourse.getSections()).hasSize(1);
+        assertThat(updatedCourse.getSections().iterator().next().getLessons()).hasSize(1);
+        // teacher id should be updated
+        assertThat(updatedCourse.getTeacherId()).isEqualTo(updateRequestDTO.teacherId());
     }
 
     @Test
-    void testUpdateCourse_ApplyDiscount() {
+    void testUpdateCourseWithInvalidDiscount() {
         // Arrange
         var discountId = 1L;
         Course existingCourse = new Course(
-                "Spring Boot Course", Money.of(100, "USD"), "Description of course",
+                "Spring Boot Course",
+                Money.of(100, "USD"), "Description of course",
                 new Audience(false, Set.of("email1@example.com"))
-                , "foo.jpg"
-        );
-
-        MonetaryAmount discountedPrice = Money.of(80, "USD");
-
-        CourseRequestDTO updateRequestDTO = new CourseRequestDTO(
-                "Updated Spring Boot Course",
-                Money.of(150, "USD"),
-                "Updated description",
-                new AudienceDTO(false, Set.of("email1@example.com")),
-                Set.of(new CourseSectionDTO(null, "Section 1", "Updated section description", Set.of())),
-                discountId // Discount ID
-                , "foo.jpg"
-        );
-
-        when(repository.findById(1L)).thenReturn(Optional.of(existingCourse));
-        when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(discountService.calculateDiscountForCourse(discountId, Money.of(150, "USD"))).thenReturn(discountedPrice);
-
-        // Act
-        Course updatedCourse = courseService.updateCourse(1L, updateRequestDTO);
-
-        // Assert
-        assertNotNull(updatedCourse);
-        assertEquals(Money.of(70, "USD"), updatedCourse.getDiscountedPrice());
-
-        verify(discountService, times(1)).calculateDiscountForCourse(discountId, Money.of(150, "USD"));
-    }
-
-    @Test
-    void testUpdateCourse_HandleInvalidDiscount() {
-        // Arrange
-        var discountId = 1L;
-        Course existingCourse = new Course(
-                "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com"))
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
         CourseRequestDTO updateRequestDTO = new CourseRequestDTO(
@@ -565,28 +661,43 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of("email1@example.com")),
                 Set.of(new CourseSectionDTO(null, "Section 1", "Updated section description", Set.of())),
                 discountId // Invalid Discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
         when(repository.findById(1L)).thenReturn(Optional.of(existingCourse));
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
         doThrow(new ResourceNotFoundException("Discount not found"))
-                .when(discountService).calculateDiscountForCourse(discountId, Money.of(150, "USD"));
+                .when(discountService).calculateDiscountForCourse(discountId, updateRequestDTO.price());
 
         // Act
         Course updatedCourse = courseService.updateCourse(1L, updateRequestDTO);
 
-        // Assert
-        assertNotNull(updatedCourse);
-        assertEquals(Money.of(150, "USD"), updatedCourse.getPrice()); // No discount applied
-
+        // Verify & Assert
         verify(discountService, times(1)).calculateDiscountForCourse(discountId, Money.of(150, "USD"));
+        assertNotNull(updatedCourse);
+        assertEquals(updatedCourse.getPrice(), updateRequestDTO.price());
+        assertThat(updatedCourse.getDiscountedPrice()).isEqualTo(updateRequestDTO.price()); // No discount applied
+        assertThat(updatedCourse.getTitle()).isEqualTo(updateRequestDTO.title());
+        assertThat(updatedCourse.getDescription()).isEqualTo(updateRequestDTO.description());
+        assertThat(updatedCourse.getAudience().isPublic()).isEqualTo(updateRequestDTO.audience().isPublic());
+        assertThat(updatedCourse.getAudience().emailAuthorities()).isEqualTo(updateRequestDTO.audience().emailAuthorities());
+        assertThat(updatedCourse.getSections()).hasSize(1);
+        assertThat(updatedCourse.getSections().iterator().next().getLessons()).hasSize(0);
+        // teacher id should be updated
+        assertThat(updatedCourse.getTeacherId()).isEqualTo(updateRequestDTO.teacherId());
     }
 
     @Test
-    void deleteCourse_removesCourseSuccessfully() {
-        Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(true, null), "foo.jpg");
+    void deleteCourseSuccessfully() {
+        Course course = new Course(
+                "Spring Boot Course",
+                Money.of(100, "USD"),
+                "Description of course",
+                new Audience(true, null),
+                "foo.jpg",
+                UUID.randomUUID().toString()
+        );
         course.setId(1L);
         when(repository.findById(1L)).thenReturn(Optional.of(course));
 
@@ -596,10 +707,15 @@ class CourseServiceTest {
     }
 
     @Test
-    void deleteCourse_throwsExceptionWhenCourseHasSections() {
+    void deleteCourseWithCourseHasSectionsShouldThrows() {
         CourseSection section = new CourseSection("Section 1");
-        Course course = new Course("Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(true, null), "foo.jpg");
+        Course course = new Course(
+                "Spring Boot Course",
+                Money.of(100, "USD"),
+                "Description of course",
+                new Audience(true, null),
+                "foo.jpg",
+                UUID.randomUUID().toString());
         course.addSection(section);
         course.setId(1L);
         when(repository.findById(1L)).thenReturn(Optional.of(course));
@@ -610,7 +726,7 @@ class CourseServiceTest {
     }
 
     @Test
-    void deleteCourse_throwsExceptionWhenCourseNotFound() {
+    void deleteCourseWhenCourseNotFoundShouldThrows() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.deleteCourse(1L));
@@ -619,13 +735,17 @@ class CourseServiceTest {
     }
 
     @Test
-    void testUpdateCourse_AudienceIsPublicWithNonEmptyAuthorities() {
+    void testUpdateCourseWithAudienceIsPublicAndNonEmptyAuthorities() {
         // Arrange
         Long courseId = 1L;
 
         Course existingCourse = new Course(
-                "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
+                "Spring Boot Course",
+                Money.of(100, "USD"),
+                "Description of course",
+                new Audience(false, Set.of("email1@example.com")),
+                "foo.jpg",
+                UUID.randomUUID().toString()
         );
         existingCourse.setId(courseId);
 
@@ -636,7 +756,8 @@ class CourseServiceTest {
                 new AudienceDTO(true, Set.of("email1@example.com")), // isPublic = true, emailAuthorities not empty
                 null, // Course sections
                 null // No discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
         // Mock repository behavior
@@ -644,20 +765,34 @@ class CourseServiceTest {
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        courseService.updateCourse(courseId, updateRequestDTO);
+        Course updatedCourse = courseService.updateCourse(courseId, updateRequestDTO);
 
         // Assert
         verify(repository, times(1)).save(any(Course.class)); // Ensure save is called once
+        assertNotNull(updatedCourse);
+        assertEquals(updatedCourse.getPrice(), updateRequestDTO.price());
+        assertThat(updatedCourse.getDiscountedPrice()).isEqualTo(updateRequestDTO.price()); // No discount applied
+        assertThat(updatedCourse.getTitle()).isEqualTo(updateRequestDTO.title());
+        assertThat(updatedCourse.getDescription()).isEqualTo(updateRequestDTO.description());
+        assertThat(updatedCourse.getAudience().isPublic()).isEqualTo(updateRequestDTO.audience().isPublic());
+        assertThat(updatedCourse.getAudience().emailAuthorities()).isEqualTo(updateRequestDTO.audience().emailAuthorities());
+        assertThat(updatedCourse.getSections()).isEmpty();
+        // teacher id should be updated
+        assertThat(updatedCourse.getTeacherId()).isEqualTo(updateRequestDTO.teacherId());
     }
 
     @Test
-    void testUpdateCourse_AudienceIsNotPublicWithNullAuthorities_ShouldThrowException() {
+    void testUpdateCourseWithAudienceIsNotPublicAndNullAuthoritiesShouldThrows() {
         // Arrange
         Long courseId = 1L;
 
         Course existingCourse = new Course(
-                "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
+                "Spring Boot Course",
+                Money.of(100, "USD"),
+                "Description of course",
+                new Audience(false, Set.of("email1@example.com")),
+                "foo.jpg",
+                UUID.randomUUID().toString()
         );
         existingCourse.setId(courseId);
 
@@ -668,7 +803,8 @@ class CourseServiceTest {
                 new AudienceDTO(false, null), // isPublic = false, but emailAuthorities is null
                 null, // Course sections
                 null // No discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
         // Mock repository behavior
@@ -679,13 +815,17 @@ class CourseServiceTest {
     }
 
     @Test
-    void testUpdateCourse_AudienceIsNotPublicWithEmptyAuthorities_ShouldThrowException() {
+    void testUpdateCourseWithAudienceIsNotPublicWithEmptyAuthoritiesShouldThrows() {
         // Arrange
         Long courseId = 1L;
 
         Course existingCourse = new Course(
-                "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
+                "Spring Boot Course",
+                Money.of(100, "USD"),
+                "Description of course",
+                new Audience(false, Set.of("email1@example.com")),
+                "foo.jpg",
+                UUID.randomUUID().toString()
         );
         existingCourse.setId(courseId);
 
@@ -696,7 +836,8 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of()), // isPublic = false, but emailAuthorities is empty
                 null, // Course sections
                 null // No discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                null
         );
 
         // Mock repository behavior
@@ -707,13 +848,17 @@ class CourseServiceTest {
     }
 
     @Test
-    void testUpdateCourse_AudienceIsNotPublicWithNonEmptyAuthorities() {
+    void testUpdateCourseWithAudienceIsNotPublicAndNonEmptyAuthoritiesShouldOK() {
         // Arrange
         Long courseId = 1L;
 
         Course existingCourse = new Course(
-                "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
+                "Spring Boot Course",
+                Money.of(100, "USD"),
+                "Description of course",
+                new Audience(false, Set.of("email1@example.com")),
+                "foo.jpg",
+                UUID.randomUUID().toString()
         );
         existingCourse.setId(courseId);
 
@@ -724,7 +869,8 @@ class CourseServiceTest {
                 new AudienceDTO(false, Set.of("email1@example.com", "email2@example.com")), // isPublic = false, emailAuthorities not empty
                 null, // Course sections
                 null // No discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                UUID.randomUUID().toString()
         );
 
         // Mock repository behavior
@@ -732,20 +878,34 @@ class CourseServiceTest {
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        courseService.updateCourse(courseId, updateRequestDTO);
+        Course updatedCourse = courseService.updateCourse(courseId, updateRequestDTO);
 
         // Assert
         verify(repository, times(1)).save(any(Course.class)); // Ensure save is called once
+        assertNotNull(updatedCourse);
+        assertEquals(updatedCourse.getPrice(), updateRequestDTO.price());
+        assertThat(updatedCourse.getDiscountedPrice()).isEqualTo(updateRequestDTO.price()); // No discount applied
+        assertThat(updatedCourse.getTitle()).isEqualTo(updateRequestDTO.title());
+        assertThat(updatedCourse.getDescription()).isEqualTo(updateRequestDTO.description());
+        assertThat(updatedCourse.getAudience().isPublic()).isEqualTo(updateRequestDTO.audience().isPublic());
+        assertThat(updatedCourse.getAudience().emailAuthorities()).isEqualTo(updateRequestDTO.audience().emailAuthorities());
+        assertThat(updatedCourse.getSections()).isEmpty();
+        // teacher id should be updated
+        assertThat(updatedCourse.getTeacherId()).isEqualTo(updateRequestDTO.teacherId());
     }
 
     @Test
-    void testUpdateCourse_AudienceIsPublicWithNullAuthorities() {
+    void testUpdateCourseWithAudienceIsPublicAndNullAuthoritiesShouldOK() {
         // Arrange
         Long courseId = 1L;
 
         Course existingCourse = new Course(
-                "Spring Boot Course", Money.of(100, "USD"), "Description of course",
-                new Audience(false, Set.of("email1@example.com")), "foo.jpg"
+                "Spring Boot Course",
+                Money.of(100, "USD"),
+                "Description of course",
+                new Audience(false, Set.of("email1@example.com")),
+                "foo.jpg",
+                UUID.randomUUID().toString()
         );
         existingCourse.setId(courseId);
 
@@ -756,7 +916,8 @@ class CourseServiceTest {
                 new AudienceDTO(true, null), // isPublic = true, emailAuthorities is null
                 null, // Course sections
                 null // No discount ID
-                , "foo.jpg"
+                , "foo.jpg",
+                existingCourse.getTeacherId()
         );
 
         // Mock repository behavior
@@ -764,10 +925,21 @@ class CourseServiceTest {
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        courseService.updateCourse(courseId, updateRequestDTO);
+        Course updatedCourse = courseService.updateCourse(courseId, updateRequestDTO);
 
         // Assert
         verify(repository, times(1)).save(any(Course.class)); // Ensure save is called once
+
+        assertNotNull(updatedCourse);
+        assertEquals(updatedCourse.getPrice(), updateRequestDTO.price());
+        assertThat(updatedCourse.getDiscountedPrice()).isEqualTo(updateRequestDTO.price()); // No discount applied
+        assertThat(updatedCourse.getTitle()).isEqualTo(updateRequestDTO.title());
+        assertThat(updatedCourse.getDescription()).isEqualTo(updateRequestDTO.description());
+        assertThat(updatedCourse.getAudience().isPublic()).isEqualTo(updateRequestDTO.audience().isPublic());
+        assertThat(updatedCourse.getAudience().emailAuthorities()).isEqualTo(updateRequestDTO.audience().emailAuthorities());
+        assertThat(updatedCourse.getSections()).isEmpty();
+        // teacher id should be updated
+        assertThat(updatedCourse.getTeacherId()).isEqualTo(updateRequestDTO.teacherId());
     }
 
 

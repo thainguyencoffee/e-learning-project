@@ -17,6 +17,7 @@ create table course
     email_authorities  varchar(255)[],
     price              varchar(50) not null,
     discounted_price   varchar(50),
+    teacher_id         varchar(50) not null,
     created_by         varchar(50) not null,
     created_date       timestamp   not null,
     last_modified_by   varchar(50) not null,

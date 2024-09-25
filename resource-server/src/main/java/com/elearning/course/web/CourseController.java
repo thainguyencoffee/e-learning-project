@@ -46,21 +46,33 @@ public class CourseController {
     }
 
     @PostMapping
-    public ResponseEntity<Long> post(@RequestBody @Valid final CourseRequestDTO courseRequestDTO,
+    public ResponseEntity<Long> post(@RequestBody @Valid CourseRequestDTO courseRequestDTO,
                                      @AuthenticationPrincipal Jwt jwt) {
-        log.info("User {} attempt create course", jwt.getClaimAsString(StandardClaimNames.PREFERRED_USERNAME));
+        String userId = jwt.getClaimAsString(StandardClaimNames.PREFERRED_USERNAME);
 
-        final Long createdId = courseService.createCourse(courseRequestDTO);
-        return new ResponseEntity<>(createdId, HttpStatus.CREATED);
+        log.info("User {} attempt create course", userId);
+
+        // if user is not admin, then automatically set teacherId to userId
+        if (!jwt.getClaimAsStringList("roles").contains("admin")) {
+            courseRequestDTO = CourseRequestDTO.withTeacherId(courseRequestDTO, userId);
+        }
+
+        final Course course = courseService.createCourse(courseRequestDTO);
+        return new ResponseEntity<>(course.getId(), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Long> put(@PathVariable(name = "id") final Long id,
-                                    @RequestBody @Valid final CourseRequestDTO courseRequestDTO,
+                                    @RequestBody @Valid CourseRequestDTO courseRequestDTO,
                                     @AuthenticationPrincipal Jwt jwt) {
-        log.info("User {} attempt update course id {}", jwt.getClaimAsString(StandardClaimNames.PREFERRED_USERNAME), id);
+        String userId = jwt.getClaimAsString(StandardClaimNames.PREFERRED_USERNAME);
+        log.info("User {} attempt update course id {}", userId);
 
         verifyRoleWithCourse(id, jwt);
+        // if user is not admin, then automatically set teacherId to userId
+        if (!jwt.getClaimAsStringList("roles").contains("admin")) {
+            courseRequestDTO = CourseRequestDTO.withTeacherId(courseRequestDTO, userId);
+        }
         courseService.updateCourse(id, courseRequestDTO);
         return ResponseEntity.ok(id);
     }
