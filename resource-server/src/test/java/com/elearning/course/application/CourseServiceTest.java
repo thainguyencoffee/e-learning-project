@@ -47,7 +47,12 @@ class CourseServiceTest {
                         new LessonDTO(1L, "Lesson 1", "https://lesson-link.com", "VIDEO")))),
                 null // No discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -81,7 +86,12 @@ class CourseServiceTest {
                 null, // Course sections are null
                 null // No discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         // Mock repository behavior
@@ -119,7 +129,12 @@ class CourseServiceTest {
                 null, // Course sections
                 null // No discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         // Mock repository behavior
@@ -154,7 +169,12 @@ class CourseServiceTest {
                 null, // Course sections
                 null // No discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         // Act & Assert
@@ -172,7 +192,12 @@ class CourseServiceTest {
                 null, // Course sections
                 null // No discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         // Act & Assert
@@ -190,7 +215,12 @@ class CourseServiceTest {
                 null, // Course sections
                 null // No discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         // Mock repository behavior
@@ -217,7 +247,12 @@ class CourseServiceTest {
                 null, // Course sections
                 null // No discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         // Course object to be saved
@@ -247,7 +282,12 @@ class CourseServiceTest {
                         new LessonDTO(1L, "Lesson 1", "https://lesson-link.com", "VIDEO")))),
                 1L // Discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         Course course = courseRequestDTO.toCourse();
@@ -288,7 +328,12 @@ class CourseServiceTest {
                         new LessonDTO(1L, "Lesson 1", "https://lesson-link.com", "VIDEO")))),
                 1L // Discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         Course course = courseRequestDTO.toCourse();
@@ -340,7 +385,12 @@ class CourseServiceTest {
                 sections,
                 null // No discount
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         when(repository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -380,7 +430,12 @@ class CourseServiceTest {
                 "Description of course",
                 new Audience(false, Set.of("email1@example.com"))
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
         existingCourse.setDiscountId(oldDiscountId);
         existingCourse.setDiscountedPrice(Money.of(80, "USD"));
@@ -402,7 +457,12 @@ class CourseServiceTest {
                         new LessonDTO(existingSectionId, "Updated Lesson 1", "http://updatedlesson1.com", "TEXT")))),
                 newDiscountId // Update discount then should apply new discount
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         when(repository.findById(1L)).thenReturn(Optional.of(existingCourse));
@@ -450,7 +510,12 @@ class CourseServiceTest {
                 "Description of course",
                 new Audience(false, Set.of("email1@example.com")),
                 "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
         existingCourse.setDiscountId(1L);
         existingCourse.setDiscountedPrice(Money.of(80, "USD"));
@@ -472,7 +537,12 @@ class CourseServiceTest {
                 null, // Course sections are null, meaning sections should remain unchanged
                 null  // No discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         // Mock repository behavior: find the existing course by ID
@@ -515,7 +585,12 @@ class CourseServiceTest {
                 "Description of course",
                 new Audience(false, Set.of("email1@example.com")),
                 "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         CourseRequestDTO updateRequestDTO = new CourseRequestDTO(
@@ -527,7 +602,12 @@ class CourseServiceTest {
                         new LessonDTO(null, "New Lesson", "http://newlesson.com", "VIDEO")))),
                 null // No discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         when(repository.findById(1L)).thenReturn(Optional.of(existingCourse));
@@ -580,7 +660,12 @@ class CourseServiceTest {
                 "Description of course",
                 new Audience(false, Set.of("email1@example.com")),
                 "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
         CourseSection sectionToKeep = new CourseSection("Section 1");
         sectionToKeep.setId(sectionIdToKeep);
@@ -606,7 +691,12 @@ class CourseServiceTest {
                         new LessonDTO(lessonIdToKeep, "Lesson 1 Updated", "http://updatedlesson1.com", "TEXT")))),
                 null // No discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         when(repository.findById(1L)).thenReturn(Optional.of(existingCourse));
@@ -651,7 +741,12 @@ class CourseServiceTest {
                 Money.of(100, "USD"), "Description of course",
                 new Audience(false, Set.of("email1@example.com"))
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         CourseRequestDTO updateRequestDTO = new CourseRequestDTO(
@@ -662,7 +757,12 @@ class CourseServiceTest {
                 Set.of(new CourseSectionDTO(null, "Section 1", "Updated section description", Set.of())),
                 discountId // Invalid Discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         when(repository.findById(1L)).thenReturn(Optional.of(existingCourse));
@@ -696,7 +796,12 @@ class CourseServiceTest {
                 "Description of course",
                 new Audience(true, null),
                 "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
         course.setId(1L);
         when(repository.findById(1L)).thenReturn(Optional.of(course));
@@ -715,7 +820,12 @@ class CourseServiceTest {
                 "Description of course",
                 new Audience(true, null),
                 "foo.jpg",
-                UUID.randomUUID().toString());
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1"));
         course.addSection(section);
         course.setId(1L);
         when(repository.findById(1L)).thenReturn(Optional.of(course));
@@ -745,7 +855,12 @@ class CourseServiceTest {
                 "Description of course",
                 new Audience(false, Set.of("email1@example.com")),
                 "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
         existingCourse.setId(courseId);
 
@@ -757,7 +872,12 @@ class CourseServiceTest {
                 null, // Course sections
                 null // No discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         // Mock repository behavior
@@ -792,7 +912,12 @@ class CourseServiceTest {
                 "Description of course",
                 new Audience(false, Set.of("email1@example.com")),
                 "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
         existingCourse.setId(courseId);
 
@@ -804,7 +929,12 @@ class CourseServiceTest {
                 null, // Course sections
                 null // No discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         // Mock repository behavior
@@ -825,7 +955,12 @@ class CourseServiceTest {
                 "Description of course",
                 new Audience(false, Set.of("email1@example.com")),
                 "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
         existingCourse.setId(courseId);
 
@@ -837,7 +972,12 @@ class CourseServiceTest {
                 null, // Course sections
                 null // No discount ID
                 , "foo.jpg",
-                null
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         // Mock repository behavior
@@ -858,7 +998,12 @@ class CourseServiceTest {
                 "Description of course",
                 new Audience(false, Set.of("email1@example.com")),
                 "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
         existingCourse.setId(courseId);
 
@@ -870,7 +1015,12 @@ class CourseServiceTest {
                 null, // Course sections
                 null // No discount ID
                 , "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         // Mock repository behavior
@@ -905,7 +1055,12 @@ class CourseServiceTest {
                 "Description of course",
                 new Audience(false, Set.of("email1@example.com")),
                 "foo.jpg",
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
         existingCourse.setId(courseId);
 
@@ -917,7 +1072,12 @@ class CourseServiceTest {
                 null, // Course sections
                 null // No discount ID
                 , "foo.jpg",
-                existingCourse.getTeacherId()
+                existingCourse.getTeacherId(),
+                Term.LIFETIME,
+                Language.ENGLISH,
+                Set.of(Language.VIETNAMESE),
+                Set.of("Benefit 1"),
+                Set.of("Prerequisite 1")
         );
 
         // Mock repository behavior
