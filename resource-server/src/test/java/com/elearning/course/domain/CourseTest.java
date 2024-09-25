@@ -7,6 +7,7 @@ import org.javamoney.moneta.Money;
 
 import javax.money.MonetaryAmount;
 import java.util.Set;
+import java.util.UUID;
 
 class CourseTest {
 
@@ -15,7 +16,7 @@ class CourseTest {
     @BeforeEach
     void setUp() {
         Audience audience = new Audience(false, Set.of("email1@example.com"));
-        course = new Course("Java Basics", Money.of(100, "USD"), "A basic Java course", audience, "foo.jpg");
+        course = new Course("Java Basics", Money.of(100, "USD"), "A basic Java course", audience, "foo.jpg", UUID.randomUUID().toString());
     }
 
     @Test

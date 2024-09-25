@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import javax.money.MonetaryAmount;
 import java.util.List;
@@ -37,12 +38,8 @@ public class CourseService {
     }
 
     @Transactional
-    public Long createCourse(CourseRequestDTO courseRequestDTO) {
-        Course course = new Course(courseRequestDTO.title(),
-                courseRequestDTO.price(),
-                courseRequestDTO.description(),
-                new Audience(courseRequestDTO.audience().isPublic(), courseRequestDTO.audience().emailAuthorities()),
-                courseRequestDTO.thumbnailUrl());
+    public Course createCourse(CourseRequestDTO courseRequestDTO) {
+        Course course = courseRequestDTO.toCourse();
         if (courseRequestDTO.discountId() != null) {
             handleDiscountCalculate(course, courseRequestDTO.discountId());
         }
@@ -52,7 +49,7 @@ public class CourseService {
                 course.addSection(newSection);
             }
         }
-        return repository.save(course).getId();
+        return repository.save(course);
     }
 
     @Transactional
@@ -60,6 +57,9 @@ public class CourseService {
         Course course = findById(id);
         course.updateInfo(courseRequestDTO.title(), courseRequestDTO.price(), courseRequestDTO.description(),
                 new Audience(courseRequestDTO.audience().isPublic(), courseRequestDTO.audience().emailAuthorities()), courseRequestDTO.thumbnailUrl());
+        // update teacherId
+        Assert.notNull(courseRequestDTO.teacherId(), "TeacherId must not be null");
+        course.setTeacherId(courseRequestDTO.teacherId());
 
         // Chỉ xử lý sections nếu không phải là null
         if (courseRequestDTO.sections() != null) {
@@ -80,9 +80,12 @@ public class CourseService {
             course.removeSectionsOrphan(sectionDTOsToSectionIds(courseRequestDTO.sections()));
         }
 
-        // Xử lý giảm giá nếu discountId không phải là null
+        // Update discount
         if (courseRequestDTO.discountId() != null) {
             handleDiscountCalculate(course, courseRequestDTO.discountId());
+        } else {
+            course.setDiscountId(null);
+            course.setDiscountedPrice(course.getFinalPrice());
         }
 
         // Lưu lại course sau khi cập nhật

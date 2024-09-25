@@ -28,6 +28,7 @@ public class Course {
     private Set<CourseSection> sections = new HashSet<>();
     private MonetaryAmount price;
     private MonetaryAmount discountedPrice;
+    private Status status;
     private String description;
     @CreatedBy
     private String createdBy;
@@ -37,23 +38,27 @@ public class Course {
     private String lastModifiedBy;
     @LastModifiedDate
     private Instant lastModifiedDate;
+    private String teacherId;
 
     private Set<StudentRef> students = new HashSet<>();
     private Long discountId;
 
-    public Course(String title, MonetaryAmount price, String description, Audience audience, String thumbnailUrl) {
+    public Course(String title, MonetaryAmount price, String description, Audience audience, String thumbnailUrl, String teacherId) {
         Assert.hasText(title, "Title must not be empty");
         Assert.notNull(price, "Price must not be null");
         Assert.hasText(description, "Description must not be empty");
         Assert.notNull(audience, "Audience must not be null");
         Assert.notNull(thumbnailUrl, "ThumbnailUrl must not be null");
+        Assert.notNull(teacherId, "TeacherId must not be null");
 
         this.title = title;
         this.price = price;
-        this.discountedPrice = getFinalPrice();
+        this.discountedPrice = getFinalPrice(); // default discounted price is the same as the original price
         this.description = description;
         this.audience = audience;
         this.thumbnailUrl = thumbnailUrl;
+        this.status = Status.DRAFT;
+        this.teacherId = teacherId;
     }
 
     // not business logic :))
@@ -71,8 +76,11 @@ public class Course {
         }
     }
 
-    private MonetaryAmount getFinalPrice() {
-        return (this.discountedPrice != null) ? this.discountedPrice : this.price;
+    public MonetaryAmount getFinalPrice() {
+        if (this.discountId != null) {
+            return (this.discountedPrice != null) ? this.discountedPrice : this.price;
+        }
+        return this.price;
     }
 
     public void addSection(CourseSection section) {
