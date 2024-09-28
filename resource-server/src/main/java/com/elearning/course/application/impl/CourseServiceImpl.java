@@ -88,9 +88,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-
-    public void assignTeacher(Long courseId, String teacher) {
-        findCourseById(courseId).assignTeacher(teacher);
+    public Course assignTeacher(Long courseId, String teacher) {
+        Course existsCourse = findCourseById(courseId);
+        existsCourse.assignTeacher(teacher);
+        courseRepository.save(existsCourse);
+        return existsCourse;
     }
 
     @Override

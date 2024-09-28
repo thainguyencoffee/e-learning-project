@@ -1,8 +1,10 @@
 package com.elearning.course.domain;
 
 import com.elearning.common.exception.InputInvalidException;
+import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.Test;
 
+import javax.money.MonetaryAmount;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -136,5 +138,68 @@ public class CourseTests {
         verify(course, times(1)).updateInfo(anyString(), anyString(), anyString(), anySet(), anySet(), anySet());
     }
 
+    @Test
+    public void delete_ValidCourse_DeletesCourse() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        course.delete();
+        assertTrue(course.isDeleted());
+    }
+
+    @Test
+    public void delete_AlreadyDeletedCourse_ThrowsException() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        course.delete();
+        assertThrows(InputInvalidException.class, course::delete);
+    }
+
+    @Test
+    void delete_PublishedCourse_ThrowsException() {
+        Course courseMock = spy(new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher"));
+        when(courseMock.canEdit()).thenReturn(false);
+        assertThrows(InputInvalidException.class, courseMock::delete);
+    }
+
+    @Test
+    void changePrice_ValidPrice_ChangesPrice() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        MonetaryAmount newPrice = Money.of(100, "USD");
+        course.changePrice(newPrice);
+        assertEquals(newPrice, course.getPrice());
+    }
+
+    @Test
+    void changePrice_NegativePrice_ThrowsException() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        MonetaryAmount negativePrice = Money.of(-100, "USD");
+        assertThrows(InputInvalidException.class, () -> course.changePrice(negativePrice));
+    }
+
+    @Test
+    void changePrice_PublishedCourse_ThrowsException() {
+        Course course = spy(new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher"));
+        when(course.canEdit()).thenReturn(false);
+        MonetaryAmount newPrice = Money.of(100, "USD");
+        assertThrows(InputInvalidException.class, () -> course.changePrice(newPrice));
+    }
+
+    @Test
+    void assignTeacher_ValidTeacher_AssignsTeacher() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "OldTeacher");
+        course.assignTeacher("NewTeacher");
+        assertEquals("NewTeacher", course.getTeacher());
+    }
+
+    @Test
+    void assignTeacher_NullTeacher_ThrowsException() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "OldTeacher");
+        assertThrows(NullPointerException.class, () -> course.assignTeacher(null));
+    }
+
+    @Test
+    void assignTeacher_PublishedCourse_ThrowsException() {
+        Course course = spy(new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "OldTeacher"));
+        when(course.canEdit()).thenReturn(false);
+        assertThrows(InputInvalidException.class, () -> course.assignTeacher("NewTeacher"));
+    }
 
 }

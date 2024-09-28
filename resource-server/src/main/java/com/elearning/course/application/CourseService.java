@@ -27,7 +27,7 @@ public interface CourseService {
 
     Course publishCourse(Long courseId, String approvedBy);
 
-    void assignTeacher(Long courseId, String teacher);
+    Course assignTeacher(Long courseId, String teacher);
 
     Course applyDiscount(Long courseId, Long discountId);
 
