@@ -1,44 +1,64 @@
 package com.elearning.course.domain;
 
-import lombok.Data;
-import lombok.ToString;
+import lombok.Getter;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.util.Assert;
 
-
-@Data
+@Getter
 @Table("lesson")
-@ToString
 public class Lesson {
+
     @Id
     private Long id;
     private String title;
     private Type type;
     private String link;
+    private Long quiz;
 
     public enum Type {
         VIDEO, TEXT, QUIZ, ASSIGNMENT
     }
 
-    public Lesson(String title, Type type, String link) {
-        Assert.hasText(title, "Title must not be empty");
-        Assert.notNull(type, "Type must not be null");
-        Assert.hasText(link, "Link must not be empty");
+    public Lesson (String title, Type type, String link, Long quiz) {
+        // Kiểm tra tính hợp lệ ngay trong constructor
+        Assert.hasText(title, "Lesson title must not be empty.");
+        Assert.notNull(type, "Lesson type must not be null.");
 
+        validateLinkOrQuiz(type, link, quiz);
+        // Gán giá trị sau khi đã kiểm tra tính hợp lệ
         this.title = title;
         this.type = type;
         this.link = link;
+        this.quiz = quiz;
     }
 
-    public void updateInfo(String title, Type type, String link) {
-        Assert.hasText(title, "Title must not be empty");
-        Assert.notNull(type, "Type must not be null");
-        Assert.hasText(link, "Link must not be empty");
+    public void updateFrom(Lesson updatedLesson) {
+        Assert.hasText(updatedLesson.getTitle(), "Updated lesson title must not be empty.");
+        Assert.notNull(updatedLesson.getType(), "Updated lesson type must not be null.");
+        this.title = updatedLesson.getTitle();
+        this.type = updatedLesson.getType();
+        validateLinkOrQuiz(updatedLesson.getType(), updatedLesson.getLink(), updatedLesson.getQuiz());
+        this.link = updatedLesson.getLink();
+        this.quiz = updatedLesson.getQuiz();
+    }
 
-        this.title = title;
-        this.type = type;
-        this.link = link;
+    private void validateLinkOrQuiz(Type type, String link, Long quiz) {
+        switch (type) {
+            case VIDEO:
+            case TEXT:
+                if (link == null || link.isEmpty()) {
+                    throw new IllegalArgumentException("Link must not be empty for VIDEO or TEXT lesson.");
+                }
+                break;
+            case QUIZ:
+                if (quiz == null) {
+                    throw new IllegalArgumentException("Quiz ID must not be null for QUIZ lesson.");
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported lesson type.");
+        }
     }
 
 }

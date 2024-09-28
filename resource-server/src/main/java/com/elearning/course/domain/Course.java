@@ -1,153 +1,214 @@
 package com.elearning.course.domain;
 
+import com.elearning.common.AuditSupportClass;
+import com.elearning.common.exception.ResourceNotFoundException;
+import com.elearning.course.domain.exception.CannotUpdateCourseException;
+import com.elearning.discount.domain.Discount;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import lombok.Getter;
+import org.apache.commons.lang3.Validate;
 import org.javamoney.moneta.Money;
 import org.springframework.data.annotation.*;
-import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.util.Assert;
 
 import javax.money.MonetaryAmount;
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
 @Table("course")
-@Slf4j
-public class Course {
+public class Course extends AuditSupportClass {
     @Id
     private Long id;
     private String title;
     private String thumbnailUrl;
-    @Embedded.Nullable
-    private Audience audience;
+    private String description;
+    private final Language language;
+    private Set<Language> subtitles;
+    private Set<String> benefits;
+    private Set<String> prerequisites;
+
     @MappedCollection(idColumn = "course")
     private Set<CourseSection> sections = new HashSet<>();
     private MonetaryAmount price;
     private MonetaryAmount discountedPrice;
-    private Status status;
-    private String description;
-    private Term term;
-    @CreatedBy
-    private String createdBy;
-    @CreatedDate
-    private Instant createdDate;
-    @LastModifiedBy
-    private String lastModifiedBy;
-    @LastModifiedDate
-    private Instant lastModifiedDate;
-    private String teacherId;
+    private Boolean published;
+    private String teacher;
     private String approvedBy;
-    private Language language;
-    private Set<Language> subtitles = new HashSet<>();
-    private Set<String> benefits = new HashSet<>();
-    private Set<String> prerequisites = new HashSet<>();
-
     private Set<StudentRef> students = new HashSet<>();
-    private Long discountId;
+    private Long discount;
+    @JsonIgnore
+    private boolean deleted;
+    @Version
+    private int version;
 
-    public Course(String title,
-                  MonetaryAmount price,
-                  String description,
-                  Audience audience,
-                  String thumbnailUrl,
-                  String teacherId,
-                  Term term,
-                  Language language,
-                  Set<Language> subtitles,
-                  Set<String> benefits,
-                  Set<String> prerequisites) {
-        Assert.hasText(title, "Title must not be empty");
-        Assert.notNull(price, "Price must not be null");
-        Assert.hasText(description, "Description must not be empty");
-        Assert.notNull(audience, "Audience must not be null");
-        Assert.notNull(thumbnailUrl, "ThumbnailUrl must not be null");
-        Assert.notNull(teacherId, "TeacherId must not be null");
-        Assert.notNull(term, "Term must not be null");
-        Assert.notNull(language, "Language must not be null");
+    public Course(
+            String title,
+            String description,
+            String thumbnailUrl,
+            Set<String> benefits,
+            Language language,
+            Set<String> prerequisites,
+            Set<Language> subtitles,
+            String teacher
+    ) {
+
+        Assert.hasText(title, "Title must not be empty.");
 
         this.title = title;
-        this.price = price;
-        this.discountedPrice = getFinalPrice(); // default discounted price is the same as the original price
         this.description = description;
-        this.audience = audience;
         this.thumbnailUrl = thumbnailUrl;
-        this.status = Status.DRAFT;
-        this.teacherId = teacherId;
-        this.term = term;
         this.language = language;
-        this.subtitles = subtitles;
         this.benefits = benefits;
         this.prerequisites = prerequisites;
+        this.subtitles = subtitles;
+        this.teacher = teacher;
+        deleted = false;
+        published = false;
     }
 
-    // not business logic :)
-    public Course() {
+    public void updateInfo(
+            String title,
+            String description,
+            String thumbnailUrl,
+            Set<String> benefits,
+            Set<String> prerequisites,
+            Set<Language> subtitles
+    ) {
+        if (published) {
+            throw new CannotUpdateCourseException("Cannot update a published course.");
+        }
+
+        Assert.hasText(title, "Title must not be empty.");
+
+        this.title = title;
+        this.description = description;
+        this.thumbnailUrl = thumbnailUrl;
+        this.benefits = benefits;
+        this.prerequisites = prerequisites;
+        this.subtitles = subtitles;
     }
 
-    public void applyDiscount(MonetaryAmount discountAmount) {
-        if (discountAmount == null) {
-            throw new IllegalArgumentException("Discount amount must not be null");
+    public void changePrice(MonetaryAmount newPrice) {
+        if (published) {
+            throw new CannotUpdateCourseException("Cannot change price of a published course.");
         }
-        if (this.price.subtract(discountAmount).isNegativeOrZero()) {
-            this.discountedPrice = Money.zero(this.price.getCurrency());
-        } else {
-            this.discountedPrice = this.price.subtract(discountAmount);
+        if (newPrice.isLessThan(Money.zero(newPrice.getCurrency()))) {
+            throw new IllegalArgumentException("Price cannot be negative.");
         }
+        this.price = newPrice;
     }
 
-    @JsonIgnore
-    public MonetaryAmount getFinalPrice() {
-        if (this.discountId != null) {
-            return (this.discountedPrice != null) ? this.discountedPrice : this.price;
+    public void applyDiscount(MonetaryAmount discountedPrice, Long discount) {
+        Validate.notNull(discountedPrice, "Discounted price must not be null.");
+
+        this.discountedPrice = discountedPrice;
+        this.discount = discount;
+    }
+
+    public void assignTeacher(String teacher) {
+        if (published) {
+            throw new IllegalStateException("Cannot assign a teacher to a published course.");
         }
-        return this.price;
+
+        Validate.notNull(teacher, "Teacher must not be null.");
+
+        this.teacher = teacher;
+    }
+
+    public void publish(String approvedBy) {
+        if (published) {
+            throw new IllegalStateException("Course is already published.");
+        }
+        Validate.notEmpty(this.sections, "Cannot publish a course without sections.");
+        Validate.notNull(this.price, "Cannot publish a course without a price.");
+        Validate.notNull(teacher, "Cannot publish a course without a teacher.");
+        Validate.notNull(approvedBy, "Approved by must not be null.");
+        this.approvedBy = approvedBy;
+        this.published = true;
     }
 
     public void addSection(CourseSection section) {
-        if (section == null) {
-            throw new IllegalArgumentException("Section can't be null");
+        if (published) {
+            throw new IllegalStateException("Cannot add a section to a published course.");
         }
+
+        Validate.notNull(section, "Section must not be null.");
+
+        if (this.sections.stream().anyMatch(existingSection -> existingSection.getTitle().equals(section.getTitle()))) {
+            throw new IllegalArgumentException("A section with the same title already exists.");
+        }
+
+        if (section.getLessons().isEmpty()) {
+            throw new IllegalArgumentException("Section must have at least one lesson.");
+        }
+
         this.sections.add(section);
     }
 
-    public void removeSectionsOrphan(Set<Long> validSectionIds) {
-        this.sections.removeIf(section -> section.getId() != null && !validSectionIds.contains(section.getId()));
+    public void updateSection(Long sectionId, String title) {
+        if (published) {
+            throw new IllegalStateException("Cannot update a section in a published course.");
+        }
+
+        if (this.sections.stream().anyMatch(existingSection -> existingSection.getTitle().equals(title))) {
+            throw new IllegalArgumentException("A section with the same title already exists.");
+        }
+
+        CourseSection existingSection = findSectionById(sectionId);
+        existingSection.updateInfo(title);
     }
 
-    public CourseSection findSectionById(Long sectionId) {
+    public void removeSection(Long sectionId) {
+        if (published) {
+            throw new IllegalStateException("Cannot remove a section from a published course.");
+        }
+        CourseSection courseSection = findSectionById(sectionId);
+        this.sections.remove(courseSection);
+    }
+
+    public void addLessonToSection(Long sectionId, Lesson lesson) {
+        if (published) {
+            throw new IllegalStateException("Cannot add a lesson to a published course.");
+        }
+        CourseSection section = findSectionById(sectionId);
+        section.addLesson(lesson);
+    }
+
+    public void updateLessonInSection(Long sectionId, Long lessonId, Lesson updatedLesson){
+        if (published) {
+            throw new IllegalStateException("Cannot add a lesson to a published course.");
+        }
+        CourseSection section = findSectionById(sectionId);
+        section.updateLesson(lessonId, updatedLesson);
+    }
+
+    public void removeLessonFromSection(Long sectionId, Long lessonId){
+        CourseSection section = findSectionById(sectionId);
+        section.removeLesson(lessonId);
+    };
+
+    public void delete() {
+        if (this.deleted) {
+            throw new IllegalStateException("Course is already deleted.");
+        }
+        this.deleted = true;
+    }
+
+    public void restore() {
+        if (!this.deleted) {
+            throw new IllegalStateException("Course is not deleted.");
+        }
+        this.deleted = false;
+    }
+
+    private CourseSection findSectionById(Long sectionId) {
         return this.sections.stream()
                 .filter(section -> section.getId().equals(sectionId))
                 .findFirst()
-                .orElse(null);
-    }
-
-    public void updateInfo(Course courseUpdate) {
-        Assert.hasText(title, "Title must not be empty");
-        Assert.notNull(price, "Price must not be null");
-        Assert.hasText(description, "Description must not be empty");
-        Assert.notNull(audience, "Audience must not be null");
-        Assert.notNull(thumbnailUrl, "ThumbnailUrl must not be null");
-        Assert.notNull(teacherId, "TeacherId must not be null");
-        Assert.notNull(term, "Term must not be null");
-        Assert.notNull(language, "Language must not be null");
-
-        this.title = courseUpdate.title;
-        this.price = courseUpdate.price;
-        this.discountedPrice = getFinalPrice();
-        this.description = courseUpdate.description;
-        this.audience = courseUpdate.audience;
-        this.thumbnailUrl = courseUpdate.thumbnailUrl;
-        this.teacherId = courseUpdate.teacherId;
-        this.term = courseUpdate.term;
-        this.language = courseUpdate.language;
-        this.subtitles = courseUpdate.subtitles;
-        this.benefits = courseUpdate.benefits;
-        this.prerequisites = courseUpdate.prerequisites;
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
 }

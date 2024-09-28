@@ -1,13 +1,15 @@
 package com.elearning.discount.domain;
 
-import lombok.Data;
+import com.elearning.discount.domain.exception.DiscountInvalidDateException;
+import lombok.Getter;
+import org.javamoney.moneta.Money;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.money.MonetaryAmount;
 import java.time.Instant;
 
-@Data
+@Getter
 @Table("discount")
 public class Discount {
     @Id
@@ -28,17 +30,29 @@ public class Discount {
     @LastModifiedBy
     private String lastModifiedBy;
 
+    public boolean isExpired() {
+        return Instant.now().isAfter(endDate);
+    }
+
+    public boolean isActive() {
+        Instant now = Instant.now();
+        return now.isAfter(startDate) && now.isBefore(endDate);
+    }
+
     public boolean isValid() {
-        return startDate.isBefore(Instant.now()) && endDate.isAfter(Instant.now());
+        return !isExpired() && isActive();
     }
 
-    public MonetaryAmount calculateDiscount(MonetaryAmount source) {
-        if (type == Type.PERCENTAGE) {
-            return source.multiply(percentage / 100.0);
-        } else if (type == Type.FIXED) {
-            return fixedAmount;
+    public MonetaryAmount calculateDiscount(MonetaryAmount originalPrice) {
+        if (!isValid()) {
+            throw new DiscountInvalidDateException("Discount is not valid.");
         }
-        throw new IllegalStateException("Unknown discount type");
-    }
 
+        if (this.type == Type.PERCENTAGE) {
+            return originalPrice.multiply(this.percentage / 100);
+        } else if (this.type == Type.FIXED) {
+            return this.fixedAmount;
+        }
+        return Money.zero(originalPrice.getCurrency());
+    }
 }

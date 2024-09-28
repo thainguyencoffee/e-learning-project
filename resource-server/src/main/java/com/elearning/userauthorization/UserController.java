@@ -1,4 +1,4 @@
-package com.elearning.user;
+package com.elearning.userauthorization;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
