@@ -5,8 +5,12 @@ import com.elearning.course.application.dto.CourseUpdateDTO;
 import com.elearning.course.domain.Course;
 import com.elearning.course.domain.CourseRepository;
 import com.elearning.course.domain.Language;
+import com.elearning.course.web.ApplyDiscountDTO;
 import com.elearning.course.web.AssignTeacherDTO;
 import com.elearning.course.web.UpdatePriceDTO;
+import com.elearning.discount.domain.Discount;
+import com.elearning.discount.domain.DiscountRepository;
+import com.elearning.discount.domain.Type;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
@@ -28,6 +32,7 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import org.testcontainers.shaded.com.google.common.net.HttpHeaders;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
@@ -52,6 +57,8 @@ class ResourceServerApplicationTests {
     private WebTestClient webTestClient;
     @Autowired
     private CourseRepository courseRepository;
+    @Autowired
+    private DiscountRepository discountRepository;
 
     @DynamicPropertySource
     static void keycloakProperties(DynamicPropertyRegistry registry) {
@@ -90,6 +97,28 @@ class ResourceServerApplicationTests {
                 "teacher-id"  // Giáo viên giả lập
         );
         courseRepository.save(course);  // Lưu khóa học vào CSDL
+
+        // prepare data for discount record
+        discountRepository.deleteAll();
+        Discount discount = new Discount(
+                "DISCOUNT_50",
+                Type.PERCENTAGE,
+                50.0,
+                null,
+                Instant.now().minusSeconds(3600),
+                Instant.now().plusSeconds(3600)
+        );
+        discountRepository.save(discount);
+
+        Discount discount2 = new Discount(
+                "DISCOUNT_30_DOLLARS",
+                Type.FIXED,
+                null,
+                Money.of(30, "USD"),
+                Instant.now().minusSeconds(3600),
+                Instant.now().plusSeconds(3600)
+        );
+        discountRepository.save(discount2);
     }
 
 
@@ -477,6 +506,117 @@ class ResourceServerApplicationTests {
                 .exchange()
                 .expectStatus().isNotFound();  // Phản hồi 404 Not Found
     }
+
+    @Test
+    void testApplyDiscount_Successful() {
+        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
+        Course course = courseRepository.findAll().iterator().next();
+        course.changePrice(Money.of(1000, "USD"));  // Đặt giá cho khóa học
+        courseRepository.save(course);  // Lưu khóa học đã cập nhật
+
+        Long courseId = course.getId();
+        Discount discount = discountRepository.findByCode("DISCOUNT_50").get();
+        String discountCode = discount.getCode();
+
+        // Thiết lập giảm giá cho khóa học
+        var applyDiscountDTO = new ApplyDiscountDTO(discountCode);
+
+        // Gửi request POST để áp dụng giảm giá cho khóa học
+        webTestClient.post().uri("/courses/{courseId}/apply-discount", courseId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(applyDiscountDTO))  // Body của request là JSON ApplyDiscountDTO
+                .exchange()
+                .expectStatus().isOk()  // Phản hồi 200 OK
+                .expectBody()
+                .jsonPath("$.discountCode").isEqualTo(discountCode)  // Kiểm tra giảm giá đã được cập nhật
+                .jsonPath("$.discountedPrice").isEqualTo("USD500.00");  // Kiểm tra giá đã được cập nhật
+    }
+
+    @Test
+    void testApplyDiscountFixed_Successful() {
+        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
+        Course course = courseRepository.findAll().iterator().next();
+        course.changePrice(Money.of(1000, "USD"));  // Đặt giá cho khóa học
+        courseRepository.save(course);  // Lưu khóa học đã cập nhật
+
+        Long courseId = course.getId();
+        Discount discount = discountRepository.findByCode("DISCOUNT_30_DOLLARS").get();
+        String discountCode = discount.getCode();
+
+        // Thiết lập giảm giá cho khóa học
+        var applyDiscountDTO = new ApplyDiscountDTO(discountCode);
+
+        // Gửi request POST để áp dụng giảm giá cho khóa học
+        webTestClient.post().uri("/courses/{courseId}/apply-discount", courseId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(applyDiscountDTO))  // Body của request là JSON ApplyDiscountDTO
+                .exchange()
+                .expectStatus().isOk()  // Phản hồi 200 OK
+                .expectBody()
+                .jsonPath("$.discountCode").isEqualTo(discountCode)  // Kiểm tra giảm giá đã được cập nhật
+                .jsonPath("$.discountedPrice").isEqualTo("USD970.00");  // Kiểm tra giá đã được cập nhật
+    }
+
+    @Test
+    void testApplyDiscount_NotFound() {
+        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
+        Course course = courseRepository.findAll().iterator().next();
+        course.changePrice(Money.of(1000, "USD"));  // Đặt giá cho khóa học
+        courseRepository.save(course);  // Lưu khóa học đã cập nhật
+        Long courseId = course.getId();
+
+        // Thiết lập giảm giá cho khóa học
+        var applyDiscountDTO = new ApplyDiscountDTO("INVALID_DISCOUNT_CODE");
+
+        // Gửi request POST để áp dụng giảm giá cho khóa học không tồn tại
+        webTestClient.post().uri("/courses/{courseId}/apply-discount", courseId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(applyDiscountDTO))  // Body của request là JSON ApplyDiscountDTO
+                .exchange()
+                .expectStatus().isNotFound();  // Phản hồi 404 Not Found
+    }
+
+    @Test
+    void testApplyDiscount_Forbidden() {
+        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
+        Course course = courseRepository.findAll().iterator().next();
+        course.changePrice(Money.of(1000, "USD"));  // Đặt giá cho khóa học
+        courseRepository.save(course);  // Lưu khóa học đã cập nhật
+        Long courseId = course.getId();
+
+        // Thiết lập giảm giá cho khóa học
+        var applyDiscountDTO = new ApplyDiscountDTO("DISCOUNT_50");
+
+        // Gửi request POST để áp dụng giảm giá cho khóa học không có quyền
+        webTestClient.post().uri("/courses/{courseId}/apply-discount", courseId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(applyDiscountDTO))  // Body của request là JSON ApplyDiscountDTO
+                .exchange()
+                .expectStatus().isForbidden();  // Phản hồi 403 Forbidden
+    }
+
+    @Test
+    void testApplyDiscount_PriceNotSet() {
+        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        // Thiết lập giảm giá cho khóa học
+        var applyDiscountDTO = new ApplyDiscountDTO("DISCOUNT_50"); // Correct discount code
+
+        // Gửi request POST để áp dụng giảm giá cho khóa học không có giá
+        webTestClient.post().uri("/courses/{courseId}/apply-discount", courseId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(applyDiscountDTO))  // Body của request là JSON ApplyDiscountDTO
+                .exchange()
+                .expectStatus().isBadRequest();  // Phản hồi 400 Bad Request
+    }
+
 
 
     protected static class KeycloakToken {

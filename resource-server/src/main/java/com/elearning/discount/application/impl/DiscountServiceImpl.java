@@ -24,8 +24,14 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public MonetaryAmount calculateDiscount(Long discountId, MonetaryAmount originalPrice) {
-        var discount = findById(discountId);
+    public Discount findByCode(String code) {
+        return discountRepository.findByCode(code)
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Override
+    public MonetaryAmount calculateDiscount(String code, MonetaryAmount originalPrice) {
+        var discount = findByCode(code);
         return discount.calculateDiscount(originalPrice);
     }
 }

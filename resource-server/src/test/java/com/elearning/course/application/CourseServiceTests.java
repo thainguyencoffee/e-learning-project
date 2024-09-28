@@ -250,4 +250,61 @@ class CourseServiceTests {
         verify(courseRepository, never()).save(any(Course.class));
     }
 
+    @Test
+    void applyDiscount_ShouldApplyDiscountSuccessfully() {
+        // Giả lập hành vi của repository và discountService
+        MonetaryAmount discountedPrice = Money.of(80, "USD"); // Giảm giá từ $100 xuống còn $80
+        when(courseRepository.findById(1L)).thenReturn(java.util.Optional.of(course));
+        course.changePrice(Money.of(100, "USD"));
+        String discountCode = "DISCOUNT_10";
+        when(discountService.calculateDiscount(discountCode, course.getPrice())).thenReturn(discountedPrice);
+        when(courseRepository.save(any(Course.class))).thenReturn(course);
+
+        // Thực thi use case
+        Course updatedCourse = courseService.applyDiscount(1L, discountCode);
+
+        // Xác minh rằng courseRepository.findById, discountService.calculateDiscount và courseRepository.save đã được gọi
+        verify(courseRepository, times(1)).findById(1L);
+        verify(discountService, times(1)).calculateDiscount(discountCode, course.getPrice());
+        verify(courseRepository, times(1)).save(course);
+
+        // Kiểm tra các giá trị trả về
+        assertNotNull(updatedCourse);
+        assertEquals(Money.of(20, "USD"), updatedCourse.getDiscountedPrice());
+        assertEquals(discountCode, updatedCourse.getDiscountCode());
+    }
+
+    @Test
+    void applyDiscount_ShouldThrowException_WhenCoursePriceIsNull() {
+        // Giả lập hành vi của repository
+        when(courseRepository.findById(1L)).thenReturn(java.util.Optional.of(course));
+        String discountCode = "DISCOUNT_10";
+
+        // Kiểm tra xem ngoại lệ có được ném ra khi giá của khóa học là null
+        assertThrows(InputInvalidException.class, () -> {
+            courseService.applyDiscount(1L, discountCode);
+        });
+
+        // Đảm bảo không có gì được lưu vào repository
+        verify(discountService, never()).calculateDiscount(anyString(), any(MonetaryAmount.class));
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void applyDiscount_ShouldThrowException_WhenDiscountNotFound() {
+        // Giả lập hành vi của repository
+        when(courseRepository.findById(1L)).thenReturn(java.util.Optional.of(course));
+        course.changePrice(Money.of(100, "USD"));
+        String discountCode = "DISCOUNT_10";
+        when(discountService.calculateDiscount(discountCode, course.getPrice())).thenThrow(ResourceNotFoundException.class);
+
+        // Kiểm tra xem ngoại lệ có được ném ra khi không tìm thấy mã giảm giá
+        assertThrows(ResourceNotFoundException.class, () -> {
+            courseService.applyDiscount(1L, discountCode);
+        });
+
+        // Đảm bảo không có gì được lưu vào repository
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
 }

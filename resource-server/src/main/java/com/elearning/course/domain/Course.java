@@ -37,7 +37,7 @@ public class Course extends AuditSupportClass {
     private String teacher;
     private String approvedBy;
     private Set<StudentRef> students = new HashSet<>();
-    private Long discount;
+    private String discountCode;
     @JsonIgnore
     private boolean deleted;
     @Version
@@ -100,11 +100,19 @@ public class Course extends AuditSupportClass {
         this.price = newPrice;
     }
 
-    public void applyDiscount(MonetaryAmount discountedPrice, Long discount) {
+    public void applyDiscount(MonetaryAmount discountedPrice, String discountCode) {
+        if (this.getPrice() == null) {
+            throw new InputInvalidException("Cannot apply discount to a course without a price.");
+        }
         Validate.notNull(discountedPrice, "Discounted price must not be null.");
 
-        this.discountedPrice = discountedPrice;
-        this.discount = discount;
+        this.discountCode = discountCode;
+
+        if (this.price.subtract(discountedPrice).isNegativeOrZero()) {
+            this.discountedPrice = Money.zero(this.price.getCurrency());
+        } else {
+            this.discountedPrice = this.price.subtract(discountedPrice);
+        }
     }
 
     public void assignTeacher(String teacher) {

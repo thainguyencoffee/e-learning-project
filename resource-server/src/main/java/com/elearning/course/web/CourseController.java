@@ -59,6 +59,19 @@ public class CourseController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{courseId}/restore")
+    public ResponseEntity<Course> restoreCourse(@PathVariable Long courseId) {
+        courseService.restoreCourse(courseId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{courseId}/apply-discount")
+    public ResponseEntity<Course> applyDiscount(@PathVariable Long courseId,
+                                                @Valid @RequestBody ApplyDiscountDTO applyDiscountDTO) {
+        Course updatedCourse = courseService.applyDiscount(courseId, applyDiscountDTO.code());
+        return ResponseEntity.ok(updatedCourse);
+    }
+
     @PutMapping("/{courseId}/publish")
     public ResponseEntity<Course> updateStatus(@AuthenticationPrincipal Jwt jwt, @PathVariable Long courseId) {
         Course updatedCourse = courseService.publishCourse(courseId, jwt.getSubject());

@@ -336,4 +336,58 @@ class CourseControllerTests {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void applyDiscount_ValidCourseIdAndDiscount_ShouldReturnOk() throws Exception {
+        Course updatedCourse = Mockito.mock(Course.class);
+        Mockito.when(updatedCourse.getId()).thenReturn(1L);
+        String discountCode = "DISCOUNT25";
+        Mockito.when(courseService.applyDiscount(1L, discountCode)).thenReturn(updatedCourse);
+
+        String body = objectMapper.writeValueAsString(new ApplyDiscountDTO(discountCode));
+
+        mockMvc.perform(post("/courses/1/apply-discount")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L));
+    }
+
+    @Test
+    void applyDiscount_CourseNotFound_ShouldReturnNotFound() throws Exception {
+        String discountCode = "DISCOUNT25";
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).applyDiscount(1L, discountCode);
+
+        String body = objectMapper.writeValueAsString(new ApplyDiscountDTO(discountCode));
+
+        mockMvc.perform(post("/courses/1/apply-discount")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void applyDiscount_UserNotAdmin_ShouldReturnForbidden() throws Exception {
+        String discountCode = "DISCOUNT25";
+        String body = objectMapper.writeValueAsString(new ApplyDiscountDTO(discountCode));
+
+        mockMvc.perform(post("/courses/1/apply-discount")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void applyDiscount_InvalidDiscountId_ShouldReturnBadRequest() throws Exception {
+        String body = objectMapper.writeValueAsString(new ApplyDiscountDTO(null));
+
+        mockMvc.perform(post("/courses/1/apply-discount")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isBadRequest());
+    }
+
 }
