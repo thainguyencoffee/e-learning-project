@@ -1,6 +1,8 @@
 package com.elearning.course.web;
 
+import com.elearning.common.config.JacksonCustomizations;
 import com.elearning.common.config.SecurityConfig;
+import com.elearning.common.exception.InputInvalidException;
 import com.elearning.common.exception.ResourceNotFoundException;
 import com.elearning.course.application.dto.CourseDTO;
 import com.elearning.course.application.dto.CourseUpdateDTO;
@@ -8,6 +10,7 @@ import com.elearning.course.application.impl.CourseServiceImpl;
 import com.elearning.course.domain.Course;
 import com.elearning.course.domain.Language;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -27,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CourseController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JacksonCustomizations.class})
 class CourseControllerTests {
 
     @Autowired
@@ -168,6 +171,22 @@ class CourseControllerTests {
 
 
     @Test
+    void testUpdateInfoCourse_ShouldReturnBadRequest_WhenCourseIsPublished() throws Exception {
+        // Giả lập hành vi của UpdateCourseUseCase ném ra InputInvalidException
+        Mockito.doThrow(new InputInvalidException("Cannot update a published course."))
+                .when(courseService).updateCourse(1L, new CourseUpdateDTO("Java Programming", "Learn Java from scratch", "http://example.com/image.jpg", Set.of("OOP", "Concurrency"), Set.of("Basic Programming Knowledge"), Set.of(Language.ENGLISH, Language.SPANISH)));
+
+        // Thực thi HTTP PUT request với JWT
+        mockMvc.perform(put("/courses/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(courseDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher")))
+                )
+                .andExpect(status().isBadRequest());  // Kiểm tra phản hồi 400 Bad Request
+    }
+
+
+    @Test
     void deleteCourse_ValidCourseId_ShouldReturnNoContent() throws Exception {
         // Chuẩn bị hành vi của deleteCourse
         Mockito.doNothing().when(courseService).deleteCourse(1L);
@@ -191,6 +210,130 @@ class CourseControllerTests {
         mockMvc.perform(delete("/courses/1")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deleteCourse_CourseAlreadyPublished_ShouldReturnBadRequest() throws Exception {
+        Mockito.doThrow(new InputInvalidException("Cannot delete a published course.")).when(courseService).deleteCourse(1L);
+
+        mockMvc.perform(delete("/courses/1")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    void changePrice_ValidCourseIdAndPrice_ShouldReturnUpdatedCourse() throws Exception {
+        Course updatedCourse = Mockito.mock(Course.class);
+        Mockito.when(updatedCourse.getId()).thenReturn(1L);
+        Mockito.when(courseService.updatePrice(1L, Money.of(100, "USD"))).thenReturn(updatedCourse);
+
+        String body = objectMapper.writeValueAsString(new UpdatePriceDTO(Money.of(100, "USD")));
+
+        mockMvc.perform(put("/courses/1/update-price")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L));
+    }
+
+    @Test
+    void changePrice_CourseNotFound_ShouldReturnNotFound() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).updatePrice(1L, Money.of(100, "USD"));
+
+        String body = objectMapper.writeValueAsString(new UpdatePriceDTO(Money.of(100, "USD")));
+
+        mockMvc.perform(put("/courses/1/update-price")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void changePrice_UserNotAdmin_ShouldReturnForbidden() throws Exception {
+        String body = objectMapper.writeValueAsString(new UpdatePriceDTO(Money.of(100, "USD")));
+        mockMvc.perform(put("/courses/1/update-price")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void changePrice_CourseAlreadyPublished_ShouldReturnBadRequest() throws Exception {
+        Mockito.doThrow(new InputInvalidException("Cannot change price of a published course.")).when(courseService).updatePrice(1L, Money.of(100, "USD"));
+
+        String body = objectMapper.writeValueAsString(new UpdatePriceDTO(Money.of(100, "USD")));
+
+        mockMvc.perform(put("/courses/1/update-price")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin")))
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void assignTeacher_ValidCourseIdAndTeacher_ShouldReturnOk() throws Exception {
+        Course updatedCourse = Mockito.mock(Course.class);
+        Mockito.when(updatedCourse.getId()).thenReturn(1L);
+        Mockito.when(courseService.assignTeacher(1L, "NewTeacher")).thenReturn(updatedCourse);
+
+        String body = objectMapper.writeValueAsString(new AssignTeacherDTO("NewTeacher"));
+
+        mockMvc.perform(put("/courses/1/assign-teacher")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L));
+    }
+
+    @Test
+    void assignTeacher_CourseNotFound_ShouldReturnNotFound() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).assignTeacher(1L, "NewTeacher");
+        String body = objectMapper.writeValueAsString(new AssignTeacherDTO("NewTeacher"));
+
+        mockMvc.perform(put("/courses/1/assign-teacher")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void assignTeacher_UserNotAdmin_ShouldReturnForbidden() throws Exception {
+        String body = objectMapper.writeValueAsString(new AssignTeacherDTO("NewTeacher"));
+        mockMvc.perform(put("/courses/1/assign-teacher")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void assignTeacher_NullTeacher_ShouldReturnBadRequest() throws Exception {
+        String body = objectMapper.writeValueAsString(new AssignTeacherDTO(null));
+        mockMvc.perform(put("/courses/1/assign-teacher")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void assignTeacher_CoursePublished_ShouldReturnBadRequest() throws Exception {
+        Mockito.doThrow(new InputInvalidException("Cannot assign teacher to a published course.")).when(courseService).assignTeacher(1L, "NewTeacher");
+        String body = objectMapper.writeValueAsString(new AssignTeacherDTO("NewTeacher"));
+
+        mockMvc.perform(put("/courses/1/assign-teacher")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin")))
+                )
+                .andExpect(status().isBadRequest());
     }
 
 }

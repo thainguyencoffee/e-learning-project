@@ -5,9 +5,12 @@ import com.elearning.course.application.dto.CourseUpdateDTO;
 import com.elearning.course.domain.Course;
 import com.elearning.course.domain.CourseRepository;
 import com.elearning.course.domain.Language;
+import com.elearning.course.web.AssignTeacherDTO;
+import com.elearning.course.web.UpdatePriceDTO;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
+import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -219,38 +222,9 @@ class ResourceServerApplicationTests {
 
     @Test
     void testUpdateInfoCourse_Successful() {
-        // Thiết lập dữ liệu CourseDTO để tạo một khóa học mới
-        var courseDTO = new CourseDTO(
-                "Java Programming",
-                "Learn Java from scratch",
-                "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
-                Language.ENGLISH,
-                Set.of("Basic Programming Knowledge"),
-                Set.of(Language.ENGLISH, Language.SPANISH)
-        );
-
-        // Extract the "sub" claim from the teacherToken (which represents the teacher's user ID)
-        String teacherId = extractClaimFromToken(teacherToken.getAccessToken(), "sub");
-
-        // Gửi request POST với token của "teacher" để tạo khóa học
-        String courseLocation = webTestClient.post().uri("/courses")
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(courseDTO))  // Body của request là JSON CourseDTO
-                .exchange()
-                .expectStatus().isCreated()  // Kiểm tra xem phản hồi có trả về 201 Created không
-                .expectHeader().value("Location", location -> assertThat(location).contains("/courses/"))  // Kiểm tra Location header
-                .returnResult(String.class).getResponseHeaders().getLocation().toString();  // Lấy giá trị của Location header
-
-        // Kiểm tra phản hồi của POST request để xác nhận khóa học đã được tạo
-        webTestClient.get().uri(courseLocation)  // Sử dụng Location từ header
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.title").isEqualTo("Java Programming")  // Kiểm tra thuộc tính title
-                .jsonPath("$.teacher").isEqualTo(teacherId);  // Kiểm tra teacher là sub (user ID từ token)
+        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
 
         // Thiết lập dữ liệu CourseUpdateDTO để cập nhật thông tin khóa học
         var courseUpdateDTO = new CourseUpdateDTO(
@@ -263,7 +237,7 @@ class ResourceServerApplicationTests {
         );
 
         // Gửi request PUT với token của "teacher" để cập nhật khóa học
-        webTestClient.put().uri(courseLocation)  // Sử dụng Location từ header để update đúng khóa học
+        webTestClient.put().uri("/courses/{courseId}", courseId)  // Sử dụng Location từ header để update đúng khóa học
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(courseUpdateDTO))  // Body của request là JSON CourseUpdateDTO
@@ -339,38 +313,9 @@ class ResourceServerApplicationTests {
 
     @Test
     void testUpdateInfoCourse_BadRequest_EmptyTitle() {
-        // Thiết lập dữ liệu CourseDTO để tạo một khóa học mới
-        var courseDTO = new CourseDTO(
-                "Java Programming",
-                "Learn Java from scratch",
-                "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
-                Language.ENGLISH,
-                Set.of("Basic Programming Knowledge"),
-                Set.of(Language.ENGLISH, Language.SPANISH)
-        );
-
-        // Extract the "sub" claim from the teacherToken (which represents the teacher's user ID)
-        String teacherId = extractClaimFromToken(teacherToken.getAccessToken(), "sub");
-
-        // Gửi request POST với token của "teacher" để tạo khóa học
-        String courseLocation = webTestClient.post().uri("/courses")
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(courseDTO))  // Body của request là JSON CourseDTO
-                .exchange()
-                .expectStatus().isCreated()  // Kiểm tra xem phản hồi có trả về 201 Created không
-                .expectHeader().value("Location", location -> assertThat(location).contains("/courses/"))  // Kiểm tra Location header
-                .returnResult(String.class).getResponseHeaders().getLocation().toString();  // Lấy giá trị của Location header
-
-        // Kiểm tra phản hồi của POST request để xác nhận khóa học đã được tạo
-        webTestClient.get().uri(courseLocation)  // Sử dụng Location từ header
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.title").isEqualTo("Java Programming")  // Kiểm tra thuộc tính title
-                .jsonPath("$.teacher").isEqualTo(teacherId);  // Kiểm tra teacher là sub (user ID từ token)
+        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
 
         // Thiết lập dữ liệu CourseUpdateDTO để cập nhật thông tin khóa học
         var courseUpdateDTO = new CourseUpdateDTO(
@@ -383,7 +328,7 @@ class ResourceServerApplicationTests {
         );
 
         // Gửi request PUT với token của "teacher" để cập nhật khóa học
-        webTestClient.put().uri(courseLocation)  // Sử dụng Location từ header để update đúng khóa học
+        webTestClient.put().uri("/courses/{courseId}", courseId)  // Sử dụng Location từ header để update đúng khóa học
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(courseUpdateDTO))  // Body của request là JSON CourseUpdateDTO
@@ -449,6 +394,88 @@ class ResourceServerApplicationTests {
         webTestClient.delete().uri("/courses/{courseId}", courseId)
                 .exchange()
                 .expectStatus().isUnauthorized();  // Phản hồi 401 Unauthorized
+    }
+
+    @Test
+    void testUpdatePrice_Successfully() {
+        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        // Thiết lập giá mới cho khóa học
+        var newPrice = new UpdatePriceDTO(Money.of(1000, "USD"));
+
+        // Gửi request PUT để cập nhật giá khóa học
+        webTestClient.put().uri("/courses/{courseId}/update-price", courseId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(newPrice))  // Body của request là JSON CourseUpdateDTO.PriceDTO
+                .exchange()
+                .expectStatus().isOk()  // Phản hồi 200 OK
+                .expectBody()
+                .jsonPath("$.price").isEqualTo("USD1,000.00");  // Kiểm tra giá đã được cập nhật
+    }
+
+    @Test
+    void testUpdatePrice_Forbidden() {
+        // Thiết lập giá mới cho khóa học
+        var newPrice = new UpdatePriceDTO(Money.of(1000, "USD"));
+
+        // Gửi request PUT để cập nhật giá khóa học
+        webTestClient.put().uri("/courses/{courseId}/update-price", 1)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(newPrice))  // Body của request là JSON CourseUpdateDTO.PriceDTO
+                .exchange()
+                .expectStatus().isForbidden();  // Phản hồi 403 Forbidden
+    }
+
+    @Test
+    void testAssignTeacher_Successful() {
+        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        // Thiết lập giáo viên mới cho khóa học
+        var assignTeacherDTO = new AssignTeacherDTO("new-teacher-id");
+
+        // Gửi request PUT để cập nhật giáo viên cho khóa học
+        webTestClient.put().uri("/courses/{courseId}/assign-teacher", courseId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(assignTeacherDTO))  // Body của request là JSON AssignTeacherDTO
+                .exchange()
+                .expectStatus().isOk()  // Phản hồi 200 OK
+                .expectBody()
+                .jsonPath("$.teacher").isEqualTo("new-teacher-id");  // Kiểm tra giáo viên đã được cập nhật
+    }
+
+    @Test
+    void testAssignTeacher_Forbidden() {
+        // Thiết lập giáo viên mới cho khóa học
+        var assignTeacherDTO = new AssignTeacherDTO("new-teacher-id");
+
+        // Gửi request PUT để cập nhật giáo viên cho khóa học
+        webTestClient.put().uri("/courses/{courseId}/assign-teacher", 1)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(assignTeacherDTO))  // Body của request là JSON AssignTeacherDTO
+                .exchange()
+                .expectStatus().isForbidden();  // Phản hồi 403 Forbidden
+    }
+
+    @Test
+    void testAssignTeacher_NotFound() {
+        // Thiết lập giáo viên mới cho khóa học
+        var assignTeacherDTO = new AssignTeacherDTO("new-teacher-id");
+
+        // Gửi request PUT để cập nhật giáo viên cho khóa học không tồn tại
+        webTestClient.put().uri("/courses/{courseId}/assign-teacher", 999)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(assignTeacherDTO))  // Body của request là JSON AssignTeacherDTO
+                .exchange()
+                .expectStatus().isNotFound();  // Phản hồi 404 Not Found
     }
 
 

@@ -9,12 +9,14 @@ import com.elearning.course.domain.Course;
 import com.elearning.course.domain.CourseRepository;
 import com.elearning.course.domain.Language;
 import com.elearning.discount.application.DiscountService;
+import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.money.MonetaryAmount;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -135,6 +137,22 @@ class CourseServiceTests {
     }
 
     @Test
+    void testUpdateInfoCourse_ShouldThrowException_WhenCoursePublished() {
+        // Giả lập hành vi của repository
+        Course courseMock = spy(course);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(courseMock));
+        doReturn(false).when(courseMock).canEdit();
+
+        // Kiểm tra xem ngoại lệ có được ném ra khi khóa học đã được xuất bản
+        assertThrows(InputInvalidException.class, () -> {
+            courseService.updateCourse(1L, courseUpdateDTO);
+        });
+
+        // Đảm bảo không có gì được lưu vào repository
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
     void deleteCourse_ValidCourseId_DeletesCourse() {
         when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
         courseService.deleteCourse(1L);
@@ -154,6 +172,81 @@ class CourseServiceTests {
         course.delete();
         when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
         assertThrows(InputInvalidException.class, () -> courseService.deleteCourse(1L));
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void deleteCourse_PublishedCourse_ThrowsException() {
+        Course courseMock = spy(course);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(courseMock));
+        doReturn(false).when(courseMock).canEdit();
+        assertThrows(InputInvalidException.class, () -> courseService.deleteCourse(1L));
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void updatePrice_ValidCourseIdAndPrice_UpdatesPrice() {
+        when(courseRepository.findById(1L)).thenReturn(java.util.Optional.of(course));
+        MonetaryAmount newPrice = Money.of(100, "USD");
+        courseService.updatePrice(1L, newPrice);
+        verify(courseRepository, times(1)).save(course);
+        assertEquals(newPrice, course.getPrice());
+    }
+
+    @Test
+    void updatePrice_CourseNotFound_ThrowsException() {
+        when(courseRepository.findById(1L)).thenReturn(java.util.Optional.empty());
+        MonetaryAmount newPrice = Money.of(100, "USD");
+        assertThrows(ResourceNotFoundException.class, () -> courseService.updatePrice(1L, newPrice));
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void updatePrice_NegativePrice_ThrowsException() {
+        when(courseRepository.findById(1L)).thenReturn(java.util.Optional.of(course));
+        MonetaryAmount negativePrice = Money.of(-100, "USD");
+        assertThrows(InputInvalidException.class, () -> courseService.updatePrice(1L, negativePrice));
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void updatePrice_CoursePublished_ThrowsException() {
+        Course courseMock = spy(course);
+        when(courseRepository.findById(1L)).thenReturn(java.util.Optional.of(courseMock));
+        doReturn(false).when(courseMock).canEdit();
+        MonetaryAmount newPrice = Money.of(100, "USD");
+        assertThrows(InputInvalidException.class, () -> courseService.updatePrice(1L, newPrice));
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void assignTeacher_ValidCourseIdAndTeacher_AssignsTeacher() {
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        courseService.assignTeacher(1L, "NewTeacher");
+        verify(courseRepository, times(1)).save(course);
+        assertEquals("NewTeacher", course.getTeacher());
+    }
+
+    @Test
+    void assignTeacher_CourseNotFound_ThrowsException() {
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> courseService.assignTeacher(1L, "NewTeacher"));
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void assignTeacher_NullTeacher_ThrowsException() {
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        assertThrows(NullPointerException.class, () -> courseService.assignTeacher(1L, null));
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void assignTeacher_PublishedCourse_ThrowsException() {
+        Course courseMock = spy(course);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(courseMock));
+        doReturn(false).when(courseMock).canEdit();
+        assertThrows(InputInvalidException.class, () -> courseService.assignTeacher(1L, "NewTeacher"));
         verify(courseRepository, never()).save(any(Course.class));
     }
 

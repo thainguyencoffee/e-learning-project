@@ -190,6 +190,9 @@ public class Course extends AuditSupportClass {
     };
 
     public void delete() {
+        if (!canEdit()) {
+            throw new InputInvalidException("Cannot delete a published course.");
+        }
         if (this.deleted) {
             throw new InputInvalidException("Course is already deleted.");
         }

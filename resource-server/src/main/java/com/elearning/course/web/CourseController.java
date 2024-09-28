@@ -67,9 +67,15 @@ public class CourseController {
 
     @PutMapping("/{courseId}/update-price")
     public ResponseEntity<Course> changePrice(@PathVariable Long courseId,
-                                              @RequestBody MonetaryPriceDTO priceDTO) {
+                                              @RequestBody UpdatePriceDTO priceDTO) {
         Course updatedCourse = courseService.updatePrice(courseId, priceDTO.price());
         return ResponseEntity.ok(updatedCourse);
+    }
+
+    @PutMapping("/{courseId}/assign-teacher")
+    public ResponseEntity<Course> assignTeacher(@PathVariable Long courseId,
+                                                @Valid @RequestBody AssignTeacherDTO assignTeacherDTO) {
+        return ResponseEntity.ok(courseService.assignTeacher(courseId, assignTeacherDTO.teacherId()));
     }
 
     @PostMapping("/{courseId}/sections")

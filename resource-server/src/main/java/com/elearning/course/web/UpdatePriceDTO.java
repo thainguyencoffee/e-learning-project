@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 import javax.money.MonetaryAmount;
 
-public record MonetaryPriceDTO(
+public record UpdatePriceDTO(
         @NotNull(message = "Price is required")
         MonetaryAmount price
 ) {
