@@ -1,6 +1,8 @@
 package com.elearning.course.application;
 
+import com.elearning.common.exception.ResourceNotFoundException;
 import com.elearning.course.application.dto.CourseDTO;
+import com.elearning.course.application.dto.CourseUpdateDTO;
 import com.elearning.course.application.impl.CourseServiceImpl;
 import com.elearning.course.domain.Course;
 import com.elearning.course.domain.CourseRepository;
@@ -30,10 +32,11 @@ class CourseServiceTests {
     private CourseServiceImpl courseService;
 
     private CourseDTO courseDTO;
+    private CourseUpdateDTO courseUpdateDTO;
     private Course course;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
 
         // Giả lập CourseDTO với dữ liệu mẫu
@@ -43,6 +46,15 @@ class CourseServiceTests {
                 "http://example.com/image.jpg",
                 Set.of("OOP", "Concurrency"),
                 Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+
+        courseUpdateDTO = new CourseUpdateDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/image.jpg",
+                Set.of("OOP", "Concurrency"),
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
@@ -61,7 +73,7 @@ class CourseServiceTests {
     }
 
     @Test
-    public void testCreateCourse_ShouldCreateAndSaveCourse() {
+    void testCreateCourse_ShouldCreateAndSaveCourse() {
         // Giả lập hành vi của repository
         when(courseRepository.save(any(Course.class))).thenReturn(course);
 
@@ -84,26 +96,42 @@ class CourseServiceTests {
     }
 
     @Test
-    public void testCreateCourse_ShouldThrowException_WhenTitleIsBlank() {
-        // Giả lập CourseDTO với tiêu đề trống
-        CourseDTO invalidCourseDTO = new CourseDTO(
-                "",
-                "Learn Java from scratch",
-                "http://example.com/image.jpg",
-                Set.of("OOP", "Concurrency"),
-                Language.ENGLISH,
-                Set.of("Basic Programming Knowledge"),
-                Set.of(Language.ENGLISH, Language.SPANISH)
-        );
+    void testUpdateInfoCourse_ShouldUpdateCourseInfo() {
+        // Giả lập hành vi của repository
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        when(courseRepository.save(any(Course.class))).thenReturn(course);
 
-        // Kiểm tra xem ngoại lệ có được ném ra khi tiêu đề trống không
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            courseService.createCourse("teacher123", invalidCourseDTO);
+        // Thực thi use case
+        Course updatedCourse = courseService.updateCourse(1L, courseUpdateDTO);
+
+        // Xác minh rằng courseRepository.findByIdAndDeleted và courseRepository.save đã được gọi
+        verify(courseRepository, times(1)).findByIdAndDeleted(1L, false);
+        verify(courseRepository, times(1)).save(any(Course.class));
+
+        // Kiểm tra các giá trị trả về
+        assertNotNull(updatedCourse);
+        assertEquals(courseUpdateDTO.title(), updatedCourse.getTitle());
+        assertEquals(courseUpdateDTO.description(), updatedCourse.getDescription());
+        assertEquals(courseUpdateDTO.thumbnailUrl(), updatedCourse.getThumbnailUrl());
+        assertEquals(courseUpdateDTO.benefits(), updatedCourse.getBenefits());
+        assertEquals(courseUpdateDTO.prerequisites(), updatedCourse.getPrerequisites());
+        assertEquals(courseUpdateDTO.subtitles(), updatedCourse.getSubtitles());
+        assertEquals("teacher123", updatedCourse.getTeacher());
+    }
+
+    @Test
+    void testUpdateInfoCourse_ShouldThrowException_WhenCourseNotFound() {
+        // Giả lập hành vi của repository
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.empty());
+
+        // Kiểm tra xem ngoại lệ có được ném ra khi không tìm thấy khóa học
+        assertThrows(ResourceNotFoundException.class, () -> {
+            courseService.updateCourse(1L, courseUpdateDTO);
         });
-
-        assertEquals("Title must not be empty.", exception.getMessage());
 
         // Đảm bảo không có gì được lưu vào repository
         verify(courseRepository, never()).save(any(Course.class));
     }
+
+
 }

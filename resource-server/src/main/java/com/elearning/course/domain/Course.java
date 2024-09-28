@@ -76,7 +76,7 @@ public class Course extends AuditSupportClass {
             Set<String> prerequisites,
             Set<Language> subtitles
     ) {
-        if (published) {
+        if (!canEdit()) {
             throw new InputInvalidException("Cannot update a published course.");
         }
 
@@ -91,7 +91,7 @@ public class Course extends AuditSupportClass {
     }
 
     public void changePrice(MonetaryAmount newPrice) {
-        if (published) {
+        if (!canEdit()) {
             throw new InputInvalidException("Cannot change price of a published course.");
         }
         if (newPrice.isLessThan(Money.zero(newPrice.getCurrency()))) {
@@ -108,7 +108,7 @@ public class Course extends AuditSupportClass {
     }
 
     public void assignTeacher(String teacher) {
-        if (published) {
+        if (!canEdit()) {
             throw new InputInvalidException("Cannot assign a teacher to a published course.");
         }
 
@@ -118,7 +118,7 @@ public class Course extends AuditSupportClass {
     }
 
     public void publish(String approvedBy) {
-        if (published) {
+        if (!canEdit()) {
             throw new InputInvalidException("Course is already published.");
         }
         Assert.notEmpty(this.sections, "Cannot publish a course without sections.");
@@ -130,7 +130,7 @@ public class Course extends AuditSupportClass {
     }
 
     public void addSection(CourseSection section) {
-        if (published) {
+        if (!canEdit()) {
             throw new InputInvalidException("Cannot add a section to a published course.");
         }
 
@@ -148,7 +148,7 @@ public class Course extends AuditSupportClass {
     }
 
     public void updateSection(Long sectionId, String title) {
-        if (published) {
+        if (!canEdit()) {
             throw new InputInvalidException("Cannot update a section in a published course.");
         }
 
@@ -161,7 +161,7 @@ public class Course extends AuditSupportClass {
     }
 
     public void removeSection(Long sectionId) {
-        if (published) {
+        if (!canEdit()) {
             throw new InputInvalidException("Cannot remove a section from a published course.");
         }
         CourseSection courseSection = findSectionById(sectionId);
@@ -169,7 +169,7 @@ public class Course extends AuditSupportClass {
     }
 
     public void addLessonToSection(Long sectionId, Lesson lesson) {
-        if (published) {
+        if (!canEdit()) {
             throw new InputInvalidException("Cannot add a lesson to a published course.");
         }
         CourseSection section = findSectionById(sectionId);
@@ -177,7 +177,7 @@ public class Course extends AuditSupportClass {
     }
 
     public void updateLessonInSection(Long sectionId, Long lessonId, Lesson updatedLesson){
-        if (published) {
+        if (!canEdit()) {
             throw new InputInvalidException("Cannot add a lesson to a published course.");
         }
         CourseSection section = findSectionById(sectionId);
@@ -210,4 +210,7 @@ public class Course extends AuditSupportClass {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
+    public boolean canEdit() {
+        return !published;
+    }
 }
