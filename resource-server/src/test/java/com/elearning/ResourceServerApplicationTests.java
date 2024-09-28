@@ -2,11 +2,14 @@ package com.elearning;
 
 import com.elearning.course.application.dto.CourseDTO;
 import com.elearning.course.application.dto.CourseUpdateDTO;
+import com.elearning.course.domain.Course;
+import com.elearning.course.domain.CourseRepository;
 import com.elearning.course.domain.Language;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,6 +39,7 @@ class ResourceServerApplicationTests {
     protected static KeycloakToken userToken;
     protected static KeycloakToken user2Token;
     protected static KeycloakToken teacherToken;
+    protected static KeycloakToken bossToken;
 
     private static final KeycloakContainer keycloak =
             new KeycloakContainer("quay.io/keycloak/keycloak:24.0")
@@ -43,6 +47,8 @@ class ResourceServerApplicationTests {
 
     @Autowired
     private WebTestClient webTestClient;
+    @Autowired
+    private CourseRepository courseRepository;
 
     @DynamicPropertySource
     static void keycloakProperties(DynamicPropertyRegistry registry) {
@@ -62,13 +68,34 @@ class ResourceServerApplicationTests {
         userToken   = authenticateWith("user", "1", webClient);
         user2Token = authenticateWith("user2", "1", webClient);
         teacherToken = authenticateWith("teacher", "1", webClient);
+        bossToken = authenticateWith("boss", "1", webClient);
     }
+
+    @BeforeEach
+    void setupData() {
+        courseRepository.deleteAll();  // Xóa dữ liệu test trước đó
+
+        // Tạo một khóa học giả lập trong database
+        Course course = new Course(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH),
+                "teacher-id"  // Giáo viên giả lập
+        );
+        courseRepository.save(course);  // Lưu khóa học vào CSDL
+    }
+
 
     @Test
     void contextLoads() {
         assertThat(userToken.accessToken).isNotNull();
         assertThat(user2Token.accessToken).isNotNull();
         assertThat(teacherToken.accessToken).isNotNull();
+        assertThat(bossToken.accessToken).isNotNull();
     }
 
     @Test
@@ -362,6 +389,66 @@ class ResourceServerApplicationTests {
                 .body(BodyInserters.fromValue(courseUpdateDTO))  // Body của request là JSON CourseUpdateDTO
                 .exchange()
                 .expectStatus().isBadRequest();  // Kiểm tra phản hồi 400 Bad Request
+    }
+
+    @Test
+    void testDeleteCourse_Successful() {
+        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        // Xóa khóa học với token của giáo viên
+        webTestClient.delete().uri("/courses/{courseId}", courseId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .exchange()
+                .expectStatus().isNoContent();  // Phản hồi trả về 204 No Content
+
+        // Kiểm tra rằng khóa học đã bị đánh dấu là deleted
+        Course deletedCourse = courseRepository.findById(courseId).orElseThrow();
+        assertThat(deletedCourse.isDeleted()).isTrue();  // Kiểm tra khóa học đã bị đánh dấu deleted
+    }
+
+    @Test
+    void testDeleteCourse_WithAdmin_Successful() {
+        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        // Xóa khóa học với token của giáo viên
+        webTestClient.delete().uri("/courses/{courseId}", courseId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của admin
+                .exchange()
+                .expectStatus().isNoContent();  // Phản hồi trả về 204 No Content
+
+        // Kiểm tra rằng khóa học đã bị đánh dấu là deleted
+        Course deletedCourse = courseRepository.findById(courseId).orElseThrow();
+        assertThat(deletedCourse.isDeleted()).isTrue();  // Kiểm tra khóa học đã bị đánh dấu deleted
+    }
+
+    @Test
+    void testDeleteCourse_AlreadyDeleted() {
+        // Lấy khóa học và đánh dấu là đã xóa
+        Course course = courseRepository.findAll().iterator().next();
+        course.delete();  // Đánh dấu khóa học là đã xóa
+        courseRepository.save(course);
+
+        // Gửi request DELETE lần nữa
+        webTestClient.delete().uri("/courses/{courseId}", course.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void testDeleteCourse_Unauthorized() {
+        // Lấy khóa học từ database
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        // Gửi request DELETE mà không đính kèm token
+        webTestClient.delete().uri("/courses/{courseId}", courseId)
+                .exchange()
+                .expectStatus().isUnauthorized();  // Phản hồi 401 Unauthorized
     }
 
 

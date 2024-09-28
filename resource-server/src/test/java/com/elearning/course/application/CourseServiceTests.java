@@ -1,5 +1,6 @@
 package com.elearning.course.application;
 
+import com.elearning.common.exception.InputInvalidException;
 import com.elearning.common.exception.ResourceNotFoundException;
 import com.elearning.course.application.dto.CourseDTO;
 import com.elearning.course.application.dto.CourseUpdateDTO;
@@ -133,5 +134,27 @@ class CourseServiceTests {
         verify(courseRepository, never()).save(any(Course.class));
     }
 
+    @Test
+    void deleteCourse_ValidCourseId_DeletesCourse() {
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        courseService.deleteCourse(1L);
+        verify(courseRepository, times(1)).save(course);
+        assertTrue(course.isDeleted());
+    }
+
+    @Test
+    void deleteCourse_CourseNotFound_ThrowsException() {
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> courseService.deleteCourse(1L));
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void deleteCourse_AlreadyDeletedCourse_ThrowsException() {
+        course.delete();
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        assertThrows(InputInvalidException.class, () -> courseService.deleteCourse(1L));
+        verify(courseRepository, never()).save(any(Course.class));
+    }
 
 }

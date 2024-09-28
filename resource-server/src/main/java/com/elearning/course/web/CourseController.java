@@ -53,6 +53,12 @@ public class CourseController {
         return ResponseEntity.ok(updatedCourse);
     }
 
+    @DeleteMapping("/{courseId}")
+    public ResponseEntity<Void> deleteCourse(@PathVariable Long courseId) {
+        courseService.deleteCourse(courseId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping("/{courseId}/publish")
     public ResponseEntity<Course> updateStatus(@AuthenticationPrincipal Jwt jwt, @PathVariable Long courseId) {
         Course updatedCourse = courseService.publishCourse(courseId, jwt.getSubject());

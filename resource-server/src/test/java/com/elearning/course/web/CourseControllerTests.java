@@ -1,6 +1,7 @@
 package com.elearning.course.web;
 
 import com.elearning.common.config.SecurityConfig;
+import com.elearning.common.exception.ResourceNotFoundException;
 import com.elearning.course.application.dto.CourseDTO;
 import com.elearning.course.application.dto.CourseUpdateDTO;
 import com.elearning.course.application.impl.CourseServiceImpl;
@@ -22,8 +23,7 @@ import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CourseController.class)
@@ -163,6 +163,33 @@ class CourseControllerTests {
                         .content("{}")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user")))
                 )
+                .andExpect(status().isForbidden());
+    }
+
+
+    @Test
+    void deleteCourse_ValidCourseId_ShouldReturnNoContent() throws Exception {
+        // Chuẩn bị hành vi của deleteCourse
+        Mockito.doNothing().when(courseService).deleteCourse(1L);
+
+        mockMvc.perform(delete("/courses/1")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deleteCourse_CourseNotFound_ShouldReturnNotFound() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).deleteCourse(1L);
+
+        mockMvc.perform(delete("/courses/1")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteCourse_UserNotTeacher_ShouldReturnForbidden() throws Exception {
+        mockMvc.perform(delete("/courses/1")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
                 .andExpect(status().isForbidden());
     }
 

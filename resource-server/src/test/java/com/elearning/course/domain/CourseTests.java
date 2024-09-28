@@ -136,5 +136,18 @@ public class CourseTests {
         verify(course, times(1)).updateInfo(anyString(), anyString(), anyString(), anySet(), anySet(), anySet());
     }
 
+    @Test
+    public void delete_ValidCourse_DeletesCourse() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        course.delete();
+        assertTrue(course.isDeleted());
+    }
+
+    @Test
+    public void delete_AlreadyDeletedCourse_ThrowsException() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        course.delete();
+        assertThrows(InputInvalidException.class, course::delete);
+    }
 
 }
