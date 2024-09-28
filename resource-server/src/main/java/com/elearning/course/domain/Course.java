@@ -2,8 +2,7 @@ package com.elearning.course.domain;
 
 import com.elearning.common.AuditSupportClass;
 import com.elearning.common.exception.ResourceNotFoundException;
-import com.elearning.course.domain.exception.CannotUpdateCourseException;
-import com.elearning.discount.domain.Discount;
+import com.elearning.common.exception.InputInvalidException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.apache.commons.lang3.Validate;
@@ -77,8 +76,8 @@ public class Course extends AuditSupportClass {
             Set<String> prerequisites,
             Set<Language> subtitles
     ) {
-        if (published) {
-            throw new CannotUpdateCourseException("Cannot update a published course.");
+        if (!canEdit()) {
+            throw new InputInvalidException("Cannot update a published course.");
         }
 
         Assert.hasText(title, "Title must not be empty.");
@@ -92,11 +91,11 @@ public class Course extends AuditSupportClass {
     }
 
     public void changePrice(MonetaryAmount newPrice) {
-        if (published) {
-            throw new CannotUpdateCourseException("Cannot change price of a published course.");
+        if (!canEdit()) {
+            throw new InputInvalidException("Cannot change price of a published course.");
         }
         if (newPrice.isLessThan(Money.zero(newPrice.getCurrency()))) {
-            throw new IllegalArgumentException("Price cannot be negative.");
+            throw new InputInvalidException("Price cannot be negative.");
         }
         this.price = newPrice;
     }
@@ -109,8 +108,8 @@ public class Course extends AuditSupportClass {
     }
 
     public void assignTeacher(String teacher) {
-        if (published) {
-            throw new IllegalStateException("Cannot assign a teacher to a published course.");
+        if (!canEdit()) {
+            throw new InputInvalidException("Cannot assign a teacher to a published course.");
         }
 
         Validate.notNull(teacher, "Teacher must not be null.");
@@ -119,10 +118,10 @@ public class Course extends AuditSupportClass {
     }
 
     public void publish(String approvedBy) {
-        if (published) {
-            throw new IllegalStateException("Course is already published.");
+        if (!canEdit()) {
+            throw new InputInvalidException("Course is already published.");
         }
-        Validate.notEmpty(this.sections, "Cannot publish a course without sections.");
+        Assert.notEmpty(this.sections, "Cannot publish a course without sections.");
         Validate.notNull(this.price, "Cannot publish a course without a price.");
         Validate.notNull(teacher, "Cannot publish a course without a teacher.");
         Validate.notNull(approvedBy, "Approved by must not be null.");
@@ -131,30 +130,30 @@ public class Course extends AuditSupportClass {
     }
 
     public void addSection(CourseSection section) {
-        if (published) {
-            throw new IllegalStateException("Cannot add a section to a published course.");
+        if (!canEdit()) {
+            throw new InputInvalidException("Cannot add a section to a published course.");
         }
 
         Validate.notNull(section, "Section must not be null.");
 
         if (this.sections.stream().anyMatch(existingSection -> existingSection.getTitle().equals(section.getTitle()))) {
-            throw new IllegalArgumentException("A section with the same title already exists.");
+            throw new InputInvalidException("A section with the same title already exists.");
         }
 
         if (section.getLessons().isEmpty()) {
-            throw new IllegalArgumentException("Section must have at least one lesson.");
+            throw new InputInvalidException("Section must have at least one lesson.");
         }
 
         this.sections.add(section);
     }
 
     public void updateSection(Long sectionId, String title) {
-        if (published) {
-            throw new IllegalStateException("Cannot update a section in a published course.");
+        if (!canEdit()) {
+            throw new InputInvalidException("Cannot update a section in a published course.");
         }
 
         if (this.sections.stream().anyMatch(existingSection -> existingSection.getTitle().equals(title))) {
-            throw new IllegalArgumentException("A section with the same title already exists.");
+            throw new InputInvalidException("A section with the same title already exists.");
         }
 
         CourseSection existingSection = findSectionById(sectionId);
@@ -162,24 +161,24 @@ public class Course extends AuditSupportClass {
     }
 
     public void removeSection(Long sectionId) {
-        if (published) {
-            throw new IllegalStateException("Cannot remove a section from a published course.");
+        if (!canEdit()) {
+            throw new InputInvalidException("Cannot remove a section from a published course.");
         }
         CourseSection courseSection = findSectionById(sectionId);
         this.sections.remove(courseSection);
     }
 
     public void addLessonToSection(Long sectionId, Lesson lesson) {
-        if (published) {
-            throw new IllegalStateException("Cannot add a lesson to a published course.");
+        if (!canEdit()) {
+            throw new InputInvalidException("Cannot add a lesson to a published course.");
         }
         CourseSection section = findSectionById(sectionId);
         section.addLesson(lesson);
     }
 
     public void updateLessonInSection(Long sectionId, Long lessonId, Lesson updatedLesson){
-        if (published) {
-            throw new IllegalStateException("Cannot add a lesson to a published course.");
+        if (!canEdit()) {
+            throw new InputInvalidException("Cannot add a lesson to a published course.");
         }
         CourseSection section = findSectionById(sectionId);
         section.updateLesson(lessonId, updatedLesson);
@@ -192,14 +191,14 @@ public class Course extends AuditSupportClass {
 
     public void delete() {
         if (this.deleted) {
-            throw new IllegalStateException("Course is already deleted.");
+            throw new InputInvalidException("Course is already deleted.");
         }
         this.deleted = true;
     }
 
     public void restore() {
         if (!this.deleted) {
-            throw new IllegalStateException("Course is not deleted.");
+            throw new InputInvalidException("Course is not deleted.");
         }
         this.deleted = false;
     }
@@ -211,4 +210,7 @@ public class Course extends AuditSupportClass {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
+    public boolean canEdit() {
+        return !published;
+    }
 }
