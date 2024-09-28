@@ -4,9 +4,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.Optional;
+
 public interface CourseRepository extends CrudRepository<Course, Long> {
 
     Page<Course> findAll(Pageable pageable);
 
-    boolean existsCourseByIdAndCreatedBy(Long courseId, String createdBy);
+    Optional<Course> findByIdAndDeleted(Long courseId, Boolean deleted);
 }

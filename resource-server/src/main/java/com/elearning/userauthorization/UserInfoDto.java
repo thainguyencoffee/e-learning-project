@@ -1,4 +1,4 @@
-package com.elearning.user;
+package com.elearning.userauthorization;
 
 import java.time.Instant;
 import java.util.List;

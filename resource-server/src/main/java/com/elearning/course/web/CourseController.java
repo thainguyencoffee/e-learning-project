@@ -1,97 +1,83 @@
 package com.elearning.course.web;
 
-import com.elearning.course.application.CourseRequestDTO;
-import com.elearning.course.application.CourseService;
+import com.elearning.course.application.*;
+import com.elearning.course.application.dto.CourseDTO;
+import com.elearning.course.application.dto.CourseSectionDTO;
+import com.elearning.course.application.dto.CourseUpdateDTO;
 import com.elearning.course.domain.Course;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import jakarta.validation.Valid;
-
-import java.util.List;
-
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 
-@Slf4j
 @RestController
-@RequestMapping(value = "/courses", produces = MediaType.APPLICATION_JSON_VALUE)
-@RequiredArgsConstructor
+@RequestMapping("/courses")
 public class CourseController {
 
-    private final CourseService courseService;
+    private final PublishCourseUseCase publishCourseUseCase;
+    private final CreateCourseUseCase createCourseUseCase;
+    private final UpdateCourseUseCase updateCourseUseCase;
+    private final CourseQueryUseCase courseQueryUseCase;
+    private final UpdatePriceUseCase updatePriceUseCase;
+    private final AddSectionUseCase addSectionUseCase;
 
-    @GetMapping
-    public ResponseEntity<List<Course>> courses(Pageable pageable) {
-        return ResponseEntity.ok(courseService.findAll(pageable));
+    public CourseController(PublishCourseUseCase publishCourseUseCase, CreateCourseUseCase createCourseUseCase, UpdateCourseUseCase updateCourseUseCase, CourseQueryUseCase courseQueryUseCase, UpdatePriceUseCase updatePriceUseCase, AddSectionUseCase addSectionUseCase) {
+        this.publishCourseUseCase = publishCourseUseCase;
+        this.createCourseUseCase = createCourseUseCase;
+        this.updateCourseUseCase = updateCourseUseCase;
+        this.courseQueryUseCase = courseQueryUseCase;
+        this.updatePriceUseCase = updatePriceUseCase;
+        this.addSectionUseCase = addSectionUseCase;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Course> course(@PathVariable(name = "id") final Long id) {
-        return ResponseEntity.ok(courseService.findById(id));
+    @GetMapping
+    public ResponseEntity<Page<Course>> courses(Pageable pageable) {
+        return ResponseEntity.ok(courseQueryUseCase.findAllCourses(pageable));
+    }
+
+    @GetMapping("/{courseId}")
+    public ResponseEntity<Course> courseById(@PathVariable Long courseId) {
+        return ResponseEntity.ok(courseQueryUseCase.findCourseById(courseId));
     }
 
     @PostMapping
-    public ResponseEntity<Long> post(@RequestBody @Valid CourseRequestDTO courseRequestDTO,
-                                     @AuthenticationPrincipal Jwt jwt) {
-        String userId = jwt.getClaimAsString(StandardClaimNames.PREFERRED_USERNAME);
-
-        log.info("User {} attempt create course", userId);
-
-        // if user is not admin, then automatically set teacherId to userId
-        if (!jwt.getClaimAsStringList("roles").contains("admin")) {
-            courseRequestDTO = CourseRequestDTO.withTeacherId(courseRequestDTO, userId);
-        }
-
-        final Course course = courseService.createCourse(courseRequestDTO);
-        return new ResponseEntity<>(course.getId(), HttpStatus.CREATED);
+    public ResponseEntity<Course> createCourse(@AuthenticationPrincipal Jwt jwt, @RequestBody @Valid CourseDTO courseDTO) {
+        String teacherId = jwt.getSubject();
+        Course createdCourse = createCourseUseCase.execute(teacherId, courseDTO);
+        URI location = URI.create("/api/courses/" + createdCourse.getId());
+        return ResponseEntity.created(location).body(createdCourse);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Long> put(@PathVariable(name = "id") final Long id,
-                                    @RequestBody @Valid CourseRequestDTO courseRequestDTO,
-                                    @AuthenticationPrincipal Jwt jwt) {
-        String userId = jwt.getClaimAsString(StandardClaimNames.PREFERRED_USERNAME);
-        log.info("User {} attempt update course id {}", userId);
-
-        verifyRoleWithCourse(id, jwt);
-        // if user is not admin, then automatically set teacherId to userId
-        if (!jwt.getClaimAsStringList("roles").contains("admin")) {
-            courseRequestDTO = CourseRequestDTO.withTeacherId(courseRequestDTO, userId);
-        }
-        courseService.updateCourse(id, courseRequestDTO);
-        return ResponseEntity.ok(id);
+    @PutMapping("/{courseId}")
+    public ResponseEntity<Course> updateCourse(@PathVariable Long courseId,
+                                               @RequestBody @Valid CourseUpdateDTO courseUpdateDTO) {
+        Course updatedCourse = updateCourseUseCase.execute(courseId, courseUpdateDTO);
+        return ResponseEntity.ok(updatedCourse);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable(name = "id") final Long id, @AuthenticationPrincipal Jwt jwt) {
-        log.info("User {} attempt delete course id {}", jwt.getClaimAsString(StandardClaimNames.PREFERRED_USERNAME), id);
-
-        verifyRoleWithCourse(id, jwt);
-        courseService.deleteCourse(id);
-        return ResponseEntity.noContent().build();
+    @PutMapping("/{courseId}/publish")
+    public ResponseEntity<Course> updateStatus(@AuthenticationPrincipal Jwt jwt, @PathVariable Long courseId) {
+        Course updatedCourse = publishCourseUseCase.execute(courseId, jwt.getSubject());
+        return ResponseEntity.ok(updatedCourse);
     }
 
-    private void verifyRoleWithCourse(final Long courseId, Jwt jwt) {
-        if (!jwt.getClaimAsStringList("roles").contains("admin")) {
-            if (!courseService.isItMyCourse(courseId, jwt.getClaimAsString(StandardClaimNames.PREFERRED_USERNAME))) {
-                throw new CoursePermissionException("You don't have permission to course id: " + courseId);
-            }
-        }
+    @PutMapping("/{courseId}/update-price")
+    public ResponseEntity<Course> changePrice(@PathVariable Long courseId,
+                                              @RequestBody MonetaryPriceDTO priceDTO) {
+        Course updatedCourse = updatePriceUseCase.execute(courseId, priceDTO.price());
+        return ResponseEntity.ok(updatedCourse);
+    }
+
+    @PostMapping("/{courseId}/sections")
+    public ResponseEntity<Course> addSection(@PathVariable Long courseId,
+                                             @RequestBody @Valid CourseSectionDTO courseSectionDTO) {
+        Course updatedCourse = addSectionUseCase.execute(courseId, courseSectionDTO);
+        return ResponseEntity.ok(updatedCourse);
     }
 
 }
