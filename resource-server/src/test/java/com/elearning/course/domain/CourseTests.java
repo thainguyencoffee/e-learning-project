@@ -202,4 +202,25 @@ public class CourseTests {
         assertThrows(InputInvalidException.class, () -> course.assignTeacher("NewTeacher"));
     }
 
+    @Test
+    void applyDiscount_ValidDiscount_AppliesDiscount() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        MonetaryAmount price = Money.of(200, "USD");
+        MonetaryAmount discountedPrice = Money.of(150, "USD");
+        course.changePrice(price);
+        String discountCode = "25OFF";
+        course.applyDiscount(discountedPrice, discountCode);
+        assertEquals(Money.of(50, "USD"), course.getDiscountedPrice());
+        assertEquals(discountCode, course.getDiscountCode());
+    }
+
+    @Test
+    void applyDiscount_NullDiscountedPrice_ThrowsException() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        MonetaryAmount price = Money.of(200, "USD");
+        String discountCode = "25OFF";
+        course.changePrice(price);
+        assertThrows(NullPointerException.class, () -> course.applyDiscount(null, discountCode));
+    }
+
 }

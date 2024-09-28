@@ -1,5 +1,6 @@
 package com.elearning.course.application.impl;
 
+import com.elearning.common.exception.InputInvalidException;
 import com.elearning.common.exception.ResourceNotFoundException;
 import com.elearning.course.application.CourseService;
 import com.elearning.course.application.dto.CourseDTO;
@@ -96,11 +97,14 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course applyDiscount(Long courseId, Long discountId) {
+    public Course applyDiscount(Long courseId, String code) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(ResourceNotFoundException::new);
-        MonetaryAmount discountedPrice = discountService.calculateDiscount(discountId, course.getPrice());
-        course.applyDiscount(discountedPrice, discountId);
+        if (course.getPrice() == null) {
+            throw new InputInvalidException("Cannot apply discount to a course without a price.");
+        }
+        MonetaryAmount discountedPrice = discountService.calculateDiscount(code, course.getPrice());
+        course.applyDiscount(discountedPrice, code);
 
         return courseRepository.save(course);
     }

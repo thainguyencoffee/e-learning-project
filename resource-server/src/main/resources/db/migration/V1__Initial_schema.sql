@@ -25,7 +25,7 @@ create table course
     created_date       timestamp   not null,
     last_modified_by   varchar(50) not null,
     last_modified_date timestamp   not null,
-    discount           bigint,
+    discount_code      varchar(50),
     deleted            boolean     not null,
     version            int         not null,
     constraint fk_course primary key (id)
@@ -83,7 +83,7 @@ create table discount
     id                 bigserial   not null,
     code               varchar(50) not null,
     type               varchar(50) not null,
-    percentage         int         not null,
+    percentage         int,
     fixed_amount       varchar(50),
     start_date         timestamp   not null,
     end_date           timestamp   not null,

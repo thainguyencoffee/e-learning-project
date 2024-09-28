@@ -29,7 +29,7 @@ public interface CourseService {
 
     Course assignTeacher(Long courseId, String teacher);
 
-    Course applyDiscount(Long courseId, Long discountId);
+    Course applyDiscount(Long courseId, String discountCode);
 
     Course addSection(Long courseId, CourseSectionDTO courseSectionDTO);
 

@@ -8,6 +8,8 @@ public interface DiscountService {
 
     Discount findById(Long id);
 
-    MonetaryAmount calculateDiscount(Long discountId, MonetaryAmount originalPrice);
+    Discount findByCode(String code);
+
+    MonetaryAmount calculateDiscount(String code, MonetaryAmount originalPrice);
 
 }
