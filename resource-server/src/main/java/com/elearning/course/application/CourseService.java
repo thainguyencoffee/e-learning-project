@@ -1,0 +1,39 @@
+package com.elearning.course.application;
+
+import com.elearning.course.application.dto.CourseDTO;
+import com.elearning.course.application.dto.CourseSectionDTO;
+import com.elearning.course.application.dto.CourseUpdateDTO;
+import com.elearning.course.domain.Course;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import javax.money.MonetaryAmount;
+
+public interface CourseService {
+
+    Page<Course> findAllCourses(Pageable pageable);
+
+    Course findCourseById(Long courseId);
+
+    Course findCourseDeleted(Long courseId);
+
+    Course createCourse(String teacherId, CourseDTO courseDTO);
+
+    Course updateCourse(Long courseId, CourseUpdateDTO courseUpdateDTO);
+
+    void deleteCourse(Long courseId);
+
+    void restoreCourse(Long courseId);
+
+    Course publishCourse(Long courseId, String approvedBy);
+
+    void assignTeacher(Long courseId, String teacher);
+
+    Course applyDiscount(Long courseId, Long discountId);
+
+    Course addSection(Long courseId, CourseSectionDTO courseSectionDTO);
+
+    Course removeSection(Long courseId, Long sectionId);
+
+    Course updatePrice(Long courseId, MonetaryAmount newPrice);
+}

@@ -19,65 +19,59 @@ import java.net.URI;
 @RequestMapping("/courses")
 public class CourseController {
 
-    private final PublishCourseUseCase publishCourseUseCase;
-    private final CreateCourseUseCase createCourseUseCase;
-    private final UpdateCourseUseCase updateCourseUseCase;
-    private final CourseQueryUseCase courseQueryUseCase;
-    private final UpdatePriceUseCase updatePriceUseCase;
-    private final AddSectionUseCase addSectionUseCase;
+    private final CourseService courseService;
 
-    public CourseController(PublishCourseUseCase publishCourseUseCase, CreateCourseUseCase createCourseUseCase, UpdateCourseUseCase updateCourseUseCase, CourseQueryUseCase courseQueryUseCase, UpdatePriceUseCase updatePriceUseCase, AddSectionUseCase addSectionUseCase) {
-        this.publishCourseUseCase = publishCourseUseCase;
-        this.createCourseUseCase = createCourseUseCase;
-        this.updateCourseUseCase = updateCourseUseCase;
-        this.courseQueryUseCase = courseQueryUseCase;
-        this.updatePriceUseCase = updatePriceUseCase;
-        this.addSectionUseCase = addSectionUseCase;
+    public CourseController(CourseService courseService) {
+        this.courseService = courseService;
     }
 
     @GetMapping
     public ResponseEntity<Page<Course>> courses(Pageable pageable) {
-        return ResponseEntity.ok(courseQueryUseCase.findAllCourses(pageable));
+        return ResponseEntity.ok(courseService.findAllCourses(pageable));
     }
 
     @GetMapping("/{courseId}")
     public ResponseEntity<Course> courseById(@PathVariable Long courseId) {
-        return ResponseEntity.ok(courseQueryUseCase.findCourseById(courseId));
+        return ResponseEntity.ok(courseService.findCourseById(courseId));
     }
 
     @PostMapping
-    public ResponseEntity<Course> createCourse(@AuthenticationPrincipal Jwt jwt, @RequestBody @Valid CourseDTO courseDTO) {
+    public ResponseEntity<Course> createCourse(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestBody @Valid CourseDTO courseDTO
+    ) {
         String teacherId = jwt.getSubject();
-        Course createdCourse = createCourseUseCase.execute(teacherId, courseDTO);
-        URI location = URI.create("/api/courses/" + createdCourse.getId());
+        Course createdCourse = courseService.createCourse(teacherId, courseDTO);
+        URI location = URI.create("/courses/" + createdCourse.getId());
         return ResponseEntity.created(location).body(createdCourse);
     }
 
     @PutMapping("/{courseId}")
     public ResponseEntity<Course> updateCourse(@PathVariable Long courseId,
                                                @RequestBody @Valid CourseUpdateDTO courseUpdateDTO) {
-        Course updatedCourse = updateCourseUseCase.execute(courseId, courseUpdateDTO);
+        Course updatedCourse = courseService.updateCourse(courseId, courseUpdateDTO);
         return ResponseEntity.ok(updatedCourse);
     }
 
     @PutMapping("/{courseId}/publish")
     public ResponseEntity<Course> updateStatus(@AuthenticationPrincipal Jwt jwt, @PathVariable Long courseId) {
-        Course updatedCourse = publishCourseUseCase.execute(courseId, jwt.getSubject());
+        Course updatedCourse = courseService.publishCourse(courseId, jwt.getSubject());
         return ResponseEntity.ok(updatedCourse);
     }
 
     @PutMapping("/{courseId}/update-price")
     public ResponseEntity<Course> changePrice(@PathVariable Long courseId,
                                               @RequestBody MonetaryPriceDTO priceDTO) {
-        Course updatedCourse = updatePriceUseCase.execute(courseId, priceDTO.price());
+        Course updatedCourse = courseService.updatePrice(courseId, priceDTO.price());
         return ResponseEntity.ok(updatedCourse);
     }
 
     @PostMapping("/{courseId}/sections")
     public ResponseEntity<Course> addSection(@PathVariable Long courseId,
                                              @RequestBody @Valid CourseSectionDTO courseSectionDTO) {
-        Course updatedCourse = addSectionUseCase.execute(courseId, courseSectionDTO);
+        Course updatedCourse = courseService.addSection(courseId, courseSectionDTO);
         return ResponseEntity.ok(updatedCourse);
     }
+
 
 }
