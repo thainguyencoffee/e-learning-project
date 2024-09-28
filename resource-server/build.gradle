@@ -30,7 +30,8 @@ ext {
 dependencies {
     implementation 'com.amazonaws:aws-java-sdk-s3:1.11.1000'
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
-
+    implementation 'commons-validator:commons-validator:1.9.0'
+    implementation 'org.apache.commons:commons-lang3:3.17.0'
     // error handling
     implementation('io.github.wimdeblauwe:error-handling-spring-boot-starter:4.3.0')
 

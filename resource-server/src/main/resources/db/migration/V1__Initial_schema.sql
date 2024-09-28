@@ -9,17 +9,14 @@ create table student
 create table course
 (
     id                 bigserial   not null,
-    title              varchar(50) not null,
-    thumbnail_url      varchar(50) not null,
-    status             varchar(50) not null,
+    title              varchar(50),
+    thumbnail_url      varchar(50),
+    published          boolean     not null,
     description        text,
-    is_public          boolean     not null,
-    email_authorities  varchar(255)[],
-    price              varchar(50) not null,
+    price              varchar(50),
     discounted_price   varchar(50),
-    teacher_id         varchar(50) not null,
-    term               varchar(50) not null,
-    language           varchar(50) not null,
+    teacher            varchar(50),
+    language           varchar(50),
     subtitles          varchar(50)[],
     benefits           text[],
     prerequisites      text[],
@@ -28,7 +25,9 @@ create table course
     created_date       timestamp   not null,
     last_modified_by   varchar(50) not null,
     last_modified_date timestamp   not null,
-    discount_id        bigint,
+    discount        bigint,
+    deleted            boolean     not null,
+    version            int         not null,
     constraint fk_course primary key (id)
 );
 
@@ -52,6 +51,22 @@ create table lesson
     constraint fk_lesson primary key (id)
 );
 
+create table quiz
+(
+    id    bigserial    not null,
+    title varchar(255) not null,
+    constraint fk_quiz primary key (id)
+);
+
+create table question
+(
+    id      bigserial    not null,
+    prompt  varchar(255) not null,
+    options varchar(255)[] not null,
+    correct int          not null,
+    quiz    bigint       not null references quiz (id) on DELETE cascade,
+    constraint fk_question primary key (id)
+);
 
 create table course_student
 (
