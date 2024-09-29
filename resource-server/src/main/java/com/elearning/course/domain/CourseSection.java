@@ -1,6 +1,6 @@
 package com.elearning.course.domain;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.ToString;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.*;
@@ -11,7 +11,7 @@ import org.springframework.util.Assert;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
 @Table("course_section")
 @ToString(exclude = "lessons")
 public class CourseSection {

@@ -1,7 +1,9 @@
 package com.elearning.course.domain;
 
 import com.elearning.common.exception.InputInvalidException;
+import com.elearning.common.exception.ResourceNotFoundException;
 import org.javamoney.moneta.Money;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import javax.money.MonetaryAmount;
@@ -265,5 +267,54 @@ public class CourseTests {
         CourseSection section = new CourseSection("SectionTitle");
         assertThrows(InputInvalidException.class, () -> course.addSection(section));
     }
+
+    @Test
+    void testUpdateSection_ShouldUpdateSectionTitle() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        CourseSection section = spy(new CourseSection("SectionTitle"));
+        // Mock id của section
+        when(section.getId()).thenReturn(1L);
+        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
+        course.addSection(section);
+        assertTrue(course.getSections().contains(section));
+
+        // update section title
+        course.updateSection(section.getId(), "NewSectionTitle");
+
+        // verify section title is updated
+        verify(section).updateInfo("NewSectionTitle");
+        assertEquals("NewSectionTitle", section.getTitle());
+    }
+
+    @Test
+    void testUpdateSection_SectionWithSameTitle_ThrowsException() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        CourseSection section = spy(new CourseSection("SectionTitle"));
+        // Mock id của section
+        when(section.getId()).thenReturn(1L);
+        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
+        course.addSection(section);
+        assertTrue(course.getSections().contains(section));
+
+        // Tạo một section khác có cùng title với section đã thêm vào course
+        CourseSection duplicateSection = new CourseSection("SectionTitle");
+        assertThrows(InputInvalidException.class, () -> course.addSection(duplicateSection));
+    }
+
+    @Test
+    void testUpdateSection_PublishedCourse_ThrowsException() {
+        Course course = spy(new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher"));
+        when(course.canEdit()).thenReturn(false); // Giả lập khóa học đã publish
+
+        CourseSection section = new CourseSection("SectionTitle");
+        assertThrows(InputInvalidException.class, () -> course.addSection(section));
+    }
+
+    @Test
+    void testUpdateSection_SectionNotFound_ThrowsException() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        assertThrows(ResourceNotFoundException.class, () -> course.updateSection(1L, "NewSectionTitle"));
+    }
+
 
 }

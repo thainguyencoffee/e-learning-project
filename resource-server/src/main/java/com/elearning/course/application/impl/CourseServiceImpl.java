@@ -120,6 +120,13 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public Course updateSectionInfo(Long courseId, Long sectionId, String newTitle) {
+        Course course = findCourseById(courseId);
+        course.updateSection(sectionId, newTitle);
+        return courseRepository.save(course);
+    }
+
+    @Override
     public Course removeSection(Long courseId, Long sectionId) {
         Course course = findCourseById(courseId);
         course.removeSection(sectionId);

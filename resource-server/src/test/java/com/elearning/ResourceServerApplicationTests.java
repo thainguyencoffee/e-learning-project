@@ -4,13 +4,11 @@ import com.elearning.course.application.dto.CourseDTO;
 import com.elearning.course.application.dto.CourseSectionDTO;
 import com.elearning.course.application.dto.CourseUpdateDTO;
 import com.elearning.course.application.dto.LessonDTO;
-import com.elearning.course.domain.Course;
-import com.elearning.course.domain.CourseRepository;
-import com.elearning.course.domain.Language;
-import com.elearning.course.domain.Lesson;
+import com.elearning.course.domain.*;
 import com.elearning.course.web.ApplyDiscountDTO;
 import com.elearning.course.web.AssignTeacherDTO;
 import com.elearning.course.web.UpdatePriceDTO;
+import com.elearning.course.web.UpdateSectionDTO;
 import com.elearning.discount.domain.Discount;
 import com.elearning.discount.domain.DiscountRepository;
 import com.elearning.discount.domain.Type;
@@ -685,6 +683,69 @@ class ResourceServerApplicationTests {
                 .expectStatus().isForbidden();
     }
 
+
+    @Test
+    void testUpdateSectionInfo_UserIsTeacher_Successful() {
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        CourseSection section = new CourseSection("Section 1");
+        section.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
+        section.addLesson(new Lesson("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null));
+        section.addLesson(new Lesson("Lesson 3", Lesson.Type.QUIZ, null, 1L));
+        course.addSection(section);
+        courseRepository.save(course);
+
+        UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("New title");
+
+        // Gửi request PUT để cập nhật section info cho khóa học
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}", courseId, section.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(updateSectionDTO))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.sections[0].title").isEqualTo(updateSectionDTO.title());
+    }
+
+    @Test
+    void testUpdateSectionInfo_UserIsAdmin_Successful() {
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        CourseSection section = new CourseSection("Section 1");
+        section.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
+        section.addLesson(new Lesson("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null));
+        section.addLesson(new Lesson("Lesson 3", Lesson.Type.QUIZ, null, 1L));
+        course.addSection(section);
+        courseRepository.save(course);
+
+        UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("New title");
+
+        // Gửi request PUT để cập nhật section info cho khóa học
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}", courseId, section.getId())
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(updateSectionDTO))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.sections[0].title").isEqualTo(updateSectionDTO.title());
+    }
+
+    @Test
+    void testUpdateSectionInfo_UserIsNotTeacherOrAdmin_Forbidden() {
+        UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("New title");
+
+        // Gửi request PUT để cập nhật section info cho khóa học
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}", 1L, 1L)
+                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(updateSectionDTO))
+                .exchange()
+                .expectStatus().isForbidden();
+    }
 
     protected static class KeycloakToken {
         private final String accessToken;

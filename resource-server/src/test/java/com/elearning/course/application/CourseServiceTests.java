@@ -388,4 +388,51 @@ class CourseServiceTests {
         verify(courseRepository, never()).save(any(Course.class));
     }
 
+    @Test
+    void updateSectionInfo_ShouldUpdateSectionInfo() {
+        // Arrange: Giả lập hành vi của repository và course
+        Course course = spy(this.course);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        when(courseRepository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        doNothing().when(course).updateSection(2L, "New Section 1");
+
+        // Act: Thực thi use case
+        courseService.updateSectionInfo(1L, 2L, "New Section 1");
+
+        // Assert: Xác minh rằng các phương thức cần thiết đã được gọi đúng
+        verify(courseRepository, times(1)).findByIdAndDeleted(1L, false); // Xác minh lấy course
+        verify(course, times(1)).updateSection(2L, "New Section 1"); // Xác minh cập nhật thông tin section
+        verify(courseRepository, times(1)).save(course); // Xác minh lưu lại course
+    }
+
+    @Test
+    void updateSectionInfo_ShouldThrowException_WhenCourseNotFound() {
+        // Arrange: Giả lập hành vi của repository
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.empty());
+
+        // Act & Assert: Kiểm tra xem ngoại lệ có được ném ra khi không tìm thấy khóa học
+        assertThrows(ResourceNotFoundException.class, () -> {
+            courseService.updateSectionInfo(1L, 2L, "New Section 1");
+        });
+
+        // Assert: Đảm bảo không có gì được lưu vào repository
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void updateSectionInfo_CoursePublish_ThrowsException() {
+        // Arrange: Giả lập hành vi của repository
+        Course courseMock = spy(course);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(courseMock));
+        doReturn(false).when(courseMock).canEdit();
+
+        // Act & Assert: Kiểm tra xem ngoại lệ có được ném ra khi khóa học đã được xuất bản
+        assertThrows(InputInvalidException.class, () -> {
+            courseService.updateSectionInfo(1L, 2L, "New Section 1");
+        });
+
+        // Assert: Đảm bảo không có gì được lưu vào repository
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
 }

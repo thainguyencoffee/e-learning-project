@@ -474,4 +474,68 @@ class CourseControllerTests {
                 .andExpect(status().isForbidden());
     }
 
+
+    @Test
+    void updateSectionInfo_ValidCourseIdAndSectionIdAndTitle_UpdatesSection() throws Exception {
+        Course updatedCourse = Mockito.mock(Course.class);
+        Mockito.when(courseService.updateSectionInfo(any(Long.class), any(Long.class), any(String.class)))
+                .thenReturn(updatedCourse);
+
+        UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("NewTitle");
+
+        mockMvc.perform(put("/courses/1/sections/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateSectionDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void updateSectionInfo_CourseNotFound_ThrowsException() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).updateSectionInfo(any(Long.class), any(Long.class), any(String.class));
+
+        UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("NewTitle");
+
+        mockMvc.perform(put("/courses/1/sections/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateSectionDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateSectionInfo_SectionNotFound_ThrowsException() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).updateSectionInfo(any(Long.class), any(Long.class), any(String.class));
+
+        UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("NewTitle");
+
+        mockMvc.perform(put("/courses/1/sections/999")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateSectionDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateSectionInfo_BlankTitle_ThrowsException() throws Exception {
+        UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("");
+
+        mockMvc.perform(put("/courses/1/sections/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateSectionDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void updateSectionInfo_UserNotTeacher_ShouldReturnForbidden() throws Exception {
+        UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("NewTitle");
+
+        mockMvc.perform(put("/courses/1/sections/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateSectionDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
+                .andExpect(status().isForbidden());
+    }
+
 }

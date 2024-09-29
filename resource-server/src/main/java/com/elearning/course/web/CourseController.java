@@ -98,5 +98,12 @@ public class CourseController {
         return ResponseEntity.created(URI.create("/courses/" + courseId)).body(updatedCourse);
     }
 
+    @PutMapping("/{courseId}/sections/{sectionId}")
+    public ResponseEntity<Course> updateSectionInfo(@PathVariable Long courseId,
+                                                    @PathVariable Long sectionId,
+                                                    @RequestBody @Valid UpdateSectionDTO updateSectionDTO) {
+        Course updatedCourse = courseService.updateSectionInfo(courseId, sectionId, updateSectionDTO.title());
+        return ResponseEntity.ok(updatedCourse);
+    }
 
 }

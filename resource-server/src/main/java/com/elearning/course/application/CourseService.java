@@ -33,6 +33,8 @@ public interface CourseService {
 
     Course addSection(Long courseId, CourseSectionDTO courseSectionDTO);
 
+    Course updateSectionInfo(Long courseId, Long sectionId, String newTitle);
+
     Course removeSection(Long courseId, Long sectionId);
 
     Course updatePrice(Long courseId, MonetaryAmount newPrice);
