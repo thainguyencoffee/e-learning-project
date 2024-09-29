@@ -5,10 +5,13 @@ import com.elearning.common.config.SecurityConfig;
 import com.elearning.common.exception.InputInvalidException;
 import com.elearning.common.exception.ResourceNotFoundException;
 import com.elearning.course.application.dto.CourseDTO;
+import com.elearning.course.application.dto.CourseSectionDTO;
 import com.elearning.course.application.dto.CourseUpdateDTO;
+import com.elearning.course.application.dto.LessonDTO;
 import com.elearning.course.application.impl.CourseServiceImpl;
 import com.elearning.course.domain.Course;
 import com.elearning.course.domain.Language;
+import com.elearning.course.domain.Lesson;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.BeforeEach;
@@ -388,6 +391,87 @@ class CourseControllerTests {
                         .content(body)
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void addSection_ValidCourseIdAndSection_ReturnsUpdatedCourse() throws Exception {
+        Course updatedCourse = Mockito.mock(Course.class);
+        Mockito.when(courseService.addSection(any(Long.class), any(CourseSectionDTO.class)))
+                .thenReturn(updatedCourse);
+
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("SectionTitle", Set.of(new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null)));
+
+        mockMvc.perform(post("/courses/1/sections")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sectionDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/courses/1"))
+                .andExpect(jsonPath("$.id").value(updatedCourse.getId()));
+    }
+
+    @Test
+    void addSection_CourseNotFound_ThrowsException() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).addSection(any(Long.class), any(CourseSectionDTO.class));
+
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("SectionTitle", Set.of(new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null)));
+
+        mockMvc.perform(post("/courses/1/sections")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sectionDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+
+    @Test
+    void addSection_SectionWithBlankTitle_ThrowsException() throws Exception {
+        Mockito.doThrow(new InputInvalidException("Section with the same title already exists."))
+                .when(courseService).addSection(any(Long.class), any(CourseSectionDTO.class));
+
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("", Set.of(new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null)));
+
+        mockMvc.perform(post("/courses/1/sections")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sectionDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void addSection_LessonWithBlankTitle_ThrowsException() throws Exception {
+        Mockito.doThrow(new InputInvalidException("Section with the same title already exists."))
+                .when(courseService).addSection(any(Long.class), any(CourseSectionDTO.class));
+
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section", Set.of(new LessonDTO("", Lesson.Type.TEXT, "https://example.com", null)));
+
+        mockMvc.perform(post("/courses/1/sections")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sectionDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void addSection_SectionWithoutLessons_ThrowsException() throws Exception {
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("SectionTitle", Set.of());
+
+        mockMvc.perform(post("/courses/1/sections")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sectionDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void addSection_UserNotTeacher_ShouldReturnForbidden() throws Exception {
+
+        mockMvc.perform(post("/courses/1/sections")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(null))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user")))
+                )
+                .andExpect(status().isForbidden());
     }
 
 }

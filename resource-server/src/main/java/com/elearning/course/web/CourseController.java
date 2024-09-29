@@ -95,7 +95,7 @@ public class CourseController {
     public ResponseEntity<Course> addSection(@PathVariable Long courseId,
                                              @RequestBody @Valid CourseSectionDTO courseSectionDTO) {
         Course updatedCourse = courseService.addSection(courseId, courseSectionDTO);
-        return ResponseEntity.ok(updatedCourse);
+        return ResponseEntity.created(URI.create("/courses/" + courseId)).body(updatedCourse);
     }
 
 

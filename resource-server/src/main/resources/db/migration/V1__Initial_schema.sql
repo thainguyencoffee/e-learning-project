@@ -46,7 +46,8 @@ create table lesson
     id             bigserial    not null,
     title          varchar(255) not null,
     type           varchar(255) not null,
-    link           varchar(255) not null,
+    link           varchar(255),
+    quiz           bigint,
     course_section bigint       not null references course_section (id) on DELETE cascade,
     constraint fk_lesson primary key (id)
 );
