@@ -3,6 +3,7 @@ package com.elearning.course.application.dto;
 import com.elearning.course.domain.CourseSection;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.util.Set;
 
@@ -10,6 +11,7 @@ public record CourseSectionDTO(
         @NotBlank(message = "Section title is required")
         String title,
         @Valid
+        @NotEmpty(message = "At least one lesson is required")
         Set<LessonDTO> lessons
 ) {
 

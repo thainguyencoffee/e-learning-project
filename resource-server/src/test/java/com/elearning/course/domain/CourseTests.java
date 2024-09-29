@@ -223,4 +223,47 @@ public class CourseTests {
         assertThrows(NullPointerException.class, () -> course.applyDiscount(null, discountCode));
     }
 
+    @Test
+    void addSection_ValidSection_AddsSection() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        CourseSection section = new CourseSection("SectionTitle");
+        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
+        course.addSection(section);
+        assertTrue(course.getSections().contains(section));
+    }
+
+    @Test
+    void addSection_NullSection_ThrowsException() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        assertThrows(NullPointerException.class, () -> course.addSection(null));
+    }
+
+    @Test
+    void addSection_SectionWithSameTitle_ThrowsException() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        CourseSection section = new CourseSection("SectionTitle");
+        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
+        course.addSection(section);
+
+        // Tạo một section khác có cùng title với section đã thêm vào course
+        CourseSection duplicateSection = new CourseSection("SectionTitle");
+        assertThrows(InputInvalidException.class, () -> course.addSection(duplicateSection));
+    }
+
+    @Test
+    void addSection_SectionWithoutLessons_ThrowsException() {
+        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        CourseSection section = new CourseSection("SectionTitle");
+        assertThrows(InputInvalidException.class, () -> course.addSection(section));
+    }
+
+    @Test
+    void addSection_PublishedCourse_ThrowsException() {
+        Course course = spy(new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher"));
+        when(course.canEdit()).thenReturn(false); // Giả lập khóa học đã publish
+
+        CourseSection section = new CourseSection("SectionTitle");
+        assertThrows(InputInvalidException.class, () -> course.addSection(section));
+    }
+
 }

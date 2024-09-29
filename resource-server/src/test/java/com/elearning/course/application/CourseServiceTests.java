@@ -3,11 +3,11 @@ package com.elearning.course.application;
 import com.elearning.common.exception.InputInvalidException;
 import com.elearning.common.exception.ResourceNotFoundException;
 import com.elearning.course.application.dto.CourseDTO;
+import com.elearning.course.application.dto.CourseSectionDTO;
 import com.elearning.course.application.dto.CourseUpdateDTO;
+import com.elearning.course.application.dto.LessonDTO;
 import com.elearning.course.application.impl.CourseServiceImpl;
-import com.elearning.course.domain.Course;
-import com.elearning.course.domain.CourseRepository;
-import com.elearning.course.domain.Language;
+import com.elearning.course.domain.*;
 import com.elearning.discount.application.DiscountService;
 import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.BeforeEach;
@@ -301,6 +301,87 @@ class CourseServiceTests {
         // Kiểm tra xem ngoại lệ có được ném ra khi không tìm thấy mã giảm giá
         assertThrows(ResourceNotFoundException.class, () -> {
             courseService.applyDiscount(1L, discountCode);
+        });
+
+        // Đảm bảo không có gì được lưu vào repository
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void addCourseSection_ShouldAddCourseSection() {
+        // Giả lập hành vi của repository
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        when(courseRepository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1", Set.of(new LessonDTO("Lesson 1", Lesson.Type.TEXT, "https://example.com/lesson1", null)));
+
+        // Thực thi use case
+        Course updatedCourse = courseService.addSection(1L, courseSectionDTO);
+
+        // Xác minh rằng courseRepository.findByIdAndDeleted và courseRepository.save đã được gọi
+        verify(courseRepository, times(1)).findByIdAndDeleted(1L, false);
+        verify(courseRepository, times(1)).save(course);
+
+        // Kiểm tra các giá trị trả về
+        assertNotNull(updatedCourse);
+        assertEquals(1, updatedCourse.getSections().size());
+        assertEquals(courseSectionDTO.title(), updatedCourse.getSections().iterator().next().getTitle());
+    }
+
+    @Test
+    void addCourseSection_ShouldThrowException_WhenCourseNotFound() {
+        // Giả lập hành vi của repository
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.empty());
+        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1", Set.of(new LessonDTO("Lesson 1", Lesson.Type.TEXT, "https://example.com/lesson1", null)));
+
+        // Kiểm tra xem ngoại lệ có được ném ra khi không tìm thấy khóa học
+        assertThrows(ResourceNotFoundException.class, () -> {
+            courseService.addSection(1L, courseSectionDTO);
+        });
+
+        // Đảm bảo không có gì được lưu vào repository
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void addCourseSection_ShouldThrowException_WhenLessonIsInvalid() {
+        // Giả lập hành vi của repository
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1", Set.of(new LessonDTO("Lesson 1", Lesson.Type.TEXT, "abcd://example.com/lesson1", null)));
+
+        // Kiểm tra xem ngoại lệ có được ném ra khi thông tin bài học không hợp lệ
+        assertThrows(InputInvalidException.class, () -> {
+            courseService.addSection(1L, courseSectionDTO);
+        });
+
+        // Đảm bảo không có gì được lưu vào repository
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void addCourseSection_ShouldThrowException_WhenLessonIsInvalidQuizType() {
+        // Giả lập hành vi của repository
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1", Set.of(new LessonDTO("Lesson 1", Lesson.Type.QUIZ, "http://example.com/lesson1", null)));
+
+        // Kiểm tra xem ngoại lệ có được ném ra khi thông tin bài học không hợp lệ
+        assertThrows(InputInvalidException.class, () -> {
+            courseService.addSection(1L, courseSectionDTO);
+        });
+
+        // Đảm bảo không có gì được lưu vào repository
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+
+    @Test
+    void addCourseSection_ShouldThrowException_WhenLessonIsInvalidTextOrVideoType() {
+        // Giả lập hành vi của repository
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1", Set.of(new LessonDTO("Lesson 1", Lesson.Type.TEXT, null, 1L)));
+
+        // Kiểm tra xem ngoại lệ có được ném ra khi thông tin bài học không hợp lệ
+        assertThrows(InputInvalidException.class, () -> {
+            courseService.addSection(1L, courseSectionDTO);
         });
 
         // Đảm bảo không có gì được lưu vào repository

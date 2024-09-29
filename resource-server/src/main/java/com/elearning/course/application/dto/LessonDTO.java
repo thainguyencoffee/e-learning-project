@@ -10,9 +10,7 @@ public record LessonDTO(
         String title,
         @NotNull(message = "Lesson description is required")
         Lesson.Type type,
-        @NotBlank(message = "Lesson link is required")
         String link,
-        @NotNull(message = "Lesson quiz is required")
         Long quiz
 ) {
     public Lesson toLesson() {

@@ -1,10 +1,13 @@
 package com.elearning;
 
 import com.elearning.course.application.dto.CourseDTO;
+import com.elearning.course.application.dto.CourseSectionDTO;
 import com.elearning.course.application.dto.CourseUpdateDTO;
+import com.elearning.course.application.dto.LessonDTO;
 import com.elearning.course.domain.Course;
 import com.elearning.course.domain.CourseRepository;
 import com.elearning.course.domain.Language;
+import com.elearning.course.domain.Lesson;
 import com.elearning.course.web.ApplyDiscountDTO;
 import com.elearning.course.web.AssignTeacherDTO;
 import com.elearning.course.web.UpdatePriceDTO;
@@ -617,6 +620,70 @@ class ResourceServerApplicationTests {
                 .expectStatus().isBadRequest();  // Phản hồi 400 Bad Request
     }
 
+    @Test
+    void testAddSectionToCourse_Successful() {
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+
+        // Gửi request POST để thêm section cho khóa học
+        webTestClient.post().uri("/courses/{courseId}/sections", courseId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(sectionDTO))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.sections.length()").isEqualTo(1)
+                .jsonPath("$.sections[0].lessons.length()").isEqualTo(3);
+    }
+
+    @Test
+    void testAddSectionToCourse_Unauthorized() {
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+
+        // Gửi request POST để thêm section cho khóa học
+        webTestClient.post().uri("/courses/{courseId}/sections", courseId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(sectionDTO))
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    void testAddSectionToCourse_Forbidden() {
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+
+        // Gửi request POST để thêm section cho khóa học
+        webTestClient.post().uri("/courses/{courseId}/sections", courseId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
+                .body(BodyInserters.fromValue(sectionDTO))
+                .exchange()
+                .expectStatus().isForbidden();
+    }
 
 
     protected static class KeycloakToken {

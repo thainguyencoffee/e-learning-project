@@ -1,6 +1,8 @@
 package com.elearning.course.domain;
 
+import com.elearning.common.exception.InputInvalidException;
 import lombok.Getter;
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.util.Assert;
@@ -48,16 +50,20 @@ public class Lesson {
             case VIDEO:
             case TEXT:
                 if (link == null || link.isEmpty()) {
-                    throw new IllegalArgumentException("Link must not be empty for VIDEO or TEXT lesson.");
+                    throw new InputInvalidException("Link must not be empty for VIDEO or TEXT lesson.");
+                }
+                // validate link format
+                if (!link.startsWith("http://") && !link.startsWith("https://")) {
+                    throw new InputInvalidException("Link must is a valid URL.");
                 }
                 break;
             case QUIZ:
                 if (quiz == null) {
-                    throw new IllegalArgumentException("Quiz ID must not be null for QUIZ lesson.");
+                    throw new InputInvalidException("Quiz ID must not be null for QUIZ lesson.");
                 }
                 break;
             default:
-                throw new IllegalArgumentException("Unsupported lesson type.");
+                throw new InputInvalidException("Unsupported lesson type.");
         }
     }
 

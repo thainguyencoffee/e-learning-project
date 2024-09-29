@@ -55,6 +55,23 @@ public class CourseJdbcTests {
     }
 
     @Test
+    void testSaveCourseWithSections() {
+        // Tạo một course với các sections
+        CourseSection section1 = new CourseSection("Introduction");
+        section1.addLesson(new Lesson("What is Java?", Lesson.Type.TEXT, "https://example.com/lesson1", null));
+        section1.addLesson(new Lesson("What is Java 2?", Lesson.Type.QUIZ, null, 1L));
+        course.addSection(section1);
+
+        // Lưu course vào database
+        Course savedCourse = courseRepository.save(course);
+
+        // Kiểm tra xem course và các sections có được lưu không
+        assertNotNull(savedCourse.getId());
+        assertEquals(1, savedCourse.getSections().size());
+        assertEquals(2, savedCourse.getSections().iterator().next().getLessons().size());
+    }
+
+    @Test
     public void testFindById() {
         // Lưu course vào database trước
         Course savedCourse = courseRepository.save(course);
