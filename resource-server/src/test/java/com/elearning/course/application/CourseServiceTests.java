@@ -37,6 +37,7 @@ class CourseServiceTests {
     private CourseDTO courseDTO;
     private CourseUpdateDTO courseUpdateDTO;
     private Course course;
+    private Course courseForPublish;
 
     @BeforeEach
     void setUp() {
@@ -73,6 +74,21 @@ class CourseServiceTests {
                 courseDTO.subtitles(),
                 "teacher123"
         );
+
+        courseForPublish = new Course(
+                courseDTO.title(),
+                courseDTO.description(),
+                courseDTO.thumbnailUrl(),
+                courseDTO.benefits(),
+                courseDTO.language(),
+                courseDTO.prerequisites(),
+                courseDTO.subtitles(),
+                "teacher123"
+        );
+        courseForPublish.changePrice(Money.of(100, "USD"));
+        CourseSection section = new CourseSection("Section 1");
+        section.addLesson(new Lesson("Lesson 1", Lesson.Type.TEXT, "https://example.com/lesson1", null));
+        courseForPublish.addSection(section);
     }
 
     @Test
@@ -186,7 +202,7 @@ class CourseServiceTests {
 
     @Test
     void updatePrice_ValidCourseIdAndPrice_UpdatesPrice() {
-        when(courseRepository.findById(1L)).thenReturn(java.util.Optional.of(course));
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
         MonetaryAmount newPrice = Money.of(100, "USD");
         courseService.updatePrice(1L, newPrice);
         verify(courseRepository, times(1)).save(course);
@@ -195,7 +211,7 @@ class CourseServiceTests {
 
     @Test
     void updatePrice_CourseNotFound_ThrowsException() {
-        when(courseRepository.findById(1L)).thenReturn(java.util.Optional.empty());
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.empty());
         MonetaryAmount newPrice = Money.of(100, "USD");
         assertThrows(ResourceNotFoundException.class, () -> courseService.updatePrice(1L, newPrice));
         verify(courseRepository, never()).save(any(Course.class));
@@ -203,7 +219,7 @@ class CourseServiceTests {
 
     @Test
     void updatePrice_NegativePrice_ThrowsException() {
-        when(courseRepository.findById(1L)).thenReturn(java.util.Optional.of(course));
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
         MonetaryAmount negativePrice = Money.of(-100, "USD");
         assertThrows(InputInvalidException.class, () -> courseService.updatePrice(1L, negativePrice));
         verify(courseRepository, never()).save(any(Course.class));
@@ -212,7 +228,7 @@ class CourseServiceTests {
     @Test
     void updatePrice_CoursePublished_ThrowsException() {
         Course courseMock = spy(course);
-        when(courseRepository.findById(1L)).thenReturn(java.util.Optional.of(courseMock));
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(courseMock));
         doReturn(false).when(courseMock).canEdit();
         MonetaryAmount newPrice = Money.of(100, "USD");
         assertThrows(InputInvalidException.class, () -> courseService.updatePrice(1L, newPrice));
@@ -251,10 +267,28 @@ class CourseServiceTests {
     }
 
     @Test
+    void publishCourse_ValidCourseIdAndApprovedBy_PublishesCourse() {
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(courseForPublish));
+
+        courseService.publishCourse(1L, "Admin");
+
+        verify(courseRepository, times(1)).save(courseForPublish);
+    }
+
+    @Test
+    void publishCourse_CourseNotFound_ThrowsException() {
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.publishCourse(1L, "Admin"));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
     void applyDiscount_ShouldApplyDiscountSuccessfully() {
         // Giả lập hành vi của repository và discountService
         MonetaryAmount discountedPrice = Money.of(80, "USD"); // Giảm giá từ $100 xuống còn $80
-        when(courseRepository.findById(1L)).thenReturn(java.util.Optional.of(course));
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
         course.changePrice(Money.of(100, "USD"));
         String discountCode = "DISCOUNT_10";
         when(discountService.calculateDiscount(discountCode, course.getPrice())).thenReturn(discountedPrice);
@@ -264,7 +298,7 @@ class CourseServiceTests {
         Course updatedCourse = courseService.applyDiscount(1L, discountCode);
 
         // Xác minh rằng courseRepository.findById, discountService.calculateDiscount và courseRepository.save đã được gọi
-        verify(courseRepository, times(1)).findById(1L);
+        verify(courseRepository, times(1)).findByIdAndDeleted(1L, false);
         verify(discountService, times(1)).calculateDiscount(discountCode, course.getPrice());
         verify(courseRepository, times(1)).save(course);
 
@@ -277,7 +311,7 @@ class CourseServiceTests {
     @Test
     void applyDiscount_ShouldThrowException_WhenCoursePriceIsNull() {
         // Giả lập hành vi của repository
-        when(courseRepository.findById(1L)).thenReturn(java.util.Optional.of(course));
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
         String discountCode = "DISCOUNT_10";
 
         // Kiểm tra xem ngoại lệ có được ném ra khi giá của khóa học là null
@@ -293,7 +327,7 @@ class CourseServiceTests {
     @Test
     void applyDiscount_ShouldThrowException_WhenDiscountNotFound() {
         // Giả lập hành vi của repository
-        when(courseRepository.findById(1L)).thenReturn(java.util.Optional.of(course));
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
         course.changePrice(Money.of(100, "USD"));
         String discountCode = "DISCOUNT_10";
         when(discountService.calculateDiscount(discountCode, course.getPrice())).thenThrow(ResourceNotFoundException.class);

@@ -73,7 +73,7 @@ public class CourseController {
     }
 
     @PutMapping("/{courseId}/publish")
-    public ResponseEntity<Course> updateStatus(@AuthenticationPrincipal Jwt jwt, @PathVariable Long courseId) {
+    public ResponseEntity<Course> publishCourse(@AuthenticationPrincipal Jwt jwt, @PathVariable Long courseId) {
         Course updatedCourse = courseService.publishCourse(courseId, jwt.getSubject());
         return ResponseEntity.ok(updatedCourse);
     }

@@ -340,6 +340,35 @@ class CourseControllerTests {
     }
 
     @Test
+    void publishCourse_ValidCourseIdAndJwt_PublishesCourse() throws Exception {
+        Course updatedCourse = Mockito.mock(Course.class);
+        Mockito.when(courseService.publishCourse(any(Long.class), any(String.class)))
+                .thenReturn(updatedCourse);
+
+        mockMvc.perform(put("/courses/1/publish")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(updatedCourse.getId()));
+    }
+
+    @Test
+    void publishCourse_CourseNotFound_ThrowsException() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).publishCourse(any(Long.class), any(String.class));
+
+        mockMvc.perform(put("/courses/1/publish")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void publishCourse_UserNotTeacher_ShouldReturnForbidden() throws Exception {
+        mockMvc.perform(put("/courses/1/publish")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isForbidden());
+    }
+
+
+    @Test
     void applyDiscount_ValidCourseIdAndDiscount_ShouldReturnOk() throws Exception {
         Course updatedCourse = Mockito.mock(Course.class);
         Mockito.when(updatedCourse.getId()).thenReturn(1L);
