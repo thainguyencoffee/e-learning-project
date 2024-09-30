@@ -567,4 +567,104 @@ class CourseControllerTests {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    void deleteSection_ValidCourseIdAndSectionId_RemovesSection() throws Exception {
+        Course updatedCourse = Mockito.mock(Course.class);
+        Mockito.when(courseService.removeSection(1L, 2L)).thenReturn(updatedCourse);
+
+        mockMvc.perform(delete("/courses/1/sections/2")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteSection_CourseNotFound_ThrowsException() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).removeSection(1L, 2L);
+
+        mockMvc.perform(delete("/courses/1/sections/2")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteSection_UserNotTeacher_ShouldReturnForbidden() throws Exception {
+        mockMvc.perform(delete("/courses/1/sections/2")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deleteSection_PublishedCourse_ThrowsException() throws Exception {
+        Mockito.doThrow(new InputInvalidException("Cannot delete section from a published course.")).when(courseService).removeSection(1L, 2L);
+
+        mockMvc.perform(delete("/courses/1/sections/2")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void addLesson_ValidCourseIdAndSectionId_AddsLesson() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null);
+        Course updatedCourse = Mockito.mock(Course.class);
+        Mockito.when(courseService.addLesson(1L, 2L, lessonDTO.toLesson()))
+                .thenReturn(updatedCourse);
+
+
+        mockMvc.perform(post("/courses/1/sections/2/lessons")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void addLesson_CourseNotFound_ThrowsException() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null);
+
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).addLesson(any(), any(), any());
+
+        mockMvc.perform(post("/courses/1/sections/2/lessons")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void addLesson_SectionNotFound_ThrowsException() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null);
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).addLesson(any(), any(), any());
+
+        mockMvc.perform(post("/courses/1/sections/999/lessons")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void addLesson_UserNotTeacher_ShouldReturnForbidden() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null);
+
+        mockMvc.perform(post("/courses/1/sections/2/lessons")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void addLesson_PublishedCourse_ThrowsException() throws Exception {
+        Mockito.doThrow(new InputInvalidException("Cannot add lesson to a published course."))
+                .when(courseService).addLesson(any(), any(), any());
+
+        LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null);
+
+        mockMvc.perform(post("/courses/1/sections/2/lessons")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isBadRequest());
+    }
+
 }

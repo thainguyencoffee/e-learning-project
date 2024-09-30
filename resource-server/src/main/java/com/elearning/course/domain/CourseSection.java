@@ -1,5 +1,6 @@
 package com.elearning.course.domain;
 
+import com.elearning.common.exception.InputInvalidException;
 import lombok.Getter;
 import lombok.ToString;
 import org.apache.commons.lang3.Validate;
@@ -34,7 +35,7 @@ public class CourseSection {
 
     public void addLesson(Lesson lesson) {
         if (lessons.stream().anyMatch(l -> l.getTitle().equals(lesson.getTitle()))) {
-            throw new IllegalArgumentException("Duplicate lesson title.");
+            throw new InputInvalidException("Duplicate lesson title.");
         }
 
         this.lessons.add(lesson);

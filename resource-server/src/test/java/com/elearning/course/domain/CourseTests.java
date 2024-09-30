@@ -342,5 +342,67 @@ public class CourseTests {
         assertThrows(ResourceNotFoundException.class, () -> courseNoSections.updateSection(1L, "NewSectionTitle"));
     }
 
+    @Test
+    void removeSection_ValidSectionId_RemovesSection() {
+        CourseSection section = spy(new CourseSection("SectionTitle"));
+        when(section.getId()).thenReturn(1L);
+        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
+        courseNoSections.addSection(section);
+
+        courseNoSections.removeSection(1L);
+
+        assertFalse(courseNoSections.getSections().contains(section));
+    }
+
+    @Test
+    void removeSection_NonExistentSectionId_ThrowsException() {
+        assertThrows(ResourceNotFoundException.class, () -> courseNoSections.removeSection(999L));
+    }
+
+    @Test
+    void removeSection_PublishedCourse_ThrowsException() {
+        Course course = spy(courseWithSections);
+        when(course.canEdit()).thenReturn(false);
+
+        assertThrows(InputInvalidException.class, () -> course.removeSection(1L));
+    }
+
+    // lessons
+    @Test
+    void addLessonToSection_ValidSectionIdAndLesson_AddsLesson() {
+        CourseSection section = spy(new CourseSection("SectionTitle"));
+        when(section.getId()).thenReturn(1L);
+        // Khi thêm một lesson mới vào section, không có lesson nào trùng title
+        section.addLesson(new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com", null));
+        courseNoSections.addSection(section);
+
+        courseNoSections.addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
+        assertEquals(2, section.getLessons().size());
+    }
+
+    @Test
+    void addLessonToSection_ValidSectionIdButLessonDuplicate_ThrowException() {
+        CourseSection section = spy(new CourseSection("SectionTitle"));
+        when(section.getId()).thenReturn(1L);
+        // Khi thêm một lesson mới vào section, không có lesson nào trùng title
+        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
+        courseNoSections.addSection(section);
+
+        assertThrows(InputInvalidException.class, () -> courseNoSections
+                .addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null)));
+    }
+
+    @Test
+    void addLessonToSection_PublishedCourse_ThrowsException() {
+        Course course = spy(courseNoSections);
+        when(course.canEdit()).thenReturn(false);
+
+        assertThrows(InputInvalidException.class, () -> course.addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null)));
+    }
+
+    @Test
+    void addLessonToSection_SectionNotFound_ThrowsException() {
+        assertThrows(ResourceNotFoundException.class, () -> courseNoSections.addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null)));
+    }
 
 }
