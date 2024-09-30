@@ -4,6 +4,7 @@ import com.elearning.course.application.*;
 import com.elearning.course.application.dto.CourseDTO;
 import com.elearning.course.application.dto.CourseSectionDTO;
 import com.elearning.course.application.dto.CourseUpdateDTO;
+import com.elearning.course.application.dto.LessonDTO;
 import com.elearning.course.domain.Course;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -106,4 +107,17 @@ public class CourseController {
         return ResponseEntity.ok(updatedCourse);
     }
 
+    @DeleteMapping("/{courseId}/sections/{sectionId}")
+    public ResponseEntity<Course> deleteSection(@PathVariable Long courseId, @PathVariable Long sectionId) {
+        Course updatedCourse = courseService.removeSection(courseId, sectionId);
+        return ResponseEntity.ok(updatedCourse);
+    }
+
+    @PostMapping("/{courseId}/sections/{sectionId}/lessons")
+    public ResponseEntity<Course> addLesson(@PathVariable Long courseId,
+                                            @PathVariable Long sectionId,
+                                            @RequestBody @Valid LessonDTO lessonDTO) {
+        Course updatedCourse = courseService.addLesson(courseId, sectionId, lessonDTO.toLesson());
+        return ResponseEntity.ok(updatedCourse);
+    }
 }

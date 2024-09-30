@@ -9,6 +9,7 @@ import com.elearning.course.application.dto.CourseUpdateDTO;
 import com.elearning.course.domain.Course;
 import com.elearning.course.domain.CourseRepository;
 import com.elearning.course.domain.CourseSection;
+import com.elearning.course.domain.Lesson;
 import com.elearning.discount.application.DiscountService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -128,6 +129,13 @@ public class CourseServiceImpl implements CourseService {
     public Course removeSection(Long courseId, Long sectionId) {
         Course course = findCourseById(courseId);
         course.removeSection(sectionId);
+        return courseRepository.save(course);
+    }
+
+    @Override
+    public Course addLesson(Long courseId, Long sectionId, Lesson lesson) {
+        Course course = findCourseById(courseId);
+        course.addLessonToSection(sectionId, lesson);
         return courseRepository.save(course);
     }
 

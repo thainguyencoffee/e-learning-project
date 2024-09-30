@@ -469,4 +469,96 @@ class CourseServiceTests {
         verify(courseRepository, never()).save(any(Course.class));
     }
 
+    @Test
+    void removeSection_ValidCourseIdAndSectionId_RemovesSection() {
+        Course course = spy(this.course);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        doNothing().when(course).removeSection(2L);
+
+        courseService.removeSection(1L, 2L);
+
+        verify(courseRepository, times(1)).findByIdAndDeleted(1L, false);
+        verify(course, times(1)).removeSection(2L);
+        verify(courseRepository, times(1)).save(course);
+    }
+
+    @Test
+    void removeSection_CourseNotFound_ThrowsException() {
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.removeSection(1L, 2L));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void removeSection_SectionNotFound_ThrowsException() {
+        Course course = spy(this.course);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        doThrow(new ResourceNotFoundException()).when(course).removeSection(999L);
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.removeSection(1L, 999L));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void removeSection_PublishedCourse_ThrowsException() {
+        Course course = spy(this.course);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        doReturn(false).when(course).canEdit();
+
+        assertThrows(InputInvalidException.class, () -> courseService.removeSection(1L, 2L));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void addLesson_ValidCourseIdAndSectionId_AddsLesson() {
+        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null);
+        Course course = spy(this.course);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        doNothing().when(course).addLessonToSection(2L, lesson);
+
+        courseService.addLesson(1L, 2L, lesson);
+
+        verify(courseRepository, times(1)).findByIdAndDeleted(1L, false);
+        verify(course, times(1)).addLessonToSection(2L, lesson);
+        verify(courseRepository, times(1)).save(course);
+    }
+
+    @Test
+    void addLesson_CourseNotFound_ThrowsException() {
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.empty());
+        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null);
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.addLesson(1L, 2L, lesson));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void addLesson_SectionNotFound_ThrowsException() {
+        Course course = spy(this.course);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        doThrow(new ResourceNotFoundException()).when(course).addLessonToSection(any(Long.class), any(Lesson.class));
+        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null);
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.addLesson(1L, 999L, lesson));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void addLesson_PublishedCourse_ThrowsException() {
+        Course course = spy(this.course);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        doReturn(false).when(course).canEdit();
+        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null);
+
+        assertThrows(InputInvalidException.class, () -> courseService.addLesson(1L, 2L, lesson));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
 }
