@@ -1,7 +1,9 @@
 package com.elearning.course.domain;
 
 import com.elearning.common.exception.InputInvalidException;
+import com.elearning.common.exception.ResourceNotFoundException;
 import org.javamoney.moneta.Money;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.money.MonetaryAmount;
@@ -13,6 +15,26 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class CourseTests {
+
+    private Course courseNoSections;
+    private Course courseWithSections;
+
+    @BeforeEach
+    void setup() {
+        Set<String> benefits = new HashSet<>(Arrays.asList("Benefit1", "Benefit2"));
+        Set<String> prerequisites = new HashSet<>(Arrays.asList("Prerequisite1", "Prerequisite2"));
+        Set<Language> subtitles = new HashSet<>(Arrays.asList(Language.ENGLISH, Language.SPANISH));
+
+        courseNoSections = new Course("Title", "Description", "ThumbnailUrl", benefits, Language.ENGLISH, prerequisites, subtitles, "Teacher");
+
+        // Tạo một course có sections
+        CourseSection courseSection = new CourseSection("SectionTitle");
+        courseSection.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
+
+        courseWithSections = new Course("Title", "Description", "ThumbnailUrl", benefits, Language.ENGLISH, prerequisites, subtitles, "Teacher");
+        courseWithSections.addSection(courseSection);
+        courseWithSections.changePrice(Money.of(100, "USD"));
+    }
 
     @Test
     public void courseConstructor_ValidInput_CreatesCourse() {
@@ -51,70 +73,45 @@ public class CourseTests {
         assertThrows(IllegalArgumentException.class, () -> new Course(null, "Description", "ThumbnailUrl", benefits, Language.ENGLISH, prerequisites, subtitles, "Teacher"));
     }
 
-    // Update course use case
     @Test
     public void updateInfo_ValidInput_UpdatesCourseInfo() {
-        Set<String> benefits = new HashSet<>(Arrays.asList("Benefit1", "Benefit2"));
-        Set<String> prerequisites = new HashSet<>(Arrays.asList("Prerequisite1", "Prerequisite2"));
-        Set<Language> subtitles = new HashSet<>(Arrays.asList(Language.ENGLISH, Language.SPANISH));
-        Course course = new Course("Title", "Description", "ThumbnailUrl", benefits, Language.ENGLISH, prerequisites, subtitles, "Teacher");
 
         Set<String> newBenefits = new HashSet<>(Arrays.asList("NewBenefit1", "NewBenefit2"));
         Set<String> newPrerequisites = new HashSet<>(Arrays.asList("NewPrerequisite1", "NewPrerequisite2"));
         Set<Language> newSubtitles = new HashSet<>(Arrays.asList(Language.FRENCH, Language.GERMAN));
-        course.updateInfo("NewTitle", "NewDescription", "NewThumbnailUrl", newBenefits, newPrerequisites, newSubtitles);
+        courseNoSections.updateInfo("NewTitle", "NewDescription", "NewThumbnailUrl", newBenefits, newPrerequisites, newSubtitles);
 
-        assertEquals("NewTitle", course.getTitle());
-        assertEquals("NewDescription", course.getDescription());
-        assertEquals("NewThumbnailUrl", course.getThumbnailUrl());
-        assertEquals(newBenefits, course.getBenefits());
-        assertEquals(newPrerequisites, course.getPrerequisites());
-        assertEquals(newSubtitles, course.getSubtitles());
+        assertEquals("NewTitle", courseNoSections.getTitle());
+        assertEquals("NewDescription", courseNoSections.getDescription());
+        assertEquals("NewThumbnailUrl", courseNoSections.getThumbnailUrl());
+        assertEquals(newBenefits, courseNoSections.getBenefits());
+        assertEquals(newPrerequisites, courseNoSections.getPrerequisites());
+        assertEquals(newSubtitles, courseNoSections.getSubtitles());
     }
+
 
     @Test
     public void updateInfo_EmptyTitle_ThrowsException() {
-        Set<String> benefits = new HashSet<>(Arrays.asList("Benefit1", "Benefit2"));
-        Set<String> prerequisites = new HashSet<>(Arrays.asList("Prerequisite1", "Prerequisite2"));
-        Set<Language> subtitles = new HashSet<>(Arrays.asList(Language.ENGLISH, Language.SPANISH));
-        Course course = new Course("Title", "Description", "ThumbnailUrl", benefits, Language.ENGLISH, prerequisites, subtitles, "Teacher");
-
         Set<String> newBenefits = new HashSet<>(Arrays.asList("NewBenefit1", "NewBenefit2"));
         Set<String> newPrerequisites = new HashSet<>(Arrays.asList("NewPrerequisite1", "NewPrerequisite2"));
         Set<Language> newSubtitles = new HashSet<>(Arrays.asList(Language.FRENCH, Language.GERMAN));
-        assertThrows(IllegalArgumentException.class, () -> course.updateInfo("", "NewDescription", "NewThumbnailUrl", newBenefits, newPrerequisites, newSubtitles));
+        assertThrows(IllegalArgumentException.class, () -> courseNoSections.updateInfo("", "NewDescription", "NewThumbnailUrl", newBenefits, newPrerequisites, newSubtitles));
     }
+
 
     @Test
     public void updateInfo_NullTitle_ThrowsException() {
-        Set<String> benefits = new HashSet<>(Arrays.asList("Benefit1", "Benefit2"));
-        Set<String> prerequisites = new HashSet<>(Arrays.asList("Prerequisite1", "Prerequisite2"));
-        Set<Language> subtitles = new HashSet<>(Arrays.asList(Language.ENGLISH, Language.SPANISH));
-        Course course = new Course("Title", "Description", "ThumbnailUrl", benefits, Language.ENGLISH, prerequisites, subtitles, "Teacher");
 
         Set<String> newBenefits = new HashSet<>(Arrays.asList("NewBenefit1", "NewBenefit2"));
         Set<String> newPrerequisites = new HashSet<>(Arrays.asList("NewPrerequisite1", "NewPrerequisite2"));
         Set<Language> newSubtitles = new HashSet<>(Arrays.asList(Language.FRENCH, Language.GERMAN));
-        assertThrows(IllegalArgumentException.class, () -> course.updateInfo(null, "NewDescription", "NewThumbnailUrl", newBenefits, newPrerequisites, newSubtitles));
+        assertThrows(IllegalArgumentException.class, () -> courseNoSections.updateInfo(null, "NewDescription", "NewThumbnailUrl", newBenefits, newPrerequisites, newSubtitles));
     }
 
     @Test
     public void updateInfo_PublishedCourse_ThrowsException() {
         // Spy đối tượng Course để dùng logic thực
-        Set<String> benefits = new HashSet<>(Arrays.asList("Benefit1", "Benefit2"));
-        Set<String> prerequisites = new HashSet<>(Arrays.asList("Prerequisite1", "Prerequisite2"));
-        Set<Language> subtitles = new HashSet<>(Arrays.asList(Language.ENGLISH, Language.SPANISH));
-
-        Course course = spy(new Course(
-                "Title",
-                "Description",
-                "ThumbnailUrl",
-                benefits,
-                Language.ENGLISH,
-                prerequisites,
-                subtitles,
-                "Teacher"
-        ));
+        Course course = spy(courseNoSections);
 
         // Giả lập trạng thái đã publish bằng cách mock canEdit trả về false
         when(course.canEdit()).thenReturn(false);
@@ -140,43 +137,39 @@ public class CourseTests {
 
     @Test
     public void delete_ValidCourse_DeletesCourse() {
-        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
-        course.delete();
-        assertTrue(course.isDeleted());
+        courseNoSections.delete();
+        assertTrue(courseNoSections.isDeleted());
     }
 
     @Test
     public void delete_AlreadyDeletedCourse_ThrowsException() {
-        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
-        course.delete();
-        assertThrows(InputInvalidException.class, course::delete);
+        courseNoSections.delete();
+        assertThrows(InputInvalidException.class, courseNoSections::delete);
     }
 
     @Test
     void delete_PublishedCourse_ThrowsException() {
-        Course courseMock = spy(new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher"));
+        Course courseMock = spy(courseNoSections);
         when(courseMock.canEdit()).thenReturn(false);
         assertThrows(InputInvalidException.class, courseMock::delete);
     }
 
     @Test
     void changePrice_ValidPrice_ChangesPrice() {
-        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
         MonetaryAmount newPrice = Money.of(100, "USD");
-        course.changePrice(newPrice);
-        assertEquals(newPrice, course.getPrice());
+        courseNoSections.changePrice(newPrice);
+        assertEquals(newPrice, courseNoSections.getPrice());
     }
 
     @Test
     void changePrice_NegativePrice_ThrowsException() {
-        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
         MonetaryAmount negativePrice = Money.of(-100, "USD");
-        assertThrows(InputInvalidException.class, () -> course.changePrice(negativePrice));
+        assertThrows(InputInvalidException.class, () -> courseNoSections.changePrice(negativePrice));
     }
 
     @Test
     void changePrice_PublishedCourse_ThrowsException() {
-        Course course = spy(new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher"));
+        Course course = spy(courseNoSections);
         when(course.canEdit()).thenReturn(false);
         MonetaryAmount newPrice = Money.of(100, "USD");
         assertThrows(InputInvalidException.class, () -> course.changePrice(newPrice));
@@ -184,86 +177,170 @@ public class CourseTests {
 
     @Test
     void assignTeacher_ValidTeacher_AssignsTeacher() {
-        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "OldTeacher");
-        course.assignTeacher("NewTeacher");
-        assertEquals("NewTeacher", course.getTeacher());
+        courseNoSections.assignTeacher("NewTeacher");
+        assertEquals("NewTeacher", courseNoSections.getTeacher());
     }
 
     @Test
     void assignTeacher_NullTeacher_ThrowsException() {
-        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "OldTeacher");
-        assertThrows(NullPointerException.class, () -> course.assignTeacher(null));
+        assertThrows(NullPointerException.class, () -> courseNoSections.assignTeacher(null));
     }
 
     @Test
     void assignTeacher_PublishedCourse_ThrowsException() {
-        Course course = spy(new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "OldTeacher"));
+        Course course = spy(courseNoSections);
         when(course.canEdit()).thenReturn(false);
         assertThrows(InputInvalidException.class, () -> course.assignTeacher("NewTeacher"));
     }
 
     @Test
-    void applyDiscount_ValidDiscount_AppliesDiscount() {
+    void publish_ValidCourse_PublishesCourse() {
+        courseWithSections.publish("Admin");
+
+        assertTrue(courseWithSections.getPublished());
+        assertEquals("Admin", courseWithSections.getApprovedBy());
+    }
+
+    @Test
+    void publish_AlreadyPublishedCourse_ThrowsException() {
+        Course course = spy(courseWithSections);
+        when(course.canEdit()).thenReturn(false);
+
+        assertThrows(InputInvalidException.class, () -> course.publish("Admin"));
+    }
+
+    @Test
+    void publish_CourseWithoutSections_ThrowsException() {
+        // Tạo một course không có sections nhưng đã set giá
+        courseNoSections.changePrice(Money.of(100, "USD"));
+
+        assertThrows(InputInvalidException.class, () -> courseNoSections.publish("Admin"));
+    }
+
+    @Test
+    void publish_CourseWithoutPrice_ThrowsException() {
         Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+        course.addSection(courseWithSections.getSections().iterator().next());
+
+        assertThrows(InputInvalidException.class, () -> course.publish("Admin"));
+    }
+
+    @Test
+    void publish_CourseWithSameTeacherAsApprover_ThrowsException() {
+        assertThrows(InputInvalidException.class, () -> courseWithSections.publish("Teacher"));
+    }
+
+    @Test
+    void publish_CourseWithoutTeacher_ThrowsException() {
+        Course courseMock = spy(courseWithSections);
+        when(courseMock.getTeacher()).thenReturn(null);
+
+        assertThrows(InputInvalidException.class, () -> courseMock.publish("Admin"));
+    }
+
+    @Test
+    void publish_NullApprovedBy_ThrowsException() {
+        assertThrows(InputInvalidException.class, () -> courseWithSections.publish(null));
+    }
+
+    @Test
+    void applyDiscount_ValidDiscount_AppliesDiscount() {
         MonetaryAmount price = Money.of(200, "USD");
         MonetaryAmount discountedPrice = Money.of(150, "USD");
-        course.changePrice(price);
+        courseNoSections.changePrice(price);
         String discountCode = "25OFF";
-        course.applyDiscount(discountedPrice, discountCode);
-        assertEquals(Money.of(50, "USD"), course.getDiscountedPrice());
-        assertEquals(discountCode, course.getDiscountCode());
+        courseNoSections.applyDiscount(discountedPrice, discountCode);
+        assertEquals(Money.of(50, "USD"), courseNoSections.getDiscountedPrice());
+        assertEquals(discountCode, courseNoSections.getDiscountCode());
     }
 
     @Test
     void applyDiscount_NullDiscountedPrice_ThrowsException() {
-        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
         MonetaryAmount price = Money.of(200, "USD");
         String discountCode = "25OFF";
-        course.changePrice(price);
-        assertThrows(NullPointerException.class, () -> course.applyDiscount(null, discountCode));
+        courseNoSections.changePrice(price);
+        assertThrows(NullPointerException.class, () -> courseNoSections.applyDiscount(null, discountCode));
     }
 
     @Test
     void addSection_ValidSection_AddsSection() {
-        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
         CourseSection section = new CourseSection("SectionTitle");
         section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
-        course.addSection(section);
-        assertTrue(course.getSections().contains(section));
+        courseNoSections.addSection(section);
+        assertTrue(courseNoSections.getSections().contains(section));
     }
 
     @Test
     void addSection_NullSection_ThrowsException() {
-        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
-        assertThrows(NullPointerException.class, () -> course.addSection(null));
+        assertThrows(NullPointerException.class, () -> courseNoSections.addSection(null));
     }
 
     @Test
     void addSection_SectionWithSameTitle_ThrowsException() {
-        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
-        CourseSection section = new CourseSection("SectionTitle");
-        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
-        course.addSection(section);
-
         // Tạo một section khác có cùng title với section đã thêm vào course
-        CourseSection duplicateSection = new CourseSection("SectionTitle");
-        assertThrows(InputInvalidException.class, () -> course.addSection(duplicateSection));
+        CourseSection duplicateSection = new CourseSection(courseWithSections.getSections().iterator().next().getTitle());
+        assertThrows(InputInvalidException.class, () -> courseWithSections.addSection(duplicateSection));
     }
 
     @Test
     void addSection_SectionWithoutLessons_ThrowsException() {
-        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
         CourseSection section = new CourseSection("SectionTitle");
-        assertThrows(InputInvalidException.class, () -> course.addSection(section));
+        assertThrows(InputInvalidException.class, () -> courseNoSections.addSection(section));
     }
 
     @Test
     void addSection_PublishedCourse_ThrowsException() {
-        Course course = spy(new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher"));
+        Course course = spy(courseNoSections);
         when(course.canEdit()).thenReturn(false); // Giả lập khóa học đã publish
 
         CourseSection section = new CourseSection("SectionTitle");
         assertThrows(InputInvalidException.class, () -> course.addSection(section));
     }
+
+    @Test
+    void testUpdateSection_ShouldUpdateSectionTitle() {
+        CourseSection section = spy(new CourseSection("SectionTitle"));
+        // Mock id của section
+        when(section.getId()).thenReturn(1L);
+        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
+        courseNoSections.addSection(section);
+        assertTrue(courseNoSections.getSections().contains(section));
+
+        // update section title
+        courseNoSections.updateSection(section.getId(), "NewSectionTitle");
+
+        // verify section title is updated
+        verify(section).updateInfo("NewSectionTitle");
+        assertEquals("NewSectionTitle", section.getTitle());
+    }
+
+    @Test
+    void testUpdateSection_SectionWithSameTitle_ThrowsException() {
+        CourseSection section = spy(new CourseSection("SectionTitle"));
+        // Mock id của section
+        when(section.getId()).thenReturn(1L);
+        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
+        courseNoSections.addSection(section);
+        assertTrue(courseNoSections.getSections().contains(section));
+
+        // Tạo một section khác có cùng title với section đã thêm vào course
+        CourseSection duplicateSection = new CourseSection("SectionTitle");
+        assertThrows(InputInvalidException.class, () -> courseNoSections.addSection(duplicateSection));
+    }
+
+    @Test
+    void testUpdateSection_PublishedCourse_ThrowsException() {
+        Course course = spy(courseNoSections);
+        when(course.canEdit()).thenReturn(false); // Giả lập khóa học đã publish
+
+        CourseSection section = new CourseSection("SectionTitle");
+        assertThrows(InputInvalidException.class, () -> course.addSection(section));
+    }
+
+    @Test
+    void testUpdateSection_SectionNotFound_ThrowsException() {
+        assertThrows(ResourceNotFoundException.class, () -> courseNoSections.updateSection(1L, "NewSectionTitle"));
+    }
+
 
 }

@@ -129,12 +129,21 @@ public class Course extends AuditSupportClass {
         if (!canEdit()) {
             throw new InputInvalidException("Course is already published.");
         }
-        Assert.notEmpty(this.sections, "Cannot publish a course without sections.");
-        Validate.notNull(this.price, "Cannot publish a course without a price.");
-        Validate.notNull(teacher, "Cannot publish a course without a teacher.");
-        Validate.notNull(approvedBy, "Approved by must not be null.");
+        validateForPublish(approvedBy);
         this.approvedBy = approvedBy;
         this.published = true;
+    }
+
+    private void validateForPublish(String approvedBy) {
+        if (this.getSections().isEmpty() || this.getPrice() == null || this.getTeacher() == null) {
+            throw new InputInvalidException("Cannot publish a course without sections, price or teacher.");
+        }
+        if (approvedBy == null || approvedBy.isEmpty()) {
+            throw new InputInvalidException("Approved by must not be empty.");
+        }
+        if (approvedBy.equals(this.getTeacher())) {
+            throw new InputInvalidException("Teacher cannot approve their own course.");
+        }
     }
 
     public void addSection(CourseSection section) {

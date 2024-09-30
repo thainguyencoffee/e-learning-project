@@ -81,8 +81,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course publishCourse(Long courseId, String approvedBy) {
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(ResourceNotFoundException::new);
+        Course course = findCourseById(courseId);
 
         course.publish(approvedBy);
         return courseRepository.save(course);
@@ -98,8 +97,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course applyDiscount(Long courseId, String code) {
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(ResourceNotFoundException::new);
+        Course course = findCourseById(courseId);
         if (course.getPrice() == null) {
             throw new InputInvalidException("Cannot apply discount to a course without a price.");
         }
@@ -120,6 +118,13 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public Course updateSectionInfo(Long courseId, Long sectionId, String newTitle) {
+        Course course = findCourseById(courseId);
+        course.updateSection(sectionId, newTitle);
+        return courseRepository.save(course);
+    }
+
+    @Override
     public Course removeSection(Long courseId, Long sectionId) {
         Course course = findCourseById(courseId);
         course.removeSection(sectionId);
@@ -128,8 +133,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course updatePrice(Long courseId, MonetaryAmount newPrice) {
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(ResourceNotFoundException::new);
+        Course course = findCourseById(courseId);
         course.changePrice(newPrice);
 
         return courseRepository.save(course);

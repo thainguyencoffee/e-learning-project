@@ -73,7 +73,7 @@ public class CourseController {
     }
 
     @PutMapping("/{courseId}/publish")
-    public ResponseEntity<Course> updateStatus(@AuthenticationPrincipal Jwt jwt, @PathVariable Long courseId) {
+    public ResponseEntity<Course> publishCourse(@AuthenticationPrincipal Jwt jwt, @PathVariable Long courseId) {
         Course updatedCourse = courseService.publishCourse(courseId, jwt.getSubject());
         return ResponseEntity.ok(updatedCourse);
     }
@@ -98,5 +98,12 @@ public class CourseController {
         return ResponseEntity.created(URI.create("/courses/" + courseId)).body(updatedCourse);
     }
 
+    @PutMapping("/{courseId}/sections/{sectionId}")
+    public ResponseEntity<Course> updateSectionInfo(@PathVariable Long courseId,
+                                                    @PathVariable Long sectionId,
+                                                    @RequestBody @Valid UpdateSectionDTO updateSectionDTO) {
+        Course updatedCourse = courseService.updateSectionInfo(courseId, sectionId, updateSectionDTO.title());
+        return ResponseEntity.ok(updatedCourse);
+    }
 
 }
