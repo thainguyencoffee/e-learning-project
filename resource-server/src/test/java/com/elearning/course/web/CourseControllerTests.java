@@ -667,4 +667,78 @@ class CourseControllerTests {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void updateLesson_ValidCourseIdAndSectionIdAndLessonId_UpdatesLesson() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        Course updatedCourse = Mockito.mock(Course.class);
+        Mockito.when(courseService.updateLesson(1L, 2L, 3L, lessonDTO.toLesson()))
+                .thenReturn(updatedCourse);
+
+        mockMvc.perform(put("/courses/1/sections/2/lessons/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void updateLesson_CourseNotFound_ThrowsException() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).updateLesson(any(), any(), any(), any());
+
+        mockMvc.perform(put("/courses/1/sections/2/lessons/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateLesson_SectionNotFound_ThrowsException() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).updateLesson(any(), any(), any(), any());
+
+        mockMvc.perform(put("/courses/1/sections/999/lessons/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateLesson_LessonNotFound_ThrowsException() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).updateLesson(any(), any(), any(), any());
+
+        mockMvc.perform(put("/courses/1/sections/2/lessons/999")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateLesson_UserNotTeacher_ShouldReturnForbidden() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+
+        mockMvc.perform(put("/courses/1/sections/2/lessons/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void updateLesson_PublishedCourse_ThrowsException() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        Mockito.doThrow(new InputInvalidException("Cannot update lesson in a published course."))
+                .when(courseService).updateLesson(any(), any(), any(), any());
+
+        mockMvc.perform(put("/courses/1/sections/2/lessons/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isBadRequest());
+    }
+
 }

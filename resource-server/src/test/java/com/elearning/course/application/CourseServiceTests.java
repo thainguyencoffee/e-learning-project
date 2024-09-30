@@ -561,4 +561,40 @@ class CourseServiceTests {
         verify(courseRepository, never()).save(any(Course.class));
     }
 
+    @Test
+    void updateLesson_ValidCourseIdAndSectionIdAndLessonId_UpdatesLesson() {
+        Course course = spy(this.course);
+        Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/updated", null);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        doNothing().when(course).updateLessonInSection(2L, 3L, updatedLesson);
+
+        courseService.updateLesson(1L, 2L, 3L, updatedLesson);
+
+        verify(courseRepository, times(1)).findByIdAndDeleted(1L, false);
+        verify(course, times(1)).updateLessonInSection(2L, 3L, updatedLesson);
+        verify(courseRepository, times(1)).save(course);
+    }
+
+    @Test
+    void updateLesson_CourseNotFound_ThrowsException() {
+        Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/updated", null);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.updateLesson(1L, 2L, 3L, updatedLesson));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void updateLesson_SectionNotFound_ThrowsException() {
+        Course course = spy(this.course);
+        Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/updated", null);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        doThrow(new ResourceNotFoundException()).when(course).updateLessonInSection(999L, 3L, updatedLesson);
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.updateLesson(1L, 999L, 3L, updatedLesson));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
 }

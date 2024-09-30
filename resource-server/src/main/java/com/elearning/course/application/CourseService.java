@@ -40,5 +40,7 @@ public interface CourseService {
 
     Course addLesson(Long courseId, Long sectionId, Lesson lesson);
 
+    Course updateLesson(Long courseId, Long sectionId, Long lessonId, Lesson updatedLesson);
+
     Course updatePrice(Long courseId, MonetaryAmount newPrice);
 }

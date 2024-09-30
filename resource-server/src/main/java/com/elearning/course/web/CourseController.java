@@ -120,4 +120,15 @@ public class CourseController {
         Course updatedCourse = courseService.addLesson(courseId, sectionId, lessonDTO.toLesson());
         return ResponseEntity.ok(updatedCourse);
     }
+
+    @PutMapping("/{courseId}/sections/{sectionId}/lessons/{lessonId}")
+    public ResponseEntity<Course> updateLesson(@PathVariable Long courseId,
+                                               @PathVariable Long sectionId,
+                                               @PathVariable Long lessonId,
+                                               @RequestBody @Valid LessonDTO lessonDTO) {
+        Course updatedCourse = courseService.updateLesson(courseId, sectionId, lessonId, lessonDTO.toLesson());
+        return ResponseEntity.ok(updatedCourse);
+    }
+
+
 }

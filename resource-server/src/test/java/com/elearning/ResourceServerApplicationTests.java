@@ -974,6 +974,109 @@ class ResourceServerApplicationTests {
                 .expectStatus().isForbidden();
     }
 
+    @Test
+    void testUpdateLesson_Successful() {
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        CourseSection section = new CourseSection("Section 1");
+        Lesson lesson = new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null);
+        section.addLesson(lesson);
+        course.addSection(section);
+        courseRepository.save(course);
+
+        LessonDTO updateLessonDTO = new LessonDTO("New title", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+
+        // Gửi request PUT để cập nhật lesson của khóa học
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", courseId, section.getId(), lesson.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(updateLessonDTO))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.sections[0].lessons[0].title").isEqualTo(updateLessonDTO.title());
+    }
+
+    @Test
+    void testUpdateLesson_LessonDuplicate_BadRequest() {
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        CourseSection section = new CourseSection("Section 1");
+        Lesson lesson1 = new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null);
+        Lesson lesson2 = new Lesson("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+        section.addLesson(lesson1);
+        section.addLesson(lesson2);
+        course.addSection(section);
+        courseRepository.save(course);
+
+        LessonDTO updateLessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+
+        // Gửi request PUT để cập nhật lesson của khóa học
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", courseId, section.getId(), lesson1.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(updateLessonDTO))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    void testUpdateLesson_CoursePublished_BadRequest() {
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        // Thiết lập giá cho khóa học
+        course.changePrice(Money.of(1000, "USD"));
+        // Thiết lập các sections cho khóa học
+        CourseSection courseSection = new CourseSection("Section 1");
+        courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
+        course.addSection(courseSection);
+        // Lưu khóa học đã cập nhật
+        courseRepository.save(course);
+
+        // Gửi request PUT để xuất bản khóa học
+        webTestClient.put().uri("/courses/{courseId}/publish", courseId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .exchange()
+                .expectStatus().isOk()  // Phản hồi 200 OK
+                .expectBody()
+                .jsonPath("$.published").isEqualTo(true);  // Kiểm tra khóa học đã được xuất bản
+
+        LessonDTO updateLessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+
+        // Gửi request PUT để cập nhật lesson của khóa học
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", courseId, courseSection.getId(), courseSection.getLessons().iterator().next().getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(updateLessonDTO))
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    void testUpdateLesson_UserIsNotTeacherOrAdmin_Forbidden() {
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        CourseSection section = new CourseSection("Section 1");
+        Lesson lesson = new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null);
+        section.addLesson(lesson);
+        course.addSection(section);
+        courseRepository.save(course);
+
+        LessonDTO updateLessonDTO = new LessonDTO("New title", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+
+        // Gửi request PUT để cập nhật lesson của khóa học
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", courseId, section.getId(), lesson.getId())
+                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(updateLessonDTO))
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
     protected static class KeycloakToken {
         private final String accessToken;
 
