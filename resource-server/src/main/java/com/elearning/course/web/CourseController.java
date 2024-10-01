@@ -130,5 +130,12 @@ public class CourseController {
         return ResponseEntity.ok(updatedCourse);
     }
 
+    @DeleteMapping("/{courseId}/sections/{sectionId}/lessons/{lessonId}")
+    public ResponseEntity<Course> deleteLesson(@PathVariable Long courseId,
+                                               @PathVariable Long sectionId,
+                                               @PathVariable Long lessonId) {
+        Course updatedCourse = courseService.removeLesson(courseId, sectionId, lessonId);
+        return ResponseEntity.ok(updatedCourse);
+    }
 
 }

@@ -597,4 +597,59 @@ class CourseServiceTests {
         verify(courseRepository, never()).save(any(Course.class));
     }
 
+    @Test
+    void removeLesson_ValidCourseIdAndSectionIdAndLessonId_RemovesLesson() {
+        Course course = spy(this.course);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        doNothing().when(course).removeLessonFromSection(2L, 3L);
+
+        courseService.removeLesson(1L, 2L, 3L);
+
+        verify(courseRepository, times(1)).findByIdAndDeleted(1L, false);
+        verify(course, times(1)).removeLessonFromSection(2L, 3L);
+        verify(courseRepository, times(1)).save(course);
+    }
+
+    @Test
+    void removeLesson_CourseNotFound_ThrowsException() {
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.removeLesson(1L, 2L, 3L));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void removeLesson_SectionNotFound_ThrowsException() {
+        Course course = spy(this.course);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        doThrow(new ResourceNotFoundException()).when(course).removeLessonFromSection(999L, 3L);
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.removeLesson(1L, 999L, 3L));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void removeLesson_LessonNotFound_ThrowsException() {
+        Course course = spy(this.course);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        doThrow(new ResourceNotFoundException()).when(course).removeLessonFromSection(2L, 999L);
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.removeLesson(1L, 2L, 999L));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void removeLesson_PublishedCourse_ThrowsException() {
+        Course course = spy(this.course);
+        when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
+        doReturn(false).when(course).canEdit();
+
+        assertThrows(InputInvalidException.class, () -> courseService.removeLesson(1L, 2L, 3L));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
 }

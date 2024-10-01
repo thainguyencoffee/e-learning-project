@@ -741,4 +741,68 @@ class CourseControllerTests {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void deleteLesson_ValidCourseIdAndSectionIdAndLessonId_RemovesLesson() throws Exception {
+        Course updatedCourse = Mockito.mock(Course.class);
+        Mockito.when(courseService.removeLesson(1L, 2L, 3L)).thenReturn(updatedCourse);
+
+        mockMvc.perform(delete("/courses/1/sections/2/lessons/3")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteLesson_ValidCourseIdAndSectionIdAndLessonId_RemovesLesson2() throws Exception {
+        Course updatedCourse = Mockito.mock(Course.class);
+        Mockito.when(courseService.removeLesson(1L, 2L, 3L)).thenReturn(updatedCourse);
+
+        mockMvc.perform(delete("/courses/1/sections/2/lessons/3")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteLesson_CourseNotFound_ThrowsException() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).removeLesson(1L, 2L, 3L);
+
+        mockMvc.perform(delete("/courses/1/sections/2/lessons/3")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteLesson_SectionNotFound_ThrowsException() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).removeLesson(1L, 999L, 3L);
+
+        mockMvc.perform(delete("/courses/1/sections/999/lessons/3")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteLesson_LessonNotFound_ThrowsException() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).removeLesson(1L, 2L, 999L);
+
+        mockMvc.perform(delete("/courses/1/sections/2/lessons/999")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteLesson_UserNotTeacher_ShouldReturnForbidden() throws Exception {
+        mockMvc.perform(delete("/courses/1/sections/2/lessons/3")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deleteLesson_PublishedCourse_ThrowsException() throws Exception {
+        Mockito.doThrow(new InputInvalidException("Cannot delete lesson from a published course."))
+                .when(courseService).removeLesson(1L, 2L, 3L);
+
+        mockMvc.perform(delete("/courses/1/sections/2/lessons/3")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isBadRequest());
+    }
+
 }

@@ -202,6 +202,9 @@ public class Course extends AuditSupportClass {
     }
 
     public void removeLessonFromSection(Long sectionId, Long lessonId){
+        if (!canEdit()) {
+            throw new InputInvalidException("Cannot add a lesson to a published course.");
+        }
         CourseSection section = findSectionById(sectionId);
         section.removeLesson(lessonId);
     };
