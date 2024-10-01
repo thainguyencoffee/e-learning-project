@@ -1,6 +1,7 @@
 package com.elearning.course.domain;
 
 import com.elearning.common.exception.InputInvalidException;
+import com.elearning.common.exception.ResourceNotFoundException;
 import lombok.Getter;
 import lombok.ToString;
 import org.apache.commons.lang3.Validate;
@@ -34,7 +35,7 @@ public class CourseSection {
     }
 
     public void addLesson(Lesson lesson) {
-        if (lessons.stream().anyMatch(l -> l.getTitle().equals(lesson.getTitle()))) {
+        if (this.lessons.stream().anyMatch(l -> l.getTitle().equals(lesson.getTitle()))) {
             throw new InputInvalidException("Duplicate lesson title.");
         }
 
@@ -42,8 +43,8 @@ public class CourseSection {
     }
 
     public void updateLesson(Long lessonId, Lesson updatedLesson) {
-        if (lessons.stream().anyMatch(l -> l.getTitle().equals(updatedLesson.getTitle()))) {
-            throw new IllegalArgumentException("Duplicate lesson title.");
+        if (this.lessons.stream().anyMatch(l -> l.getTitle().equals(updatedLesson.getTitle()))) {
+            throw new InputInvalidException("Duplicate lesson title.");
         }
 
         Lesson lesson = findLessonById(lessonId);
@@ -59,7 +60,7 @@ public class CourseSection {
         return this.lessons.stream()
                 .filter(lesson -> lesson.getId().equals(lessonId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Lesson not found"));
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
 }

@@ -667,4 +667,142 @@ class CourseControllerTests {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void updateLesson_ValidCourseIdAndSectionIdAndLessonId_UpdatesLesson() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        Course updatedCourse = Mockito.mock(Course.class);
+        Mockito.when(courseService.updateLesson(1L, 2L, 3L, lessonDTO.toLesson()))
+                .thenReturn(updatedCourse);
+
+        mockMvc.perform(put("/courses/1/sections/2/lessons/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void updateLesson_CourseNotFound_ThrowsException() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).updateLesson(any(), any(), any(), any());
+
+        mockMvc.perform(put("/courses/1/sections/2/lessons/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateLesson_SectionNotFound_ThrowsException() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).updateLesson(any(), any(), any(), any());
+
+        mockMvc.perform(put("/courses/1/sections/999/lessons/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateLesson_LessonNotFound_ThrowsException() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).updateLesson(any(), any(), any(), any());
+
+        mockMvc.perform(put("/courses/1/sections/2/lessons/999")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateLesson_UserNotTeacher_ShouldReturnForbidden() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+
+        mockMvc.perform(put("/courses/1/sections/2/lessons/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void updateLesson_PublishedCourse_ThrowsException() throws Exception {
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        Mockito.doThrow(new InputInvalidException("Cannot update lesson in a published course."))
+                .when(courseService).updateLesson(any(), any(), any(), any());
+
+        mockMvc.perform(put("/courses/1/sections/2/lessons/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deleteLesson_ValidCourseIdAndSectionIdAndLessonId_RemovesLesson() throws Exception {
+        Course updatedCourse = Mockito.mock(Course.class);
+        Mockito.when(courseService.removeLesson(1L, 2L, 3L)).thenReturn(updatedCourse);
+
+        mockMvc.perform(delete("/courses/1/sections/2/lessons/3")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteLesson_ValidCourseIdAndSectionIdAndLessonId_RemovesLesson2() throws Exception {
+        Course updatedCourse = Mockito.mock(Course.class);
+        Mockito.when(courseService.removeLesson(1L, 2L, 3L)).thenReturn(updatedCourse);
+
+        mockMvc.perform(delete("/courses/1/sections/2/lessons/3")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteLesson_CourseNotFound_ThrowsException() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).removeLesson(1L, 2L, 3L);
+
+        mockMvc.perform(delete("/courses/1/sections/2/lessons/3")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteLesson_SectionNotFound_ThrowsException() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).removeLesson(1L, 999L, 3L);
+
+        mockMvc.perform(delete("/courses/1/sections/999/lessons/3")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteLesson_LessonNotFound_ThrowsException() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).removeLesson(1L, 2L, 999L);
+
+        mockMvc.perform(delete("/courses/1/sections/2/lessons/999")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteLesson_UserNotTeacher_ShouldReturnForbidden() throws Exception {
+        mockMvc.perform(delete("/courses/1/sections/2/lessons/3")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deleteLesson_PublishedCourse_ThrowsException() throws Exception {
+        Mockito.doThrow(new InputInvalidException("Cannot delete lesson from a published course."))
+                .when(courseService).removeLesson(1L, 2L, 3L);
+
+        mockMvc.perform(delete("/courses/1/sections/2/lessons/3")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isBadRequest());
+    }
+
 }

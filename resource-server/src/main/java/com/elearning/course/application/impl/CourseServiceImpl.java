@@ -140,6 +140,20 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public Course updateLesson(Long courseId, Long sectionId, Long lessonId, Lesson updatedLesson) {
+        Course course = findCourseById(courseId);
+        course.updateLessonInSection(sectionId, lessonId, updatedLesson);
+        return courseRepository.save(course);
+    }
+
+    @Override
+    public Course removeLesson(Long courseId, Long sectionId, Long lessonId) {
+        Course course = findCourseById(courseId);
+        course.removeLessonFromSection(sectionId, lessonId);
+        return courseRepository.save(course);
+    }
+
+    @Override
     public Course updatePrice(Long courseId, MonetaryAmount newPrice) {
         Course course = findCourseById(courseId);
         course.changePrice(newPrice);
