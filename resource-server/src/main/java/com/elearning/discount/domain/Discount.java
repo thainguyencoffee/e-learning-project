@@ -1,10 +1,11 @@
 package com.elearning.discount.domain;
 
+import com.elearning.common.AuditSupportClass;
 import com.elearning.common.exception.InputInvalidException;
 import com.elearning.discount.domain.exception.DiscountInvalidDateException;
 import lombok.Getter;
 import org.javamoney.moneta.Money;
-import org.springframework.data.annotation.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.money.MonetaryAmount;
@@ -12,7 +13,7 @@ import java.time.Instant;
 
 @Getter
 @Table("discount")
-public class Discount {
+public class Discount extends AuditSupportClass {
     @Id
     private Long id;
     private String code;
@@ -21,15 +22,6 @@ public class Discount {
     private MonetaryAmount fixedAmount;
     private Instant startDate;
     private Instant endDate;
-
-    @CreatedDate
-    private Instant createdDate;
-    @CreatedBy
-    private String createdBy;
-    @LastModifiedDate
-    private Instant lastModifiedDate;
-    @LastModifiedBy
-    private String lastModifiedBy;
 
     // Constructor với các logic kiểm tra
     public Discount(
