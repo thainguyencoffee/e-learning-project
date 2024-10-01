@@ -1,5 +1,6 @@
 package com.elearning;
 
+import com.elearning.common.Currencies;
 import com.elearning.course.application.dto.CourseDTO;
 import com.elearning.course.application.dto.CourseSectionDTO;
 import com.elearning.course.application.dto.CourseUpdateDTO;
@@ -112,10 +113,10 @@ class ResourceServerApplicationTests {
         discountRepository.save(discount);
 
         Discount discount2 = new Discount(
-                "DISCOUNT_30_DOLLARS",
+                "DISCOUNT_30_VN",
                 Type.FIXED,
                 null,
-                Money.of(30, "USD"),
+                Money.of(30, Currencies.VND),
                 Instant.now().minusSeconds(3600),
                 Instant.now().plusSeconds(3600)
         );
@@ -433,7 +434,7 @@ class ResourceServerApplicationTests {
         Long courseId = course.getId();
 
         // Thiết lập giá mới cho khóa học
-        var newPrice = new UpdatePriceDTO(Money.of(1000, "USD"));
+        var newPrice = new UpdatePriceDTO(Money.of(1000, Currencies.VND));
 
         // Gửi request PUT để cập nhật giá khóa học
         webTestClient.put().uri("/courses/{courseId}/update-price", courseId)
@@ -443,13 +444,13 @@ class ResourceServerApplicationTests {
                 .exchange()
                 .expectStatus().isOk()  // Phản hồi 200 OK
                 .expectBody()
-                .jsonPath("$.price").isEqualTo("USD1,000.00");  // Kiểm tra giá đã được cập nhật
+                .jsonPath("$.price").isEqualTo("VND1,000.00");  // Kiểm tra giá đã được cập nhật
     }
 
     @Test
     void testUpdatePrice_Forbidden() {
         // Thiết lập giá mới cho khóa học
-        var newPrice = new UpdatePriceDTO(Money.of(1000, "USD"));
+        var newPrice = new UpdatePriceDTO(Money.of(1000, Currencies.VND));
 
         // Gửi request PUT để cập nhật giá khóa học
         webTestClient.put().uri("/courses/{courseId}/update-price", 1)
@@ -515,7 +516,7 @@ class ResourceServerApplicationTests {
         Long courseId = course.getId();
 
         // Thiết lập giá cho khóa học
-        course.changePrice(Money.of(1000, "USD"));
+        course.changePrice(Money.of(1000, Currencies.VND));
         // Thiết lập các sections cho khóa học
         CourseSection courseSection = new CourseSection("Section 1");
         courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
@@ -558,7 +559,7 @@ class ResourceServerApplicationTests {
     void testApplyDiscount_Successful() {
         // Lấy khóa học từ CSDL thật (được tạo ở setupData)
         Course course = courseRepository.findAll().iterator().next();
-        course.changePrice(Money.of(1000, "USD"));  // Đặt giá cho khóa học
+        course.changePrice(Money.of(1000, Currencies.VND));  // Đặt giá cho khóa học
         courseRepository.save(course);  // Lưu khóa học đã cập nhật
 
         Long courseId = course.getId();
@@ -577,18 +578,18 @@ class ResourceServerApplicationTests {
                 .expectStatus().isOk()  // Phản hồi 200 OK
                 .expectBody()
                 .jsonPath("$.discountCode").isEqualTo(discountCode)  // Kiểm tra giảm giá đã được cập nhật
-                .jsonPath("$.discountedPrice").isEqualTo("USD500.00");  // Kiểm tra giá đã được cập nhật
+                .jsonPath("$.discountedPrice").isEqualTo("VND500.00");  // Kiểm tra giá đã được cập nhật
     }
 
     @Test
     void testApplyDiscountFixed_Successful() {
         // Lấy khóa học từ CSDL thật (được tạo ở setupData)
         Course course = courseRepository.findAll().iterator().next();
-        course.changePrice(Money.of(1000, "USD"));  // Đặt giá cho khóa học
+        course.changePrice(Money.of(1000, Currencies.VND));  // Đặt giá cho khóa học
         courseRepository.save(course);  // Lưu khóa học đã cập nhật
 
         Long courseId = course.getId();
-        Discount discount = discountRepository.findByCode("DISCOUNT_30_DOLLARS").get();
+        Discount discount = discountRepository.findByCode("DISCOUNT_30_VN").get();
         String discountCode = discount.getCode();
 
         // Thiết lập giảm giá cho khóa học
@@ -603,14 +604,14 @@ class ResourceServerApplicationTests {
                 .expectStatus().isOk()  // Phản hồi 200 OK
                 .expectBody()
                 .jsonPath("$.discountCode").isEqualTo(discountCode)  // Kiểm tra giảm giá đã được cập nhật
-                .jsonPath("$.discountedPrice").isEqualTo("USD970.00");  // Kiểm tra giá đã được cập nhật
+                .jsonPath("$.discountedPrice").isEqualTo("VND970.00");  // Kiểm tra giá đã được cập nhật
     }
 
     @Test
     void testApplyDiscount_NotFound() {
         // Lấy khóa học từ CSDL thật (được tạo ở setupData)
         Course course = courseRepository.findAll().iterator().next();
-        course.changePrice(Money.of(1000, "USD"));  // Đặt giá cho khóa học
+        course.changePrice(Money.of(1000, Currencies.VND));  // Đặt giá cho khóa học
         courseRepository.save(course);  // Lưu khóa học đã cập nhật
         Long courseId = course.getId();
 
@@ -630,7 +631,7 @@ class ResourceServerApplicationTests {
     void testApplyDiscount_Forbidden() {
         // Lấy khóa học từ CSDL thật (được tạo ở setupData)
         Course course = courseRepository.findAll().iterator().next();
-        course.changePrice(Money.of(1000, "USD"));  // Đặt giá cho khóa học
+        course.changePrice(Money.of(1000, Currencies.VND));  // Đặt giá cho khóa học
         courseRepository.save(course);  // Lưu khóa học đã cập nhật
         Long courseId = course.getId();
 
@@ -799,7 +800,7 @@ class ResourceServerApplicationTests {
         Long courseId = course.getId();
 
         // Thiết lập giá cho khóa học
-        course.changePrice(Money.of(1000, "USD"));
+        course.changePrice(Money.of(1000, Currencies.VND));
         // Thiết lập các sections cho khóa học
         CourseSection courseSection = new CourseSection("Section 1");
         courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
@@ -853,7 +854,7 @@ class ResourceServerApplicationTests {
         Long courseId = course.getId();
 
         // Thiết lập giá cho khóa học
-        course.changePrice(Money.of(1000, "USD"));
+        course.changePrice(Money.of(1000, Currencies.VND));
         // Thiết lập các sections cho khóa học
         CourseSection courseSection = new CourseSection("Section 1");
         courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
@@ -926,7 +927,7 @@ class ResourceServerApplicationTests {
         Long courseId = course.getId();
 
         // Thiết lập giá cho khóa học
-        course.changePrice(Money.of(1000, "USD"));
+        course.changePrice(Money.of(1000, Currencies.VND));
         // Thiết lập các sections cho khóa học
         CourseSection courseSection = new CourseSection("Section 1");
         courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
@@ -1028,7 +1029,7 @@ class ResourceServerApplicationTests {
         Long courseId = course.getId();
 
         // Thiết lập giá cho khóa học
-        course.changePrice(Money.of(1000, "USD"));
+        course.changePrice(Money.of(1000, Currencies.VND));
         // Thiết lập các sections cho khóa học
         CourseSection courseSection = new CourseSection("Section 1");
         courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
@@ -1103,7 +1104,7 @@ class ResourceServerApplicationTests {
         Long courseId = course.getId();
 
         // Thiết lập giá cho khóa học
-        course.changePrice(Money.of(1000, "USD"));
+        course.changePrice(Money.of(1000, Currencies.VND));
         // Thiết lập các sections cho khóa học
         CourseSection courseSection = new CourseSection("Section 1");
         courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));

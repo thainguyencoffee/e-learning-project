@@ -1,5 +1,6 @@
 package com.elearning.course.domain;
 
+import com.elearning.common.Currencies;
 import com.elearning.common.exception.InputInvalidException;
 import com.elearning.common.exception.ResourceNotFoundException;
 import org.javamoney.moneta.Money;
@@ -34,7 +35,7 @@ class CourseTests {
 
         courseWithSections = new Course("Title", "Description", "ThumbnailUrl", benefits, Language.ENGLISH, prerequisites, subtitles, "Teacher");
         courseWithSections.addSection(courseSection);
-        courseWithSections.changePrice(Money.of(100, "USD"));
+        courseWithSections.changePrice(Money.of(100, Currencies.VND));
     }
 
     @AfterEach
@@ -163,14 +164,14 @@ class CourseTests {
 
     @Test
     void changePrice_ValidPrice_ChangesPrice() {
-        MonetaryAmount newPrice = Money.of(100, "USD");
+        MonetaryAmount newPrice = Money.of(100, Currencies.VND);
         courseNoSections.changePrice(newPrice);
         assertEquals(newPrice, courseNoSections.getPrice());
     }
 
     @Test
     void changePrice_NegativePrice_ThrowsException() {
-        MonetaryAmount negativePrice = Money.of(-100, "USD");
+        MonetaryAmount negativePrice = Money.of(-100, Currencies.VND);
         assertThrows(InputInvalidException.class, () -> courseNoSections.changePrice(negativePrice));
     }
 
@@ -178,7 +179,7 @@ class CourseTests {
     void changePrice_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
         when(course.canEdit()).thenReturn(false);
-        MonetaryAmount newPrice = Money.of(100, "USD");
+        MonetaryAmount newPrice = Money.of(100, Currencies.VND);
         assertThrows(InputInvalidException.class, () -> course.changePrice(newPrice));
     }
 
@@ -219,7 +220,7 @@ class CourseTests {
     @Test
     void publish_CourseWithoutSections_ThrowsException() {
         // Tạo một course không có sections nhưng đã set giá
-        courseNoSections.changePrice(Money.of(100, "USD"));
+        courseNoSections.changePrice(Money.of(100, Currencies.VND));
 
         assertThrows(InputInvalidException.class, () -> courseNoSections.publish("Admin"));
     }
@@ -252,18 +253,18 @@ class CourseTests {
 
     @Test
     void applyDiscount_ValidDiscount_AppliesDiscount() {
-        MonetaryAmount price = Money.of(200, "USD");
-        MonetaryAmount discountedPrice = Money.of(150, "USD");
+        MonetaryAmount price = Money.of(200, Currencies.VND);
+        MonetaryAmount discountedPrice = Money.of(150, Currencies.VND);
         courseNoSections.changePrice(price);
         String discountCode = "25OFF";
         courseNoSections.applyDiscount(discountedPrice, discountCode);
-        assertEquals(Money.of(50, "USD"), courseNoSections.getDiscountedPrice());
+        assertEquals(Money.of(50, Currencies.VND), courseNoSections.getDiscountedPrice());
         assertEquals(discountCode, courseNoSections.getDiscountCode());
     }
 
     @Test
     void applyDiscount_NullDiscountedPrice_ThrowsException() {
-        MonetaryAmount price = Money.of(200, "USD");
+        MonetaryAmount price = Money.of(200, Currencies.VND);
         String discountCode = "25OFF";
         courseNoSections.changePrice(price);
         assertThrows(NullPointerException.class, () -> courseNoSections.applyDiscount(null, discountCode));

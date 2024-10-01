@@ -1,5 +1,6 @@
 package com.elearning.course.domain;
 
+import com.elearning.common.Currencies;
 import com.elearning.common.config.DataAuditConfig;
 import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,7 @@ public class CourseJdbcTests {
                 Set.of(Language.ENGLISH, Language.SPANISH),
                 "teacher123"
         );
-        course.changePrice(Money.of(100, "USD"));
+        course.changePrice(Money.of(100, Currencies.VND));
     }
 
     @Test

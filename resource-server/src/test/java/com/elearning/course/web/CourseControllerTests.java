@@ -1,5 +1,6 @@
 package com.elearning.course.web;
 
+import com.elearning.common.Currencies;
 import com.elearning.common.config.JacksonCustomizations;
 import com.elearning.common.config.SecurityConfig;
 import com.elearning.common.exception.InputInvalidException;
@@ -229,9 +230,9 @@ class CourseControllerTests {
     void changePrice_ValidCourseIdAndPrice_ShouldReturnUpdatedCourse() throws Exception {
         Course updatedCourse = Mockito.mock(Course.class);
         Mockito.when(updatedCourse.getId()).thenReturn(1L);
-        Mockito.when(courseService.updatePrice(1L, Money.of(100, "USD"))).thenReturn(updatedCourse);
+        Mockito.when(courseService.updatePrice(1L, Money.of(100, Currencies.VND))).thenReturn(updatedCourse);
 
-        String body = objectMapper.writeValueAsString(new UpdatePriceDTO(Money.of(100, "USD")));
+        String body = objectMapper.writeValueAsString(new UpdatePriceDTO(Money.of(100, Currencies.VND)));
 
         mockMvc.perform(put("/courses/1/update-price")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -243,9 +244,9 @@ class CourseControllerTests {
 
     @Test
     void changePrice_CourseNotFound_ShouldReturnNotFound() throws Exception {
-        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).updatePrice(1L, Money.of(100, "USD"));
+        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).updatePrice(1L, Money.of(100, Currencies.VND));
 
-        String body = objectMapper.writeValueAsString(new UpdatePriceDTO(Money.of(100, "USD")));
+        String body = objectMapper.writeValueAsString(new UpdatePriceDTO(Money.of(100, Currencies.VND)));
 
         mockMvc.perform(put("/courses/1/update-price")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -256,7 +257,7 @@ class CourseControllerTests {
 
     @Test
     void changePrice_UserNotAdmin_ShouldReturnForbidden() throws Exception {
-        String body = objectMapper.writeValueAsString(new UpdatePriceDTO(Money.of(100, "USD")));
+        String body = objectMapper.writeValueAsString(new UpdatePriceDTO(Money.of(100, Currencies.VND)));
         mockMvc.perform(put("/courses/1/update-price")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
@@ -266,9 +267,9 @@ class CourseControllerTests {
 
     @Test
     void changePrice_CourseAlreadyPublished_ShouldReturnBadRequest() throws Exception {
-        Mockito.doThrow(new InputInvalidException("Cannot change price of a published course.")).when(courseService).updatePrice(1L, Money.of(100, "USD"));
+        Mockito.doThrow(new InputInvalidException("Cannot change price of a published course.")).when(courseService).updatePrice(1L, Money.of(100, Currencies.VND));
 
-        String body = objectMapper.writeValueAsString(new UpdatePriceDTO(Money.of(100, "USD")));
+        String body = objectMapper.writeValueAsString(new UpdatePriceDTO(Money.of(100, Currencies.VND)));
 
         mockMvc.perform(put("/courses/1/update-price")
                         .contentType(MediaType.APPLICATION_JSON)
