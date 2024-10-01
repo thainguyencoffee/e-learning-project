@@ -279,6 +279,18 @@ class CourseControllerTests {
     }
 
     @Test
+    void changePrice_NewPriceInvalid_ShouldReturnBadRequest() throws Exception {
+        String body = objectMapper.writeValueAsString(new UpdatePriceDTO(null));
+
+        mockMvc.perform(put("/courses/1/update-price")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin")))
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void assignTeacher_ValidCourseIdAndTeacher_ShouldReturnOk() throws Exception {
         Course updatedCourse = Mockito.mock(Course.class);
         Mockito.when(updatedCourse.getId()).thenReturn(1L);

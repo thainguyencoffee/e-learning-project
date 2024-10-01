@@ -81,7 +81,7 @@ public class CourseController {
 
     @PutMapping("/{courseId}/update-price")
     public ResponseEntity<Course> changePrice(@PathVariable Long courseId,
-                                              @RequestBody UpdatePriceDTO priceDTO) {
+                                              @Valid @RequestBody UpdatePriceDTO priceDTO) {
         Course updatedCourse = courseService.updatePrice(courseId, priceDTO.price());
         return ResponseEntity.ok(updatedCourse);
     }

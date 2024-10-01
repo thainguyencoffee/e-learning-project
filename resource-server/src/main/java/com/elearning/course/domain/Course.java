@@ -169,11 +169,12 @@ public class Course extends AuditSupportClass {
             throw new InputInvalidException("Cannot update a section in a published course.");
         }
 
-        if (this.sections.stream().anyMatch(existingSection -> existingSection.getTitle().equals(title))) {
+        CourseSection existingSection = findSectionById(sectionId);
+
+        if (this.sections.stream().anyMatch(section -> section.getTitle().equals(title))) {
             throw new InputInvalidException("A section with the same title already exists.");
         }
 
-        CourseSection existingSection = findSectionById(sectionId);
         existingSection.updateInfo(title);
     }
 

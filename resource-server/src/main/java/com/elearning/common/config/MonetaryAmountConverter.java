@@ -33,6 +33,11 @@ public class MonetaryAmountConverter extends AbstractJdbcConfiguration {
 
         @Override
         public MonetaryAmount convert(@NotNull String source) {
+
+            if (source.isEmpty()) {
+                return null;
+            }
+
             try {
                 // Attempt to parse the string using the default Money parser
                 return Money.parse(source);

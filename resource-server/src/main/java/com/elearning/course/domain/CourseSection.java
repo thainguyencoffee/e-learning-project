@@ -35,19 +35,22 @@ public class CourseSection {
     }
 
     public void addLesson(Lesson lesson) {
-        if (this.lessons.stream().anyMatch(l -> l.getTitle().equals(lesson.getTitle()))) {
-            throw new InputInvalidException("Duplicate lesson title.");
+        if (this.lessons.stream().anyMatch(l ->
+                l.getTitle().equals(lesson.getTitle()) ||
+                        (l.getLink() != null && lesson.getLink() != null && l.getLink().equals(lesson.getLink())))) {
+            throw new InputInvalidException("Duplicate lesson title or link.");
         }
 
         this.lessons.add(lesson);
     }
 
     public void updateLesson(Long lessonId, Lesson updatedLesson) {
-        if (this.lessons.stream().anyMatch(l -> l.getTitle().equals(updatedLesson.getTitle()))) {
-            throw new InputInvalidException("Duplicate lesson title.");
+        Lesson lesson = findLessonById(lessonId);
+
+        if (this.lessons.stream().anyMatch(l -> l.getTitle().equals(updatedLesson.getTitle()) || l.getLink().equals(updatedLesson.getLink()))) {
+            throw new InputInvalidException("Duplicate lesson title or link.");
         }
 
-        Lesson lesson = findLessonById(lessonId);
         lesson.updateFrom(updatedLesson);  // Delegate updating logic to `Lesson`
     }
 
