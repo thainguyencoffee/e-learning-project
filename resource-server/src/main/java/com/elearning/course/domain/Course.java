@@ -1,6 +1,7 @@
 package com.elearning.course.domain;
 
 import com.elearning.common.AuditSupportClass;
+import com.elearning.common.Currencies;
 import com.elearning.common.exception.ResourceNotFoundException;
 import com.elearning.common.exception.InputInvalidException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -12,6 +13,7 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.util.Assert;
 
+import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
 import java.util.HashSet;
 import java.util.Set;
@@ -93,6 +95,9 @@ public class Course extends AuditSupportClass {
     public void changePrice(MonetaryAmount newPrice) {
         if (!canEdit()) {
             throw new InputInvalidException("Cannot change price of a published course.");
+        }
+        if (!isValidCurrency(newPrice.getCurrency())) {
+            throw new InputInvalidException("Currency is not supported. We support VND only.");
         }
         if (newPrice.isLessThan(Money.zero(newPrice.getCurrency()))) {
             throw new InputInvalidException("Price cannot be negative.");
@@ -237,4 +242,10 @@ public class Course extends AuditSupportClass {
     public boolean canEdit() {
         return !published;
     }
+
+    public boolean isValidCurrency(CurrencyUnit inputCurrency) {
+        var validCurrencies = Set.of(Currencies.VND);
+        return validCurrencies.contains(inputCurrency);
+    }
+
 }

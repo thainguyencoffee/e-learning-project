@@ -1,5 +1,6 @@
 package com.elearning.course.application;
 
+import com.elearning.common.Currencies;
 import com.elearning.common.exception.InputInvalidException;
 import com.elearning.common.exception.ResourceNotFoundException;
 import com.elearning.course.application.dto.CourseDTO;
@@ -85,7 +86,7 @@ class CourseServiceTests {
                 courseDTO.subtitles(),
                 "teacher123"
         );
-        courseForPublish.changePrice(Money.of(100, "USD"));
+        courseForPublish.changePrice(Money.of(100, Currencies.VND));
         CourseSection section = new CourseSection("Section 1");
         section.addLesson(new Lesson("Lesson 1", Lesson.Type.TEXT, "https://example.com/lesson1", null));
         courseForPublish.addSection(section);
@@ -203,7 +204,7 @@ class CourseServiceTests {
     @Test
     void updatePrice_ValidCourseIdAndPrice_UpdatesPrice() {
         when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
-        MonetaryAmount newPrice = Money.of(100, "USD");
+        MonetaryAmount newPrice = Money.of(100, Currencies.VND);
         courseService.updatePrice(1L, newPrice);
         verify(courseRepository, times(1)).save(course);
         assertEquals(newPrice, course.getPrice());
@@ -212,7 +213,7 @@ class CourseServiceTests {
     @Test
     void updatePrice_CourseNotFound_ThrowsException() {
         when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.empty());
-        MonetaryAmount newPrice = Money.of(100, "USD");
+        MonetaryAmount newPrice = Money.of(100, Currencies.VND);
         assertThrows(ResourceNotFoundException.class, () -> courseService.updatePrice(1L, newPrice));
         verify(courseRepository, never()).save(any(Course.class));
     }
@@ -220,7 +221,7 @@ class CourseServiceTests {
     @Test
     void updatePrice_NegativePrice_ThrowsException() {
         when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
-        MonetaryAmount negativePrice = Money.of(-100, "USD");
+        MonetaryAmount negativePrice = Money.of(-100, Currencies.VND);
         assertThrows(InputInvalidException.class, () -> courseService.updatePrice(1L, negativePrice));
         verify(courseRepository, never()).save(any(Course.class));
     }
@@ -230,7 +231,7 @@ class CourseServiceTests {
         Course courseMock = spy(course);
         when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(courseMock));
         doReturn(false).when(courseMock).canEdit();
-        MonetaryAmount newPrice = Money.of(100, "USD");
+        MonetaryAmount newPrice = Money.of(100, Currencies.VND);
         assertThrows(InputInvalidException.class, () -> courseService.updatePrice(1L, newPrice));
         verify(courseRepository, never()).save(any(Course.class));
     }
@@ -287,9 +288,9 @@ class CourseServiceTests {
     @Test
     void applyDiscount_ShouldApplyDiscountSuccessfully() {
         // Giả lập hành vi của repository và discountService
-        MonetaryAmount discountedPrice = Money.of(80, "USD"); // Giảm giá từ $100 xuống còn $80
+        MonetaryAmount discountedPrice = Money.of(80, Currencies.VND); // Giảm giá từ $100 xuống còn $80
         when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
-        course.changePrice(Money.of(100, "USD"));
+        course.changePrice(Money.of(100, Currencies.VND));
         String discountCode = "DISCOUNT_10";
         when(discountService.calculateDiscount(discountCode, course.getPrice())).thenReturn(discountedPrice);
         when(courseRepository.save(any(Course.class))).thenReturn(course);
@@ -304,7 +305,7 @@ class CourseServiceTests {
 
         // Kiểm tra các giá trị trả về
         assertNotNull(updatedCourse);
-        assertEquals(Money.of(20, "USD"), updatedCourse.getDiscountedPrice());
+        assertEquals(Money.of(20, Currencies.VND), updatedCourse.getDiscountedPrice());
         assertEquals(discountCode, updatedCourse.getDiscountCode());
     }
 
@@ -328,7 +329,7 @@ class CourseServiceTests {
     void applyDiscount_ShouldThrowException_WhenDiscountNotFound() {
         // Giả lập hành vi của repository
         when(courseRepository.findByIdAndDeleted(1L, false)).thenReturn(java.util.Optional.of(course));
-        course.changePrice(Money.of(100, "USD"));
+        course.changePrice(Money.of(100, Currencies.VND));
         String discountCode = "DISCOUNT_10";
         when(discountService.calculateDiscount(discountCode, course.getPrice())).thenThrow(ResourceNotFoundException.class);
 
