@@ -61,11 +61,11 @@ create table quiz
 
 create table question
 (
-    id      bigserial    not null,
-    prompt  varchar(255) not null,
+    id      bigserial      not null,
+    prompt  varchar(255)   not null,
     options varchar(255)[] not null,
-    correct int          not null,
-    quiz    bigint       not null references quiz (id) on DELETE cascade,
+    correct int            not null,
+    quiz    bigint         not null references quiz (id) on DELETE cascade,
     constraint fk_question primary key (id)
 );
 

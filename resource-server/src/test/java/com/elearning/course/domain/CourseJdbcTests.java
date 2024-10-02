@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("integration")
 @DataJdbcTest
-public class CourseJdbcTests {
+class CourseJdbcTests {
 
     @Autowired
     private CourseRepository courseRepository;
