@@ -30,7 +30,7 @@ import java.util.UUID;
 
 @WebMvcTest(UploadDataController.class)
 @Import(SecurityConfig.class)
-public class UploadDataControllerTests {
+class UploadDataControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
