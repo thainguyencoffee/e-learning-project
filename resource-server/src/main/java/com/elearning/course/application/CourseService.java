@@ -16,6 +16,10 @@ public interface CourseService {
 
     Course findCourseById(Long courseId);
 
+    Page<Course> findAllPublishedCourses(Pageable pageable);
+
+    Course findPublishedCourseById(Long courseId);
+
     Course findCourseDeleted(Long courseId);
 
     Course createCourse(String teacherId, CourseDTO courseDTO);

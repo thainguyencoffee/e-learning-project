@@ -306,6 +306,7 @@ class CourseServiceTests {
         // Kiểm tra các giá trị trả về
         assertNotNull(updatedCourse);
         assertEquals(Money.of(20, Currencies.VND), updatedCourse.getDiscountedPrice());
+        assertEquals(Money.of(20, Currencies.VND), updatedCourse.getFinalPrice());
         assertEquals(discountCode, updatedCourse.getDiscountCode());
     }
 

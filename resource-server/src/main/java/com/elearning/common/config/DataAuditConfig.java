@@ -24,7 +24,7 @@ public class DataAuditConfig {
                 .map(authentication -> {
                     Object principal = authentication.getPrincipal();
                     if (principal instanceof Jwt) {
-                        return ((Jwt) principal).getClaim(StandardClaimNames.PREFERRED_USERNAME);
+                        return ((Jwt) principal).getClaim(StandardClaimNames.SUB);
                     } else {
                         return "guest";
                     }
