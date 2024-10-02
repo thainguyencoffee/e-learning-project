@@ -94,3 +94,27 @@ create table discount
     last_modified_date timestamp   not null,
     constraint fk_discount primary key (id)
 );
+
+create table orders
+(
+    id                 uuid DEFAULT gen_random_uuid() not null,
+    order_date         timestamp                      not null,
+    total_price        varchar(50)                    not null,
+    status             varchar(50)                    not null,
+    discount_code      varchar(50),
+    discounted_price   varchar(50),
+    created_by         varchar(50)                    not null,
+    created_date       timestamp                      not null,
+    last_modified_by   varchar(50)                    not null,
+    last_modified_date timestamp                      not null,
+    constraint fk_orders primary key (id)
+);
+
+create table order_items
+(
+    id     bigserial   not null,
+    course bigint      not null,
+    price  varchar(50) not null,
+    orders uuid        not null references orders (id) on DELETE cascade,
+    constraint fk_order_item primary key (id)
+);
