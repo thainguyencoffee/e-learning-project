@@ -42,6 +42,17 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public Page<Course> findAllPublishedCourses(Pageable pageable) {
+        return courseRepository.findAllByPublished(true, pageable);
+    }
+
+    @Override
+    public Course findPublishedCourseById(Long courseId) {
+        return courseRepository.findByIdAndPublished(courseId, true)
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Override
     public Course findCourseDeleted(Long courseId) {
         return courseRepository.findByIdAndDeleted(courseId, true)
                 .orElseThrow(ResourceNotFoundException::new);

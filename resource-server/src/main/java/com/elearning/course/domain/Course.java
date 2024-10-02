@@ -120,6 +120,10 @@ public class Course extends AuditSupportClass {
         }
     }
 
+    public MonetaryAmount getFinalPrice() {
+        return this.discountedPrice != null ? this.discountedPrice : this.price;
+    }
+
     public void assignTeacher(String teacher) {
         if (!canEdit()) {
             throw new InputInvalidException("Cannot assign a teacher to a published course.");

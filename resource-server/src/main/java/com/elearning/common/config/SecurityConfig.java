@@ -25,6 +25,8 @@ public class SecurityConfig {
 
                         // Allow GET requests to /courses/** without authentication
                         .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/published-courses/**").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
 
                         .requestMatchers(HttpMethod.PUT, "/courses/{courseId}/update-price").hasRole("admin")
                         .requestMatchers(HttpMethod.PUT, "/courses/{courseId}/assign-teacher").hasRole("admin")
