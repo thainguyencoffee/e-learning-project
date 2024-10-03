@@ -106,11 +106,15 @@ public class Order extends AbstractAggregateRoot<Order> {
 
     public void makePaid() {
         // Business rule: You can't pay for a completed order
-        if (status == Status.PAID) {
+        if (isPaid()) {
             throw new InputInvalidException("You can't pay for a completed order.");
         }
         this.status = Status.PAID;
         registerEvent(new OrderPaidEvent(id));
+    }
+
+    private boolean isPaid() {
+        return status == Status.PAID;
     }
 
     public void cancelOrder() {
