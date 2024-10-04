@@ -19,7 +19,7 @@
           </li>
           <li class="nav-item dropdown" v-if="isLoggedIn">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              {{user.fullName}}
+              {{user.firstName}} {{user.lastName}}
             </a>
             <ul class="dropdown-menu">
               <li><router-link class="dropdown-item" :to="{name: 'profile'}">Profile</router-link></li>
@@ -40,37 +40,19 @@ import {useRoute} from "vue-router";
 import {useCookies} from "vue3-cookies";
 
 const store = useStore()
-const route = useRoute()
 const {cookies} = useCookies()
 
-const loginUri = ref('')
 const isLoggedIn = computed(() => store.getters["auth/isLoggedIn"])
 const user = computed(() => store.getters["auth/user"])
 
 onMounted(() => {
-  store.dispatch("auth/refreshAuth");
-  fetch("/bff/login-options")
-      .then(response => response.json())
-      .then(opts => {
-        if (opts.length > 0) {
-          loginUri.value = opts[0].loginUri;
-        }
-      })
-      .catch(error => console.error("Failed to fetch login options:", error));
+  store.dispatch("auth/authenticate");
 });
+
 function login() {
-  if (!loginUri.value) return
-  const url = new URL(loginUri.value)
-  url.searchParams.append(
-      "post_login_success_uri",
-      `${import.meta.env.VITE_REVERSE_PROXY}${import.meta.env.BASE_URL}${route.path}`
-  )
-  url.searchParams.append(
-      "post_login_failure_uri",
-      `${import.meta.env.VITE_REVERSE_PROXY}${import.meta.env.BASE_URL}/login-error`
-  )
-  window.location.href = url.toString();
+  window.open("/oauth2/authorization/keycloak", "_self");
 }
+
 function logout(xsrfToken) {
   if (!xsrfToken) {
     console.error("XSRF-TOKEN is missing.");
