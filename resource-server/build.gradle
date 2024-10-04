@@ -28,6 +28,7 @@ ext {
 }
 
 dependencies {
+    implementation "com.stripe:stripe-java:27.0.0"
     implementation 'com.amazonaws:aws-java-sdk-s3:1.11.1000'
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
     implementation 'org.apache.commons:commons-lang3:3.17.0'

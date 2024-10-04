@@ -118,3 +118,14 @@ create table order_items
     orders uuid        not null references orders (id) on DELETE cascade,
     constraint fk_order_item primary key (id)
 );
+
+create table payment (
+    id  uuid DEFAULT gen_random_uuid() not null,
+    order_id uuid not null,
+    amount varchar(50) not null,
+    payment_date timestamp,
+    payment_method varchar(50) not null,
+    status varchar(50) not null,
+    transaction_id varchar(50),
+    constraint fk_payment primary key (id)
+);
