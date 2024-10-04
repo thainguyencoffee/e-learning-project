@@ -30,5 +30,5 @@ spring:
         registration:
           keycloak:
             client-id: edge-service
-            client-secret: keycloak-secret
+            client-secret: WRdVtsZ1oaVboulVqsNfBPcE5rZoc4VF
             scope: openid,roles

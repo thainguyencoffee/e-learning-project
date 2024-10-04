@@ -1326,7 +1326,7 @@ class ApplicationTests {
                 .post()
                 .body(BodyInserters.fromFormData("grant_type", "password")
                         .with("client_id", "edge-service")
-                        .with("client_secret", "client-secret")
+                        .with("client_secret", "WRdVtsZ1oaVboulVqsNfBPcE5rZoc4VF")
                         .with("username", username)
                         .with("password", password)
                 )
