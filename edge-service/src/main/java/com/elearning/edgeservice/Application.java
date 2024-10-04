@@ -1,13 +1,13 @@
-package com.elearning.bff;
+package com.elearning.edgeservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BffApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(BffApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 
 }

@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: bff
+    name: edge-service
   cloud:
     gateway:
       default-filters:

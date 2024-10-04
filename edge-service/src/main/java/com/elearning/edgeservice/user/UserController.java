@@ -1,4 +1,4 @@
-package com.elearning.bff.user;
+package com.elearning.edgeservice.user;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;

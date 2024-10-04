@@ -1,4 +1,4 @@
-package com.elearning.bff.config;
+package com.elearning.edgeservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
