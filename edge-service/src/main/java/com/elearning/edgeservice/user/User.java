@@ -1,4 +1,4 @@
-package com.elearning.bff.user;
+package com.elearning.edgeservice.user;
 
 import java.util.List;
 

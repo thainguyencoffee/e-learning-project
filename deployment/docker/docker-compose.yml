@@ -16,11 +16,18 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0
-    command: start-dev --import-realm
+    depends_on: [ postgres ]
+    restart: always
+    command: start-dev --import-realm --features=preview # Import configs provided at startup
     volumes:
       - ./keycloak:/opt/keycloak/data/import
     environment:
-      - KEYCLOAK_ADMIN=user
-      - KEYCLOAK_ADMIN_PASSWORD=password
+      KC_DB: postgres
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: changemeinprod
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_FEATURES: scripts
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: password
     ports:
-      - 8080:8080
+      - '8080:8080'

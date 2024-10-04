@@ -47,16 +47,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
-class ResourceServerApplicationTests {
+class ApplicationTests {
 
     protected static KeycloakToken userToken;
-    protected static KeycloakToken user2Token;
     protected static KeycloakToken teacherToken;
     protected static KeycloakToken bossToken;
 
     private static final KeycloakContainer keycloak =
             new KeycloakContainer("quay.io/keycloak/keycloak:24.0")
-                    .withRealmImportFile("thainguyencoffee-realm.json");
+                    .withRealmImportFile("keycloak101-realm.json");
 
     @Autowired
     private WebTestClient webTestClient;
@@ -68,7 +67,7 @@ class ResourceServerApplicationTests {
     @DynamicPropertySource
     static void keycloakProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri",
-                () -> keycloak.getAuthServerUrl() + "/realms/thainguyencoffee");
+                () -> keycloak.getAuthServerUrl() + "/realms/keycloak101");
     }
 
     @BeforeAll
@@ -76,12 +75,11 @@ class ResourceServerApplicationTests {
         keycloak.start(); // Fix: Mapped port can only be obtained after the container is started
 
         WebClient webClient = WebClient.builder()
-                .baseUrl(keycloak.getAuthServerUrl() + "/realms/thainguyencoffee/protocol/openid-connect/token")
+                .baseUrl(keycloak.getAuthServerUrl() + "/realms/keycloak101/protocol/openid-connect/token")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE,
                         MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();
         userToken   = authenticateWith("user", "1", webClient);
-        user2Token = authenticateWith("user2", "1", webClient);
         teacherToken = authenticateWith("teacher", "1", webClient);
         bossToken = authenticateWith("boss", "1", webClient);
     }
@@ -130,7 +128,6 @@ class ResourceServerApplicationTests {
     @Test
     void contextLoads() {
         assertThat(userToken.accessToken).isNotNull();
-        assertThat(user2Token.accessToken).isNotNull();
         assertThat(teacherToken.accessToken).isNotNull();
         assertThat(bossToken.accessToken).isNotNull();
     }
@@ -1328,8 +1325,8 @@ class ResourceServerApplicationTests {
         return webClient
                 .post()
                 .body(BodyInserters.fromFormData("grant_type", "password")
-                        .with("client_id", "thainguyencoffee-confidentials")
-                        .with("client_secret", "qk2lxjuIPAUY0e9I1AMzQZLQf3YINJ80")
+                        .with("client_id", "edge-service")
+                        .with("client_secret", "WRdVtsZ1oaVboulVqsNfBPcE5rZoc4VF")
                         .with("username", username)
                         .with("password", password)
                 )
