@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h3 class="text-center">Hi {{user.fullName}}! Welcome to <span class="fw-bold">profile page</span></h3>
+    <h3 class="text-center">Hi {{user.firstName}}! Welcome to <span class="fw-bold">profile page</span></h3>
   </div>
 </template>
 
@@ -12,7 +12,7 @@ const store = useStore()
 
 const user = computed(() => store.getters["auth/user"])
 onMounted(() => {
-  store.dispatch("auth/refreshAuth")
+  store.dispatch("auth/authenticate")
 })
 
 </script>
