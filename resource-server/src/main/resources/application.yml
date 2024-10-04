@@ -29,3 +29,4 @@ digitalocean:
     access-key: DO00XXYJDDAPT9EXWVF8
     secret-key: ZY2YAo3WrW+Eq28oLYVW89mDwst//QLJyqiF4TMP+Vg
     bucket-name: bookstore-bucket
+STRIPE_SECRET_KEY: sk_test_51PtPqOLcSSqgAPH9SPAVNGV3vMYll5CNIvCUHFT7RJWIPkHTHa9LySfuiswCMvYlbe5KwKavly4QV6rjJP2zVBoS00x6oNhWCR

@@ -1,7 +1,7 @@
 package com.elearning.course.web;
 
 import com.elearning.common.Currencies;
-import com.elearning.common.config.JacksonCustomizations;
+import com.elearning.common.config.jackson.JacksonCustomizations;
 import com.elearning.common.config.SecurityConfig;
 import com.elearning.common.exception.InputInvalidException;
 import com.elearning.common.exception.ResourceNotFoundException;

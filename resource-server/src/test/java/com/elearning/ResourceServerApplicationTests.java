@@ -16,6 +16,8 @@ import com.elearning.discount.domain.Type;
 import com.elearning.order.application.dto.OrderItemDTO;
 import com.elearning.order.application.dto.OrderRequestDTO;
 import com.elearning.order.domain.Status;
+import com.elearning.payment.application.PaymentRequest;
+import com.elearning.payment.domain.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
@@ -38,10 +40,7 @@ import org.testcontainers.shaded.com.google.common.net.HttpHeaders;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -1244,6 +1243,71 @@ class ResourceServerApplicationTests {
                 .body(BodyInserters.fromValue(orderRequestDto))
                 .exchange()
                 .expectStatus().isNotFound();
+    }
+
+    @Test
+    void testCreateOrderAndThenPay_Successful() {
+        Course course = courseRepository.findAll().iterator().next();
+        Long courseId = course.getId();
+
+        // Thiết lập giá cho khóa học
+        course.changePrice(Money.of(1000, Currencies.VND));
+        // Thiết lập các sections cho khóa học
+        CourseSection courseSection = new CourseSection("Section 1");
+        courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
+        course.addSection(courseSection);
+        // Lưu khóa học đã cập nhật
+        courseRepository.save(course);
+
+        // Gửi request PUT để xuất bản khóa học
+        webTestClient.put().uri("/courses/{courseId}/publish", courseId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .exchange()
+                .expectStatus().isOk()  // Phản hồi 200 OK
+                .expectBody()
+                .jsonPath("$.published").isEqualTo(true);  // Kiểm tra khóa học đã được xuất bản
+
+        webTestClient.get()
+                .uri("/published-courses/{courseId}", courseId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(courseId.intValue());
+
+        // Chuẩn bị dữ liệu cho request tạo order
+        Set<OrderItemDTO> orderItemsDto = new HashSet<>();
+        orderItemsDto.add(new OrderItemDTO(courseId));
+        var orderRequestDto = new OrderRequestDTO(orderItemsDto, null);
+
+        // Gửi request POST để tạo order
+        String location = webTestClient.post().uri("/orders")
+                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))  // Đính kèm JWT của người dùng
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(orderRequestDto))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(1)
+                .jsonPath("$.items[0].course").isEqualTo(courseId.intValue())
+                .jsonPath("$.items[0].price").isEqualTo("VND1,000.00")
+                .jsonPath("$.status").isEqualTo(Status.PENDING.name())
+                .jsonPath("$.totalPrice").isEqualTo("VND1,000.00")
+                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(userToken.accessToken, "sub"))
+                .returnResult().getResponseHeaders().getLocation().toString();
+
+        String orderId = location.substring(location.lastIndexOf("/") + 1);
+
+        // Gửi request POST để thanh toán order
+        var paymentRequestDto = new PaymentRequest(
+                UUID.fromString(orderId),
+                Money.of(50000, Currencies.VND),
+                PaymentMethod.STRIPE, "tok_visa");
+        webTestClient.post().uri("/payments")
+                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))  // Đính kèm JWT của người dùng
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(paymentRequestDto))
+                .exchange()
+                .expectStatus().isCreated();
     }
 
     protected static class KeycloakToken {

@@ -27,7 +27,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/published-courses/**").permitAll()
 //                        .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
 
-                        .requestMatchers("/orders/**").authenticated()
+                        .requestMatchers("/orders/**", "/payments/**").authenticated()
 
                         .requestMatchers(HttpMethod.PUT, "/courses/{courseId}/update-price").hasRole("admin")
                         .requestMatchers(HttpMethod.PUT, "/courses/{courseId}/assign-teacher").hasRole("admin")

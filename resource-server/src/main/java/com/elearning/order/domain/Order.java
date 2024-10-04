@@ -42,7 +42,6 @@ public class Order extends AbstractAggregateRoot<Order> {
         this.status = Status.PENDING;
 
         items.forEach(this::addItem);
-        registerEvent(new OrderCreatedEvent(id));
     }
 
     public void addItem(OrderItem item) {
@@ -106,11 +105,15 @@ public class Order extends AbstractAggregateRoot<Order> {
 
     public void makePaid() {
         // Business rule: You can't pay for a completed order
-        if (status == Status.PAID) {
+        if (isPaid()) {
             throw new InputInvalidException("You can't pay for a completed order.");
         }
         this.status = Status.PAID;
         registerEvent(new OrderPaidEvent(id));
+    }
+
+    private boolean isPaid() {
+        return status == Status.PAID;
     }
 
     public void cancelOrder() {
@@ -121,7 +124,6 @@ public class Order extends AbstractAggregateRoot<Order> {
         registerEvent(new OrderCancelledEvent(id));
     }
 
-    public record OrderCreatedEvent(UUID orderId) {}
     public record OrderPaidEvent(UUID orderId) {}
     public record OrderCancelledEvent(UUID orderId) {}
 
