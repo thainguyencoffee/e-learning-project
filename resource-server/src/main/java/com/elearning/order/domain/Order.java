@@ -42,7 +42,6 @@ public class Order extends AbstractAggregateRoot<Order> {
         this.status = Status.PENDING;
 
         items.forEach(this::addItem);
-        registerEvent(new OrderCreatedEvent(id));
     }
 
     public void addItem(OrderItem item) {
@@ -125,7 +124,6 @@ public class Order extends AbstractAggregateRoot<Order> {
         registerEvent(new OrderCancelledEvent(id));
     }
 
-    public record OrderCreatedEvent(UUID orderId) {}
     public record OrderPaidEvent(UUID orderId) {}
     public record OrderCancelledEvent(UUID orderId) {}
 

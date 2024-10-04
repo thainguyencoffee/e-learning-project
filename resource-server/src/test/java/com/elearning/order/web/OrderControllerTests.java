@@ -1,6 +1,6 @@
 package com.elearning.order.web;
 
-import com.elearning.common.config.JacksonCustomizations;
+import com.elearning.common.config.jackson.JacksonCustomizations;
 import com.elearning.common.config.SecurityConfig;
 import com.elearning.common.exception.InputInvalidException;
 import com.elearning.order.application.dto.OrderItemDTO;
@@ -26,7 +26,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 
 @WebMvcTest(OrderController.class)
