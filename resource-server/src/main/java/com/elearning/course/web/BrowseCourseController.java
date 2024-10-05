@@ -1,31 +1,33 @@
 package com.elearning.course.web;
 
-import com.elearning.course.application.CourseService;
+import com.elearning.course.application.CourseQueryService;
 import com.elearning.course.domain.Course;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/published-courses")
 public class BrowseCourseController {
 
-    private final CourseService courseService;
+    private final CourseQueryService courseQueryService;
 
-    public BrowseCourseController(CourseService courseService) {
-        this.courseService = courseService;
+    public BrowseCourseController(CourseQueryService courseQueryService) {
+        this.courseQueryService = courseQueryService;
     }
 
-    @GetMapping("/published-courses")
-    public ResponseEntity<Page<Course>> browseCourses(Pageable pageable) {
-        return ResponseEntity.ok(courseService.findAllPublishedCourses(pageable));
+    @GetMapping
+    public ResponseEntity<Page<Course>> getAllPublishedCourses(Pageable pageable) {
+        return ResponseEntity.ok(courseQueryService.findAllPublishedCourses(pageable));
     }
 
-    @GetMapping("/published-courses/{courseId}")
-    public ResponseEntity<Course> browseCourseById(@PathVariable Long courseId) {
-        return ResponseEntity.ok(courseService.findPublishedCourseById(courseId));
+    @GetMapping("/{courseId}")
+    public ResponseEntity<Course> getPublishedCourseById(@PathVariable Long courseId) {
+        return ResponseEntity.ok(courseQueryService.findPublishedCourseById(courseId));
     }
 
 }

@@ -22,22 +22,24 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/courses")
-public class CourseController {
+public class CourseManagementController {
 
     private final CourseService courseService;
+    private final CourseQueryService courseQueryService;
 
-    public CourseController(CourseService courseService) {
+    public CourseManagementController(CourseService courseService, CourseQueryService courseQueryService) {
         this.courseService = courseService;
+        this.courseQueryService = courseQueryService;
     }
 
     @GetMapping
-    public ResponseEntity<Page<Course>> courses(Pageable pageable) {
-        return ResponseEntity.ok(courseService.findAllCourses(pageable));
+    public ResponseEntity<Page<Course>> getAllCourses(Pageable pageable) {
+        return ResponseEntity.ok(courseQueryService.findAllCourses(pageable));
     }
 
     @GetMapping("/{courseId}")
-    public ResponseEntity<Course> courseById(@PathVariable Long courseId) {
-        return ResponseEntity.ok(courseService.findCourseById(courseId));
+    public ResponseEntity<Course> getCourseById(@PathVariable Long courseId) {
+        return ResponseEntity.ok(courseQueryService.findCourseById(courseId));
     }
 
     @PostMapping

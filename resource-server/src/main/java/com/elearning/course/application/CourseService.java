@@ -5,22 +5,10 @@ import com.elearning.course.application.dto.CourseSectionDTO;
 import com.elearning.course.application.dto.CourseUpdateDTO;
 import com.elearning.course.domain.Course;
 import com.elearning.course.domain.Lesson;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import javax.money.MonetaryAmount;
 
 public interface CourseService {
-
-    Page<Course> findAllCourses(Pageable pageable);
-
-    Course findCourseById(Long courseId);
-
-    Page<Course> findAllPublishedCourses(Pageable pageable);
-
-    Course findPublishedCourseById(Long courseId);
-
-    Course findCourseDeleted(Long courseId);
 
     Course createCourse(String teacherId, CourseDTO courseDTO);
 
