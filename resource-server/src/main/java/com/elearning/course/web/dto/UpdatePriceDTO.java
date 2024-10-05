@@ -1,4 +1,4 @@
-package com.elearning.course.web;
+package com.elearning.course.web.dto;
 
 import jakarta.validation.constraints.NotNull;
 
