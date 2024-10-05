@@ -1,7 +1,7 @@
 package com.elearning.order.application.impl;
 
 import com.elearning.common.exception.ResourceNotFoundException;
-import com.elearning.course.application.CourseService;
+import com.elearning.course.application.CourseQueryService;
 import com.elearning.course.domain.Course;
 import com.elearning.discount.application.DiscountService;
 import com.elearning.order.application.OrderService;
@@ -19,19 +19,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
 
-    private final CourseService courseService;
     private final OrderRepository orderRepository;
     private final DiscountService discountService;
+    private final CourseQueryService courseQueryService;
 
-    public OrderServiceImpl(CourseService courseService, OrderRepository orderRepository, DiscountService discountService) {
-        this.courseService = courseService;
+    public OrderServiceImpl(OrderRepository orderRepository, DiscountService discountService, CourseQueryService courseQueryService) {
         this.orderRepository = orderRepository;
         this.discountService = discountService;
+        this.courseQueryService = courseQueryService;
     }
 
     @Override
@@ -57,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
         Set<OrderItem> items = new HashSet<>();
 
         for (OrderItemDTO itemDto : orderRequestDTO.items()) {
-            Course course = courseService.findPublishedCourseById(itemDto.id());
+            Course course = courseQueryService.findPublishedCourseById(itemDto.id());
             Long courseId = course.getId();
             MonetaryAmount finalPrice = course.getFinalPrice();
             items.add(new OrderItem(courseId, finalPrice));

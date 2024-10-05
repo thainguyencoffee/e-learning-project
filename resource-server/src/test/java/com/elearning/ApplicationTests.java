@@ -79,7 +79,7 @@ class ApplicationTests {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE,
                         MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();
-        userToken   = authenticateWith("user", "1", webClient);
+        userToken = authenticateWith("user", "1", webClient);
         teacherToken = authenticateWith("teacher", "1", webClient);
         bossToken = authenticateWith("boss", "1", webClient);
     }
@@ -87,19 +87,6 @@ class ApplicationTests {
     @BeforeEach
     void setupData() {
         courseRepository.deleteAll();  // Xóa dữ liệu test trước đó
-
-        // Tạo một khóa học giả lập trong database
-        Course course = new Course(
-                "Java Programming",
-                "Learn Java from scratch",
-                "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
-                Language.ENGLISH,
-                Set.of("Basic Programming Knowledge"),
-                Set.of(Language.ENGLISH, Language.SPANISH),
-                "teacher-id"  // Giáo viên giả lập
-        );
-        courseRepository.save(course);  // Lưu khóa học vào CSDL
 
         // prepare data for discount record
         discountRepository.deleteAll();
@@ -253,9 +240,16 @@ class ApplicationTests {
 
     @Test
     void testUpdateInfoCourse_Successful() {
-        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, null);
 
         // Thiết lập dữ liệu CourseUpdateDTO để cập nhật thông tin khóa học
         var courseUpdateDTO = new CourseUpdateDTO(
@@ -268,7 +262,7 @@ class ApplicationTests {
         );
 
         // Gửi request PUT với token của "teacher" để cập nhật khóa học
-        webTestClient.put().uri("/courses/{courseId}", courseId)  // Sử dụng Location từ header để update đúng khóa học
+        webTestClient.put().uri("/courses/{courseId}", course.getId())  // Sử dụng Location từ header để update đúng khóa học
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(courseUpdateDTO))  // Body của request là JSON CourseUpdateDTO
@@ -278,6 +272,44 @@ class ApplicationTests {
                 .jsonPath("$.title").isEqualTo("Advanced Java Programming")  // Kiểm tra thuộc tính title đã được cập nhật
                 .jsonPath("$.description").isEqualTo("Learn advanced Java programming")  // Kiểm tra thuộc tính description đã được cập nhật
                 .jsonPath("$.thumbnailUrl").isEqualTo("http://example.com/new-thumbnail.jpg");  // Kiểm tra thuộc tính thumbnail đã được cập nhật
+    }
+
+    private Course createCourseWithParameters(KeycloakToken token, CourseDTO courseDTO, boolean hasPrice, Set<CourseSectionDTO> sectionDTOs) {
+        String courseId = webTestClient.post().uri("/courses")
+                .headers(header -> header.setBearerAuth(token.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(courseDTO))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().value("Location", location -> {
+                    assertThat(location).contains("/courses/");
+                })
+                .returnResult(String.class)
+                .getResponseHeaders()
+                .getLocation()
+                .getPath()
+                .split("/")[2];
+
+        if (hasPrice) {
+            webTestClient.put().uri("/courses/{courseId}/update-price", courseId)
+                    .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(BodyInserters.fromValue(new UpdatePriceDTO(Money.of(1000, Currencies.VND))))  // Body của request là JSON CourseUpdateDTO.PriceDTO
+                    .exchange()
+                    .expectStatus().isOk();  // Phản hồi 200 OK
+        }
+
+        if (sectionDTOs != null && !sectionDTOs.isEmpty()) {
+            for (CourseSectionDTO sectionDTO : sectionDTOs) {
+                webTestClient.post().uri("/courses/{courseId}/sections", courseId)
+                        .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(sectionDTO))
+                        .exchange()
+                        .expectStatus().isCreated();
+            }
+        }
+        return courseRepository.findById(Long.valueOf(courseId)).orElseThrow();
     }
 
     @Test
@@ -344,10 +376,6 @@ class ApplicationTests {
 
     @Test
     void testUpdateInfoCourse_BadRequest_EmptyTitle() {
-        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
         // Thiết lập dữ liệu CourseUpdateDTO để cập nhật thông tin khóa học
         var courseUpdateDTO = new CourseUpdateDTO(
                 "",  // Cập nhật title mới
@@ -359,7 +387,7 @@ class ApplicationTests {
         );
 
         // Gửi request PUT với token của "teacher" để cập nhật khóa học
-        webTestClient.put().uri("/courses/{courseId}", courseId)  // Sử dụng Location từ header để update đúng khóa học
+        webTestClient.put().uri("/courses/{courseId}", 111)  // Sử dụng Location từ header để update đúng khóa học
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(courseUpdateDTO))  // Body của request là JSON CourseUpdateDTO
@@ -369,44 +397,70 @@ class ApplicationTests {
 
     @Test
     void testDeleteCourse_Successful() {
-        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, null);
 
         // Xóa khóa học với token của giáo viên
-        webTestClient.delete().uri("/courses/{courseId}", courseId)
+        webTestClient.delete().uri("/courses/{courseId}", course.getId())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .exchange()
                 .expectStatus().isNoContent();  // Phản hồi trả về 204 No Content
 
         // Kiểm tra rằng khóa học đã bị đánh dấu là deleted
-        Course deletedCourse = courseRepository.findById(courseId).orElseThrow();
+        Course deletedCourse = courseRepository.findById(course.getId()).orElseThrow();
         assertThat(deletedCourse.isDeleted()).isTrue();  // Kiểm tra khóa học đã bị đánh dấu deleted
     }
 
     @Test
     void testDeleteCourse_WithAdmin_Successful() {
-        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, null); // admin has the same permission as teacher
 
         // Xóa khóa học với token của giáo viên
-        webTestClient.delete().uri("/courses/{courseId}", courseId)
+        webTestClient.delete().uri("/courses/{courseId}", course.getId())
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của admin
                 .exchange()
                 .expectStatus().isNoContent();  // Phản hồi trả về 204 No Content
 
         // Kiểm tra rằng khóa học đã bị đánh dấu là deleted
-        Course deletedCourse = courseRepository.findById(courseId).orElseThrow();
+        Course deletedCourse = courseRepository.findById(course.getId()).orElseThrow();
         assertThat(deletedCourse.isDeleted()).isTrue();  // Kiểm tra khóa học đã bị đánh dấu deleted
     }
 
     @Test
     void testDeleteCourse_AlreadyDeleted() {
         // Lấy khóa học và đánh dấu là đã xóa
-        Course course = courseRepository.findAll().iterator().next();
-        course.delete();  // Đánh dấu khóa học là đã xóa
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, null);
+
+        webTestClient.delete().uri("/courses/{courseId}", course.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .exchange()
+                .expectStatus().isNoContent();  // Phản hồi trả về 204 No Content
 
         // Gửi request DELETE lần nữa
         webTestClient.delete().uri("/courses/{courseId}", course.getId())
@@ -417,21 +471,31 @@ class ApplicationTests {
 
     @Test
     void testDeleteCourse_Unauthorized() {
-        // Lấy khóa học từ database
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
         // Gửi request DELETE mà không đính kèm token
-        webTestClient.delete().uri("/courses/{courseId}", courseId)
+        webTestClient.delete().uri("/courses/{courseId}", 1000L) // dont need to be a valid course id
                 .exchange()
                 .expectStatus().isUnauthorized();  // Phản hồi 401 Unauthorized
     }
 
     @Test
     void testUpdatePrice_Successfully() {
-        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        var courseId = course.getId();
 
         // Thiết lập giá mới cho khóa học
         var newPrice = new UpdatePriceDTO(Money.of(1000, Currencies.VND));
@@ -463,15 +527,22 @@ class ApplicationTests {
 
     @Test
     void testAssignTeacher_Successful() {
-        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, null); // admin has the same permission as teacher
 
         // Thiết lập giáo viên mới cho khóa học
         var assignTeacherDTO = new AssignTeacherDTO("new-teacher-id");
 
         // Gửi request PUT để cập nhật giáo viên cho khóa học
-        webTestClient.put().uri("/courses/{courseId}/assign-teacher", courseId)
+        webTestClient.put().uri("/courses/{courseId}/assign-teacher", course.getId())
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(assignTeacherDTO))  // Body của request là JSON AssignTeacherDTO
@@ -511,36 +582,55 @@ class ApplicationTests {
 
     @Test
     void testPublishCourse_Successful() {
-        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        // Thiết lập giá cho khóa học
-        course.changePrice(Money.of(1000, Currencies.VND));
-        // Thiết lập các sections cho khóa học
-        CourseSection courseSection = new CourseSection("Section 1");
-        courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        course.addSection(courseSection);
-        // Lưu khóa học đã cập nhật
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", courseId)
+        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .exchange()
                 .expectStatus().isOk()  // Phản hồi 200 OK
                 .expectBody()
                 .jsonPath("$.published").isEqualTo(true);  // Kiểm tra khóa học đã được xuất bản
+
+        // Check các khóa học published không cần login
+        webTestClient.get().uri("/published-courses/{courseId}", course.getId())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.title").isEqualTo("Java Programming")
+                .jsonPath("$.published").isEqualTo(true);
     }
 
     @Test
     void testPublishCourse_WithNoSetPriceOrNoSections_BadRequest() {
-        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, null); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", courseId)
+        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .exchange()
                 .expectStatus().isBadRequest();
@@ -557,12 +647,24 @@ class ApplicationTests {
 
     @Test
     void testApplyDiscount_Successful() {
-        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
-        Course course = courseRepository.findAll().iterator().next();
-        course.changePrice(Money.of(1000, Currencies.VND));  // Đặt giá cho khóa học
-        courseRepository.save(course);  // Lưu khóa học đã cập nhật
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        var courseId = course.getId();
 
-        Long courseId = course.getId();
         Discount discount = discountRepository.findByCode("DISCOUNT_50").get();
         String discountCode = discount.getCode();
 
@@ -583,12 +685,22 @@ class ApplicationTests {
 
     @Test
     void testApplyDiscountFixed_Successful() {
-        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
-        Course course = courseRepository.findAll().iterator().next();
-        course.changePrice(Money.of(1000, Currencies.VND));  // Đặt giá cho khóa học
-        courseRepository.save(course);  // Lưu khóa học đã cập nhật
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        var courseId = course.getId();
 
-        Long courseId = course.getId();
         Discount discount = discountRepository.findByCode("DISCOUNT_30_VN").get();
         String discountCode = discount.getCode();
 
@@ -609,11 +721,23 @@ class ApplicationTests {
 
     @Test
     void testApplyDiscount_NotFound() {
-        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
-        Course course = courseRepository.findAll().iterator().next();
-        course.changePrice(Money.of(1000, Currencies.VND));  // Đặt giá cho khóa học
-        courseRepository.save(course);  // Lưu khóa học đã cập nhật
-        Long courseId = course.getId();
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        var courseId = course.getId();
 
         // Thiết lập giảm giá cho khóa học
         var applyDiscountDTO = new ApplyDiscountDTO("INVALID_DISCOUNT_CODE");
@@ -629,11 +753,23 @@ class ApplicationTests {
 
     @Test
     void testApplyDiscount_Forbidden() {
-        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
-        Course course = courseRepository.findAll().iterator().next();
-        course.changePrice(Money.of(1000, Currencies.VND));  // Đặt giá cho khóa học
-        courseRepository.save(course);  // Lưu khóa học đã cập nhật
-        Long courseId = course.getId();
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        var courseId = course.getId();
 
         // Thiết lập giảm giá cho khóa học
         var applyDiscountDTO = new ApplyDiscountDTO("DISCOUNT_50");
@@ -649,9 +785,23 @@ class ApplicationTests {
 
     @Test
     void testApplyDiscount_PriceNotSet() {
-        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
+        var courseId = course.getId();
 
         // Thiết lập giảm giá cho khóa học
         var applyDiscountDTO = new ApplyDiscountDTO("DISCOUNT_50"); // Correct discount code
@@ -667,8 +817,16 @@ class ApplicationTests {
 
     @Test
     void testAddSectionToCourse_Successful() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, null); // admin has the same permission as teacher
 
         CourseSectionDTO sectionDTO = new CourseSectionDTO(
                 "Section 1",
@@ -678,7 +836,7 @@ class ApplicationTests {
         );
 
         // Gửi request POST để thêm section cho khóa học
-        webTestClient.post().uri("/courses/{courseId}/sections", courseId)
+        webTestClient.post().uri("/courses/{courseId}/sections", course.getId())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(sectionDTO))
@@ -691,9 +849,6 @@ class ApplicationTests {
 
     @Test
     void testAddSectionToCourse_Unauthorized() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
         CourseSectionDTO sectionDTO = new CourseSectionDTO(
                 "Section 1",
                 Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
@@ -702,7 +857,7 @@ class ApplicationTests {
         );
 
         // Gửi request POST để thêm section cho khóa học
-        webTestClient.post().uri("/courses/{courseId}/sections", courseId)
+        webTestClient.post().uri("/courses/{courseId}/sections", 9999L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(sectionDTO))
                 .exchange()
@@ -711,9 +866,6 @@ class ApplicationTests {
 
     @Test
     void testAddSectionToCourse_Forbidden() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
         CourseSectionDTO sectionDTO = new CourseSectionDTO(
                 "Section 1",
                 Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
@@ -722,7 +874,7 @@ class ApplicationTests {
         );
 
         // Gửi request POST để thêm section cho khóa học
-        webTestClient.post().uri("/courses/{courseId}/sections", courseId)
+        webTestClient.post().uri("/courses/{courseId}/sections", 9999L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
                 .body(BodyInserters.fromValue(sectionDTO))
@@ -733,20 +885,28 @@ class ApplicationTests {
 
     @Test
     void testUpdateSectionInfo_UserIsTeacher_Successful() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        CourseSection section = new CourseSection("Section 1");
-        section.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        section.addLesson(new Lesson("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null));
-        section.addLesson(new Lesson("Lesson 3", Lesson.Type.QUIZ, null, 1L));
-        course.addSection(section);
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("New title");
 
         // Gửi request PUT để cập nhật section info cho khóa học
-        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}", courseId, section.getId())
+        var sectionId = course.getSections().iterator().next().getId();
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}", course.getId(), sectionId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(updateSectionDTO))
@@ -758,20 +918,28 @@ class ApplicationTests {
 
     @Test
     void testUpdateSectionInfo_UserIsAdmin_Successful() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        CourseSection section = new CourseSection("Section 1");
-        section.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        section.addLesson(new Lesson("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null));
-        section.addLesson(new Lesson("Lesson 3", Lesson.Type.QUIZ, null, 1L));
-        course.addSection(section);
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("New title");
 
         // Gửi request PUT để cập nhật section info cho khóa học
-        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}", courseId, section.getId())
+        var sectionId = course.getSections().iterator().next().getId();
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}", course.getId(), sectionId)
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(updateSectionDTO))
@@ -796,20 +964,23 @@ class ApplicationTests {
 
     @Test
     void testUpdateSectionInfo_CoursePublished_BadRequest() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        // Thiết lập giá cho khóa học
-        course.changePrice(Money.of(1000, Currencies.VND));
-        // Thiết lập các sections cho khóa học
-        CourseSection courseSection = new CourseSection("Section 1");
-        courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        course.addSection(courseSection);
-        // Lưu khóa học đã cập nhật
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", courseId)
+        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .exchange()
                 .expectStatus().isOk()  // Phản hồi 200 OK
@@ -819,7 +990,8 @@ class ApplicationTests {
         UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("New title");
 
         // Gửi request PUT để cập nhật section info cho khóa học
-        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}", courseId, courseSection.getId())
+        var sectionId = course.getSections().iterator().next().getId();
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}", course.getId(), sectionId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(updateSectionDTO))
@@ -829,18 +1001,26 @@ class ApplicationTests {
 
     @Test
     void testRemoveSection_Successful() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        CourseSection section = new CourseSection("Section 1");
-        section.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        section.addLesson(new Lesson("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null));
-        section.addLesson(new Lesson("Lesson 3", Lesson.Type.QUIZ, null, 1L));
-        course.addSection(section);
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request DELETE để xóa section khỏi khóa học
-        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}", courseId, section.getId())
+        var sectionId = course.getSections().iterator().next().getId();
+        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}", course.getId(), sectionId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .exchange()
                 .expectStatus().isOk()
@@ -850,20 +1030,26 @@ class ApplicationTests {
 
     @Test
     void testRemoveSection_CoursePublished_BadRequest() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
-        // Thiết lập giá cho khóa học
-        course.changePrice(Money.of(1000, Currencies.VND));
-        // Thiết lập các sections cho khóa học
-        CourseSection courseSection = new CourseSection("Section 1");
-        courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        course.addSection(courseSection);
-        // Lưu khóa học đã cập nhật
-        courseRepository.save(course);
 
         // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", courseId)
+        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .exchange()
                 .expectStatus().isOk()  // Phản hồi 200 OK
@@ -871,7 +1057,8 @@ class ApplicationTests {
                 .jsonPath("$.published").isEqualTo(true);  // Kiểm tra khóa học đã được xuất bản
 
         // Gửi request DELETE để xóa section khỏi khóa học
-        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}", courseId, courseSection.getId())
+        var sectionId = course.getSections().iterator().next().getId();
+        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}", course.getId(), sectionId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .exchange()
                 .expectStatus().isBadRequest();
@@ -879,18 +1066,26 @@ class ApplicationTests {
 
     @Test
     void testAddLesson_Successful() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        CourseSection section = new CourseSection("Section 1");
-        section.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        course.addSection(section);
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
 
         // Gửi request POST để thêm lesson cho section của khóa học
-        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", courseId, section.getId())
+        var sectionId = course.getSections().iterator().next().getId();
+        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(lessonDTO))
@@ -902,18 +1097,28 @@ class ApplicationTests {
 
     @Test
     void testAddLesson_LessonDuplicate_BadRequest() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        CourseSection section = new CourseSection("Section 1");
-        section.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        course.addSection(section);
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         LessonDTO lessonDTO = new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null);
 
         // Gửi request POST để thêm lesson cho section của khóa học
-        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", courseId, section.getId())
+        var sectionId = course.getSections().iterator().next().getId();
+        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(lessonDTO))
@@ -923,20 +1128,25 @@ class ApplicationTests {
 
     @Test
     void testAddLesson_CoursePublished_BadRequest() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        // Thiết lập giá cho khóa học
-        course.changePrice(Money.of(1000, Currencies.VND));
-        // Thiết lập các sections cho khóa học
-        CourseSection courseSection = new CourseSection("Section 1");
-        courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        course.addSection(courseSection);
-        // Lưu khóa học đã cập nhật
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", courseId)
+        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .exchange()
                 .expectStatus().isOk()  // Phản hồi 200 OK
@@ -946,7 +1156,8 @@ class ApplicationTests {
         LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
 
         // Gửi request POST để thêm lesson cho section của khóa học
-        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", courseId, courseSection.getId())
+        var courseSection = course.getSections().iterator().next();
+        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), courseSection.getId())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(lessonDTO))
@@ -956,18 +1167,10 @@ class ApplicationTests {
 
     @Test
     void testAddLesson_UserIsNotTeacherOrAdmin_Forbidden() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        CourseSection section = new CourseSection("Section 1");
-        section.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        course.addSection(section);
-        courseRepository.save(course);
-
         LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
 
         // Gửi request POST để thêm lesson cho section của khóa học
-        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", courseId, section.getId())
+        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", 999L, 111L)
                 .headers(header -> header.setBearerAuth(userToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(lessonDTO))
@@ -977,19 +1180,27 @@ class ApplicationTests {
 
     @Test
     void testUpdateLesson_Successful() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        CourseSection section = new CourseSection("Section 1");
-        Lesson lesson = new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null);
-        section.addLesson(lesson);
-        course.addSection(section);
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         LessonDTO updateLessonDTO = new LessonDTO("New title", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
 
         // Gửi request PUT để cập nhật lesson của khóa học
-        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", courseId, section.getId(), lesson.getId())
+        var section = course.getSections().iterator().next();
+        var lesson = section.getLessons().iterator().next();
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lesson.getId())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(updateLessonDTO))
@@ -1001,21 +1212,28 @@ class ApplicationTests {
 
     @Test
     void testUpdateLesson_LessonDuplicate_BadRequest() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        CourseSection section = new CourseSection("Section 1");
-        Lesson lesson1 = new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null);
-        Lesson lesson2 = new Lesson("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
-        section.addLesson(lesson1);
-        section.addLesson(lesson2);
-        course.addSection(section);
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.VIDEO, "http://example.com/lesson2.mp4", null))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         LessonDTO updateLessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
 
         // Gửi request PUT để cập nhật lesson của khóa học
-        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", courseId, section.getId(), lesson1.getId())
+        var section = course.getSections().iterator().next();
+        var lesson1 = section.getLessons().iterator().next();
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lesson1.getId())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(updateLessonDTO))
@@ -1025,20 +1243,25 @@ class ApplicationTests {
 
     @Test
     void testUpdateLesson_CoursePublished_BadRequest() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        // Thiết lập giá cho khóa học
-        course.changePrice(Money.of(1000, Currencies.VND));
-        // Thiết lập các sections cho khóa học
-        CourseSection courseSection = new CourseSection("Section 1");
-        courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        course.addSection(courseSection);
-        // Lưu khóa học đã cập nhật
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", courseId)
+        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .exchange()
                 .expectStatus().isOk()  // Phản hồi 200 OK
@@ -1048,7 +1271,9 @@ class ApplicationTests {
         LessonDTO updateLessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
 
         // Gửi request PUT để cập nhật lesson của khóa học
-        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", courseId, courseSection.getId(), courseSection.getLessons().iterator().next().getId())
+        var courseSection = course.getSections().iterator().next();
+        var lesson = courseSection.getLessons().iterator().next();
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), courseSection.getId(), lesson.getId())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(updateLessonDTO))
@@ -1058,19 +1283,10 @@ class ApplicationTests {
 
     @Test
     void testUpdateLesson_UserIsNotTeacherOrAdmin_Forbidden() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        CourseSection section = new CourseSection("Section 1");
-        Lesson lesson = new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null);
-        section.addLesson(lesson);
-        course.addSection(section);
-        courseRepository.save(course);
-
         LessonDTO updateLessonDTO = new LessonDTO("New title", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
 
         // Gửi request PUT để cập nhật lesson của khóa học
-        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", courseId, section.getId(), lesson.getId())
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", 1000L, 2000L, 3000L)
                 .headers(header -> header.setBearerAuth(userToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(updateLessonDTO))
@@ -1080,17 +1296,25 @@ class ApplicationTests {
 
     @Test
     void testRemoveLesson_Successful() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        CourseSection section = new CourseSection("Section 1");
-        Lesson lesson = new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null);
-        section.addLesson(lesson);
-        course.addSection(section);
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request DELETE để xóa lesson khỏi khóa học
-        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", courseId, section.getId(), lesson.getId())
+        var section = course.getSections().iterator().next();
+        var lesson = section.getLessons().iterator().next();
+        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lesson.getId())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .exchange()
                 .expectStatus().isOk()
@@ -1100,20 +1324,25 @@ class ApplicationTests {
 
     @Test
     void testRemoveLesson_CoursePublished_BadRequest() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        // Thiết lập giá cho khóa học
-        course.changePrice(Money.of(1000, Currencies.VND));
-        // Thiết lập các sections cho khóa học
-        CourseSection courseSection = new CourseSection("Section 1");
-        courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        course.addSection(courseSection);
-        // Lưu khóa học đã cập nhật
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", courseId)
+        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .exchange()
                 .expectStatus().isOk()  // Phản hồi 200 OK
@@ -1121,7 +1350,9 @@ class ApplicationTests {
                 .jsonPath("$.published").isEqualTo(true);  // Kiểm tra khóa học đã được xuất bản
 
         // Gửi request DELETE để xóa lesson khỏi khóa học
-        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", courseId, courseSection.getId(), courseSection.getLessons().iterator().next().getId())
+        var courseSection = course.getSections().iterator().next();
+        var lesson = courseSection.getLessons().iterator().next();
+        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), courseSection.getId(), lesson.getId())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .exchange()
                 .expectStatus().isBadRequest();
@@ -1129,17 +1360,8 @@ class ApplicationTests {
 
     @Test
     void testRemoveLesson_UserIsNotTeacherOrAdmin_Forbidden() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        CourseSection section = new CourseSection("Section 1");
-        Lesson lesson = new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null);
-        section.addLesson(lesson);
-        course.addSection(section);
-        courseRepository.save(course);
-
         // Gửi request DELETE để xóa lesson khỏi khóa học
-        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", courseId, section.getId(), lesson.getId())
+        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", 100L, 200L, 300L)
                 .headers(header -> header.setBearerAuth(userToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .exchange()
                 .expectStatus().isForbidden();
@@ -1147,17 +1369,23 @@ class ApplicationTests {
 
     @Test
     void testCreateOrder_Successful() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        // Thiết lập giá cho khóa học
-        course.changePrice(Money.of(1000, Currencies.VND));
-        // Thiết lập các sections cho khóa học
-        CourseSection courseSection = new CourseSection("Section 1");
-        courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        course.addSection(courseSection);
-        // Lưu khóa học đã cập nhật
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        var courseId = course.getId();
 
         // Gửi request PUT để xuất bản khóa học
         webTestClient.put().uri("/courses/{courseId}/publish", courseId)
@@ -1197,8 +1425,23 @@ class ApplicationTests {
 
     @Test
     void testCreateOrder_Unauthorized() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        var courseId = course.getId();
 
         // Chuẩn bị dữ liệu cho request tạo order
         Set<OrderItemDTO> orderItemsDto = new HashSet<>();
@@ -1215,23 +1458,29 @@ class ApplicationTests {
 
     @Test
     void testCreateOrder_CourseNotFound() {
-        // Lấy khóa học từ CSDL thật (được tạo ở setupData)
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        // Thiết lập giá cho khóa học
-        course.changePrice(Money.of(1000, Currencies.VND));
-        // Thiết lập các sections cho khóa học
-        CourseSection courseSection = new CourseSection("Section 1");
-        courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        course.addSection(courseSection);
-        // Lưu khóa học đã cập nhật
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        var courseId = course.getId();
 
         // Chuẩn bị dữ liệu cho request tạo order
         Set<OrderItemDTO> orderItemsDto = new HashSet<>();
-        orderItemsDto.add(new OrderItemDTO(courseId));  // Course tồn tại nhưng không được publish
+        orderItemsDto.add(new OrderItemDTO(courseId));
         var orderRequestDto = new OrderRequestDTO(orderItemsDto, null);
+        // Course tồn tại nhưng không được publish
 
         // Gửi request POST để tạo order
         webTestClient.post().uri("/orders")
@@ -1244,17 +1493,23 @@ class ApplicationTests {
 
     @Test
     void testCreateOrderAndThenPay_Successful() {
-        Course course = courseRepository.findAll().iterator().next();
-        Long courseId = course.getId();
-
-        // Thiết lập giá cho khóa học
-        course.changePrice(Money.of(1000, Currencies.VND));
-        // Thiết lập các sections cho khóa học
-        CourseSection courseSection = new CourseSection("Section 1");
-        courseSection.addLesson(new Lesson("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        course.addSection(courseSection);
-        // Lưu khóa học đã cập nhật
-        courseRepository.save(course);
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("OOP", "Concurrency"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO(
+                "Section 1",
+                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
+                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
+                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        var courseId = course.getId();
 
         // Gửi request PUT để xuất bản khóa học
         webTestClient.put().uri("/courses/{courseId}/publish", courseId)

@@ -5,6 +5,7 @@ import com.elearning.common.config.jackson.JacksonCustomizations;
 import com.elearning.common.config.SecurityConfig;
 import com.elearning.common.exception.InputInvalidException;
 import com.elearning.common.exception.ResourceNotFoundException;
+import com.elearning.course.application.CourseQueryService;
 import com.elearning.course.application.dto.CourseDTO;
 import com.elearning.course.application.dto.CourseSectionDTO;
 import com.elearning.course.application.dto.CourseUpdateDTO;
@@ -26,10 +27,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -37,9 +42,9 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(CourseController.class)
+@WebMvcTest(CourseManagementController.class)
 @Import({SecurityConfig.class, JacksonCustomizations.class})
-class CourseControllerTests {
+class CourseManagementControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -47,10 +52,14 @@ class CourseControllerTests {
     @MockBean
     private CourseServiceImpl courseService;
 
+    @MockBean
+    private CourseQueryService courseQueryService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     private CourseDTO courseDTO;
+    private Course course;
 
     @BeforeEach
     public void setUp() {
@@ -64,6 +73,84 @@ class CourseControllerTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
+
+        course = new Course(
+                courseDTO.title(),
+                courseDTO.description(),
+                courseDTO.thumbnailUrl(),
+                courseDTO.benefits(),
+                courseDTO.language(),
+                courseDTO.prerequisites(),
+                courseDTO.subtitles(),
+                "teacher123"
+        );
+    }
+
+    @Test
+    void getAllCourses_ShouldReturnPageOfCourses() throws Exception {
+        Page<Course> coursePage = new PageImpl<>(List.of(course));
+
+        Mockito.when(courseQueryService.findAllCourses(any(Pageable.class))).thenReturn(coursePage);
+
+        mockMvc.perform(get("/courses")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").exists());
+    }
+
+    @Test
+    void getAllCourses_ShouldReturnForbidden_WhenAuthenticatedWithUserRole() throws Exception {
+        mockMvc.perform(get("/courses")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void getAllCourses_ShouldReturnUnauthorized_WhenNotAuthenticated() throws Exception {
+        mockMvc.perform(get("/courses"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void getCourseById_ShouldReturnCourse_WhenCourseExistsAndTeacherRole() throws Exception {
+        Mockito.when(courseQueryService.findCourseById(1L)).thenReturn(course);
+
+        mockMvc.perform(get("/courses/1")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value(course.getTitle()));
+    }
+
+    @Test
+    void getCourseById_ShouldReturnCourse_WhenCourseExistsAndAdminRole() throws Exception {
+        Mockito.when(courseQueryService.findCourseById(1L)).thenReturn(course);
+
+        mockMvc.perform(get("/courses/1")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value(course.getTitle()));
+    }
+
+    @Test
+    void getCourseById_ShouldReturnNotFound_WhenCourseDoesNotExist() throws Exception {
+        Mockito.when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+
+        mockMvc.perform(get("/courses/1")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getCourseById_ShouldReturnForbidden_WhenUser() throws Exception {
+        mockMvc.perform(get("/courses/1")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void getCourseById_ShouldReturnUnauthenticated_WhenIsNotAuthenticated() throws Exception {
+        mockMvc.perform(get("/courses/1"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

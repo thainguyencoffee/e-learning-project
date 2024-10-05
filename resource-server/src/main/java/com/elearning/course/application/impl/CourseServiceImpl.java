@@ -1,7 +1,9 @@
 package com.elearning.course.application.impl;
 
+import com.elearning.common.RolesBaseUtil;
+import com.elearning.common.exception.AccessDeniedException;
 import com.elearning.common.exception.InputInvalidException;
-import com.elearning.common.exception.ResourceNotFoundException;
+import com.elearning.course.application.CourseQueryService;
 import com.elearning.course.application.CourseService;
 import com.elearning.course.application.dto.CourseDTO;
 import com.elearning.course.application.dto.CourseSectionDTO;
@@ -11,8 +13,6 @@ import com.elearning.course.domain.CourseRepository;
 import com.elearning.course.domain.CourseSection;
 import com.elearning.course.domain.Lesson;
 import com.elearning.discount.application.DiscountService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,39 +23,18 @@ import javax.money.MonetaryAmount;
 public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
+    private final CourseQueryService courseQueryService;
     private final DiscountService discountService;
+    private final RolesBaseUtil rolesBaseUtil;
 
-    public CourseServiceImpl(CourseRepository courseRepository, DiscountService discountService) {
+    public CourseServiceImpl(CourseRepository courseRepository,
+                             CourseQueryService courseQueryService,
+                             DiscountService discountService,
+                             RolesBaseUtil rolesBaseUtil) {
         this.courseRepository = courseRepository;
+        this.courseQueryService = courseQueryService;
         this.discountService = discountService;
-    }
-
-    @Override
-    public Page<Course> findAllCourses(Pageable pageable) {
-        return courseRepository.findAll(pageable);
-    }
-
-    @Override
-    public Course findCourseById(Long courseId) {
-        return courseRepository.findByIdAndDeleted(courseId, false)
-                .orElseThrow(ResourceNotFoundException::new);
-    }
-
-    @Override
-    public Page<Course> findAllPublishedCourses(Pageable pageable) {
-        return courseRepository.findAllByPublished(true, pageable);
-    }
-
-    @Override
-    public Course findPublishedCourseById(Long courseId) {
-        return courseRepository.findByIdAndPublished(courseId, true)
-                .orElseThrow(ResourceNotFoundException::new);
-    }
-
-    @Override
-    public Course findCourseDeleted(Long courseId) {
-        return courseRepository.findByIdAndDeleted(courseId, true)
-                .orElseThrow(ResourceNotFoundException::new);
+        this.rolesBaseUtil = rolesBaseUtil;
     }
 
     @Override
@@ -66,7 +45,12 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course updateCourse(Long courseId, CourseUpdateDTO courseUpdateDTO) {
-        Course course = findCourseById(courseId);
+        Course course = courseQueryService.findCourseById(courseId);
+
+        if (!canUpdateCourse(course)) {
+            throw new AccessDeniedException("You do not have permission to update this course");
+        }
+
         course.updateInfo(
                 courseUpdateDTO.title(),
                 courseUpdateDTO.description(),
@@ -79,21 +63,31 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void deleteCourse(Long courseId) {
-        Course course = findCourseById(courseId);
+        Course course = courseQueryService.findCourseById(courseId);
+
+        if (!canUpdateCourse(course)) {
+            throw new AccessDeniedException("You do not have permission to update this course");
+        }
+
         course.delete();
         courseRepository.save(course);
     }
 
     @Override
     public void restoreCourse(Long courseId) {
-        Course course = findCourseDeleted(courseId);
+        Course course = courseQueryService.findCourseDeleted(courseId);
+
+        if (!canUpdateCourse(course)) {
+            throw new AccessDeniedException("You do not have permission to update this course");
+        }
+
         course.restore();
         courseRepository.save(course);
     }
 
     @Override
     public Course publishCourse(Long courseId, String approvedBy) {
-        Course course = findCourseById(courseId);
+        Course course = courseQueryService.findCourseById(courseId);
 
         course.publish(approvedBy);
         return courseRepository.save(course);
@@ -101,7 +95,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course assignTeacher(Long courseId, String teacher) {
-        Course existsCourse = findCourseById(courseId);
+        Course existsCourse = courseQueryService.findCourseById(courseId);
         existsCourse.assignTeacher(teacher);
         courseRepository.save(existsCourse);
         return existsCourse;
@@ -109,7 +103,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course applyDiscount(Long courseId, String code) {
-        Course course = findCourseById(courseId);
+        Course course = courseQueryService.findCourseById(courseId);
         if (course.getPrice() == null) {
             throw new InputInvalidException("Cannot apply discount to a course without a price.");
         }
@@ -121,7 +115,11 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course addSection(Long courseId, CourseSectionDTO courseSectionDTO) {
-        Course course = findCourseById(courseId);
+        Course course = courseQueryService.findCourseById(courseId);
+
+        if (!canUpdateCourse(course)) {
+            throw new AccessDeniedException("You do not have permission to update this course");
+        }
 
         CourseSection courseSection = courseSectionDTO.toCourseSection();
 
@@ -131,44 +129,79 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course updateSectionInfo(Long courseId, Long sectionId, String newTitle) {
-        Course course = findCourseById(courseId);
+        Course course = courseQueryService.findCourseById(courseId);
+
+        if (!canUpdateCourse(course)) {
+            throw new AccessDeniedException("You do not have permission to update this course");
+        }
+
         course.updateSection(sectionId, newTitle);
         return courseRepository.save(course);
     }
 
     @Override
     public Course removeSection(Long courseId, Long sectionId) {
-        Course course = findCourseById(courseId);
+        Course course = courseQueryService.findCourseById(courseId);
+
+        if (!canUpdateCourse(course)) {
+            throw new AccessDeniedException("You do not have permission to update this course");
+        }
+
         course.removeSection(sectionId);
         return courseRepository.save(course);
     }
 
     @Override
     public Course addLesson(Long courseId, Long sectionId, Lesson lesson) {
-        Course course = findCourseById(courseId);
+        Course course = courseQueryService.findCourseById(courseId);
+
+        if (!canUpdateCourse(course)) {
+            throw new AccessDeniedException("You do not have permission to update this course");
+        }
+
         course.addLessonToSection(sectionId, lesson);
         return courseRepository.save(course);
     }
 
     @Override
     public Course updateLesson(Long courseId, Long sectionId, Long lessonId, Lesson updatedLesson) {
-        Course course = findCourseById(courseId);
+        Course course = courseQueryService.findCourseById(courseId);
+
+        if (!canUpdateCourse(course)) {
+            throw new AccessDeniedException("You do not have permission to update this course");
+        }
+
         course.updateLessonInSection(sectionId, lessonId, updatedLesson);
         return courseRepository.save(course);
     }
 
     @Override
     public Course removeLesson(Long courseId, Long sectionId, Long lessonId) {
-        Course course = findCourseById(courseId);
+        Course course = courseQueryService.findCourseById(courseId);
+
+        if (!canUpdateCourse(course)) {
+            throw new AccessDeniedException("You do not have permission to update this course");
+        }
+
         course.removeLessonFromSection(sectionId, lessonId);
         return courseRepository.save(course);
     }
 
     @Override
     public Course updatePrice(Long courseId, MonetaryAmount newPrice) {
-        Course course = findCourseById(courseId);
+        Course course = courseQueryService.findCourseById(courseId);
         course.changePrice(newPrice);
 
         return courseRepository.save(course);
     }
+
+    private boolean canUpdateCourse(Course course) {
+        if (rolesBaseUtil.isAdmin()) {
+            return true;
+        }
+
+        String currentUserId = rolesBaseUtil.getCurrentSubjectFromJwt();
+        return course.getTeacher().equals(currentUserId);
+    }
+
 }
