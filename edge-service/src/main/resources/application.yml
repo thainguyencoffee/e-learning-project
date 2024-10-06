@@ -24,11 +24,27 @@ spring:
   security:
     oauth2:
       client:
-        provider:
-          keycloak:
-            issuer-uri: http://localhost:8080/realms/keycloak101
         registration:
           keycloak:
             client-id: edge-service
             client-secret: WRdVtsZ1oaVboulVqsNfBPcE5rZoc4VF
             scope: openid,roles
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/keycloak101
+  redis:
+    connect-timeout: 2s
+    host: localhost
+    port: 6379
+    timeout: 1s
+  session:
+    store-type: redis
+    timeout: 10m
+    redis:
+      namespace: polar:edge
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: gateway, health, info
