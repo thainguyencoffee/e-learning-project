@@ -1,5 +1,5 @@
 server:
-  port: 9001
+  port: 9000
 
 spring:
   application:
@@ -12,9 +12,9 @@ spring:
         - TokenRelay
       routes:
         - id: spa-route
-          uri: ${SPA_URL:http://localhost:9200/spa}
+          uri: ${SPA_URL:http://localhost:4200}
           predicates:
-            - Path=/spa/**
+            - Path=/,/*.css,/*.js,/favicon.ico,/@vite/client,/@fs/**
         - id: resource-server-route
           uri: ${RESOURCE_SERVER_URL:http://localhost:9100}
           predicates:

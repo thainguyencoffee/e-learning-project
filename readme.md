@@ -18,10 +18,24 @@ git clone https://github.com/thainguyencoffee/e-learning-project.git
 cd e-learning-project
 ```
 
-### Build the code
+### Run Docker Compose
 
-To compile, test, and build
+You can change directory with `cd deployment/docker` and run the following command `docker-compose up -d`
 
-```bash
-./gradlew build
-```
+### Run the Application
+
+You can run the application by using the following command: `./gradlew bootRun` 
+This project depends on the following services:
+* Postgres
+* Keycloak
+* Edge Service
+* Resource Server
+
+To run successful application, you need to run them.
+
+### Run angular application
+
+After run backend application, you can run frontend application by using the following command `ng serve`
+
+## Successful
+You can access the application at `http://localhost:9000`
