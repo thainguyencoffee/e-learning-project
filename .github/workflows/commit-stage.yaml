@@ -1,14 +1,6 @@
 name: Backend CI with Gradle
 
-on:
-  push:
-    paths:
-      - 'backend/**'
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'backend/**'
+on: push
 
 jobs:
   build:
