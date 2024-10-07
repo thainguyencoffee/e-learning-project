@@ -11,10 +11,6 @@ spring:
         - SaveSession
         - TokenRelay
       routes:
-        - id: spa-route
-          uri: ${SPA_URL:http://localhost:4200}
-          predicates:
-            - Path=/,/*.css,/*.js,/favicon.ico,/@vite/client,/@fs/**
         - id: resource-server-route
           uri: ${RESOURCE_SERVER_URL:http://localhost:9100}
           predicates:
