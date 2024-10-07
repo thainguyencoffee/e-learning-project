@@ -1,0 +1,60 @@
+scheme: http
+hostname: localhost
+reverse-proxy-port: 7080
+reverse-proxy-uri: ${scheme}://${hostname}:${reverse-proxy-port}
+authorization-server-prefix: /auth
+realm_name: keycloak101
+issuer: ${reverse-proxy-uri}${authorization-server-prefix}/realms/${realm_name}
+lms-port: 7084
+
+server:
+  port: ${lms-port}
+
+spring:
+  application:
+    name: lms
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+  datasource:
+    url: jdbc:postgresql://localhost:5432/lms
+    username: postgres
+    password: secret
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${issuer}
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+error:
+  handling:
+    exception-logging: no_logging
+    http-status-in-json-response: true
+    full-stacktrace-http-statuses: 5xx
+    log-levels:
+      5xx: ERROR
+
+digitalocean:
+  spaces:
+    endpoint: https://bookstore-bucket.sgp1.digitaloceanspaces.com
+    access-key: DO00XXYJDDAPT9EXWVF8
+    secret-key: ZY2YAo3WrW+Eq28oLYVW89mDwst//QLJyqiF4TMP+Vg
+    bucket-name: bookstore-bucket
+
+STRIPE_SECRET_KEY: sk_test_51PtPqOLcSSqgAPH9SPAVNGV3vMYll5CNIvCUHFT7RJWIPkHTHa9LySfuiswCMvYlbe5KwKavly4QV6rjJP2zVBoS00x6oNhWCR
