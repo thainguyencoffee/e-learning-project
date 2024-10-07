@@ -1,0 +1,863 @@
+openapi: "3.1.0"
+info:
+  title: "e_learning_project API"
+  description: "e_learning_project API"
+  version: "1.0.0"
+servers:
+  - url: "https://e_learning_project"
+paths:
+  /upload:
+    post:
+      summary: "POST upload"
+      operationId: "upload"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: "object"
+              required:
+                - "file"
+              properties:
+                file:
+                  type: "string"
+                  format: "binary"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+  /upload/{urlEncode}:
+    delete:
+      summary: "DELETE upload/{urlEncode}"
+      operationId: "delete"
+      parameters:
+        - name: "urlEncode"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+  /orders:
+    post:
+      summary: "POST orders"
+      operationId: "createOrder"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Order"
+    get:
+      summary: "GET orders"
+      operationId: "orders"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Order"
+  /orders/{id}:
+    get:
+      summary: "GET orders/{id}"
+      operationId: "orderById"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Order"
+  /orders/my-orders:
+    get:
+      summary: "GET orders/my-orders"
+      operationId: "myOrders"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Order"
+  /published-courses:
+    get:
+      summary: "GET published-courses"
+      operationId: "getAllPublishedCourses"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+  /published-courses/{courseId}:
+    get:
+      summary: "GET published-courses/{courseId}"
+      operationId: "getPublishedCourseById"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+  /courses/{courseId}:
+    put:
+      summary: "PUT courses/{courseId}"
+      operationId: "updateCourse"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseUpdateDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+    delete:
+      summary: "DELETE courses/{courseId}"
+      operationId: "deleteCourse"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+    get:
+      summary: "GET courses/{courseId}"
+      operationId: "getCourseById"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+  /courses/{courseId}/publish:
+    put:
+      summary: "PUT courses/{courseId}/publish"
+      operationId: "publishCourse"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+  /courses/{courseId}/update-price:
+    put:
+      summary: "PUT courses/{courseId}/update-price"
+      operationId: "changePrice"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePriceDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+  /courses/{courseId}/assign-teacher:
+    put:
+      summary: "PUT courses/{courseId}/assign-teacher"
+      operationId: "assignTeacher"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignTeacherDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+  /courses/{courseId}/sections/{sectionId}:
+    put:
+      summary: "PUT courses/{courseId}/sections/{sectionId}"
+      operationId: "updateSectionInfo"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "sectionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSectionDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+    delete:
+      summary: "DELETE courses/{courseId}/sections/{sectionId}"
+      operationId: "deleteSection"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "sectionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+  /courses/{courseId}/sections/{sectionId}/lessons/{lessonId}:
+    put:
+      summary: "PUT courses/{courseId}/sections/{sectionId}/lessons/{lessonId}"
+      operationId: "updateLesson"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "sectionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "lessonId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LessonDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+    delete:
+      summary: "DELETE courses/{courseId}/sections/{sectionId}/lessons/{lessonId}"
+      operationId: "deleteLesson"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "sectionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "lessonId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+  /courses:
+    post:
+      summary: "POST courses"
+      operationId: "createCourse"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+    get:
+      summary: "GET courses"
+      operationId: "getAllCourses"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+  /courses/{courseId}/restore:
+    post:
+      summary: "POST courses/{courseId}/restore"
+      operationId: "restoreCourse"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+  /courses/{courseId}/apply-discount:
+    post:
+      summary: "POST courses/{courseId}/apply-discount"
+      operationId: "applyDiscount"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplyDiscountDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+  /courses/{courseId}/sections:
+    post:
+      summary: "POST courses/{courseId}/sections"
+      operationId: "addSection"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseSectionDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+  /courses/{courseId}/sections/{sectionId}/lessons:
+    post:
+      summary: "POST courses/{courseId}/sections/{sectionId}/lessons"
+      operationId: "addLesson"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "sectionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LessonDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Course"
+  /payments:
+    post:
+      summary: "POST payments"
+      operationId: "payment"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Payment"
+components:
+  schemas:
+    Void:
+      type: "object"
+      properties: { }
+    OrderItemDTO:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+    OrderRequestDTO:
+      type: "object"
+      properties:
+        items:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/OrderItemDTO"
+        discountCode:
+          type: "string"
+    MonetaryAmount:
+      type: "object"
+      properties: { }
+    OrderItem:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        course:
+          type: "integer"
+          format: "int64"
+        price:
+          $ref: "#/components/schemas/MonetaryAmount"
+    Instant:
+      type: "object"
+      properties: { }
+    Order:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        items:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/OrderItem"
+        orderDate:
+          $ref: "#/components/schemas/Instant"
+        totalPrice:
+          $ref: "#/components/schemas/MonetaryAmount"
+        discountedPrice:
+          $ref: "#/components/schemas/MonetaryAmount"
+        discountCode:
+          type: "string"
+        status:
+          type: "string"
+          enum:
+            - "PENDING"
+            - "PAID"
+            - "CANCELLED"
+        createdBy:
+          type: "string"
+        createdDate:
+          $ref: "#/components/schemas/Instant"
+        lastModifiedBy:
+          type: "string"
+        lastModifiedDate:
+          $ref: "#/components/schemas/Instant"
+    Lesson:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        title:
+          type: "string"
+        type:
+          type: "string"
+          enum:
+            - "VIDEO"
+            - "TEXT"
+            - "QUIZ"
+            - "ASSIGNMENT"
+        link:
+          type: "string"
+        quiz:
+          type: "integer"
+          format: "int64"
+    CourseSection:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        title:
+          type: "string"
+        lessons:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Lesson"
+    StudentRef:
+      type: "object"
+      properties:
+        student:
+          type: "integer"
+          format: "int64"
+        firstName:
+          type: "string"
+        lastName:
+          type: "string"
+        email:
+          type: "string"
+    Course:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        title:
+          type: "string"
+        thumbnailUrl:
+          type: "string"
+        description:
+          type: "string"
+        language:
+          type: "string"
+          enum:
+            - "ENGLISH"
+            - "VIETNAMESE"
+            - "JAPANESE"
+            - "KOREAN"
+            - "CHINESE"
+            - "FRENCH"
+            - "GERMAN"
+            - "SPANISH"
+        subtitles:
+          type: "array"
+          items:
+            type: "string"
+            enum:
+              - "ENGLISH"
+              - "VIETNAMESE"
+              - "JAPANESE"
+              - "KOREAN"
+              - "CHINESE"
+              - "FRENCH"
+              - "GERMAN"
+              - "SPANISH"
+        benefits:
+          type: "array"
+          items:
+            type: "string"
+        prerequisites:
+          type: "array"
+          items:
+            type: "string"
+        sections:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/CourseSection"
+        price:
+          $ref: "#/components/schemas/MonetaryAmount"
+        discountedPrice:
+          $ref: "#/components/schemas/MonetaryAmount"
+        published:
+          type: "boolean"
+        teacher:
+          type: "string"
+        approvedBy:
+          type: "string"
+        students:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/StudentRef"
+        discountCode:
+          type: "string"
+        version:
+          type: "integer"
+          format: "int32"
+        createdBy:
+          type: "string"
+        createdDate:
+          $ref: "#/components/schemas/Instant"
+        lastModifiedBy:
+          type: "string"
+        lastModifiedDate:
+          $ref: "#/components/schemas/Instant"
+    CourseUpdateDTO:
+      type: "object"
+      properties:
+        title:
+          type: "string"
+        description:
+          type: "string"
+        thumbnailUrl:
+          type: "string"
+        benefits:
+          type: "array"
+          items:
+            type: "string"
+        prerequisites:
+          type: "array"
+          items:
+            type: "string"
+        subtitles:
+          type: "array"
+          items:
+            type: "string"
+            enum:
+              - "ENGLISH"
+              - "VIETNAMESE"
+              - "JAPANESE"
+              - "KOREAN"
+              - "CHINESE"
+              - "FRENCH"
+              - "GERMAN"
+              - "SPANISH"
+    UpdatePriceDTO:
+      type: "object"
+      properties:
+        price:
+          $ref: "#/components/schemas/MonetaryAmount"
+    AssignTeacherDTO:
+      type: "object"
+      properties:
+        teacherId:
+          type: "string"
+    UpdateSectionDTO:
+      type: "object"
+      properties:
+        title:
+          type: "string"
+    LessonDTO:
+      type: "object"
+      properties:
+        title:
+          type: "string"
+        type:
+          type: "string"
+          enum:
+            - "VIDEO"
+            - "TEXT"
+            - "QUIZ"
+            - "ASSIGNMENT"
+        link:
+          type: "string"
+        quiz:
+          type: "integer"
+          format: "int64"
+    CourseDTO:
+      type: "object"
+      properties:
+        title:
+          type: "string"
+        description:
+          type: "string"
+        thumbnailUrl:
+          type: "string"
+        benefits:
+          type: "array"
+          items:
+            type: "string"
+        language:
+          type: "string"
+          enum:
+            - "ENGLISH"
+            - "VIETNAMESE"
+            - "JAPANESE"
+            - "KOREAN"
+            - "CHINESE"
+            - "FRENCH"
+            - "GERMAN"
+            - "SPANISH"
+        prerequisites:
+          type: "array"
+          items:
+            type: "string"
+        subtitles:
+          type: "array"
+          items:
+            type: "string"
+            enum:
+              - "ENGLISH"
+              - "VIETNAMESE"
+              - "JAPANESE"
+              - "KOREAN"
+              - "CHINESE"
+              - "FRENCH"
+              - "GERMAN"
+              - "SPANISH"
+    ApplyDiscountDTO:
+      type: "object"
+      properties:
+        code:
+          type: "string"
+    CourseSectionDTO:
+      type: "object"
+      properties:
+        title:
+          type: "string"
+        lessons:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/LessonDTO"
+    PaymentRequest:
+      type: "object"
+      properties:
+        orderId:
+          type: "string"
+          format: "uuid"
+        amount:
+          $ref: "#/components/schemas/MonetaryAmount"
+        paymentMethod:
+          type: "string"
+          enum:
+            - "PAYPAL"
+            - "STRIPE"
+        token:
+          type: "string"
+    Payment:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        orderId:
+          type: "string"
+          format: "uuid"
+        amount:
+          $ref: "#/components/schemas/MonetaryAmount"
+        status:
+          type: "string"
+          enum:
+            - "PENDING"
+            - "PAID"
+            - "FAILED"
+        paymentDate:
+          type: "string"
+          format: "date-time"
+        paymentMethod:
+          type: "string"
+          enum:
+            - "PAYPAL"
+            - "STRIPE"
+        transactionId:
+          type: "string"
