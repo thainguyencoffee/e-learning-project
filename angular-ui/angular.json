@@ -13,6 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
+            "baseHref": "/angular-ui/",
             "outputPath": "dist/angular-ui",
             "index": "src/index.html",
             "browser": "src/main.ts",
@@ -61,6 +62,11 @@
             },
             "development": {
               "buildTarget": "angular-ui:build:development"
+            },
+            "local": {
+              "buildTarget": "angular-ui:build:development",
+              "host": "0.0.0.0",
+              "port": 4201
             }
           },
           "defaultConfiguration": "development"
@@ -91,5 +97,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "23e97199-7e93-4604-8730-91fe13971aa4"
   }
 }

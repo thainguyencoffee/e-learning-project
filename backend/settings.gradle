@@ -6,4 +6,4 @@
  */
 
 rootProject.name = 'backend'
-include 'resource-server', 'edge-service'
+include 'lms', 'bff'

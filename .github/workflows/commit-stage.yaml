@@ -1,16 +1,14 @@
-name: Resource server CI with Gradle
+name: Backend CI with Gradle
 
 on:
   push:
     paths:
-      - 'resource-server/**'
-      - 'edge-service/**'
+      - 'backend/**'
     branches: [ main ]
   pull_request:
     branches: [ main ]
     paths:
-      - 'resource-server/**'
-      - 'edge-service/**'
+      - 'backend/**'
 
 jobs:
   build:
@@ -30,5 +28,5 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          cd resource-server
+          cd backend/
           ./gradlew build

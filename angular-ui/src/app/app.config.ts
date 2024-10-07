@@ -1,19 +1,12 @@
-import {ApplicationConfig, importProvidersFrom, provideZoneChangeDetection} from '@angular/core';
-import {ExtraOptions, provideRouter, RouterModule} from '@angular/router';
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter } from '@angular/router';
 
+import { provideHttpClient } from '@angular/common/http';
 import { routes } from './app.routes';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {HttpClientModule} from '@angular/common/http';
-
-const routeConfig: ExtraOptions = {
-  onSameUrlNavigation: 'reload',
-  scrollPositionRestoration: 'enabled'
-};
 
 export const appConfig: ApplicationConfig = {
-  providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
-    importProvidersFrom(RouterModule.forRoot(routes, routeConfig), BrowserAnimationsModule, HttpClientModule),
-  ],
+    providers: [provideRouter(routes), provideHttpClient()],
 };
+
+export const reverseProxyUri = 'http://heaven-host:7080';
+export const baseUri = `${reverseProxyUri}/angular-ui/`;

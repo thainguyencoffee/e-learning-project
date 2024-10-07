@@ -1,0 +1,105 @@
+services:
+  nginx-reverse-proxy:
+    container_name: el.nginx-reverse-proxy
+    image: el/nginx-reverse-proxy
+    ports:
+      - 7080:7080
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "LOCALHOST_NAME:host-gateway"
+
+  postgres:
+    container_name: el.db
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: secret
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d lms -U postgres && pg_isready -d keycloak -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    container_name: el.auth
+    image: quay.io/keycloak/keycloak:24.0.0
+    command:
+      - start-dev
+      - --import-realm
+    ports:
+      - 8080:8080
+    volumes:
+      - ./keycloak/import/:/opt/keycloak/data/import/
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_SCHEMA: public
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: secret
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: secret
+      KC_HTTP_PORT: 8080
+      KC_HOSTNAME_URL: http://LOCALHOST_NAME:7080/auth
+      KC_HOSTNAME_ADMIN_URL: http://LOCALHOST_NAME:7080/auth
+      KC_HOSTNAME_STRICT_BACKCHANNEL: true
+      KC_HTTP_RELATIVE_PATH: /auth/
+      KC_HTTP_ENABLED: true
+      KC_HEALTH_ENABLED: true
+      KC_METRICS_ENABLED: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "LOCALHOST_NAME:host-gateway"
+    healthcheck:
+      test: [ 'CMD-SHELL', '[ -f /tmp/HealthCheck.java ] || echo "public class HealthCheck { public static void main(String[] args) throws java.lang.Throwable { System.exit(java.net.HttpURLConnection.HTTP_OK == ((java.net.HttpURLConnection)new java.net.URL(args[0]).openConnection()).getResponseCode() ? 0 : 1); } }" > /tmp/HealthCheck.java && java /tmp/HealthCheck.java http://localhost:8080/auth/health/live' ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  angular-ui:
+    container_name: el.angular-ui
+    image: el/angular-ui
+    ports:
+      - 4201:80
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "LOCALHOST_NAME:host-gateway"
+
+  lms:
+    container_name: el.lms
+    image: el/lms
+    ports:
+      - 7084:7084
+    environment:
+      HOSTNAME: LOCALHOST_NAME
+      SERVER_ADDRESS: 0.0.0.0
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lms
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: secret
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "LOCALHOST_NAME:host-gateway"
+
+  bff:
+    container_name: el.bff
+    image: el/bff
+    ports:
+      - 7081:7081
+    environment:
+      HOSTNAME: LOCALHOST_NAME
+      SERVER_ADDRESS: 0.0.0.0
+      CLIENT_SECRET: secret
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "LOCALHOST_NAME:host-gateway"
