@@ -62,8 +62,6 @@ $SED "s/LOCALHOST_NAME/${host}/g" keycloak/import/keycloak101-realm.json
 rm -f "keycloak/import/keycloak101-realm.json''"
 
 cd angular-ui/
-rm -f "src/app/app.config.ts"
-cp ../angular-ui.app.config.ts src/app/app.config.ts
 $SED "s/LOCALHOST_NAME/${host}/g" src/app/app.config.ts
 rm -f "src/app/app.config.ts''"
 npm i
