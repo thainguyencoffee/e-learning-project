@@ -15,9 +15,17 @@ https://github.com/thainguyencoffee/e-learning-project.git
 ```
 
 ### Compile and test; build all JARs, build image container, start docker compose
+
+1. Without angular (recommend when you want to develop frontend)
+```bash
+./build.sh without-angular
+```
+2. With angular (recommend when you want to deploy)
 ```bash
 ./build.sh
 ```
-### Check out
-- Keycloak as admin with `username|password` format: **admin:secret**
-- Frontend: `http://$HOSTNAME:7080/angular-ui`. You can get `$HOSTNAME` with `echo $HOSTNAME`
+
+3. If you want to build image
+```bash
+./build.sh native
+```

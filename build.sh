@@ -1,10 +1,19 @@
 #!/bin/bash
-echo "***************************************************************************************************************************************"
+
+WITHOUT_ANGULAR=false
+if [[ " $@ " =~ [[:space:]]without-angular[[:space:]] ]]; then
+  WITHOUT_ANGULAR=true
+fi
+
+figlet "EL project."
 echo "* To build Spring Boot native images, run with the \"native\" argument: \"sh ./build.sh native\" (images will take much longer to build). *"
-echo "*                                                                                                                                     *"
+echo "* To build without Angular, run with the \"without-angular\" argument: \"sh ./build.sh without-angular\". *"
 echo "* This build script tries to auto-detect ARM64 (Apple Silicon) to build the appropriate Spring Boot Docker images.                    *"
-echo "***************************************************************************************************************************************"
-echo ""
+if $WITHOUT_ANGULAR; then
+  echo "Without Angular."
+else
+  echo "With Angular."
+fi
 
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -25,7 +34,6 @@ if [ ${#GRADLE_PROFILES[@]} -eq 0 ]; then
 else
   GRADLE_PROFILE_ARG="-P$(IFS=, ; echo "${GRADLE_PROFILES[*]}")"
 fi
-
 host=$(echo $HOSTNAME | tr '[A-Z]' '[a-z]')
 
 cd backend
@@ -64,19 +72,32 @@ rm -f "keycloak/import/keycloak101-realm.json''"
 cd angular-ui/
 $SED "s/LOCALHOST_NAME/${host}/g" src/app/app.config.ts
 rm -f "src/app/app.config.ts''"
-npm i
-npm run build
+if $WITHOUT_ANGULAR; then
+  echo "Skipping angular building."
+  echo ""
+else
+  npm i
+  npm run build
+fi
 cd ..
 
 cd nginx-reverse-proxy/
 rm nginx.conf
 cp ../nginx.conf ./
 $SED "s/LOCALHOST_NAME/${host}/g" nginx.conf
+if $WITHOUT_ANGULAR; then
+  $SED "s/4201/4200/g" nginx.conf
+fi
 cd ..
 
-docker build -t el/nginx-reverse-proxy ./nginx-reverse-proxy
-docker build -t el/angular-ui ./angular-ui
-docker compose -f compose-${host}.yml up -d
+if $WITHOUT_ANGULAR; then
+  docker build -t el/nginx-reverse-proxy ./nginx-reverse-proxy
+  docker compose -f compose-${host}.yml up -d nginx-reverse-proxy bff lms
+else
+  docker build -t el/nginx-reverse-proxy ./nginx-reverse-proxy
+  docker build -t el/angular-ui ./angular-ui
+  docker compose -f compose-${host}.yml up -d
+fi
 
 echo ""
 echo "Open the following in a new private navigation window."
@@ -87,4 +108,9 @@ echo "http://${host}:7080/auth/admin/master/console/#/keycloak101"
 
 echo ""
 echo "Frontends"
-echo http://${host}:7080/angular-ui/
+if $WITHOUT_ANGULAR; then
+  cd angular-ui/
+  ng serve
+else
+  echo http://${host}:7080/angular-ui/
+fi
