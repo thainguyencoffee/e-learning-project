@@ -83,7 +83,16 @@ cd ..
 
 cd nginx-reverse-proxy/
 rm nginx.conf
-cp ../nginx.conf ./
+
+WLAN_IP=$(ip addr show wlo1 | grep 'inet ' | awk '{print $2}' | cut -d'/' -f1)
+
+if $WITHOUT_ANGULAR; then
+  cp ../nginx-cors.conf ./nginx.conf
+  $SED "s/WLAN_IP/$WLAN_IP/g" nginx.conf
+else
+  cp ../nginx.conf ./
+fi
+
 $SED "s/LOCALHOST_NAME/${host}/g" nginx.conf
 if $WITHOUT_ANGULAR; then
   $SED "s/4201/4200/g" nginx.conf
@@ -108,9 +117,9 @@ echo "http://${host}:7080/auth/admin/master/console/#/keycloak101"
 
 echo ""
 echo "Frontends"
+echo "Please use the url below to access angular:"
+echo http://${host}:7080/angular-ui/
 if $WITHOUT_ANGULAR; then
   cd angular-ui/
-  ng serve
-else
-  echo http://${host}:7080/angular-ui/
+  ng serve --host $WLAN_IP --port 4200
 fi
