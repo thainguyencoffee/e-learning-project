@@ -9,4 +9,4 @@ export const appConfig: ApplicationConfig = {
 };
 
 export const reverseProxyUri = 'http://heaven-host:7080';
-export const baseUri = `${reverseProxyUri}/angular-ui/`;
+export const baseUri = `${reverseProxyUri}/angular-ui`;

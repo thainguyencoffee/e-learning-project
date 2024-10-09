@@ -77,7 +77,6 @@ com:
         resourceserver:
           permit-all:
             - /login-options
-            - /me
             - /error
             - /actuator/health/readiness
             - /actuator/health/liveness

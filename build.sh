@@ -7,8 +7,8 @@ fi
 
 figlet "EL project."
 echo "* To build Spring Boot native images, run with the \"native\" argument: \"sh ./build.sh native\" (images will take much longer to build). *"
-echo "* To build without Angular, run with the \"without-angular\" argument: \"sh ./build.sh without-angular\". *"
-echo "* This build script tries to auto-detect ARM64 (Apple Silicon) to build the appropriate Spring Boot Docker images.                    *"
+echo "* To build without Angular, run with the \"without-angular\" argument: \"sh ./build.sh without-angular\".                                 *"
+echo "* This build script tries to auto-detect ARM64 (Apple Silicon) to build the appropriate Spring Boot Docker images.                        *"
 if $WITHOUT_ANGULAR; then
   echo "Without Angular."
 else

@@ -24,6 +24,7 @@ ext {
 dependencies {
 	// https://mvnrepository.com/artifact/com.c4-soft.springaddons/spring-addons-starter-oidc
 	implementation 'com.c4-soft.springaddons:spring-addons-starter-oidc:7.8.10'
+	implementation 'com.c4-soft.springaddons:spring-addons-starter-oidc-test:7.8.10'
 	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'

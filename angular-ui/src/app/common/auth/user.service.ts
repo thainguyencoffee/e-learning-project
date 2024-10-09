@@ -1,31 +1,26 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, Subscription, interval} from 'rxjs';
-import {reverseProxyUri} from "../../app.config";
 
 interface UserInfoDto {
   username: string;
-  firstName: string,
-  lastName: string,
   email: string;
   roles: string[]
   exp: number;
 }
 
 export class User {
-  static readonly ANONYMOUS = new User("", "", "", "", []);
+  static readonly ANONYMOUS = new User("", "", []);
 
   constructor(
-    readonly username: string,
-    readonly firstName: string,
-    readonly lastName: string,
+    readonly name: string,
     readonly email: string,
     readonly roles: string[]
   ) {
   }
 
   get isAuthenticated(): boolean {
-    return !!this.username;
+    return !!this.name;
   }
 
   hasAnyRole(...roles: string[]): boolean {
@@ -51,22 +46,20 @@ export class UserService {
 
   refresh(): void {
     this.refreshSub?.unsubscribe();
-    this.http.get(reverseProxyUri + '/bff/me').subscribe({
+    this.http.get('/bff/api/me').subscribe({
       next: (dto: any) => {
         const user = dto as UserInfoDto;
         if (
-          user.username !== this.user$.value.username ||
-          user.firstName !== this.user$.value.firstName ||
-          user.lastName !== this.user$.value.lastName ||
+          // Compare user fetched from server with current user
+          user.username !== this.user$.value.name ||
           user.email !== this.user$.value.email ||
           (user.roles || []).toString() !== this.user$.value.roles.toString()
         ) {
+          // update current user
           this.user$.next(
             user.username
               ? new User(
                 user.username || '',
-                user.firstName || '',
-                user.lastName || '',
                 user.email || '',
                 user.roles || []
               )
@@ -74,6 +67,7 @@ export class UserService {
           );
         }
         if (!!user.exp) {
+          // Calculate delay
           const now = Date.now();
           const delay = (1000 * user.exp - now) * 0.8;
           if (delay > 2000) {

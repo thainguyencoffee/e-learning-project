@@ -20,6 +20,9 @@ public class SecurityConfig {
         return http
                 // Define authorization rules
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/actuator/health/readiness").permitAll()
+                        .requestMatchers("/actuator/health/liveness").permitAll()
+                        .requestMatchers("/me").permitAll()
                         // Allow GET requests to /courses/** without authentication
                         .requestMatchers(HttpMethod.GET, "/published-courses/**").permitAll()
 //                        .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
