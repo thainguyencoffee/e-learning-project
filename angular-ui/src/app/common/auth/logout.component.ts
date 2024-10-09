@@ -2,24 +2,24 @@ import { Component } from '@angular/core';
 import { UserService } from './user.service';
 import { lastValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import {baseUri, reverseProxyUri} from "../../app.config";
+import {baseUri} from "../../app.config";
 
 @Component({
   selector: 'app-logout',
   standalone: true,
   imports: [],
   template: `
-  <button (click)="logout()">Logout</button>
+  <button class="btn btn-light" (click)="logout()">Logout</button>
   `,
   styles: ``
 })
 export class LogoutComponent {
 
-  constructor(private http: HttpClient, private user: UserService) {}
+  constructor(private http: HttpClient, private userService: UserService) {}
 
   logout() {
     lastValueFrom(
-      this.http.post(reverseProxyUri + '/bff/logout', null, {
+      this.http.post('/bff/logout', null, {
         headers: {
           'X-POST-LOGOUT-SUCCESS-URI': baseUri,
         },
@@ -33,7 +33,7 @@ export class LogoutComponent {
         }
       })
       .finally(() => {
-        this.user.refresh();
+        this.userService.refresh();
       });
   }
 }
