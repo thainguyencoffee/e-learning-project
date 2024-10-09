@@ -1,5 +1,8 @@
 <app-header/>
 
-<router-outlet></router-outlet>
-
-<app-footer/>
+<main class="my-5">
+  <div class="container-fluid">
+    @if (msgSuccess) { <p class="alert alert-success mb-4" role="alert">{{ msgSuccess }}</p> }
+    <router-outlet />
+  </div>
+</main>

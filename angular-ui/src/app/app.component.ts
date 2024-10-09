@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {Component, inject, OnInit} from '@angular/core';
+import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {HeaderComponent} from "./common/header/header.component";
 import {FooterComponent} from "./common/footer/footer.component";
 import {AuthenticationComponent} from "./common/auth/authentication.component";
@@ -11,6 +11,19 @@ import {AuthenticationComponent} from "./common/auth/authentication.component";
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
-  title = 'angular-ui';
+export class AppComponent implements OnInit {
+  title = 'Hello World! Have a nice day!';
+
+  router = inject(Router);
+  msgSuccess = null;
+
+  ngOnInit(): void {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        const navigationState = this.router.getCurrentNavigation()?.extras.state;
+        this.msgSuccess = navigationState?.['msgSuccess'] || null;
+      }
+    })
+  }
+
 }

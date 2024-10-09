@@ -1,0 +1,13 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Add Product</h1>
+  <div>
+    <a routerLink="/administration/courses" class="btn btn-secondary">Back to list</a>
+  </div>
+</div>
+
+<form [formGroup]="addForm" (ngSubmit)="handleSubmit()">
+  <app-input-row [group]="addForm" field="title" label="Title" />
+  <app-input-row [group]="addForm" rowType="textarea" field="description" label="Description" />
+  <app-input-row [group]="addForm" rowType="radio" field="language" label="Language" [options]="languagesMap"/>
+  <input type="submit" value="Add Course" class="btn btn-primary mt-4" />
+</form>
