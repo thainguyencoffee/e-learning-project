@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -117,6 +118,53 @@ class LmsApplicationTests {
         assertThat(userToken.accessToken).isNotNull();
         assertThat(teacherToken.accessToken).isNotNull();
         assertThat(bossToken.accessToken).isNotNull();
+    }
+
+    @Test
+    void givenRequestIsAnonymous_whenGetLiveness_thenOk() throws Exception {
+        webTestClient.get().uri("/actuator/health/liveness")
+                .exchange()
+                .expectStatus()
+                .isOk();
+    }
+
+    @Test
+    void givenRequestIsAnonymous_whenGetReadiness_thenOk() throws Exception {
+        webTestClient.get().uri("/actuator/health/readiness")
+                .exchange()
+                .expectStatus()
+                .isOk();
+    }
+
+    @Test
+    void testMeWhenUnauthenticated() {
+        webTestClient.get().uri("/me")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.username")
+                .isEqualTo("")
+                .jsonPath("$.email")
+                .isEqualTo("")
+                .jsonPath("$.roles")
+                .isEmpty()
+                .jsonPath("$.exp")
+                .doesNotExist();
+    }
+
+    @Test
+    void testMeWhenAuthenticated() {
+        webTestClient.get().uri("/me")
+                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.username")
+                .isEqualTo(extractClaimFromToken(userToken.getAccessToken(), "sub"))
+                .jsonPath("$.email")
+                .isEqualTo(extractClaimFromToken(userToken.getAccessToken(), "email"))
+                .jsonPath("$.roles")
+                .isArray();
     }
 
     @Test
@@ -1602,6 +1650,23 @@ class LmsApplicationTests {
         try {
             Map<String, Object> claims = mapper.readValue(payload, Map.class);
             return claims.get(claimName).toString();  // Trả về giá trị của claim "sub"
+        } catch (IOException e) {
+            throw new RuntimeException("Error decoding JWT", e);
+        }
+    }
+
+    private List<String> extractClaimToListFromToken(String token, String claimName) {
+        // Sử dụng thư viện JWT hoặc Base64 để giải nén thông tin từ token
+        // Bạn có thể dùng các thư viện như Nimbus JWT hoặc Java JWT (jjwt)
+        String[] chunks = token.split("\\.");
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+
+        String payload = new String(decoder.decode(chunks[1]));
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            Map<String, Object> claims = mapper.readValue(payload, Map.class);
+            return (List<String>) claims.get(claimName);  // Trả về giá trị của claim "sub"
         } catch (IOException e) {
             throw new RuntimeException("Error decoding JWT", e);
         }
