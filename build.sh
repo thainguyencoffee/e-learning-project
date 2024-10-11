@@ -84,11 +84,8 @@ cd ..
 cd nginx-reverse-proxy/
 rm nginx.conf
 
-WLAN_IP=$(ip addr show wlo1 | grep 'inet ' | awk '{print $2}' | cut -d'/' -f1)
-
 if $WITHOUT_ANGULAR; then
-  cp ../nginx-cors.conf ./nginx.conf
-  $SED "s/WLAN_IP/$WLAN_IP/g" nginx.conf
+  cp ../nginx-local.conf ./nginx.conf
 else
   cp ../nginx.conf ./
 fi
@@ -121,5 +118,6 @@ echo "Please use the url below to access angular:"
 echo http://${host}:7080/angular-ui/
 if $WITHOUT_ANGULAR; then
   cd angular-ui/
-  ng serve --host $WLAN_IP --port 4200
+  npm i
+  ng serve --host 0.0.0.0 --port 4200
 fi
