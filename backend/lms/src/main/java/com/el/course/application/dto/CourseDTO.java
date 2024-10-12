@@ -14,10 +14,10 @@ public record CourseDTO (
         @Size(max = 2000, message = "Description is too long")
         String description,
         String thumbnailUrl,
-        @EachItemStringMaxSize(max = 255, message = "Benefit is too long")
+        @EachItemStringMaxSize(max = 255)
         Set<String> benefits,
         Language language,
-        @EachItemStringMaxSize(max = 255, message = "Prerequisite is too long")
+        @EachItemStringMaxSize(max = 255)
         Set<String> prerequisites,
         Set<Language> subtitles
 ) {

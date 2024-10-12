@@ -12,9 +12,10 @@ import java.lang.annotation.Target;
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EachItemStringMaxSize {
-    String message() default "Each benefit must be at most {max} characters long";
+    String message() default "Each benefit must be at most {max} characters long and at least {min} characters";
 
-    int max() default 500;  // Giá trị mặc định là 500 ký tự
+    int max() default 500;
+    int min() default 25;
 
     Class<?>[] groups() default {};
 

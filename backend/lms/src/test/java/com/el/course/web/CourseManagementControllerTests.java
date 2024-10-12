@@ -68,7 +68,7 @@ class CourseManagementControllerTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/image.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -269,7 +269,13 @@ class CourseManagementControllerTests {
     void testUpdateInfoCourse_ShouldReturnBadRequest_WhenCourseIsPublished() throws Exception {
         // Giả lập hành vi của UpdateCourseUseCase ném ra InputInvalidException
         Mockito.doThrow(new InputInvalidException("Cannot update a published course."))
-                .when(courseService).updateCourse(1L, new CourseUpdateDTO("Java Programming", "Learn Java from scratch", "http://example.com/image.jpg", Set.of("OOP", "Concurrency"), Set.of("Basic Programming Knowledge"), Set.of(Language.ENGLISH, Language.SPANISH)));
+                .when(courseService).updateCourse(1L, new CourseUpdateDTO(
+                        "Java Programming",
+                        "Learn Java from scratch",
+                        "http://example.com/image.jpg",
+                        Set.of("Be a master OOP Java Programming"),
+                        Set.of("Basic Programming Knowledge"),
+                        Set.of(Language.ENGLISH, Language.SPANISH)));
 
         // Thực thi HTTP PUT request với JWT
         mockMvc.perform(put("/courses/1")
