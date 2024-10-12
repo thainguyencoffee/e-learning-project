@@ -25,7 +25,7 @@ export class ErrorHandler {
       if (!errorsMap[fieldName]) {
         errorsMap[fieldName] = {}
       }
-      let errorMessage = getGlobalErrorMessage(fieldError.code) || fieldError.code;
+      let errorMessage = getGlobalErrorMessage(fieldError.code) || fieldError.message;
       if (getMessage) {
         errorMessage = getMessage(fieldError.property + '.' + fieldError.code) ||
           getMessage(fieldError.code) || errorMessage;
@@ -45,7 +45,7 @@ export function getGlobalErrorMessage(key: string, details?: any) {
     maxlength: 'Your value must have a length of less then ${details?.requiredLength} characters.',
     validDouble: 'Please provide a valid floating point number.',
     REQUIRED_NOT_NULL: 'Please provide a value.',
-    REQUIRED_NOT_BLANK: 'Please provide a value.'
+    REQUIRED_NOT_BLANK: 'Please provide a value.',
   }
   return globalErrorMessage[key];
 }

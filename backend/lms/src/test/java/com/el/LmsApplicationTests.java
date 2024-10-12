@@ -174,7 +174,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -292,7 +292,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -304,8 +304,8 @@ class LmsApplicationTests {
                 "Advanced Java Programming",  // Cập nhật title mới
                 "Learn advanced Java programming",  // Cập nhật description mới
                 "http://example.com/new-thumbnail.jpg",  // Cập nhật thumbnail mới
-                Set.of("OOP", "Concurrency", "Multithreading"),  // Cập nhật benefits
-                Set.of("Basic Programming", "Java SE"),  // Cập nhật prerequisites
+                Set.of("Be a master OOP Java Programming"),
+                Set.of("Be a master OOP Java Programming"),  // Cập nhật prerequisites
                 Set.of(Language.ENGLISH, Language.GERMAN)  // Cập nhật subtitles
         );
 
@@ -408,8 +408,8 @@ class LmsApplicationTests {
                 "Advanced Java Programming",  // Cập nhật title mới
                 "Learn advanced Java programming",  // Cập nhật description mới
                 "http://example.com/new-thumbnail.jpg",  // Cập nhật thumbnail mới
-                Set.of("OOP", "Concurrency", "Multithreading"),  // Cập nhật benefits
-                Set.of("Basic Programming", "Java SE"),  // Cập nhật prerequisites
+                Set.of("Be a master OOP Java Programming"),
+                Set.of("Be a master OOP Java Programming"),  // Cập nhật prerequisites
                 Set.of(Language.ENGLISH, Language.GERMAN)  // Cập nhật subtitles
         );
 
@@ -429,8 +429,8 @@ class LmsApplicationTests {
                 "",  // Cập nhật title mới
                 "Learn advanced Java programming",  // Cập nhật description mới
                 "http://example.com/new-thumbnail.jpg",  // Cập nhật thumbnail mới
-                Set.of("OOP", "Concurrency", "Multithreading"),  // Cập nhật benefits
-                Set.of("Basic Programming", "Java SE"),  // Cập nhật prerequisites
+                Set.of("Be a master OOP Java Programming"),
+                Set.of("Be a master OOP Java Programming prerequisite"),
                 Set.of(Language.ENGLISH, Language.GERMAN)  // Cập nhật subtitles
         );
 
@@ -449,7 +449,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -473,7 +473,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -498,7 +498,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -531,7 +531,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -579,7 +579,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -634,7 +634,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -670,7 +670,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -699,7 +699,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -737,7 +737,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -773,7 +773,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -805,7 +805,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -837,7 +837,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -869,7 +869,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -937,7 +937,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -970,7 +970,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -1016,7 +1016,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -1053,7 +1053,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -1082,7 +1082,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -1118,7 +1118,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -1149,7 +1149,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -1180,7 +1180,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -1232,7 +1232,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -1264,7 +1264,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -1295,7 +1295,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -1348,7 +1348,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -1376,7 +1376,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -1421,7 +1421,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -1477,7 +1477,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -1510,7 +1510,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
@@ -1545,7 +1545,7 @@ class LmsApplicationTests {
                 "Java Programming",
                 "Learn Java from scratch",
                 "http://example.com/thumbnail.jpg",
-                Set.of("OOP", "Concurrency"),
+                Set.of("Be a master OOP Java Programming"),
                 Language.ENGLISH,
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)

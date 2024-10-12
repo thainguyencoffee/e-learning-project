@@ -57,8 +57,18 @@
       } @else if (rowType === 'imageFile') {
         <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}" />
         <img [src]="previewImageUrl" alt="Image preview" class="img-thumbnail mt-2" style="max-height: 200px;" />
+      } @else if (rowType === 'formArray') {
+
+        <ng-container [formArrayName]="field">
+          <div *ngFor="let _ of formArray.controls; index as i">
+            <input type="text" [formControlName]="i">
+            <button type="button" (click)="removeItem(i)">Remove</button>
+          </div>
+          <button type="button" (click)="addItem()">Add {{ label }}</button>
+        </ng-container>
       }
       <app-input-errors [control]="control" />
     </div>
+
   }
 </div>
