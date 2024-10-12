@@ -5,6 +5,7 @@ import {ListCourseComponent} from "./administration/courses/page/list-course/lis
 import {AddCourseComponent} from "./administration/courses/page/add-course/add-course.component";
 import {ErrorComponent} from "./error/error.component";
 import {EditCourseComponent} from "./administration/courses/page/edit-course/edit-course.component";
+import {CourseDetailComponent} from "./administration/courses/page/course-detail/course-detail.component";
 
 export const routes: Routes = [
   {
@@ -28,6 +29,11 @@ export const routes: Routes = [
         component: AddCourseComponent
       },
       {
+        title: 'Course detail management center!',
+        path: 'courses/:id',
+        component: CourseDetailComponent
+      },
+      {
         title: 'Edit course',
         path: 'courses/edit/:id',
         component: EditCourseComponent
@@ -39,4 +45,9 @@ export const routes: Routes = [
     component: ErrorComponent,
     title: 'Error page'
   },
+  {
+    path: '**',
+    component: ErrorComponent,
+    title: 'Page not found',
+  }
 ];
