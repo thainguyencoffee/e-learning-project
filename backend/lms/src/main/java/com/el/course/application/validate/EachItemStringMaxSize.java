@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EachItemStringMaxSize {
-    String message() default "Each benefit must be at most {max} characters long and at least {min} characters";
+    String message() default "Each item must be at most {max} characters long and at least {min} characters";
 
     int max() default 500;
     int min() default 25;

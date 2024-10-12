@@ -1,18 +1,25 @@
-import { KeyValuePipe } from '@angular/common';
-import {Component, HostListener, inject, Input, OnChanges, OnDestroy, OnInit} from '@angular/core';
-import { AbstractControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {KeyValuePipe, NgForOf} from '@angular/common';
+import {Component, HostListener, inject, Input, OnChanges, OnInit} from '@angular/core';
+import {
+  AbstractControl,
+  FormArray,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 import {InputErrorsComponent} from "./input-errors.component";
 import {UploadService} from "../upload/upload.service";
 import {ErrorHandler} from "../error-handler.injectable";
-import {error} from "@angular/compiler-cli/src/transformers/util";
-import {NavigationStart, Router} from "@angular/router";
+import {Router} from "@angular/router";
 
 
 @Component({
   selector: 'app-input-row',
   standalone: true,
   templateUrl: './input-row.component.html',
-  imports: [ReactiveFormsModule, InputErrorsComponent, KeyValuePipe]
+  imports: [ReactiveFormsModule, InputErrorsComponent, KeyValuePipe, FormsModule, NgForOf]
 })
 export class InputRowComponent implements OnChanges, OnInit{
 
@@ -56,6 +63,14 @@ export class InputRowComponent implements OnChanges, OnInit{
       this.optionsMap = this.options;
     } else {
       this.optionsMap = new Map(Object.entries(this.options));
+    }
+  }
+
+  // thống nhất dữ liệu
+  @HostListener('input', ['$event.target'])
+  onEvent(target: HTMLInputElement) {
+    if (target.value === '') {
+      this.control!.setValue(null);
     }
   }
 
@@ -103,6 +118,18 @@ export class InputRowComponent implements OnChanges, OnInit{
       })
     }
 
+  }
+
+  get formArray(): FormArray {
+    return this.group?.get(this.field) as FormArray;
+  }
+
+  addItem() {
+    this.formArray.push(new FormControl(''))
+  }
+
+  removeItem(i: number) {
+    this.formArray.removeAt(i);
   }
 
 }

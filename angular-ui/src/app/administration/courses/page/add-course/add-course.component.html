@@ -1,5 +1,5 @@
 <div class="d-flex flex-wrap mb-4">
-  <h1 class="flex-grow-1">Add Product</h1>
+  <h1 class="flex-grow-1">Initialize Course</h1>
   <div>
     <a routerLink="/administration/courses" class="btn btn-secondary">Back to list</a>
   </div>
@@ -10,5 +10,8 @@
   <app-input-row [group]="addForm" field="thumbnailUrl" label="Thumbnail" rowType="imageFile"/>
   <app-input-row [group]="addForm" rowType="textarea" field="description" label="Description" />
   <app-input-row [group]="addForm" rowType="radio" field="language" label="Language" [options]="languagesMap"/>
+  <app-input-row [group]="addForm" rowType="formArray" field="benefits" label="Benefits" />
+  <app-input-row [group]="addForm" rowType="formArray" field="prerequisites" label="Prerequisites"/>
+  <app-input-row [group]="addForm" rowType="multiselect" field="subtitles" label="Subtitles" [options]="languagesMap"/>
   <input type="submit" value="Add Course" class="btn btn-primary mt-4" />
 </form>

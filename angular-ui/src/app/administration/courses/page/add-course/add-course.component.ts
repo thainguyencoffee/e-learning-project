@@ -1,6 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {CourseService} from "../../service/course.service";
-import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {AddCourseDto} from "../../model/add-course.dto";
 import {Router, RouterLink} from "@angular/router";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
@@ -31,17 +31,19 @@ export class AddCourseComponent {
 
   languagesMap: Record<string, string> = {
     VIETNAMESE: 'Vietnamese',
-    ENGLISH: 'English'
+    ENGLISH: 'English',
+    FRENCH: 'French',
+    SPANISH: 'Spanish'
   }
 
   addForm = new FormGroup({
     title: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
     description: new FormControl(null, [Validators.maxLength(2000)]),
     thumbnailUrl: new FormControl(null),
-    benefits: new FormControl([]),
+    benefits: new FormArray([], []),
     language: new FormControl(null, [Validators.required]),
-    prerequisites: new FormControl([]),
-    subtitles: new FormControl(null)
+    prerequisites: new FormArray([], []),
+    subtitles: new FormControl([])
   }, { updateOn: 'submit' });
 
   handleSubmit() {
