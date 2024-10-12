@@ -4,6 +4,7 @@ import {DashboardComponent} from "./administration/dashboard/dashboard.component
 import {ListCourseComponent} from "./administration/courses/page/list-course/list-course.component";
 import {AddCourseComponent} from "./administration/courses/page/add-course/add-course.component";
 import {ErrorComponent} from "./error/error.component";
+import {EditCourseComponent} from "./administration/courses/page/edit-course/edit-course.component";
 
 export const routes: Routes = [
   {
@@ -25,6 +26,11 @@ export const routes: Routes = [
         title: "Create new course",
         path: 'courses/add',
         component: AddCourseComponent
+      },
+      {
+        title: 'Edit course',
+        path: 'courses/edit/:id',
+        component: EditCourseComponent
       }
     ]
   },

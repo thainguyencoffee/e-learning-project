@@ -18,8 +18,9 @@ export class UploadService {
     return this.http.post<ObjectUrl>('/bff/api/upload', formData);
   }
 
-  delete(encodedUrl: string) {
-    return this.http.delete<void>(`/bff/api/upload/${encodedUrl}`);
+  delete(ImageUrl: string) {
+    const base64EncodedUrl = btoa(ImageUrl);
+    return this.http.delete<void>(`/bff/api/upload/${base64EncodedUrl}`);
   }
 
 }

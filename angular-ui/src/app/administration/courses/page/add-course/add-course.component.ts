@@ -55,8 +55,6 @@ export class AddCourseComponent {
 
     const data = new AddCourseDto(this.addForm.value);
 
-    console.log(data)
-
     this.courseService.createCourse(data).subscribe({
       next:() => this.router.navigate(['/administration/courses'], {
         state: {

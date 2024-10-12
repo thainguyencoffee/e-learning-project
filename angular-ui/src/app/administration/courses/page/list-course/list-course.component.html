@@ -17,6 +17,7 @@
         <th scope="col">Language</th>
         <th scope="col">Thumbnail</th>
         <th scope="col">Published</th>
+        <th><!-- --></th>
       </tr>
       </thead>
       <tbody>
@@ -33,6 +34,12 @@
               }
             </td>
             <td>{{course.published}}</td>
+            <td>
+              <div class="float-end text-nowrap">
+                <a [routerLink]="['/administration/courses/edit', course.id]" class="btn btn-sm btn-info mx-2">Edit</a>
+                <button type="button" (click)="confirmDelete(course.id!, course.thumbnailUrl)" class="btn btn-sm btn-secondary">Delete</button>
+              </div>
+            </td>
           </tr>
         }
       </tbody>

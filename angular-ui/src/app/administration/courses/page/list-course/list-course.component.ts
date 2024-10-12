@@ -27,6 +27,14 @@ export class ListCourseComponent implements OnInit, OnDestroy{
   courses?: CourseDto[];
   navigationSubscription?: Subscription;
 
+  getMessage(key: string, details?: any) {
+    const messages: Record<string, string> = {
+      confirm: 'Do you really want to delete this element?',
+      deleted: 'Course was removed successfully.'
+    }
+    return messages[key];
+  }
+
   ngOnInit(): void {
     this.loadData();
     this.navigationSubscription = this.router.events.subscribe((event) => {
@@ -46,6 +54,22 @@ export class ListCourseComponent implements OnInit, OnDestroy{
         next: (data) => this.courses = data,
         error: (error) => this.errorHandler.handleServerError(error.error)
       });
+  }
+
+  confirmDelete(id: number, thumbnailUrl?: string) {
+    if (confirm(this.getMessage('confirm'))) {
+      this.courseService.deleteCourse(id, thumbnailUrl)
+        .subscribe({
+          next: () => this.router.navigate(['/administration/courses'], {
+            state: {
+              msgInfo: this.getMessage('deleted')
+            }
+          }),
+          error: (error) => this.errorHandler.handleServerError(error.error)
+        });
+
+    }
+
   }
 
 }

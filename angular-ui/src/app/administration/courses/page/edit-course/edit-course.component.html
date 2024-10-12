@@ -1,0 +1,17 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Edit Course</h1>
+  <div>
+    <a routerLink="/administration/courses" class="btn btn-secondary">Back to list</a>
+  </div>
+</div>
+
+<form [formGroup]="editForm" (ngSubmit)="handleSubmit()">
+  <app-input-row [group]="editForm" field="id" rowType="number" label="Id"/>
+  <app-input-row [group]="editForm" field="title" label="Title" />
+  <app-input-row [group]="editForm" field="thumbnailUrl" label="Thumbnail" rowType="imageFile"/>
+  <app-input-row [group]="editForm" rowType="textarea" field="description" label="Description" />
+  <app-input-row [group]="editForm" rowType="formArray" field="benefits" label="Benefits" />
+  <app-input-row [group]="editForm" rowType="formArray" field="prerequisites" label="Prerequisites"/>
+  <app-input-row [group]="editForm" rowType="multiselect" field="subtitles" label="Subtitles" [options]="languagesMap"/>
+  <input type="submit" value="Edit Course" class="btn btn-primary mt-4" />
+</form>
