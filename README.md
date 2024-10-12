@@ -1,4 +1,11 @@
-# E-Learning Project
+```bash
+ _____ _                       _           _
+| ____| |      _ __  _ __ ___ (_) ___  ___| |_
+|  _| | |     | '_ \| '__/ _ \| |/ _ \/ __| __|
+| |___| |___  | |_) | | | (_) | |  __/ (__| |_ _
+|_____|_____| | .__/|_|  \___// |\___|\___|\__(_)
+              |_|           |__/
+```
 
 [![Backend CI with Gradle](https://github.com/thainguyencoffee/e-learning-project/actions/workflows/commit-stage.yaml/badge.svg)](https://github.com/thainguyencoffee/e-l/actions/workflows/commit-stage.yaml)
 
