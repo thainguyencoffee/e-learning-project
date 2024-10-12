@@ -55,6 +55,14 @@ export class InputRowComponent implements OnChanges, OnInit{
     this.control = this.group!.get(this.field)!;
     if (this.rowType === 'imageFile') {
       this.previewImageUrl = 'https://placehold.co/400'
+      this.control.valueChanges.subscribe(value => {
+        if (value) {
+          this.previewImageUrl = value
+          this.previousImageUrl = value
+        } else {
+          this.previewImageUrl = 'https://placehold.co/400'
+        }
+      })
     }
   }
 
@@ -96,7 +104,6 @@ export class InputRowComponent implements OnChanges, OnInit{
 
     this.uploadService.upload(file).subscribe({
       next: response => {
-        console.log(`File ${response.url} uploaded successfully`);
         this.control?.setValue(response.url);
         this.previewImageUrl = response.url;
         this.previousImageUrl = response.url;
@@ -108,10 +115,8 @@ export class InputRowComponent implements OnChanges, OnInit{
 
   deletePreviousFile() {
     if (this.previousImageUrl) {
-      const base64EncodedUrl = btoa(this.previousImageUrl);
-      this.uploadService.delete(base64EncodedUrl).subscribe({
+      this.uploadService.delete(this.previousImageUrl).subscribe({
         next: () => {
-          console.log(`File ${this.previousImageUrl} deleted successfully`);
           this.previousImageUrl = null;
         },
         error: error => this.errorHandler.handleServerError(error, this.group)

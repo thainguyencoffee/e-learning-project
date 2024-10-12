@@ -16,12 +16,14 @@ export class AppComponent implements OnInit {
 
   router = inject(Router);
   msgSuccess = null;
+  msgInfo = null;
 
   ngOnInit(): void {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         const navigationState = this.router.getCurrentNavigation()?.extras.state;
         this.msgSuccess = navigationState?.['msgSuccess'] || null;
+        this.msgInfo = navigationState?.['msgInfo'] || null;
       }
     })
   }
