@@ -1,10 +1,11 @@
 import {inject, Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
-import {map, Observable, switchMap} from "rxjs";
+import {Observable, switchMap} from "rxjs";
 import {CourseDto} from "../model/course.dto";
 import {AddCourseDto} from "../model/add-course.dto";
 import {UploadService} from "../../../common/upload/upload.service";
 import {EditCourseDto} from "../model/edit-course.dto";
+import {PageWrapper} from "../model/page-wrapper";
 
 @Injectable(
   {providedIn: 'root'}
@@ -16,9 +17,9 @@ export class CourseService {
 
   resourcePath = '/bff/api/courses'
 
-  getAllCourses(): Observable<CourseDto[]> {
-    return this.http.get<{content: CourseDto[]}>(this.resourcePath)
-      .pipe(map(response => response.content))
+  getAllCourses(pageNumber: number = 0, pageSize: number = 10): Observable<PageWrapper> {
+    const url = `${this.resourcePath}?page=${pageNumber}&size=${pageSize}`;
+    return this.http.get<PageWrapper>(url)
   }
 
   getCourse(id: number): Observable<CourseDto> {

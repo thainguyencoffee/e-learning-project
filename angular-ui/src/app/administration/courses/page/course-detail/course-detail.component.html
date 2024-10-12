@@ -1,0 +1,94 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Course Detail Center!</h1>
+  <div>
+    <a routerLink="/administration/courses" class="btn btn-secondary">Back to list</a>
+  </div>
+</div>
+
+<div class="container-fluid" *ngIf="courseDto">
+  <!-- Basic Info Section -->
+  <section id="basic" class="pt-3">
+    <h2>Basic information</h2>
+    <!-- Title -->
+    <h5>Title: {{ courseDto?.title ? courseDto.title : 'No title available' }}</h5>
+
+    <!-- Image -->
+    <img [src]="courseDto?.thumbnailUrl ? courseDto?.thumbnailUrl : 'https://placehold.jp/200x200.png'"
+         class="img-thumbnail mb-2" alt="Course Thumbnail"
+         style="max-height: 200px;">
+
+    <!-- Description -->
+    <p class="d-block">
+      Description: {{ courseDto?.description ? courseDto.description : 'No description available' }}</p>
+
+    <!-- Language -->
+    <p class="d-block">Language:
+      <span class="fw-bold">{{ courseDto?.language ? courseDto.language : 'Language not specified' }}</span>
+    </p>
+
+    <!-- Price and Discounted Price -->
+    <p>Price: {{ courseDto?.price ? courseDto.price : 'Price not available' }}</p>
+    <p>Discounted Price: {{ courseDto?.discountedPrice ? courseDto.discountedPrice : 'No discount available' }}</p>
+
+    <!-- Published Status -->
+    <p [class]="courseDto.published ? 'badge bg-success' : 'badge bg-primary'">
+      Status: {{ courseDto?.published ? 'Published' : 'Not published' }}</p>
+
+    <!--Subtitles-->
+    <div id="subtitles">
+      <h5>Subtitles</h5>
+      <ul>
+        <li *ngFor="let subtitle of courseDto?.subtitles">
+          <span class="fw-bold">{{ subtitle }}</span>
+        </li>
+        <li *ngIf="courseDto?.subtitles?.length === 0">
+              <span class="badge bg-dark">
+                No subtitles available
+              </span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Benefits -->
+    <div id="benefits">
+      <h5>Benefits</h5>
+      <ul>
+        <li *ngFor="let benefit of courseDto?.benefits">
+          <span class="fw-bold">{{ benefit }}</span>
+        </li>
+        <li *ngIf="courseDto?.benefits?.length === 0">
+              <span class="badge bg-dark">
+                No benefits available
+              </span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Prerequisites -->
+    <div id="prerequisites">
+      <h5>Prerequisites</h5>
+      <ul>
+        <li *ngFor="let prerequisite of courseDto?.prerequisites">
+          {{ prerequisite }}
+        </li>
+        <li *ngIf="courseDto?.prerequisites?.length === 0">
+              <span class="badge bg-dark">
+                No prerequisites available
+              </span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Accessibility Section -->
+  <section id="accessibility" class="pt-3">
+    <h2>Accessibility</h2>
+    <p>Created by: {{ courseDto?.createdBy }}</p>
+    <p>Created date: {{ courseDto?.createdDate }}</p>
+    <p>Last modified by: {{ courseDto?.lastModifiedBy }}</p>
+    <p>Last modified date: {{ courseDto?.lastModifiedDate }}</p>
+  </section>
+
+
+
+</div>

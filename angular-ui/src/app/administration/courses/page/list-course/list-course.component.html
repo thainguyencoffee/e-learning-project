@@ -36,6 +36,7 @@
             <td>{{course.published}}</td>
             <td>
               <div class="float-end text-nowrap">
+                <a [routerLink]="['/administration/courses/', course.id]">View</a>
                 <a [routerLink]="['/administration/courses/edit', course.id]" class="btn btn-sm btn-info mx-2">Edit</a>
                 <button type="button" (click)="confirmDelete(course.id!, course.thumbnailUrl)" class="btn btn-sm btn-secondary">Delete</button>
               </div>
@@ -44,5 +45,20 @@
         }
       </tbody>
     </table>
+
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        <li class="page-item" [class.disabled]="number === 0">
+          <button class="page-link" (click)="onPageChange(number - 1)">Previous</button>
+        </li>
+        <li class="page-item" *ngFor="let page of getPageRange()" [class.active]="page === number">
+          <button class="page-link" (click)="onPageChange(page)">{{ page + 1 }}</button>
+        </li>
+        <li class="page-item" [class.disabled]="number === totalPages - 1">
+          <button class="page-link" (click)="onPageChange(number + 1)">Next</button>
+        </li>
+      </ul>
+    </nav>
+
   </div>
 }
