@@ -2,7 +2,9 @@ package com.el.awss3.infrastructure;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.el.awss3.application.AmazonS3Service;
 import com.el.awss3.application.AmazonServiceS3Exception;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +35,11 @@ class AmazonS3ServiceImpl implements AmazonS3Service {
         String uniqueFileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         var objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(file.getSize());
+        objectMetadata.setContentType(file.getContentType());
         try {
-            amazonS3.putObject(bucketName, uniqueFileName, file.getInputStream(), objectMetadata);
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, uniqueFileName, file.getInputStream(), objectMetadata);
+            putObjectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
+            amazonS3.putObject(putObjectRequest);
             log.info("Upload media for " + uniqueFileName + " successfully.");
         } catch (IOException | AmazonClientException e) {
             log.error("Upload media for " + uniqueFileName + " failed.");
