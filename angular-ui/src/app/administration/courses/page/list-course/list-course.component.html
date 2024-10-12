@@ -27,7 +27,9 @@
             <td>{{course.language}}</td>
             <td>
               @if(course.thumbnailUrl) {
-                <img [ngSrc]="course.thumbnailUrl" alt="" fill>
+                <a href="{{course.thumbnailUrl}}">
+                  <img [src]="course.thumbnailUrl" class="img-fluid" alt="Thumbnail" style="max-width: 40px;">
+                </a>
               }
             </td>
             <td>{{course.published}}</td>

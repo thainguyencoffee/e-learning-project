@@ -2,6 +2,8 @@ package com.el.awss3.infrastructure;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.el.awss3.application.AmazonServiceS3Exception;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +53,8 @@ class AmazonS3ServiceTests {
         MultipartFile file = Mockito.mock(MultipartFile.class);
         String fileName = "test.txt";
         byte[] content = "Hello, World!".getBytes();
+
+        // Mock các thuộc tính của MultipartFile
         when(file.getOriginalFilename()).thenReturn(fileName);
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(content));
         when(file.getSize()).thenReturn((long) content.length);
@@ -64,10 +68,16 @@ class AmazonS3ServiceTests {
         String fileUrl = amazonS3Service.uploadFile(file);
 
         // Assert
-        // Kiểm tra rằng putObject được gọi với bất kỳ tên tệp nào
-        verify(amazonS3).putObject(any(), any(), any(), any());
+        // Kiểm tra rằng phương thức putObject được gọi đúng cách
+        verify(amazonS3).putObject(any(PutObjectRequest.class));
+
         // Kiểm tra rằng URL trả về khớp với URL mong đợi
         Assertions.assertThat(fileUrl).isEqualTo(expectedUrl);
+
+        // Kiểm tra ACL (Access Control List) của tệp đã được đặt thành public-read
+        verify(amazonS3).putObject(argThat((PutObjectRequest req) ->
+                req.getCannedAcl().equals(CannedAccessControlList.PublicRead)
+        ));
     }
 
     @Test
@@ -81,7 +91,7 @@ class AmazonS3ServiceTests {
         when(file.getSize()).thenReturn((long) content.length);
 
         // Mock phương thức putObject để ném ra ngoại lệ
-        when(amazonS3.putObject(any(), any(), any(), any()))
+        when(amazonS3.putObject(any(PutObjectRequest.class)))
                 .thenThrow(new AmazonServiceS3Exception("Upload media failed."));
 
         // Assert

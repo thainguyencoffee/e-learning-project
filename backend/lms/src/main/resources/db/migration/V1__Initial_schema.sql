@@ -10,7 +10,7 @@ create table course
 (
     id                 bigserial   not null,
     title              varchar(50),
-    thumbnail_url      varchar(50),
+    thumbnail_url      varchar(500),
     published          boolean     not null,
     description        varchar(2000),
     price              varchar(50),
@@ -61,11 +61,11 @@ create table quiz
 
 create table question
 (
-    id      bigserial      not null,
-    prompt  varchar(255)   not null,
+    id      bigserial    not null,
+    prompt  varchar(255) not null,
     options varchar(255)[] not null,
-    correct int            not null,
-    quiz    bigint         not null references quiz (id) on DELETE cascade,
+    correct int          not null,
+    quiz    bigint       not null references quiz (id) on DELETE cascade,
     constraint fk_question primary key (id)
 );
 
@@ -119,13 +119,14 @@ create table order_items
     constraint fk_order_item primary key (id)
 );
 
-create table payment (
-    id  uuid DEFAULT gen_random_uuid() not null,
-    order_id uuid not null,
-    amount varchar(50) not null,
-    payment_date timestamp,
-    payment_method varchar(50) not null,
-    status varchar(50) not null,
+create table payment
+(
+    id             uuid DEFAULT gen_random_uuid() not null,
+    order_id       uuid                           not null,
+    amount         varchar(50)                    not null,
+    payment_date   timestamp,
+    payment_method varchar(50)                    not null,
+    status         varchar(50)                    not null,
     transaction_id varchar(50),
     constraint fk_payment primary key (id)
 );

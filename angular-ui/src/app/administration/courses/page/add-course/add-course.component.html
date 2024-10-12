@@ -7,6 +7,7 @@
 
 <form [formGroup]="addForm" (ngSubmit)="handleSubmit()">
   <app-input-row [group]="addForm" field="title" label="Title" />
+  <app-input-row [group]="addForm" field="thumbnailUrl" label="Thumbnail" rowType="imageFile"/>
   <app-input-row [group]="addForm" rowType="textarea" field="description" label="Description" />
   <app-input-row [group]="addForm" rowType="radio" field="language" label="Language" [options]="languagesMap"/>
   <input type="submit" value="Add Course" class="btn btn-primary mt-4" />

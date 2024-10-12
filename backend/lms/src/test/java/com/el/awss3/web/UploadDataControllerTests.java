@@ -4,8 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.el.awss3.application.AmazonS3Service;
 import com.el.awss3.application.AmazonServiceS3Exception;
@@ -60,7 +59,7 @@ class UploadDataControllerTests {
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .with(SecurityMockMvcRequestPostProcessors.jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
                 .andExpect(status().isCreated())
-                .andExpect(content().string(url));
+                .andExpect(jsonPath("$.url").value(url));
     }
 
     @Test
@@ -82,7 +81,7 @@ class UploadDataControllerTests {
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .with(SecurityMockMvcRequestPostProcessors.jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
                 .andExpect(status().isCreated())
-                .andExpect(content().string(url));
+                .andExpect(jsonPath("$.url").value(url));
     }
 
     @Test

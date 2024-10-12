@@ -21,11 +21,11 @@ public class UploadDataController {
     private final AmazonS3Service amazonS3Service;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> upload(@RequestPart
+    public ResponseEntity<ObjectUrl> upload(@RequestPart
                                          @NotNull(message = "File to upload is required.") MultipartFile file) {
         log.info("Uploading file: {}", file.getOriginalFilename());
         String fileUrl = amazonS3Service.uploadFile(file);
-        return new ResponseEntity<>(fileUrl, HttpStatus.CREATED);
+        return new ResponseEntity<>(new ObjectUrl(fileUrl), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{urlEncode}")
@@ -35,5 +35,9 @@ public class UploadDataController {
         amazonS3Service.deleteFile(url);
         return ResponseEntity.noContent().build();
     }
+
+    record ObjectUrl(
+            String url
+    ) {}
 
 }
