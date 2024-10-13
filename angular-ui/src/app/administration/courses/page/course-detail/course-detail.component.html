@@ -10,29 +10,29 @@
   <section id="basic" class="pt-3">
     <h2>Basic information</h2>
     <!-- Title -->
-    <h5>Title: {{ courseDto?.title ? courseDto.title : 'No title available' }}</h5>
+    <h5>Title: {{ courseDto.title }}</h5>
 
     <!-- Image -->
-    <img [src]="courseDto?.thumbnailUrl ? courseDto?.thumbnailUrl : 'https://placehold.jp/200x200.png'"
+    <img [src]="courseDto.thumbnailUrl || 'https://placehold.jp/200x200.png'"
          class="img-thumbnail mb-2" alt="Course Thumbnail"
          style="max-height: 200px;">
 
     <!-- Description -->
     <p class="d-block">
-      Description: {{ courseDto?.description ? courseDto.description : 'No description available' }}</p>
+      Description: {{ courseDto.description || 'No description available' }}</p>
 
     <!-- Language -->
     <p class="d-block">Language:
-      <span class="fw-bold">{{ courseDto?.language ? courseDto.language : 'Language not specified' }}</span>
+      <span class="fw-bold">{{ courseDto.language }}</span>
     </p>
 
     <!-- Price and Discounted Price -->
-    <p>Price: {{ courseDto?.price ? courseDto.price : 'Price not available' }}</p>
-    <p>Discounted Price: {{ courseDto?.discountedPrice ? courseDto.discountedPrice : 'No discount available' }}</p>
+    <p>Price: {{ courseDto.price || 'Price not available' }}</p>
+    <p>Discounted Price: {{ courseDto.discountedPrice || 'No discount available' }}</p>
 
     <!-- Published Status -->
     <p [class]="courseDto.published ? 'badge bg-success' : 'badge bg-primary'">
-      Status: {{ courseDto?.published ? 'Published' : 'Not published' }}</p>
+      Status: {{ courseDto.published ? 'Published' : 'Not published' }}</p>
 
     <!--Subtitles-->
     <div id="subtitles">
@@ -83,12 +83,10 @@
   <!-- Accessibility Section -->
   <section id="accessibility" class="pt-3">
     <h2>Accessibility</h2>
-    <p>Created by: {{ courseDto?.createdBy }}</p>
-    <p>Created date: {{ courseDto?.createdDate }}</p>
-    <p>Last modified by: {{ courseDto?.lastModifiedBy }}</p>
-    <p>Last modified date: {{ courseDto?.lastModifiedDate }}</p>
+    <p>Created by: {{ courseDto.createdBy }}</p>
+    <p>Created date: {{ courseDto.createdDate }}</p>
+    <p>Last modified by: {{ courseDto.lastModifiedBy }}</p>
+    <p>Last modified date: {{ courseDto.lastModifiedDate }}</p>
   </section>
-
-
 
 </div>
