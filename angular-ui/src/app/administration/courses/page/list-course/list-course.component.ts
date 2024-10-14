@@ -1,6 +1,6 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {CourseService} from "../../service/course.service";
-import {CourseDto} from "../../model/course.dto";
+import {Course} from "../../model/view/course";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
 import {NavigationEnd, Router, RouterLink} from "@angular/router";
 import {Subscription} from "rxjs";
@@ -25,7 +25,7 @@ export class ListCourseComponent implements OnInit, OnDestroy{
 
   errorHandler = inject(ErrorHandler);
   router = inject(Router);
-  courses?: CourseDto[];
+  courses?: Course[];
   size!: number;
   number!: number;
   totalElements!: number;
@@ -71,7 +71,7 @@ export class ListCourseComponent implements OnInit, OnDestroy{
     this.courseService.getAllCourses(pageNumber)
       .subscribe({
         next: (pageWrapper) => {
-          this.courses = pageWrapper.content as CourseDto[];
+          this.courses = pageWrapper.content as Course[];
           this.size = pageWrapper.page.size;
           this.number = pageWrapper.page.number;
           this.totalElements = pageWrapper.page.totalElements;

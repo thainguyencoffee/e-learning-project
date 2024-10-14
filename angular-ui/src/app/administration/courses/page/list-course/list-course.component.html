@@ -35,10 +35,11 @@
             </td>
             <td>{{course.published}}</td>
             <td>
-              <div class="float-end text-nowrap">
-                <a [routerLink]="['/administration/courses/', course.id]">View</a>
-                <a [routerLink]="['/administration/courses/edit', course.id]" class="btn btn-sm btn-info mx-2">Edit</a>
-                <button type="button" (click)="confirmDelete(course.id!, course.thumbnailUrl)" class="btn btn-sm btn-secondary">Delete</button>
+              <div class="float-end text-nowrap d-flex">
+                <a [routerLink]="['/administration/courses/', course.id]" class="btn btn-sm btn-secondary me-2">View</a>
+                <a [routerLink]="['/administration/courses/', course.id, 'sections', 'add']" class="btn btn-sm btn-secondary me-2">Add Section</a>
+                <a [routerLink]="['/administration/courses/edit', course.id]" class="btn btn-sm btn-secondary me-2">Edit</a>
+                <button type="button" (click)="confirmDelete(course.id!, course.thumbnailUrl)" class="btn btn-sm btn-secondary me-2">Delete</button>
               </div>
             </td>
           </tr>

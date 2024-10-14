@@ -1,7 +1,7 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from "@angular/router";
 import {CourseService} from "../../service/course.service";
-import {CourseDto} from "../../model/course.dto";
+import {Course} from "../../model/view/course";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
 import {NgForOf, NgIf} from "@angular/common";
 
@@ -23,7 +23,7 @@ export class CourseDetailComponent implements OnInit{
   errorHandler = inject(ErrorHandler);
 
   currentId?: number;
-  courseDto?: CourseDto
+  courseDto?: Course
 
   ngOnInit(): void {
     this.currentId = +this.route.snapshot.params['id']

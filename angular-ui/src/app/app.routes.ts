@@ -6,6 +6,7 @@ import {AddCourseComponent} from "./administration/courses/page/add-course/add-c
 import {ErrorComponent} from "./error/error.component";
 import {EditCourseComponent} from "./administration/courses/page/edit-course/edit-course.component";
 import {CourseDetailComponent} from "./administration/courses/page/course-detail/course-detail.component";
+import { AddSectionComponent } from './administration/courses/page/add-section/add-section.component';
 
 export const routes: Routes = [
   {
@@ -34,10 +35,15 @@ export const routes: Routes = [
         component: CourseDetailComponent
       },
       {
+        title: 'Add Section',
+        path: 'courses/:id/sections/add',
+        component: AddSectionComponent
+      },
+      {
         title: 'Edit course',
         path: 'courses/edit/:id',
         component: EditCourseComponent
-      }
+      },
     ]
   },
   {

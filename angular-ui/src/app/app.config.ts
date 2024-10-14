@@ -16,5 +16,5 @@ export const appConfig: ApplicationConfig = {
       provideHttpClient()],
 };
 
-export const reverseProxyUri = 'http://heaven-host:7080';
+export const reverseProxyUri = 'http://wsl:7080';
 export const baseUri = `${reverseProxyUri}/angular-ui`;

@@ -47,12 +47,18 @@ export class InputRowComponent implements OnChanges, OnInit{
   label = '';
 
   control?: AbstractControl;
+  controlArray?: FormArray;
   previewImageUrl: string | null = null;
   previousImageUrl: string | null = null;
   optionsMap?: Map<string|number,string>;
 
   ngOnInit() {
     this.control = this.group!.get(this.field)!;
+
+    if (this.control instanceof FormArray) {
+      this.controlArray = this.control;
+    }
+
     if (this.rowType === 'imageFile') {
       this.previewImageUrl = 'https://placehold.co/400'
       this.control.valueChanges.subscribe(value => {
@@ -130,6 +136,9 @@ export class InputRowComponent implements OnChanges, OnInit{
   }
 
   addItem() {
+    if (this.controlArray) {
+      console.log(this.controlArray.controls);
+    }
     this.formArray.push(new FormControl(''))
   }
 

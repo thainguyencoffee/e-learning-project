@@ -1,11 +1,11 @@
 import {inject, Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {Observable, switchMap} from "rxjs";
-import {CourseDto} from "../model/course.dto";
+import {Course} from "../model/view/course";
 import {AddCourseDto} from "../model/add-course.dto";
 import {UploadService} from "../../../common/upload/upload.service";
 import {EditCourseDto} from "../model/edit-course.dto";
-import {PageWrapper} from "../model/page-wrapper";
+import {PageWrapper} from "../model/view/page-wrapper";
 
 @Injectable(
   {providedIn: 'root'}
@@ -22,12 +22,12 @@ export class CourseService {
     return this.http.get<PageWrapper>(url)
   }
 
-  getCourse(id: number): Observable<CourseDto> {
-    return this.http.get<CourseDto>(this.resourcePath + '/' + id);
+  getCourse(id: number): Observable<Course> {
+    return this.http.get<Course>(this.resourcePath + '/' + id);
   }
 
-  createCourse(data: AddCourseDto): Observable<CourseDto> {
-    return this.http.post<CourseDto>(this.resourcePath, data);
+  createCourse(data: AddCourseDto): Observable<Course> {
+    return this.http.post<Course>(this.resourcePath, data);
   }
 
   deleteCourse(id: number, thumbnailUrl?: string) {
@@ -41,7 +41,7 @@ export class CourseService {
   }
 
   updateCourse(id: number, data: EditCourseDto) {
-    return this.http.put<CourseDto>(this.resourcePath + '/' + id, data);
+    return this.http.put<Course>(this.resourcePath + '/' + id, data);
   }
 
 }

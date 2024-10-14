@@ -44,7 +44,7 @@ export class AddCourseComponent {
     language: new FormControl(null, [Validators.required]),
     prerequisites: new FormArray([], []),
     subtitles: new FormControl([])
-  }, { updateOn: 'submit' });
+  }, { updateOn: 'blur' });
 
   handleSubmit() {
     window.scrollTo(0, 0);

@@ -1,6 +1,6 @@
-import {SectionDto} from "./section.dto";
+import {Section} from "./section";
 
-export interface CourseDto {
+export interface Course {
   id: number;
   title: string;
   thumbnailUrl?: string;
@@ -9,7 +9,7 @@ export interface CourseDto {
   subtitles?: string[],
   benefits?: string[],
   prerequisites?: string[],
-  sections?: SectionDto[],
+  sections?: Section[],
   price?: string,
   discountedPrice?: string,
   published: boolean,
