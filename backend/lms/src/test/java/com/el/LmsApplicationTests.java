@@ -42,6 +42,7 @@ import org.testcontainers.shaded.com.google.common.net.HttpHeaders;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -536,12 +537,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -639,12 +635,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
@@ -704,12 +695,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -742,10 +728,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -778,12 +761,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -810,12 +788,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -842,12 +815,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -876,12 +844,7 @@ class LmsApplicationTests {
         );
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, null); // admin has the same permission as teacher
 
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
 
         // Gửi request POST để thêm section cho khóa học
         webTestClient.post().uri("/courses/{courseId}/sections", course.getId())
@@ -891,18 +854,12 @@ class LmsApplicationTests {
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody()
-                .jsonPath("$.sections.length()").isEqualTo(1)
-                .jsonPath("$.sections[0].lessons.length()").isEqualTo(3);
+                .jsonPath("$.sections.length()").isEqualTo(1);
     }
 
     @Test
     void testAddSectionToCourse_Unauthorized() {
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
 
         // Gửi request POST để thêm section cho khóa học
         webTestClient.post().uri("/courses/{courseId}/sections", 9999L)
@@ -914,12 +871,7 @@ class LmsApplicationTests {
 
     @Test
     void testAddSectionToCourse_Forbidden() {
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
 
         // Gửi request POST để thêm section cho khóa học
         webTestClient.post().uri("/courses/{courseId}/sections", 9999L)
@@ -942,12 +894,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("New title");
@@ -975,12 +922,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("New title");
@@ -1021,10 +963,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
@@ -1058,12 +997,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request DELETE để xóa section khỏi khóa học
@@ -1087,12 +1021,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
 
@@ -1123,10 +1052,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
@@ -1140,7 +1066,7 @@ class LmsApplicationTests {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.sections[0].lessons.length()").isEqualTo(2);
+                .jsonPath("$.sections[0].lessons.length()").isEqualTo(1);
     }
 
     @Test
@@ -1154,12 +1080,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         LessonDTO lessonDTO = new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null);
@@ -1170,6 +1091,15 @@ class LmsApplicationTests {
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(lessonDTO))
+                .exchange()
+                .expectStatus().isOk();
+
+        LessonDTO lessonDTODup = new LessonDTO("Lesson 1", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+
+        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(lessonDTODup))
                 .exchange()
                 .expectStatus().isBadRequest();
     }
@@ -1185,12 +1115,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
@@ -1237,18 +1162,30 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
-        LessonDTO updateLessonDTO = new LessonDTO("New title", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+
+        // Gửi request POST để thêm lesson cho section của khóa học
+        LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+
+        var sectionId = course.getSections().iterator().next().getId();
+        AtomicReference<Integer> lessonId = new AtomicReference<>();
+        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(lessonDTO))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.sections[0].lessons.length()").isEqualTo(1)
+                .jsonPath("$.sections[0].lessons[0].id").value(lessonId::set);
+
+        LessonDTO updateLessonDTO = new LessonDTO("New title", Lesson.Type.TEXT, "http://example.com/lesson1.txt", null);
 
         // Gửi request PUT để cập nhật lesson của khóa học
         var section = course.getSections().iterator().next();
-        var lesson = section.getLessons().iterator().next();
-        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lesson.getId())
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lessonId.get())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(updateLessonDTO))
@@ -1259,7 +1196,8 @@ class LmsApplicationTests {
     }
 
     @Test
-    void testUpdateLesson_LessonDuplicate_BadRequest() {
+    void testUpdateLesson_LessonDuplicate_OKBecauseIsItself() {
+        // first, add a lesson
         var courseDTO = new CourseDTO(
                 "Java Programming",
                 "Learn Java from scratch",
@@ -1269,24 +1207,35 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.VIDEO, "http://example.com/lesson2.mp4", null))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
+        LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+
+        // Gửi request POST để thêm lesson cho section của khóa học
+        var sectionId = course.getSections().iterator().next().getId();
+        AtomicReference<Integer> lessonId = new AtomicReference<>();
+        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(lessonDTO))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.sections[0].lessons.length()").isEqualTo(1)
+                .jsonPath("$.sections[0].lessons[0].id").value(lessonId::set);
+
+        //act
         LessonDTO updateLessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
 
         // Gửi request PUT để cập nhật lesson của khóa học
         var section = course.getSections().iterator().next();
-        var lesson1 = section.getLessons().iterator().next();
-        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lesson1.getId())
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lessonId.get())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(updateLessonDTO))
                 .exchange()
-                .expectStatus().isBadRequest();
+                .expectStatus().isOk();
     }
 
     @Test
@@ -1300,12 +1249,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
@@ -1320,8 +1264,9 @@ class LmsApplicationTests {
 
         // Gửi request PUT để cập nhật lesson của khóa học
         var courseSection = course.getSections().iterator().next();
-        var lesson = courseSection.getLessons().iterator().next();
-        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), courseSection.getId(), lesson.getId())
+        var lessonId = 1234567L; // not need lessonId because course is published then throws exception
+
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), courseSection.getId(), lessonId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(updateLessonDTO))
@@ -1353,16 +1298,27 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
+
+        // Gửi request POST để thêm lesson cho section của khóa học
+        LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+
+        var sectionId = course.getSections().iterator().next().getId();
+        AtomicReference<Integer> lessonId = new AtomicReference<>();
+        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(lessonDTO))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.sections[0].lessons.length()").isEqualTo(1)
+                .jsonPath("$.sections[0].lessons[0].id").value(lessonId::set);
 
         // Gửi request DELETE để xóa lesson khỏi khóa học
         var section = course.getSections().iterator().next();
-        var lesson = section.getLessons().iterator().next();
-        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lesson.getId())
+        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lessonId.get())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
                 .exchange()
                 .expectStatus().isOk()
@@ -1381,12 +1337,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
@@ -1399,9 +1350,9 @@ class LmsApplicationTests {
 
         // Gửi request DELETE để xóa lesson khỏi khóa học
         var courseSection = course.getSections().iterator().next();
-        var lesson = courseSection.getLessons().iterator().next();
-        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), courseSection.getId(), lesson.getId())
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+        var lessonId = 1234567L; // not need lessonId because course is published then throws exception
+        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), courseSection.getId(), lessonId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .exchange()
                 .expectStatus().isBadRequest();
     }
@@ -1426,12 +1377,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -1482,12 +1428,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -1515,12 +1456,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -1550,12 +1486,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO(
-                "Section 1",
-                Set.of(new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null),
-                        new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null),
-                        new LessonDTO("Lesson 3", Lesson.Type.QUIZ, null, 1L))
-        );
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 

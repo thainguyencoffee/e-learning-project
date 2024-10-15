@@ -166,9 +166,9 @@ public class Course extends AuditSupportClass {
             throw new InputInvalidException("A section with the same title already exists.");
         }
 
-        if (section.getLessons().isEmpty()) {
-            throw new InputInvalidException("Section must have at least one lesson.");
-        }
+//        if (section.getLessons().isEmpty()) {
+//            throw new InputInvalidException("Section must have at least one lesson.");
+//        }
 
         this.sections.add(section);
     }

@@ -9,17 +9,17 @@ import java.util.Set;
 
 public record CourseSectionDTO(
         @NotBlank(message = "Section title is required")
-        String title,
-        @Valid
-        @NotEmpty(message = "At least one lesson is required")
-        Set<LessonDTO> lessons
+        String title
+//        @Valid
+//        @NotEmpty(message = "At least one lesson is required")
+//        Set<LessonDTO> lessons
 ) {
 
     public CourseSection toCourseSection() {
         CourseSection courseSection = new CourseSection(title);
-        for (LessonDTO lessonDTO : lessons) {
-            courseSection.addLesson(lessonDTO.toLesson());
-        }
+//        for (LessonDTO lessonDTO : lessons) {
+//            courseSection.addLesson(lessonDTO.toLesson());
+//        }
         return courseSection;
     }
 }

@@ -412,7 +412,7 @@ class CourseServiceTests {
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
         when(courseRepository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1", Set.of(new LessonDTO("Lesson 1", Lesson.Type.TEXT, "https://example.com/lesson1", null)));
+        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1");
 
         // Thực thi use case
         Course updatedCourse = courseService.addSection(1L, courseSectionDTO);
@@ -433,60 +433,10 @@ class CourseServiceTests {
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
-        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1", Set.of(new LessonDTO("Lesson 1", Lesson.Type.TEXT, "https://example.com/lesson1", null)));
+        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1");
 
         // Kiểm tra xem ngoại lệ có được ném ra khi không tìm thấy khóa học
         assertThrows(ResourceNotFoundException.class, () -> {
-            courseService.addSection(1L, courseSectionDTO);
-        });
-
-        // Đảm bảo không có gì được lưu vào repository
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void addCourseSection_ShouldThrowException_WhenLessonIsInvalid() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        // Mock canEdit method
-        when(rolesBaseUtil.isAdmin()).thenReturn(true);
-
-        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1", Set.of(new LessonDTO("Lesson 1", Lesson.Type.TEXT, "abcd://example.com/lesson1", null)));
-
-        // Kiểm tra xem ngoại lệ có được ném ra khi thông tin bài học không hợp lệ
-        assertThrows(InputInvalidException.class, () -> {
-            courseService.addSection(1L, courseSectionDTO);
-        });
-
-        // Đảm bảo không có gì được lưu vào repository
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void addCourseSection_ShouldThrowException_WhenLessonIsInvalidQuizType() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        // Mock canEdit method
-        when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1", Set.of(new LessonDTO("Lesson 1", Lesson.Type.QUIZ, "http://example.com/lesson1", null)));
-
-        // Kiểm tra xem ngoại lệ có được ném ra khi thông tin bài học không hợp lệ
-        assertThrows(InputInvalidException.class, () -> {
-            courseService.addSection(1L, courseSectionDTO);
-        });
-
-        // Đảm bảo không có gì được lưu vào repository
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-
-    @Test
-    void addCourseSection_ShouldThrowException_WhenLessonIsInvalidTextOrVideoType() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        // Mock canEdit method
-        when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1", Set.of(new LessonDTO("Lesson 1", Lesson.Type.TEXT, null, 1L)));
-
-        // Kiểm tra xem ngoại lệ có được ném ra khi thông tin bài học không hợp lệ
-        assertThrows(InputInvalidException.class, () -> {
             courseService.addSection(1L, courseSectionDTO);
         });
 
@@ -501,7 +451,7 @@ class CourseServiceTests {
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
         when(rolesBaseUtil.getCurrentSubjectFromJwt()).thenReturn("otherTeacher");
 
-        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1", Set.of(new LessonDTO("Lesson 1", Lesson.Type.TEXT, "https://example.com/lesson1", null)));
+        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1");
 
         // Kiểm tra xem ngoại lệ có được ném ra khi không có quyền thêm section
         assertThrows(AccessDeniedException.class, () -> {
