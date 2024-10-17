@@ -82,10 +82,11 @@ export class ListCourseComponent implements OnInit{
     if (confirm(this.getMessage('confirm'))) {
       this.courseService.deleteCourse(id, thumbnailUrl)
         .subscribe({
-          next: () => {
-            this.loadData(this.number); // Gọi lại loadData để cập nhật danh sách
-            alert(this.getMessage('deleted')); // Hiển thị thông báo thành công
-          },
+          next: () => this.router.navigate(['/administration/courses'], {
+            state: {
+              msgSuccess: this.getMessage('deleted')
+            }
+          }),
           error: (error) => this.errorHandler.handleServerError(error.error)
         });
 

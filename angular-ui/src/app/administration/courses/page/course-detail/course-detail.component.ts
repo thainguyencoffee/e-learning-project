@@ -15,7 +15,6 @@ import {Subscription} from "rxjs";
     NgIf,
   ],
   templateUrl: './course-detail.component.html',
-  styleUrl: './course-detail.component.css'
 })
 export class CourseDetailComponent implements OnInit, OnDestroy{
 
@@ -54,7 +53,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
   getMessage(key: string, details?: any) {
     const messages: Record<string, string> = {
       confirm: 'Do you really want to delete this element?',
-      deleted: 'Course was removed successfully.'
+      deleted: `Course section was removed successfully.`
     }
     return messages[key];
   }
@@ -63,10 +62,11 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
     if (confirm(this.getMessage('confirm'))) {
       this.courseService.deleteSection(this.currentId!, sectionId)
         .subscribe({
-          next: () => {
-            this.loadData(); // Gọi lại loadData để cập nhật danh sách
-            alert(this.getMessage('deleted')); // Hiển thị thông báo thành công
-          },
+          next: () => this.router.navigate(['/administration/courses', this.currentId], {
+            state: {
+              msgSuccess: this.getMessage('deleted')
+            }
+          }),
           error: (error) => this.errorHandler.handleServerError(error.error)
         });
     }
