@@ -1,1 +1,11 @@
-<p>add-section works!</p>
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Add Section</h1>
+  <div>
+    <a [routerLink]="['/administration/courses', course?.id]" class="btn btn-secondary">Back to course detail</a>
+  </div>
+</div>
+
+<form [formGroup]="addForm" (ngSubmit)="handleSubmit()">
+  <app-input-row [group]="addForm" field="title" label="Label"/>
+  <input type="submit" value="Add Section" class="btn btn-primary mt-4" />
+</form>

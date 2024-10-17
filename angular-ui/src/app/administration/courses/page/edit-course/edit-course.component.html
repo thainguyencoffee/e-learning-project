@@ -10,8 +10,8 @@
   <app-input-row [group]="editForm" field="title" label="Title" />
   <app-input-row [group]="editForm" field="thumbnailUrl" label="Thumbnail" rowType="imageFile"/>
   <app-input-row [group]="editForm" rowType="textarea" field="description" label="Description" />
-  <app-input-row [group]="editForm" rowType="formArray" field="benefits" label="Benefits" />
-  <app-input-row [group]="editForm" rowType="formArray" field="prerequisites" label="Prerequisites"/>
+  <app-input-row [group]="editForm" rowType="textarea" field="benefits" label="Benefits" />
+  <app-input-row [group]="editForm" rowType="textarea" field="prerequisites" label="Prerequisites"/>
   <app-input-row [group]="editForm" rowType="multiselect" field="subtitles" label="Subtitles" [options]="languagesMap"/>
   <input type="submit" value="Edit Course" class="btn btn-primary mt-4" />
 </form>

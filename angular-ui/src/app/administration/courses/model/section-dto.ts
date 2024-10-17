@@ -1,6 +1,7 @@
-import {LessonDto} from "./lesson-dto";
+export class SectionDto {
+  title?: string | null;
 
-export interface SectionDto {
-  title: string,
-  lessons: LessonDto[]
+  constructor(data: Partial<SectionDto>) {
+    Object.assign(this, data);
+  }
 }

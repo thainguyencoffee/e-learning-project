@@ -89,4 +89,45 @@
     <p>Last modified date: {{ courseDto.lastModifiedDate }}</p>
   </section>
 
+  <!--Section-->
+  <div id="sections">
+    <h5>Sections</h5>
+
+    <div *ngIf="courseDto?.sections?.length === 0">
+    <span class="badge bg-dark">
+      No prerequisites available
+    </span>
+    </div>
+
+    <div *ngIf="courseDto?.sections?.length !== 0" class="table-responsive">
+      <table class="table table-striped table-hover align-middle">
+        <thead>
+        <tr>
+          <th scope="col">Id</th>
+          <th scope="col">Title</th>
+          <th><!-- --></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let section of courseDto.sections;">
+          <td>{{ section.id }}</td>
+          <td>{{ section.title }}</td>
+          <td>
+            <div class="float-end text-nowrap d-flex">
+              <a [routerLink]="['/administration/courses/', currentId, 'sections', section.id]"
+                 class="btn btn-sm btn-secondary me-2">View section detail</a>
+              <a [routerLink]="['/administration/courses', currentId, 'sections', 'edit', section.id]"
+                 class="btn btn-sm btn-secondary me-2">Edit Section</a>
+              <button type="button" (click)="confirmDelete(section.id)"
+                      class="btn btn-sm btn-secondary me-2">Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
 </div>

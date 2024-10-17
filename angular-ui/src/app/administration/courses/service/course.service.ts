@@ -6,6 +6,7 @@ import {AddCourseDto} from "../model/add-course.dto";
 import {UploadService} from "../../../common/upload/upload.service";
 import {EditCourseDto} from "../model/edit-course.dto";
 import {PageWrapper} from "../model/view/page-wrapper";
+import {SectionDto} from "../model/section-dto";
 
 @Injectable(
   {providedIn: 'root'}
@@ -42,6 +43,18 @@ export class CourseService {
 
   updateCourse(id: number, data: EditCourseDto) {
     return this.http.put<Course>(this.resourcePath + '/' + id, data);
+  }
+
+  addSection(id: number, data: SectionDto) {
+    return this.http.post(`${this.resourcePath}/${id}/sections`, data)
+  }
+
+  deleteSection(currentId: number, sectionId: number) {
+    return this.http.delete(`${this.resourcePath}/${currentId}/sections/${sectionId}`)
+  }
+
+  updateSection(courseId: number, sectionId: number | undefined, data: SectionDto) {
+    return this.http.put<Course>(`${this.resourcePath}/${courseId}/sections/${sectionId}`, data);
   }
 
 }

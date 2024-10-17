@@ -2,25 +2,25 @@
   @if (rowType === 'checkbox') {
     <div class="col-md-10 offset-md-2">
       <div class="form-check">
-        <input type="checkbox" [id]="field" [formControlName]="field"
-               class="form-check-input {{ getInputClasses() }}">
+        <input [id]="field" [formControlName]="field" type="checkbox"
+               class="form-check-input {{ getInputClasses() }}" />
         <label [for]="field" class="form-check-label">
           {{ label + (isRequired() ? '*' : '') }}
         </label>
       </div>
-      <app-input-errors [control]="control"/>
+      <app-input-errors [control]="control" />
     </div>
   } @else {
-    <label [for]="rowType === 'radio' ? '' : field " class="col-md-2 col-form-label">
+    <label [for]="rowType === 'radio' ? '' : field" class="col-md-2 col-form-label">
       {{ label + (isRequired() ? '*' : '') }}
     </label>
     <div class="col-md-10">
       @if (rowType === 'text' || rowType === 'password' || rowType === 'email' || rowType === 'tel') {
-        <input [type]="rowType" [id]="field" [formControlName]="field"
-               class="form-control {{getInputClasses()}}">
+        <input [id]="field" [type]="rowType" [formControlName]="field"
+               class="form-control {{ getInputClasses() }}" />
       } @else if (rowType === 'number') {
         <input [id]="field" type="number" [formControlName]="field"
-               class="form-control {{ getInputClasses() }}"/>
+               class="form-control {{ getInputClasses() }}" />
       } @else if (rowType === 'textarea') {
         <textarea [id]="field" [formControlName]="field"
                   class="form-control {{ getInputClasses() }}"></textarea>
@@ -56,19 +56,14 @@
         }
       } @else if (rowType === 'imageFile') {
         <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}" />
-        <img [src]="previewImageUrl" alt="Image preview" class="img-thumbnail mt-2" style="max-height: 200px;" />
-      } @else if (rowType === 'formArray') {
-
-        <ng-container [formArrayName]="field">
-          <div *ngFor="let _ of formArray.controls; index as i">
-            <input type="text" [formControlName]="i">
-            <button type="button" (click)="removeItem(i)">Remove</button>
-          </div>
-          <button type="button" (click)="addItem()">Add {{ label }}</button>
-        </ng-container>
+        <img [src]="previewUrl" alt="Image preview" class="img-thumbnail mt-2" style="max-height: 200px;" />
+      } @else if (rowType === 'videoFile') {
+        <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}" />
+        <video *ngIf="previewUrl" #videoPlayer id="myVideo" controls width="100%">
+          <source [src]="previewUrl" type="video/mp4">
+        </video>
       }
       <app-input-errors [control]="control" />
     </div>
-
   }
 </div>

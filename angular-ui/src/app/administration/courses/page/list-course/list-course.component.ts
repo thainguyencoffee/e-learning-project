@@ -15,9 +15,8 @@ import {NgForOf, NgOptimizedImage} from "@angular/common";
     NgForOf
   ],
   templateUrl: './list-course.component.html',
-  styleUrl: './list-course.component.css'
 })
-export class ListCourseComponent implements OnInit, OnDestroy{
+export class ListCourseComponent implements OnInit{
 
   constructor(
     private courseService: CourseService) {
@@ -63,9 +62,7 @@ export class ListCourseComponent implements OnInit, OnDestroy{
     return pageRange;
   }
 
-  ngOnDestroy(): void {
-    this.navigationSubscription!.unsubscribe();
-  }
+
 
   loadData(pageNumber: number): void {
     this.courseService.getAllCourses(pageNumber)
@@ -85,11 +82,10 @@ export class ListCourseComponent implements OnInit, OnDestroy{
     if (confirm(this.getMessage('confirm'))) {
       this.courseService.deleteCourse(id, thumbnailUrl)
         .subscribe({
-          next: () => this.router.navigate(['/administration/courses'], {
-            state: {
-              msgInfo: this.getMessage('deleted')
-            }
-          }),
+          next: () => {
+            this.loadData(this.number); // Gọi lại loadData để cập nhật danh sách
+            alert(this.getMessage('deleted')); // Hiển thị thông báo thành công
+          },
           error: (error) => this.errorHandler.handleServerError(error.error)
         });
 
