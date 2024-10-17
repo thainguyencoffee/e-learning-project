@@ -6,7 +6,6 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
   standalone: true,
   imports: [],
   templateUrl: './add-section.component.html',
-  styleUrl: './add-section.component.css'
 })
 export class AddSectionComponent implements OnInit {
 

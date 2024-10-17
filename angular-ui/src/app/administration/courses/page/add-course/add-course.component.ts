@@ -15,7 +15,6 @@ import {InputRowComponent} from "../../../../common/input-row/input-row.componen
     InputRowComponent
   ],
   templateUrl: './add-course.component.html',
-  styleUrl: './add-course.component.css'
 })
 export class AddCourseComponent {
   router = inject(Router);

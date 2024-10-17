@@ -17,7 +17,6 @@ import {EditCourseDto} from "../../model/edit-course.dto";
     ReactiveFormsModule
   ],
   templateUrl: './edit-course.component.html',
-  styleUrl: './edit-course.component.css'
 })
 export class EditCourseComponent implements OnInit{
 
