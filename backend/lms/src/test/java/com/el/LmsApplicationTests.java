@@ -537,7 +537,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -635,7 +635,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
@@ -695,7 +695,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -728,7 +728,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -761,7 +761,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -788,7 +788,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -815,7 +815,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -844,7 +844,7 @@ class LmsApplicationTests {
         );
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, null); // admin has the same permission as teacher
 
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
         // Gửi request POST để thêm section cho khóa học
         webTestClient.post().uri("/courses/{courseId}/sections", course.getId())
@@ -859,7 +859,7 @@ class LmsApplicationTests {
 
     @Test
     void testAddSectionToCourse_Unauthorized() {
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
         // Gửi request POST để thêm section cho khóa học
         webTestClient.post().uri("/courses/{courseId}/sections", 9999L)
@@ -871,7 +871,7 @@ class LmsApplicationTests {
 
     @Test
     void testAddSectionToCourse_Forbidden() {
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
         // Gửi request POST để thêm section cho khóa học
         webTestClient.post().uri("/courses/{courseId}/sections", 9999L)
@@ -894,7 +894,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("New title");
@@ -922,7 +922,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("New title");
@@ -963,7 +963,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
@@ -997,7 +997,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request DELETE để xóa section khỏi khóa học
@@ -1021,7 +1021,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
 
@@ -1052,7 +1052,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
@@ -1080,7 +1080,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         LessonDTO lessonDTO = new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null);
@@ -1115,7 +1115,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
@@ -1162,7 +1162,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
 
@@ -1207,7 +1207,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
@@ -1249,7 +1249,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
@@ -1298,7 +1298,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request POST để thêm lesson cho section của khóa học
@@ -1337,7 +1337,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Gửi request PUT để xuất bản khóa học
@@ -1377,7 +1377,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -1428,7 +1428,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -1456,7 +1456,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
@@ -1486,7 +1486,7 @@ class LmsApplicationTests {
                 Set.of("Basic Programming Knowledge"),
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 

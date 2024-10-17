@@ -9,7 +9,7 @@ create table student
 create table course
 (
     id                 bigserial   not null,
-    title              varchar(50),
+    title              varchar(255) not null ,
     thumbnail_url      varchar(500),
     published          boolean     not null,
     description        varchar(2000),

@@ -538,7 +538,7 @@ class CourseManagementControllerTests {
         Mockito.when(courseService.addSection(any(Long.class), any(CourseSectionDTO.class)))
                 .thenReturn(updatedCourse);
 
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
         mockMvc.perform(post("/courses/1/sections")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -553,7 +553,7 @@ class CourseManagementControllerTests {
     void addSection_CourseNotFound_ThrowsException() throws Exception {
         Mockito.doThrow(new ResourceNotFoundException()).when(courseService).addSection(any(Long.class), any(CourseSectionDTO.class));
 
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
         mockMvc.perform(post("/courses/1/sections")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -582,7 +582,7 @@ class CourseManagementControllerTests {
         Mockito.doThrow(new InputInvalidException("Section with the same title already exists."))
                 .when(courseService).addSection(any(Long.class), any(CourseSectionDTO.class));
 
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
         mockMvc.perform(post("/courses/1/sections")
                         .contentType(MediaType.APPLICATION_JSON)

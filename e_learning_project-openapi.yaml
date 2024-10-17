@@ -6,6 +6,17 @@ info:
 servers:
   - url: "https://e_learning_project"
 paths:
+  /me:
+    get:
+      summary: "GET me"
+      operationId: "getMe"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserInfoDto"
   /upload:
     post:
       summary: "POST upload"
@@ -27,7 +38,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: "string"
+                $ref: "#/components/schemas/ObjectUrl"
   /upload/{urlEncode}:
     delete:
       summary: "DELETE upload/{urlEncode}"
@@ -516,6 +527,25 @@ paths:
                 $ref: "#/components/schemas/Payment"
 components:
   schemas:
+    UserInfoDto:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+        email:
+          type: "string"
+        roles:
+          type: "array"
+          items:
+            type: "string"
+        exp:
+          type: "integer"
+          format: "int64"
+    ObjectUrl:
+      type: "object"
+      properties:
+        url:
+          type: "string"
     Void:
       type: "object"
       properties: { }
@@ -815,10 +845,6 @@ components:
       properties:
         title:
           type: "string"
-        lessons:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/LessonDTO"
     PaymentRequest:
       type: "object"
       properties:

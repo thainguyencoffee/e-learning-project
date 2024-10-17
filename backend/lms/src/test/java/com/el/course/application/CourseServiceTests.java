@@ -95,7 +95,7 @@ class CourseServiceTests {
                 "teacher123"
         );
         courseForPublish.changePrice(Money.of(100, Currencies.VND));
-        CourseSection section = new CourseSection("Section 1");
+        CourseSection section = new CourseSection("Billie Jean [4K] 30th Anniversary, 2001");
         section.addLesson(new Lesson("Lesson 1", Lesson.Type.TEXT, "https://example.com/lesson1", null));
         courseForPublish.addSection(section);
     }
@@ -412,7 +412,7 @@ class CourseServiceTests {
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
         when(courseRepository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
         // Thực thi use case
         Course updatedCourse = courseService.addSection(1L, courseSectionDTO);
@@ -433,7 +433,7 @@ class CourseServiceTests {
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
-        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
         // Kiểm tra xem ngoại lệ có được ném ra khi không tìm thấy khóa học
         assertThrows(ResourceNotFoundException.class, () -> {
@@ -451,7 +451,7 @@ class CourseServiceTests {
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
         when(rolesBaseUtil.getCurrentSubjectFromJwt()).thenReturn("otherTeacher");
 
-        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Section 1");
+        CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
         // Kiểm tra xem ngoại lệ có được ném ra khi không có quyền thêm section
         assertThrows(AccessDeniedException.class, () -> {
