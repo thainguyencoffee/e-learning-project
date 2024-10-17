@@ -1,6 +1,6 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {CourseService} from "../../service/course.service";
-import {CourseDto} from "../../model/course.dto";
+import {Course} from "../../model/view/course";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
 import {NavigationEnd, Router, RouterLink} from "@angular/router";
 import {Subscription} from "rxjs";
@@ -15,9 +15,8 @@ import {NgForOf, NgOptimizedImage} from "@angular/common";
     NgForOf
   ],
   templateUrl: './list-course.component.html',
-  styleUrl: './list-course.component.css'
 })
-export class ListCourseComponent implements OnInit, OnDestroy{
+export class ListCourseComponent implements OnInit{
 
   constructor(
     private courseService: CourseService) {
@@ -25,7 +24,7 @@ export class ListCourseComponent implements OnInit, OnDestroy{
 
   errorHandler = inject(ErrorHandler);
   router = inject(Router);
-  courses?: CourseDto[];
+  courses?: Course[];
   size!: number;
   number!: number;
   totalElements!: number;
@@ -63,15 +62,13 @@ export class ListCourseComponent implements OnInit, OnDestroy{
     return pageRange;
   }
 
-  ngOnDestroy(): void {
-    this.navigationSubscription!.unsubscribe();
-  }
+
 
   loadData(pageNumber: number): void {
     this.courseService.getAllCourses(pageNumber)
       .subscribe({
         next: (pageWrapper) => {
-          this.courses = pageWrapper.content as CourseDto[];
+          this.courses = pageWrapper.content as Course[];
           this.size = pageWrapper.page.size;
           this.number = pageWrapper.page.number;
           this.totalElements = pageWrapper.page.totalElements;
@@ -87,7 +84,7 @@ export class ListCourseComponent implements OnInit, OnDestroy{
         .subscribe({
           next: () => this.router.navigate(['/administration/courses'], {
             state: {
-              msgInfo: this.getMessage('deleted')
+              msgSuccess: this.getMessage('deleted')
             }
           }),
           error: (error) => this.errorHandler.handleServerError(error.error)

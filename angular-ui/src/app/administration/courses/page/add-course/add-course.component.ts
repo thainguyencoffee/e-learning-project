@@ -1,10 +1,11 @@
 import {Component, inject} from '@angular/core';
 import {CourseService} from "../../service/course.service";
-import {FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {AddCourseDto} from "../../model/add-course.dto";
 import {Router, RouterLink} from "@angular/router";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
 import {InputRowComponent} from "../../../../common/input-row/input-row.component";
+import {validJson} from "../../../../common/utils";
 
 @Component({
   selector: 'app-add-course',
@@ -15,7 +16,6 @@ import {InputRowComponent} from "../../../../common/input-row/input-row.componen
     InputRowComponent
   ],
   templateUrl: './add-course.component.html',
-  styleUrl: './add-course.component.css'
 })
 export class AddCourseComponent {
   router = inject(Router);
@@ -37,14 +37,14 @@ export class AddCourseComponent {
   }
 
   addForm = new FormGroup({
-    title: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
+    title: new FormControl(null, [Validators.required, Validators.maxLength(255), Validators.minLength(10)]),
     description: new FormControl(null, [Validators.maxLength(2000)]),
     thumbnailUrl: new FormControl(null),
-    benefits: new FormArray([], []),
     language: new FormControl(null, [Validators.required]),
-    prerequisites: new FormArray([], []),
+    benefits: new FormControl(null, [validJson]),
+    prerequisites: new FormControl(null, [validJson]),
     subtitles: new FormControl([])
-  }, { updateOn: 'submit' });
+  });
 
   handleSubmit() {
     window.scrollTo(0, 0);

@@ -2,10 +2,10 @@ import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 import {CourseService} from "../../service/course.service";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
-import {updateForm, validJson} from "../../../../common/utils";
-import {FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
+import {updateForm} from "../../../../common/utils";
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {InputRowComponent} from "../../../../common/input-row/input-row.component";
-import {EditCourseDto} from "../../model/edit-course.dto";
+import {SectionDto} from "../../model/section-dto";
 
 @Component({
   selector: 'app-edit-course',
@@ -16,33 +16,17 @@ import {EditCourseDto} from "../../model/edit-course.dto";
     InputRowComponent,
     ReactiveFormsModule
   ],
-  templateUrl: './edit-course.component.html',
+  templateUrl: './edit-section.component.html',
 })
-export class EditCourseComponent implements OnInit {
+export class EditSectionComponent implements OnInit{
 
   courseService = inject(CourseService);
   route = inject(ActivatedRoute);
   router = inject(Router);
   errorHandler = inject(ErrorHandler)
 
-  currentId?: number;
-
-  languagesMap: Record<string, string> = {
-    VIETNAMESE: 'Vietnamese',
-    ENGLISH: 'English',
-    FRENCH: 'French',
-    SPANISH: 'Spanish'
-  }
-
-  editForm = new FormGroup({
-    id: new FormControl({value: null, disabled: true}),
-    title: new FormControl(null, [Validators.required, Validators.maxLength(255), Validators.minLength(10)]),
-    description: new FormControl(null, [Validators.maxLength(2000)]),
-    thumbnailUrl: new FormControl(null),
-    benefits: new FormControl(null, [validJson]),
-    prerequisites: new FormControl(null, [validJson]),
-    subtitles: new FormControl([])
-  });
+  courseId?: number;
+  sectionId?: number;
 
   getMessage(key: string, details?: any) {
     const messages: Record<string, string> = {
@@ -51,11 +35,17 @@ export class EditCourseComponent implements OnInit {
     return messages[key];
   }
 
+  editForm = new FormGroup({
+    id: new FormControl({value: null, disabled: true}),
+    title: new FormControl(null, [Validators.required, Validators.maxLength(255), Validators.minLength(10)]),
+  });
+
   ngOnInit(): void {
-    this.currentId = +this.route.snapshot.params['id'];
-    this.courseService.getCourse(this.currentId)
+    this.courseId = +this.route.snapshot.params['id'];
+    this.sectionId = +this.route.snapshot.params['sectionId'];
+    this.courseService.getCourse(this.courseId)
       .subscribe({
-        next: (data) => updateForm(this.editForm, data),
+        next: (data) => updateForm(this.editForm, data.sections?.find(section => section.id === this.sectionId)),
         error: (error) => this.errorHandler.handleServerError(error.error)
       })
   }
@@ -67,10 +57,10 @@ export class EditCourseComponent implements OnInit {
       return;
     }
 
-    const data = new EditCourseDto(this.editForm.value);
-    this.courseService.updateCourse(this.currentId!, data)
+    const data = new SectionDto(this.editForm.value);
+    this.courseService.updateSection(this.courseId!, this.sectionId, data)
       .subscribe({
-        next: () => this.router.navigate(['/administration/courses'], {
+        next: () => this.router.navigate(['/administration/courses', this.courseId], {
           state: {
             msgSuccess: this.getMessage('updated')
           }

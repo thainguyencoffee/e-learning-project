@@ -1,5 +1,6 @@
 package com.el.course.application.validate;
 
+import com.el.common.ValidateMessages;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.Set;
@@ -21,11 +22,22 @@ public class EachItemStringMaxSizeValidator implements ConstraintValidator<EachI
             return true;
         }
 
+        boolean isValid = true;
         for (String benefit : benefits) {
-            if (benefit.isBlank() || benefit.length() > max || benefit.length() < min) {
-                return false;
+            if (benefit.isBlank()) {
+                context.disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate("Value you provide must not be blank").addConstraintViolation();
+                isValid = false;
+            } else if (benefit.length() > max) {
+                context.disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate(ValidateMessages.MAX_LENGTH).addConstraintViolation();
+                isValid = false;
+            } else if (benefit.length() < min) {
+                context.disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate(ValidateMessages.MIN_LENGTH).addConstraintViolation();
+                isValid = false;
             }
         }
-        return true;
+        return isValid;
     }
 }

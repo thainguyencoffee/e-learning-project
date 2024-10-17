@@ -1,9 +1,18 @@
-import {KeyValuePipe, NgForOf} from '@angular/common';
-import {Component, HostListener, inject, Input, OnChanges, OnInit} from '@angular/core';
+import {KeyValuePipe, NgForOf, NgIf} from '@angular/common';
 import {
-  AbstractControl,
-  FormArray,
-  FormControl,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  inject,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
+import {
+  AbstractControl, FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
@@ -19,13 +28,15 @@ import {Router} from "@angular/router";
   selector: 'app-input-row',
   standalone: true,
   templateUrl: './input-row.component.html',
-  imports: [ReactiveFormsModule, InputErrorsComponent, KeyValuePipe, FormsModule, NgForOf]
+  imports: [ReactiveFormsModule, InputErrorsComponent, KeyValuePipe /**/, FormsModule, NgForOf, NgIf]
 })
-export class InputRowComponent implements OnChanges, OnInit{
+export class InputRowComponent implements OnChanges, OnInit {
 
   uploadService = inject(UploadService)
   errorHandler = inject(ErrorHandler);
   router = inject(Router);
+
+  @Output() optionsMapEvent = new EventEmitter<string>();
 
   @Input({ required: true })
   group?: FormGroup;
@@ -36,31 +47,58 @@ export class InputRowComponent implements OnChanges, OnInit{
   @Input()
   rowType = 'text';
 
-  // custom css
   @Input()
   inputClass = '';
 
   @Input()
-  options?: Record<string,string>|Map<number,string>;
+  options?: Record<string, string> | Map<number, string>;
 
   @Input({ required: true })
   label = '';
 
   control?: AbstractControl;
-  previewImageUrl: string | null = null;
-  previousImageUrl: string | null = null;
-  optionsMap?: Map<string|number,string>;
+  optionsMap?: Map<string | number, string>;
+
+  @Input()
+  formArrayName?: string | undefined
+
+  @Input()
+  controlFormArray?: FormControl;
+
+  previewUrl: string | null = null;
+  previousUrl: string | null = null;
+  @ViewChild('videoPlayer') videoPlayer: ElementRef | undefined;
 
   ngOnInit() {
     this.control = this.group!.get(this.field)!;
+
+    this.initImageFile(this.control);
+    this.initVideoFile(this.control);
+  }
+
+  initImageFile(control: AbstractControl) {
     if (this.rowType === 'imageFile') {
-      this.previewImageUrl = 'https://placehold.co/400'
-      this.control.valueChanges.subscribe(value => {
+      this.previewUrl = 'https://placehold.co/400'
+      control.valueChanges.subscribe(value => {
         if (value) {
-          this.previewImageUrl = value
-          this.previousImageUrl = value
+          this.previewUrl = value
+          this.previousUrl = value
         } else {
-          this.previewImageUrl = 'https://placehold.co/400'
+          this.previewUrl = 'https://placehold.co/400'
+        }
+      })
+    }
+  }
+
+  initVideoFile(control: AbstractControl) {
+    if (this.rowType === 'videoFile') {
+      this.previewUrl = ''
+      control.valueChanges.subscribe(value => {
+        if (value) {
+          this.previewUrl = value
+          this.previousUrl = value
+        } else {
+          this.previewUrl = ''
         }
       })
     }
@@ -74,7 +112,6 @@ export class InputRowComponent implements OnChanges, OnInit{
     }
   }
 
-  // thống nhất dữ liệu
   @HostListener('input', ['$event.target'])
   onEvent(target: HTMLInputElement) {
     if (target.value === '') {
@@ -98,15 +135,17 @@ export class InputRowComponent implements OnChanges, OnInit{
     const fileInput = event.target as HTMLInputElement;
     const file = fileInput.files![0];
 
-    if (this.previousImageUrl) {
+    if (this.previousUrl) {
       this.deletePreviousFile();
     }
 
     this.uploadService.upload(file).subscribe({
       next: response => {
         this.control?.setValue(response.url);
-        this.previewImageUrl = response.url;
-        this.previousImageUrl = response.url;
+        this.previewUrl = response.url;
+        this.previousUrl = response.url;
+        // reload native element
+        this.videoPlayer?.nativeElement.load();
       },
       error: (error) => this.errorHandler.handleServerError(error.error, this.group)
     })
@@ -114,27 +153,15 @@ export class InputRowComponent implements OnChanges, OnInit{
   }
 
   deletePreviousFile() {
-    if (this.previousImageUrl) {
-      this.uploadService.delete(this.previousImageUrl).subscribe({
+    if (this.previousUrl) {
+      this.uploadService.delete(this.previousUrl).subscribe({
         next: () => {
-          this.previousImageUrl = null;
+          this.previousUrl = null;
         },
         error: error => this.errorHandler.handleServerError(error, this.group)
       })
     }
 
-  }
-
-  get formArray(): FormArray {
-    return this.group?.get(this.field) as FormArray;
-  }
-
-  addItem() {
-    this.formArray.push(new FormControl(''))
-  }
-
-  removeItem(i: number) {
-    this.formArray.removeAt(i);
   }
 
 }

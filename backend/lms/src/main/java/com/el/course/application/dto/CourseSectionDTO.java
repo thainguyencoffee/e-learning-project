@@ -1,25 +1,18 @@
 package com.el.course.application.dto;
 
+import com.el.common.ValidateMessages;
 import com.el.course.domain.CourseSection;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-
-import java.util.Set;
+import jakarta.validation.constraints.Size;
 
 public record CourseSectionDTO(
-        @NotBlank(message = "Section title is required")
-        String title,
-        @Valid
-        @NotEmpty(message = "At least one lesson is required")
-        Set<LessonDTO> lessons
+        @NotBlank(message = ValidateMessages.NOT_BLANK)
+        @Size(max = 255, message = ValidateMessages.MAX_LENGTH)
+        @Size(min = 10, message = ValidateMessages.MIN_LENGTH)
+        String title
 ) {
 
     public CourseSection toCourseSection() {
-        CourseSection courseSection = new CourseSection(title);
-        for (LessonDTO lessonDTO : lessons) {
-            courseSection.addLesson(lessonDTO.toLesson());
-        }
-        return courseSection;
+        return new CourseSection(title);
     }
 }

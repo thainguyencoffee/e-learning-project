@@ -15,7 +15,6 @@ import {NgIf} from "@angular/common";
     NgIf
   ],
   templateUrl: './header.component.html',
-  styleUrl: './header.component.css'
 })
 export class HeaderComponent {
 

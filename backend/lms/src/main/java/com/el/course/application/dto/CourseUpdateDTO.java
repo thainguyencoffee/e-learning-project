@@ -1,19 +1,23 @@
 package com.el.course.application.dto;
 
+import com.el.common.ValidateMessages;
 import com.el.course.application.validate.EachItemStringMaxSize;
 import com.el.course.domain.Language;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.util.Set;
 
 public record CourseUpdateDTO(
-        @NotBlank(message = "Title is required")
+        @NotBlank(message = ValidateMessages.NOT_BLANK)
+        @Size(max = 255, message = ValidateMessages.MAX_LENGTH)
+        @Size(min = 10, message = ValidateMessages.MIN_LENGTH)
         String title,
         String description,
         String thumbnailUrl,
-        @EachItemStringMaxSize(max = 255, message = "Benefit is too long")
+        @EachItemStringMaxSize(max = 255)
         Set<String> benefits,
-        @EachItemStringMaxSize(max = 255, message = "Prerequisite is too long")
+        @EachItemStringMaxSize(max = 255)
         Set<String> prerequisites,
         Set<Language> subtitles
 ) {

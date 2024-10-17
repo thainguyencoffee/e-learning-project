@@ -622,11 +622,11 @@
       "http://localhost:7080/bff/login/oauth2/code/keycloak101",
       "http://127.0.0.1:7080/bff/login/oauth2/code/keycloak101",
       "http://host.docker.internal:7080/bff/login/oauth2/code/keycloak101",
-      "http://heaven-host:7080/bff/login/oauth2/code/keycloak101",
+      "http://ubuntu:7080/bff/login/oauth2/code/keycloak101",
       "https://localhost:7080/bff/login/oauth2/code/keycloak101",
       "https://127.0.0.1:7080/bff/login/oauth2/code/keycloak101",
       "https://host.docker.internal:7080/bff/login/oauth2/code/keycloak101",
-      "https://heaven-host:7080/bff/login/oauth2/code/keycloak101"
+      "https://ubuntu:7080/bff/login/oauth2/code/keycloak101"
     ],
     "webOrigins" : [ "+" ],
     "notBefore" : 0,
@@ -643,8 +643,8 @@
       "oidc.ciba.grant.enabled" : "false",
       "client.secret.creation.time" : "1728051978",
       "backchannel.logout.session.required" : "true",
-      "backchannel.logout.url" : "http://heaven-host:7080/bff/logout/connect/back-channel/keycloak101",
-      "post.logout.redirect.uris" : "http://localhost:7080/*##http://127.0.0.1:7080/*##https://localhost:7080/*##https://127.0.0.1:7080/*##http://heaven-host:7080/*##https://heaven-host:7080/*",
+      "backchannel.logout.url" : "http://ubuntu:7080/bff/logout/connect/back-channel/keycloak101",
+      "post.logout.redirect.uris" : "http://localhost:7080/*##http://127.0.0.1:7080/*##https://localhost:7080/*##https://127.0.0.1:7080/*##http://ubuntu:7080/*##https://ubuntu:7080/*",
       "display.on.consent.screen" : "false",
       "oauth2.device.authorization.grant.enabled" : "false",
       "backchannel.logout.revoke.offline.tokens" : "false"

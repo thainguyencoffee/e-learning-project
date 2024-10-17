@@ -291,12 +291,6 @@ class CourseTests {
     }
 
     @Test
-    void addSection_SectionWithoutLessons_ThrowsException() {
-        CourseSection section = new CourseSection("SectionTitle");
-        assertThrows(InputInvalidException.class, () -> courseNoSections.addSection(section));
-    }
-
-    @Test
     void addSection_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
         when(course.canEdit()).thenReturn(false); // Giả lập khóa học đã publish

@@ -538,7 +538,7 @@ class CourseManagementControllerTests {
         Mockito.when(courseService.addSection(any(Long.class), any(CourseSectionDTO.class)))
                 .thenReturn(updatedCourse);
 
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("SectionTitle", Set.of(new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null)));
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
         mockMvc.perform(post("/courses/1/sections")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -553,7 +553,7 @@ class CourseManagementControllerTests {
     void addSection_CourseNotFound_ThrowsException() throws Exception {
         Mockito.doThrow(new ResourceNotFoundException()).when(courseService).addSection(any(Long.class), any(CourseSectionDTO.class));
 
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("SectionTitle", Set.of(new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null)));
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
         mockMvc.perform(post("/courses/1/sections")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -568,7 +568,7 @@ class CourseManagementControllerTests {
         Mockito.doThrow(new InputInvalidException("Section with the same title already exists."))
                 .when(courseService).addSection(any(Long.class), any(CourseSectionDTO.class));
 
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("", Set.of(new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null)));
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("");
 
         mockMvc.perform(post("/courses/1/sections")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -582,18 +582,7 @@ class CourseManagementControllerTests {
         Mockito.doThrow(new InputInvalidException("Section with the same title already exists."))
                 .when(courseService).addSection(any(Long.class), any(CourseSectionDTO.class));
 
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Section", Set.of(new LessonDTO("", Lesson.Type.TEXT, "https://example.com", null)));
-
-        mockMvc.perform(post("/courses/1/sections")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(sectionDTO))
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void addSection_SectionWithoutLessons_ThrowsException() throws Exception {
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("SectionTitle", Set.of());
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
         mockMvc.perform(post("/courses/1/sections")
                         .contentType(MediaType.APPLICATION_JSON)

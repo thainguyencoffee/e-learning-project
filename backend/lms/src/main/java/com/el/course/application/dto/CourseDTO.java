@@ -1,5 +1,6 @@
 package com.el.course.application.dto;
 
+import com.el.common.ValidateMessages;
 import com.el.course.application.validate.EachItemStringMaxSize;
 import com.el.course.domain.Course;
 import com.el.course.domain.Language;
@@ -8,10 +9,12 @@ import jakarta.validation.constraints.Size;
 
 import java.util.Set;
 
-public record CourseDTO (
-        @NotBlank(message = "Title is required")
+public record CourseDTO(
+        @NotBlank(message = ValidateMessages.NOT_BLANK)
+        @Size(max = 255, message = ValidateMessages.MAX_LENGTH)
+        @Size(min = 10, message = ValidateMessages.MIN_LENGTH)
         String title,
-        @Size(max = 2000, message = "Description is too long")
+        @Size(max = 2000, message = ValidateMessages.MAX_LENGTH)
         String description,
         String thumbnailUrl,
         @EachItemStringMaxSize(max = 255)

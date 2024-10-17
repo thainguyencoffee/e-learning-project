@@ -16,5 +16,5 @@ export const appConfig: ApplicationConfig = {
       provideHttpClient()],
 };
 
-export const reverseProxyUri = 'http://ubuntu:7080';
+export const reverseProxyUri = 'http://LOCALHOST_NAME:7080';
 export const baseUri = `${reverseProxyUri}/angular-ui`;

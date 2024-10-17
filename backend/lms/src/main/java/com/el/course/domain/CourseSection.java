@@ -47,7 +47,9 @@ public class CourseSection {
     public void updateLesson(Long lessonId, Lesson updatedLesson) {
         Lesson lesson = findLessonById(lessonId);
 
-        if (this.lessons.stream().anyMatch(l -> l.getTitle().equals(updatedLesson.getTitle()) || l.getLink().equals(updatedLesson.getLink()))) {
+        if (this.lessons.stream()
+                .filter(l -> !l.getId().equals(lessonId))  // Loại trừ bài học hiện tại
+                .anyMatch(l -> l.getTitle().equals(updatedLesson.getTitle()) || l.getLink().equals(updatedLesson.getLink()))) {
             throw new InputInvalidException("Duplicate lesson title or link.");
         }
 

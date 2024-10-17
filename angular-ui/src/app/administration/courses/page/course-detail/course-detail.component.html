@@ -10,29 +10,29 @@
   <section id="basic" class="pt-3">
     <h2>Basic information</h2>
     <!-- Title -->
-    <h5>Title: {{ courseDto?.title ? courseDto.title : 'No title available' }}</h5>
+    <h5>Title: {{ courseDto.title }}</h5>
 
     <!-- Image -->
-    <img [src]="courseDto?.thumbnailUrl ? courseDto?.thumbnailUrl : 'https://placehold.jp/200x200.png'"
+    <img [src]="courseDto.thumbnailUrl || 'https://placehold.jp/200x200.png'"
          class="img-thumbnail mb-2" alt="Course Thumbnail"
          style="max-height: 200px;">
 
     <!-- Description -->
     <p class="d-block">
-      Description: {{ courseDto?.description ? courseDto.description : 'No description available' }}</p>
+      Description: {{ courseDto.description || 'No description available' }}</p>
 
     <!-- Language -->
     <p class="d-block">Language:
-      <span class="fw-bold">{{ courseDto?.language ? courseDto.language : 'Language not specified' }}</span>
+      <span class="fw-bold">{{ courseDto.language }}</span>
     </p>
 
     <!-- Price and Discounted Price -->
-    <p>Price: {{ courseDto?.price ? courseDto.price : 'Price not available' }}</p>
-    <p>Discounted Price: {{ courseDto?.discountedPrice ? courseDto.discountedPrice : 'No discount available' }}</p>
+    <p>Price: {{ courseDto.price || 'Price not available' }}</p>
+    <p>Discounted Price: {{ courseDto.discountedPrice || 'No discount available' }}</p>
 
     <!-- Published Status -->
     <p [class]="courseDto.published ? 'badge bg-success' : 'badge bg-primary'">
-      Status: {{ courseDto?.published ? 'Published' : 'Not published' }}</p>
+      Status: {{ courseDto.published ? 'Published' : 'Not published' }}</p>
 
     <!--Subtitles-->
     <div id="subtitles">
@@ -83,12 +83,51 @@
   <!-- Accessibility Section -->
   <section id="accessibility" class="pt-3">
     <h2>Accessibility</h2>
-    <p>Created by: {{ courseDto?.createdBy }}</p>
-    <p>Created date: {{ courseDto?.createdDate }}</p>
-    <p>Last modified by: {{ courseDto?.lastModifiedBy }}</p>
-    <p>Last modified date: {{ courseDto?.lastModifiedDate }}</p>
+    <p>Created by: {{ courseDto.createdBy }}</p>
+    <p>Created date: {{ courseDto.createdDate }}</p>
+    <p>Last modified by: {{ courseDto.lastModifiedBy }}</p>
+    <p>Last modified date: {{ courseDto.lastModifiedDate }}</p>
   </section>
 
+  <!--Section-->
+  <div id="sections">
+    <h5>Sections</h5>
 
+    <div *ngIf="courseDto?.sections?.length === 0">
+    <span class="badge bg-dark">
+      No prerequisites available
+    </span>
+    </div>
+
+    <div *ngIf="courseDto?.sections?.length !== 0" class="table-responsive">
+      <table class="table table-striped table-hover align-middle">
+        <thead>
+        <tr>
+          <th scope="col">Id</th>
+          <th scope="col">Title</th>
+          <th><!-- --></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let section of courseDto.sections;">
+          <td>{{ section.id }}</td>
+          <td>{{ section.title }}</td>
+          <td>
+            <div class="float-end text-nowrap d-flex">
+              <a [routerLink]="['/administration/courses/', currentId, 'sections', section.id]"
+                 class="btn btn-sm btn-secondary me-2">View section detail</a>
+              <a [routerLink]="['/administration/courses', currentId, 'sections', 'edit', section.id]"
+                 class="btn btn-sm btn-secondary me-2">Edit Section</a>
+              <button type="button" (click)="confirmDelete(section.id)"
+                      class="btn btn-sm btn-secondary me-2">Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
 
 </div>
