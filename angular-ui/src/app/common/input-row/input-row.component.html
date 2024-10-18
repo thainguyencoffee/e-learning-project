@@ -3,12 +3,12 @@
     <div class="col-md-10 offset-md-2">
       <div class="form-check">
         <input [id]="field" [formControlName]="field" type="checkbox"
-               class="form-check-input {{ getInputClasses() }}" />
+               class="form-check-input {{ getInputClasses() }}"/>
         <label [for]="field" class="form-check-label">
           {{ label + (isRequired() ? '*' : '') }}
         </label>
       </div>
-      <app-input-errors [control]="control" />
+      <app-input-errors [control]="control"/>
     </div>
   } @else {
     <label [for]="rowType === 'radio' ? '' : field" class="col-md-2 col-form-label">
@@ -17,10 +17,10 @@
     <div class="col-md-10">
       @if (rowType === 'text' || rowType === 'password' || rowType === 'email' || rowType === 'tel') {
         <input [id]="field" [type]="rowType" [formControlName]="field"
-               class="form-control {{ getInputClasses() }}" />
+               class="form-control {{ getInputClasses() }}"/>
       } @else if (rowType === 'number') {
         <input [id]="field" type="number" [formControlName]="field"
-               class="form-control {{ getInputClasses() }}" />
+               class="form-control {{ getInputClasses() }}"/>
       } @else if (rowType === 'textarea') {
         <textarea [id]="field" [formControlName]="field"
                   class="form-control {{ getInputClasses() }}"></textarea>
@@ -43,27 +43,38 @@
         @if (!isRequired()) {
           <div class="form-check form-check-inline pt-2">
             <input [id]="field" [formControlName]="field" [value]="null" type="radio"
-                   class="form-check-input {{ inputClass }}" />
+                   class="form-check-input {{ inputClass }}"/>
             <label [for]="field" class="form-check-label">Please select</label>
           </div>
         }
         @for (option of optionsMap | keyvalue; track option.key) {
           <div class="form-check form-check-inline pt-2">
-            <input [id]="field + '_' + option.key" [formControlName]="field" [value]="option.key" type="radio"
-                   class="form-check-input {{ getInputClasses() }}" />
+            <input
+              [id]="field + '_' + option.key"
+              [formControlName]="field"
+              [value]="option.key"
+              type="radio"
+              class="form-check-input {{ getInputClasses() }}"
+              (click)="onRadioOptionsSelected(option.key)"/>
             <label [for]="field + '_' + option.key" class="form-check-label">{{ option.value }}</label>
           </div>
         }
       } @else if (rowType === 'imageFile') {
-        <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}" />
-        <img [src]="previewUrl" alt="Image preview" class="img-thumbnail mt-2" style="max-height: 200px;" />
+        <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}"
+               accept=".jpg, .jpeg, .png"/>
+        <img [src]="previewUrl" alt="Image preview" class="img-thumbnail mt-2" style="max-height: 200px;"/>
       } @else if (rowType === 'videoFile') {
-        <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}" />
+        <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}"
+               accept=".mp4"/>
         <video *ngIf="previewUrl" #videoPlayer id="myVideo" controls width="100%">
           <source [src]="previewUrl" type="video/mp4">
         </video>
+      } @else if (rowType == 'docFile') {
+        <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}"
+               accept=".pdf, .doc, .docx"/>
+        <p *ngIf="previewUrl">Your document was uploaded: {{ previewUrl }}</p>
       }
-      <app-input-errors [control]="control" />
+      <app-input-errors [control]="control"/>
     </div>
   }
 </div>

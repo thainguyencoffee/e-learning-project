@@ -8,6 +8,7 @@ import {EditCourseComponent} from "./administration/courses/page/edit-course/edi
 import {CourseDetailComponent} from "./administration/courses/page/course-detail/course-detail.component";
 import { AddSectionComponent } from './administration/courses/page/add-section/add-section.component';
 import {EditSectionComponent} from "./administration/courses/page/edit-section/edit-section.component";
+import {AddLessonComponent} from "./administration/courses/page/add-lesson/add-lesson.component";
 
 export const routes: Routes = [
   {
@@ -50,6 +51,11 @@ export const routes: Routes = [
         path: 'courses/:id/sections/edit/:sectionId',
         component: EditSectionComponent
       },
+      {
+        title: "Add Lesson",
+        path: 'courses/:courseId/sections/:sectionId/lessons/add',
+        component: AddLessonComponent
+      }
     ]
   },
   {

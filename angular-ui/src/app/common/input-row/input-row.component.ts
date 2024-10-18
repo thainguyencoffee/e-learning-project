@@ -12,7 +12,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {
-  AbstractControl, FormControl,
+  AbstractControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
@@ -36,8 +36,6 @@ export class InputRowComponent implements OnChanges, OnInit {
   errorHandler = inject(ErrorHandler);
   router = inject(Router);
 
-  @Output() optionsMapEvent = new EventEmitter<string>();
-
   @Input({ required: true })
   group?: FormGroup;
 
@@ -59,15 +57,11 @@ export class InputRowComponent implements OnChanges, OnInit {
   control?: AbstractControl;
   optionsMap?: Map<string | number, string>;
 
-  @Input()
-  formArrayName?: string | undefined
-
-  @Input()
-  controlFormArray?: FormControl;
-
   previewUrl: string | null = null;
   previousUrl: string | null = null;
   @ViewChild('videoPlayer') videoPlayer: ElementRef | undefined;
+
+  @Output() optionsChange = new EventEmitter<string>();
 
   ngOnInit() {
     this.control = this.group!.get(this.field)!;
@@ -110,6 +104,10 @@ export class InputRowComponent implements OnChanges, OnInit {
     } else {
       this.optionsMap = new Map(Object.entries(this.options));
     }
+  }
+
+  onRadioOptionsSelected(option: any) {
+    this.optionsChange.emit(option);
   }
 
   @HostListener('input', ['$event.target'])

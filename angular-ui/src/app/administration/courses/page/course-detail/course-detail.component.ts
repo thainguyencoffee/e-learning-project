@@ -5,6 +5,7 @@ import {Course} from "../../model/view/course";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
 import {NgForOf, NgIf} from "@angular/common";
 import {Subscription} from "rxjs";
+import {UserService} from "../../../../common/auth/user.service";
 
 @Component({
   selector: 'app-course-detail',
@@ -22,6 +23,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
   router = inject(Router);
   courseService = inject(CourseService);
   errorHandler = inject(ErrorHandler);
+  userService = inject(UserService);
 
   currentId?: number;
   courseDto?: Course
@@ -53,18 +55,19 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
   getMessage(key: string, details?: any) {
     const messages: Record<string, string> = {
       confirm: 'Do you really want to delete this element?',
-      deleted: `Course section was removed successfully.`
+      sectionDeleted: `Course section was removed successfully.`,
+      lessonDeleted: `Course lesson was removed successfully.`
     }
     return messages[key];
   }
 
-  confirmDelete(sectionId: number) {
+  confirmDeleteSection(sectionId: number) {
     if (confirm(this.getMessage('confirm'))) {
       this.courseService.deleteSection(this.currentId!, sectionId)
         .subscribe({
           next: () => this.router.navigate(['/administration/courses', this.currentId], {
             state: {
-              msgSuccess: this.getMessage('deleted')
+              msgSuccess: this.getMessage('sectionDeleted')
             }
           }),
           error: (error) => this.errorHandler.handleServerError(error.error)
@@ -73,5 +76,23 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
 
   }
 
+  confirmDeleteLesson(sectionId: number, lessonId: number) {
+    if (confirm(this.getMessage('confirm'))) {
+      this.courseService.deleteLesson(this.currentId!, sectionId, lessonId)
+        .subscribe({
+          next: () => this.router.navigate(['/administration/courses', this.currentId], {
+            state: {
+              msgSuccess: this.getMessage('lessonDeleted')
+            }
+          }),
+          error: (error) => this.errorHandler.handleServerError(error.error)
+        });
+    }
+
+  }
+
+  isCreateByYou(teacherId: string) {
+    return this.userService.current.name === teacherId;
+  }
 
 }
