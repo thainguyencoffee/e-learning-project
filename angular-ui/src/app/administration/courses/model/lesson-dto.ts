@@ -1,5 +1,10 @@
-export interface LessonDto {
-  title: string,
-  type: string,
-  link: string
+export class LessonDto {
+  title?: string | null;
+  type?: string | null;
+  link?: string | null;
+
+  constructor(data: Partial<LessonDto>) {
+    Object.assign(this, data);
+  }
+
 }

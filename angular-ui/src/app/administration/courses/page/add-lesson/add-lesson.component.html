@@ -1,0 +1,15 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Add Lesson</h1>
+  <div>
+    <a [routerLink]="['/administration/courses', courseId]" class="btn btn-secondary">Back to course detail</a>
+  </div>
+</div>
+
+<form [formGroup]="addForm" (ngSubmit)="handleSubmit()">
+  <app-input-row [group]="addForm" field="title" label="Title"/>
+  <app-input-row [group]="addForm" field="type" rowType="radio" [options]="lessonTypesMap" label="Lesson type" (optionsChange)="lessonTypeChange($event)"/>
+  @if (typeOfInputFile) {
+    <app-input-row [group]="addForm" field="link" [rowType]="typeOfInputFile" [label]="typeOfInputFile === 'videoFile' ? 'Upload Video' : 'Upload Document'"/>
+  }
+  <input type="submit" value="Add Section" class="btn btn-primary mt-4" />
+</form>

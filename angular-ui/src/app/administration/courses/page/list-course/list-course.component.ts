@@ -4,7 +4,8 @@ import {Course} from "../../model/view/course";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
 import {NavigationEnd, Router, RouterLink} from "@angular/router";
 import {Subscription} from "rxjs";
-import {NgForOf, NgOptimizedImage} from "@angular/common";
+import {NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
+import {UserService} from "../../../../common/auth/user.service";
 
 @Component({
   selector: 'app-list-course',
@@ -12,14 +13,16 @@ import {NgForOf, NgOptimizedImage} from "@angular/common";
   imports: [
     RouterLink,
     NgOptimizedImage,
-    NgForOf
+    NgForOf,
+    NgIf
   ],
   templateUrl: './list-course.component.html',
 })
 export class ListCourseComponent implements OnInit{
 
   constructor(
-    private courseService: CourseService) {
+    private courseService: CourseService,
+    private userService: UserService) {
   }
 
   errorHandler = inject(ErrorHandler);
@@ -92,6 +95,10 @@ export class ListCourseComponent implements OnInit{
 
     }
 
+  }
+
+  isAdminCourse(teacherId: string) {
+    return this.userService.current.hasAnyRole('ROLE_admin') && this.userService.current.name === teacherId;
   }
 
 }
