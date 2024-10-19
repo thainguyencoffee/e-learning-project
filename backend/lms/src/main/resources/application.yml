@@ -9,6 +9,13 @@ lms-port: 7084
 
 server:
   port: ${lms-port}
+  shutdown: graceful
+  tomcat:
+    threads:
+      min-spare: 5
+      max: 50
+    keep-alive-timeout: 15s
+    connection-timeout: 2s
 
 spring:
   application:
@@ -21,6 +28,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/lms
     username: postgres
     password: secret
+    hikari:
+      connection-timeout: 2000 #ms
+      maximum-pool-size: 20
   security:
     oauth2:
       resourceserver:
@@ -50,11 +60,14 @@ error:
     log-levels:
       5xx: ERROR
 
-digitalocean:
-  spaces:
-    endpoint: https://bookstore-bucket.sgp1.digitaloceanspaces.com
-    access-key: DO00XXYJDDAPT9EXWVF8
-    secret-key: ZY2YAo3WrW+Eq28oLYVW89mDwst//QLJyqiF4TMP+Vg
-    bucket-name: bookstore-bucket
-
 STRIPE_SECRET_KEY: sk_test_51PtPqOLcSSqgAPH9SPAVNGV3vMYll5CNIvCUHFT7RJWIPkHTHa9LySfuiswCMvYlbe5KwKavly4QV6rjJP2zVBoS00x6oNhWCR
+
+cloudinary:
+  api-key: ${CLOUDINARY_APIKEY:877596511851618}
+  api-secret: ${CLOUDINARY_API_SECRET:n9G3BbaUOOevIKWEuT0vYAm3EDM}
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:dl0v8gbku}
+s3:
+  access-key: DO00XXYJDDAPT9EXWVF8
+  secret-key: ZY2YAo3WrW+Eq28oLYVW89mDwst//QLJyqiF4TMP+Vg
+  endpoint: https://bookstore-bucket.sgp1.digitaloceanspaces.com
+  bucket-name: bookstore-bucket

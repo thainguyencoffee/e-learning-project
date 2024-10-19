@@ -135,7 +135,7 @@
                  class="btn btn-sm btn-secondary me-2">Edit Section</a>
               <a [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'add']"
                  class="btn btn-sm btn-secondary me-2">Add Lesson</a>
-              <button type="button" (click)="confirmDeleteSection(section.id)"
+              <button type="button" (click)="confirmDeleteSection(section.id, section)"
                       class="btn btn-sm btn-secondary me-2">Delete
               </button>
             </div>
@@ -152,6 +152,7 @@
           <tr>
             <th>Id</th>
             <th>Title</th>
+            <td>Type</td>
             <th>Preview</th>
             <th><!-- --></th>
           </tr>
@@ -160,10 +161,13 @@
           <tr *ngFor="let lesson of section.lessons">
             <td>{{ lesson.id }}</td>
             <td>{{ lesson.title }}</td>
+            <td>{{ lesson.type }}</td>
             <td><a [href]="lesson.link" target="_blank">View content</a></td>
 
             <td>
-              <button type="button" (click)="confirmDeleteLesson(section.id, lesson.id)"
+              <a [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'edit', lesson.id]"
+                 class="btn btn-sm btn-secondary me-2">Edit Lesson</a>
+              <button type="button" (click)="confirmDeleteLesson(section.id, lesson.id, lesson)"
                       class="btn btn-sm btn-secondary me-2">Delete
               </button>
             </td>

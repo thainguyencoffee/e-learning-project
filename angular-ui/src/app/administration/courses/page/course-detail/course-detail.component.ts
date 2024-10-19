@@ -6,6 +6,8 @@ import {ErrorHandler} from "../../../../common/error-handler.injectable";
 import {NgForOf, NgIf} from "@angular/common";
 import {Subscription} from "rxjs";
 import {UserService} from "../../../../common/auth/user.service";
+import {Section} from "../../model/view/section";
+import {Lesson} from "../../model/view/lesson";
 
 @Component({
   selector: 'app-course-detail',
@@ -61,9 +63,9 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
     return messages[key];
   }
 
-  confirmDeleteSection(sectionId: number) {
+  confirmDeleteSection(sectionId: number, section: Section) {
     if (confirm(this.getMessage('confirm'))) {
-      this.courseService.deleteSection(this.currentId!, sectionId)
+      this.courseService.deleteSection(this.currentId!, sectionId, section)
         .subscribe({
           next: () => this.router.navigate(['/administration/courses', this.currentId], {
             state: {
@@ -76,9 +78,9 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
 
   }
 
-  confirmDeleteLesson(sectionId: number, lessonId: number) {
+  confirmDeleteLesson(sectionId: number, lessonId: number, lesson: Lesson) {
     if (confirm(this.getMessage('confirm'))) {
-      this.courseService.deleteLesson(this.currentId!, sectionId, lessonId)
+      this.courseService.deleteLesson(this.currentId!, sectionId, lessonId, lesson)
         .subscribe({
           next: () => this.router.navigate(['/administration/courses', this.currentId], {
             state: {

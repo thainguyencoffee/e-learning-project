@@ -30,7 +30,7 @@ export class EditSectionComponent implements OnInit{
 
   getMessage(key: string, details?: any) {
     const messages: Record<string, string> = {
-      updated: `Course was updated successfully.`
+      updated: `Course section was updated successfully.`
     };
     return messages[key];
   }
