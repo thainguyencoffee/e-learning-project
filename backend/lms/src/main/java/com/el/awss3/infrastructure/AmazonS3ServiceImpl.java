@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -27,6 +28,7 @@ class AmazonS3ServiceImpl implements AmazonS3Service {
     @Value("${digitalocean.spaces.bucket-name}")
     private @Setter String bucketName;
 
+    @Override
     public String uploadFile(MultipartFile file) {
         String fileName = file.getOriginalFilename();
         if (fileName == null) {
@@ -48,6 +50,7 @@ class AmazonS3ServiceImpl implements AmazonS3Service {
         return amazonS3.getUrl(bucketName, uniqueFileName).toString();
     }
 
+    @Override
     public void deleteFile(String url) {
         try {
             amazonS3.deleteObject(bucketName, cutURL(url, bucketName));
@@ -56,6 +59,12 @@ class AmazonS3ServiceImpl implements AmazonS3Service {
             log.error("Error deleting media with url {}.", url);
             throw new AmazonServiceS3Exception("Delete media failed.");
         }
+    }
+
+    @Override
+    public void deleteFiles(Set<String> urls) {
+        for (String url : urls)
+            deleteFile(url);
     }
 
     private String cutURL(String url, String bucketName) {

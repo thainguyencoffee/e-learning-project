@@ -32,9 +32,23 @@ export class CourseService {
     return this.http.post<Course>(this.resourcePath, data);
   }
 
-  deleteCourse(id: number, thumbnailUrl?: string) {
-    if (thumbnailUrl) {
-      return this.uploadService.delete(thumbnailUrl).pipe(
+  deleteCourse(id: number, course?: Course) {
+    const links: string[] = [];
+
+    if (course?.thumbnailUrl) {
+      links.push(course.thumbnailUrl);
+    }
+
+    course?.sections?.forEach(section => {
+      section.lessons?.forEach(lesson => {
+        if (lesson.link) {
+          links.push(lesson.link);
+        }
+      });
+    });
+
+    if (links) {
+      return this.uploadService.deleteAll(links).pipe(
         switchMap(() => this.http.delete<void>(this.resourcePath + '/' + id))
       );
     } else {

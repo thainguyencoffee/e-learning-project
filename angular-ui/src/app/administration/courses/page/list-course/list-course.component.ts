@@ -81,9 +81,9 @@ export class ListCourseComponent implements OnInit{
       });
   }
 
-  confirmDelete(id: number, thumbnailUrl?: string) {
+  confirmDelete(id: number, course?: Course) {
     if (confirm(this.getMessage('confirm'))) {
-      this.courseService.deleteCourse(id, thumbnailUrl)
+      this.courseService.deleteCourse(id, course)
         .subscribe({
           next: () => this.router.navigate(['/administration/courses'], {
             state: {

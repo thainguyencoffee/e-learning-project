@@ -23,4 +23,8 @@ export class UploadService {
     return this.http.delete<void>(`/bff/api/upload/${base64EncodedUrl}`);
   }
 
+  deleteAll(imageUrls: string[]) {
+    return this.http.delete('/bff/api/upload', { body: { urls: imageUrls }});
+  }
+
 }

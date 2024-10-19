@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.el.awss3.application.AmazonS3Service;
 import com.el.awss3.application.AmazonServiceS3Exception;
 import com.el.common.config.SecurityConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -23,6 +24,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Base64;
+import java.util.Set;
 import java.util.UUID;
 
 @WebMvcTest(UploadDataController.class)
@@ -34,6 +36,9 @@ class UploadDataControllerTests {
 
     @MockBean
     private AmazonS3Service amazonS3Service;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     public void setUp() {
@@ -204,4 +209,43 @@ class UploadDataControllerTests {
                         .with(SecurityMockMvcRequestPostProcessors.jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
                 .andExpect(status().isInternalServerError());
     }
+
+    @Test
+    void whenDeleteAllWithTeacherThen204() throws Exception {
+        // Arrange
+        Set<String> urlsSet = Set.of(
+                "https://example.com/bucket-name/" + UUID.randomUUID(),
+                "https://example.com/bucket-name/" + UUID.randomUUID(),
+                "https://example.com/bucket-name/" + UUID.randomUUID());
+        var objectUrls = new UploadDataController.ObjectUrls(urlsSet);
+
+        doNothing().when(amazonS3Service).deleteFiles(urlsSet);
+
+        // Gửi yêu cầu DELETE đến endpoint /upload/{urlEncode}
+        mockMvc.perform(delete("/upload")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(objectUrls))
+                        .with(SecurityMockMvcRequestPostProcessors.jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void whenDeleteAllWithUserRoleThen403() throws Exception {
+        // Arrange
+        Set<String> urlsSet = Set.of(
+                "https://example.com/bucket-name/" + UUID.randomUUID(),
+                "https://example.com/bucket-name/" + UUID.randomUUID(),
+                "https://example.com/bucket-name/" + UUID.randomUUID());
+        var objectUrls = new UploadDataController.ObjectUrls(urlsSet);
+
+        doNothing().when(amazonS3Service).deleteFiles(urlsSet);
+
+        // Gửi yêu cầu DELETE đến endpoint /upload/{urlEncode}
+        mockMvc.perform(delete("/upload")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(objectUrls))
+                        .with(SecurityMockMvcRequestPostProcessors.jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
+                .andExpect(status().isForbidden());
+    }
+
 }

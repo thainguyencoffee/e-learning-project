@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Base64;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -28,6 +29,13 @@ public class UploadDataController {
         return new ResponseEntity<>(new ObjectUrl(fileUrl), HttpStatus.CREATED);
     }
 
+    @DeleteMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> deleteAll(@RequestBody ObjectUrls objectUrls) {
+        log.info("Deleting files: {}", objectUrls.urls());
+        amazonS3Service.deleteFiles(objectUrls.urls());
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/{urlEncode}")
     public ResponseEntity<Void> delete(@PathVariable String urlEncode) {
         String url = new String(Base64.getDecoder().decode(urlEncode));
@@ -35,6 +43,10 @@ public class UploadDataController {
         amazonS3Service.deleteFile(url);
         return ResponseEntity.noContent().build();
     }
+
+    record ObjectUrls(
+            Set<String> urls
+    ) {}
 
     record ObjectUrl(
             String url
