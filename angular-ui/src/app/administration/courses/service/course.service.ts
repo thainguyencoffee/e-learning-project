@@ -8,6 +8,8 @@ import {EditCourseDto} from "../model/edit-course.dto";
 import {PageWrapper} from "../model/view/page-wrapper";
 import {SectionDto} from "../model/section-dto";
 import {LessonDto} from "../model/lesson-dto";
+import {Section} from "../model/view/section";
+import {Lesson} from "../model/view/lesson";
 
 @Injectable(
   {providedIn: 'root'}
@@ -64,8 +66,20 @@ export class CourseService {
     return this.http.post(`${this.resourcePath}/${id}/sections`, data)
   }
 
-  deleteSection(currentId: number, sectionId: number) {
-    return this.http.delete(`${this.resourcePath}/${currentId}/sections/${sectionId}`)
+  deleteSection(currentId: number, sectionId: number, section: Section) {
+    const links: string[] = [];
+    section.lessons?.forEach(lesson => {
+      if (lesson.link) {
+        links.push(lesson.link);
+      }
+    });
+    if (links) {
+      return this.uploadService.deleteAll(links)
+        .pipe(switchMap(() => this.http.delete(`${this.resourcePath}/${currentId}/sections/${sectionId}`)))
+    }
+    else {
+      return this.http.delete(`${this.resourcePath}/${currentId}/sections/${sectionId}`)
+    }
   }
 
   updateSection(courseId: number, sectionId: number | undefined, data: SectionDto) {
@@ -76,8 +90,17 @@ export class CourseService {
     return this.http.post(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons`, data);
   }
 
-  deleteLesson(courseId: number, sectionId: number, lessonId: number) {
-    return this.http.delete(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons/${lessonId}`);
+  deleteLesson(courseId: number, sectionId: number, lessonId: number, lesson: Lesson) {
+    if (lesson.link) {
+      return this.uploadService.deleteAll([lesson.link])
+        .pipe(switchMap(() => this.http.delete(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons/${lessonId}`)))
+    } else {
+      return this.http.delete(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons/${lessonId}`);
+    }
+  }
+
+  updateLesson(courseId: number, sectionId: number, lessonId: number, data: LessonDto) {
+    return this.http.put<Course>(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons/${lessonId}`, data);
   }
 
 }

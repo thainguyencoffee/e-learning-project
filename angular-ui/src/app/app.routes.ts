@@ -9,6 +9,7 @@ import {CourseDetailComponent} from "./administration/courses/page/course-detail
 import { AddSectionComponent } from './administration/courses/page/add-section/add-section.component';
 import {EditSectionComponent} from "./administration/courses/page/edit-section/edit-section.component";
 import {AddLessonComponent} from "./administration/courses/page/add-lesson/add-lesson.component";
+import {EditLessonComponent} from "./administration/courses/page/edit-lesson/edit-lesson.component";
 
 export const routes: Routes = [
   {
@@ -32,6 +33,11 @@ export const routes: Routes = [
         component: AddCourseComponent
       },
       {
+        title: 'Edit course',
+        path: 'courses/edit/:id',
+        component: EditCourseComponent
+      },
+      {
         title: 'Course detail management center!',
         path: 'courses/:id',
         component: CourseDetailComponent
@@ -42,11 +48,6 @@ export const routes: Routes = [
         component: AddSectionComponent
       },
       {
-        title: 'Edit course',
-        path: 'courses/edit/:id',
-        component: EditCourseComponent
-      },
-      {
         title: 'Edit section',
         path: 'courses/:id/sections/edit/:sectionId',
         component: EditSectionComponent
@@ -55,6 +56,11 @@ export const routes: Routes = [
         title: "Add Lesson",
         path: 'courses/:courseId/sections/:sectionId/lessons/add',
         component: AddLessonComponent
+      },
+      {
+        title: "Edit Lesson",
+        path: 'courses/:courseId/sections/:sectionId/lessons/edit/:lessonId',
+        component: EditLessonComponent
       }
     ]
   },

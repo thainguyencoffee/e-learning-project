@@ -66,37 +66,27 @@ export class InputRowComponent implements OnChanges, OnInit {
   ngOnInit() {
     this.control = this.group!.get(this.field)!;
 
-    this.initImageFile(this.control);
-    this.initVideoFile(this.control);
-  }
-
-  initImageFile(control: AbstractControl) {
     if (this.rowType === 'imageFile') {
-      this.previewUrl = 'https://placehold.co/400'
-      control.valueChanges.subscribe(value => {
-        if (value) {
-          this.previewUrl = value
-          this.previousUrl = value
-        } else {
-          this.previewUrl = 'https://placehold.co/400'
-        }
-      })
+      this.previewUrl = this.control.value || 'https://placehold.co/400'
+
+    } else {
+      this.previewUrl = this.control.value || ''
     }
+
+    this.previousUrl = this.control.value || '' // bất kể rowType là gì thì vẫn đảm bảo previousUrl để clear data khi cần
+    this.control.valueChanges.subscribe(value => {
+      if (value) {
+        this.previewUrl = value
+        this.previousUrl = value
+      } else {
+        this.previewUrl = ''
+      }
+    })
+
+    console.log(this.previewUrl)
   }
 
-  initVideoFile(control: AbstractControl) {
-    if (this.rowType === 'videoFile') {
-      this.previewUrl = ''
-      control.valueChanges.subscribe(value => {
-        if (value) {
-          this.previewUrl = value
-          this.previousUrl = value
-        } else {
-          this.previewUrl = ''
-        }
-      })
-    }
-  }
+
 
   ngOnChanges() {
     if (!this.options || this.options instanceof Map) {
