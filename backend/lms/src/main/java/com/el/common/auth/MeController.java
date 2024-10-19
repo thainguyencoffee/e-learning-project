@@ -1,4 +1,4 @@
-package com.el.auth.web;
+package com.el.common.auth;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

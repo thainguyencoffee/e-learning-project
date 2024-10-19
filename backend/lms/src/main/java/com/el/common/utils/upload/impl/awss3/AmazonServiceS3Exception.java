@@ -1,4 +1,4 @@
-package com.el.awss3.application;
+package com.el.common.utils.upload.impl.awss3;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

@@ -152,7 +152,7 @@ export class InputRowComponent implements OnChanges, OnInit {
 
   deletePreviousFile() {
     if (this.previousUrl) {
-      this.uploadService.delete(this.previousUrl).subscribe({
+      this.uploadService.deleteAll([this.previousUrl]).subscribe({
         next: () => {
           this.previousUrl = null;
         },
