@@ -12,6 +12,12 @@
     <!-- Title -->
     <h5>Title: {{ courseDto.title }}</h5>
 
+    @if (isCreateByYou(courseDto.teacher)) {
+      <p>Teacher: <span class="badge bg-secondary">this account</span></p>
+    } @else {
+      <p>Teacher: {{ courseDto.teacher }}</p>
+    }
+
     <!-- Image -->
     <img [src]="courseDto.thumbnailUrl || 'https://placehold.jp/200x200.png'"
          class="img-thumbnail mb-2" alt="Course Thumbnail"

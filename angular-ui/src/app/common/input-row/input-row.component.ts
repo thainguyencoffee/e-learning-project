@@ -68,7 +68,6 @@ export class InputRowComponent implements OnChanges, OnInit {
 
     if (this.rowType === 'imageFile') {
       this.previewUrl = this.control.value || 'https://placehold.co/400'
-
     } else {
       this.previewUrl = this.control.value || ''
     }
@@ -78,12 +77,9 @@ export class InputRowComponent implements OnChanges, OnInit {
       if (value) {
         this.previewUrl = value
         this.previousUrl = value
-      } else {
-        this.previewUrl = ''
       }
     })
 
-    console.log(this.previewUrl)
   }
 
 

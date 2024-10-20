@@ -20,6 +20,9 @@ public class SecurityConfig {
         return http
                 // Define authorization rules
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/users/search/**").hasAnyRole("admin", "teacher")
+                        .requestMatchers("/users/count/**").hasRole("admin")
+
                         .requestMatchers("/actuator/health/readiness").permitAll()
                         .requestMatchers("/actuator/health/liveness").permitAll()
                         .requestMatchers("/me").permitAll()

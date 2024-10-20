@@ -10,17 +10,19 @@ import { AddSectionComponent } from './administration/courses/page/add-section/a
 import {EditSectionComponent} from "./administration/courses/page/edit-section/edit-section.component";
 import {AddLessonComponent} from "./administration/courses/page/add-lesson/add-lesson.component";
 import {EditLessonComponent} from "./administration/courses/page/edit-lesson/edit-lesson.component";
+import {AssignTeacherComponent} from "./administration/courses/page/assign-teacher/assign-teacher.component";
 
 export const routes: Routes = [
   {
     title: 'Welcome to E learning!',
     path: '',
-    component: HomeComponent
+    component: HomeComponent,
   },
   {
     title: 'Welcome to dashboard!',
     path: 'administration',
     component: DashboardComponent,
+    // canActivate: [authGuard],
     children: [
       {
         title: 'Course management center!',
@@ -36,6 +38,11 @@ export const routes: Routes = [
         title: 'Edit course',
         path: 'courses/edit/:id',
         component: EditCourseComponent
+      },
+      {
+        title: 'Assign course to teacher',
+        path: 'courses/assign-teacher/:courseId',
+        component: AssignTeacherComponent
       },
       {
         title: 'Course detail management center!',

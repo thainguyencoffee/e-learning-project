@@ -4,6 +4,8 @@ reverse-proxy-port: 7080
 reverse-proxy-uri: ${scheme}://${hostname}:${reverse-proxy-port}
 authorization-server-prefix: /auth
 realm_name: keycloak101
+client_id: bff-client
+client_secret: secret
 issuer: ${reverse-proxy-uri}${authorization-server-prefix}/realms/${realm_name}
 lms-port: 7084
 
@@ -62,10 +64,6 @@ error:
 
 STRIPE_SECRET_KEY: sk_test_51PtPqOLcSSqgAPH9SPAVNGV3vMYll5CNIvCUHFT7RJWIPkHTHa9LySfuiswCMvYlbe5KwKavly4QV6rjJP2zVBoS00x6oNhWCR
 
-cloudinary:
-  api-key: ${CLOUDINARY_APIKEY:877596511851618}
-  api-secret: ${CLOUDINARY_API_SECRET:n9G3BbaUOOevIKWEuT0vYAm3EDM}
-  cloud-name: ${CLOUDINARY_CLOUD_NAME:dl0v8gbku}
 s3:
   access-key: DO00XXYJDDAPT9EXWVF8
   secret-key: ZY2YAo3WrW+Eq28oLYVW89mDwst//QLJyqiF4TMP+Vg
