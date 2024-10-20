@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -57,7 +56,9 @@ class LmsApplicationTests {
 
     private static final KeycloakContainer keycloak =
             new KeycloakContainer("quay.io/keycloak/keycloak:24.0")
-                    .withRealmImportFile("keycloak101-realm.json");
+                    .withRealmImportFile("keycloak101-realm.json")
+                    .withEnv("KEYCLOAK_ADMIN", "admin")
+                    .withEnv("KEYCLOAK_ADMIN_PASSWORD", "secret");
 
     @Autowired
     private WebTestClient webTestClient;
@@ -70,6 +71,8 @@ class LmsApplicationTests {
     static void keycloakProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri",
                 () -> keycloak.getAuthServerUrl() + "/realms/keycloak101");
+        registry.add("reverse-proxy-uri", keycloak::getAuthServerUrl);
+        registry.add("authorization-server-prefix", () -> "");
     }
 
     @BeforeAll
@@ -1539,6 +1542,78 @@ class LmsApplicationTests {
                 .body(BodyInserters.fromValue(paymentRequestDto))
                 .exchange()
                 .expectStatus().isCreated();
+    }
+
+
+    @Test
+    void testGetCountUsers_IsAdmin_Successful() {
+        webTestClient.get().uri("/users/count")
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Integer.class).isEqualTo(3);
+    }
+
+    @Test
+    void testGetCountUsersWithCriteria_IsAdmin_Successful() {
+        webTestClient.get().uri("/users/count?lastName=nguyen")
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Integer.class).isEqualTo(2);
+    }
+
+    @Test
+    void testGetCountUsersWithSearch_IsAdmin_Successful() {
+        // I want to search by username
+        // 1. Exact search then use "foo"
+        // 2. Prefix-based then use foo*
+        // 3. Infix search then just use foo
+        webTestClient.get().uri("/users/count/search?search=\"use\"") // search exact "use"
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Integer.class).isEqualTo(0);
+
+        webTestClient.get().uri("/users/count/search?search=use*") // search prefix "use"
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Integer.class).isEqualTo(1);
+    }
+
+    @Test
+    void testSearchUsersWithUsername_IsAdmin_Successful() {
+        webTestClient.get().uri("/users/search?username=teach")
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.length()").isEqualTo(1)
+                .jsonPath("$[0].id").isEqualTo("9db2e8a4-ca81-43ca-bfb4-bef6fa9e0844")
+                .jsonPath("$[0].firstName").isEqualTo("teacher")
+                .jsonPath("$[0].lastName").isEqualTo("nguyen")
+                .jsonPath("$[0].username").isEqualTo("teacher")
+                .jsonPath("$[0].email").isEqualTo("nguyennt110320042@gmail.com");
+
+        webTestClient.get().uri("/users/search?username=each*")
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.length()").isEqualTo(0);
+
+        webTestClient.get().uri("/users/search?username=teacher")
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.length()").isEqualTo(1)
+                .jsonPath("$[0].id").isEqualTo("9db2e8a4-ca81-43ca-bfb4-bef6fa9e0844")
+                .jsonPath("$[0].firstName").isEqualTo("teacher")
+                .jsonPath("$[0].lastName").isEqualTo("nguyen")
+                .jsonPath("$[0].username").isEqualTo("teacher")
+                .jsonPath("$[0].email").isEqualTo("nguyennt110320042@gmail.com");
     }
 
     protected static class KeycloakToken {
