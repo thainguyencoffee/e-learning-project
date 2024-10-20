@@ -1,0 +1,47 @@
+<div class="d-flex flex-wrap mb-4">
+
+  <span class="flex-grow-1 fs-3">
+    Assign teacher to
+    <span class="flex-grow-1 text-decoration-underline badge bg-secondary">{{course?.title}}</span>
+  </span>
+
+
+  <div>
+    <a routerLink="/administration/courses" class="btn btn-secondary">Back to list</a>
+  </div>
+</div>
+
+<div class="d-flex">
+  <input [(ngModel)]="username" (keydown.enter)="search()" class="form-control me-2" type="search" placeholder="Search teacher by username" aria-label="Search">
+  <button class="btn btn-outline-success" type="submit" (click)="search()">Search</button>
+</div>
+
+<h1>Teacher list</h1>
+<table class="table table-striped table-hover align-middle">
+  <thead>
+  <tr>
+    <th>Id</th>
+    <th>First name</th>
+    <th>Last name</th>
+    <th>Username</th>
+    <th>Email</th>
+    <th><!-- --></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let teacher of teachers">
+    <td>{{teacher.id}}</td>
+    <td>{{teacher.firstName}}</td>
+    <td>{{teacher.lastName}}</td>
+    <td>{{teacher.username}}</td>
+    <td>{{teacher.email}}</td>
+    <td>
+      @if (canAssignable(teacher.id)) {
+        <button type="button" (click)="assignTeacher(teacher.id!)"
+                class="btn btn-sm btn-secondary me-2">Assign</button>
+      } @else {
+        <div class="badge bg-warning">Cannot assign</div>
+      }
+    </td>
+  </tbody>
+</table>
