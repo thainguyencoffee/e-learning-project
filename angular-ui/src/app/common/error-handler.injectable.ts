@@ -13,7 +13,8 @@ export class ErrorHandler {
     if (!error || !error.fieldErrors) {
       this.router.navigate(['/error'], {
         state:{
-          errorStatus: error.status ? + '' + error.status : '503'
+          errorStatus: error.status ? + '' + error.status : '503',
+          errorMessage: error.message || ''
         }
       })
       return;

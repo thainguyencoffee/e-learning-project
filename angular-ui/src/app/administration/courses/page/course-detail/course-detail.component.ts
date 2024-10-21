@@ -97,4 +97,8 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
     return this.userService.current.name === teacherId;
   }
 
+  isEditable() {
+    return this.userService.current.hasAnyRole('ROLE_admin') || !this.courseDto?.published;
+  }
+
 }

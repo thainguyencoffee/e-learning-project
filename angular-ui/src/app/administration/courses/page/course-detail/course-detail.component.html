@@ -137,11 +137,11 @@
             <div class="float-end text-nowrap d-flex">
               <a [routerLink]="['/administration/courses/', currentId, 'sections', section.id]"
                  class="btn btn-sm btn-secondary me-2">View section detail</a>
-              <a [routerLink]="['/administration/courses', currentId, 'sections', 'edit', section.id]"
+              <a *ngIf="isEditable()" [routerLink]="['/administration/courses', currentId, 'sections', 'edit', section.id]"
                  class="btn btn-sm btn-secondary me-2">Edit Section</a>
-              <a [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'add']"
+              <a *ngIf="isEditable()" [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'add']"
                  class="btn btn-sm btn-secondary me-2">Add Lesson</a>
-              <button type="button" (click)="confirmDeleteSection(section.id, section)"
+              <button *ngIf="isEditable()" type="button" (click)="confirmDeleteSection(section.id, section)"
                       class="btn btn-sm btn-secondary me-2">Delete
               </button>
             </div>
@@ -171,9 +171,9 @@
             <td><a [href]="lesson.link" target="_blank">View content</a></td>
 
             <td>
-              <a [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'edit', lesson.id]"
+              <a *ngIf="isEditable()" [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'edit', lesson.id]"
                  class="btn btn-sm btn-secondary me-2">Edit Lesson</a>
-              <button type="button" (click)="confirmDeleteLesson(section.id, lesson.id, lesson)"
+              <button *ngIf="isEditable()" type="button" (click)="confirmDeleteLesson(section.id, lesson.id, lesson)"
                       class="btn btn-sm btn-secondary me-2">Delete
               </button>
             </td>
