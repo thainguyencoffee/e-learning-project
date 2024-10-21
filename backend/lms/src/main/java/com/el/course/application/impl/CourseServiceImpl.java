@@ -74,6 +74,18 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public void deleteCourseForce(Long courseId) {
+        Course course = courseQueryService.findCourseInTrashById(courseId);
+
+        if (!canUpdateCourse(course)) {
+            throw new AccessDeniedException("You do not have permission to update this course");
+        }
+
+        course.deleteForce();
+        courseRepository.delete(course);
+    }
+
+    @Override
     public void restoreCourse(Long courseId) {
         Course course = courseQueryService.findCourseDeleted(courseId);
 

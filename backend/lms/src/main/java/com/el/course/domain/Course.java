@@ -229,6 +229,12 @@ public class Course extends AuditSupportClass {
         this.deleted = true;
     }
 
+    public void deleteForce() {
+        if (!this.deleted) {
+            throw new InputInvalidException("Course is not deleted.");
+        }
+    }
+
     public void restore() {
         if (!this.deleted) {
             throw new InputInvalidException("Course is not deleted.");

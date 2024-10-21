@@ -1,24 +1,23 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
-import {CourseService} from "../../service/course.service";
-import {Course} from "../../model/view/course";
-import {ErrorHandler} from "../../../../common/error-handler.injectable";
+import {Component, inject, OnInit} from '@angular/core';
+import {NgForOf, NgIf} from "@angular/common";
 import {NavigationEnd, Router, RouterLink} from "@angular/router";
-import {Subscription} from "rxjs";
-import {NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
+import {Course} from "../../model/view/course";
+import {CourseService} from "../../service/course.service";
 import {UserService} from "../../../../common/auth/user.service";
+import {ErrorHandler} from "../../../../common/error-handler.injectable";
+import {Subscription} from "rxjs";
 
 @Component({
-  selector: 'app-list-course',
+  selector: 'app-course-trash',
   standalone: true,
   imports: [
-    RouterLink,
-    NgOptimizedImage,
     NgForOf,
-    NgIf
+    NgIf,
+    RouterLink
   ],
-  templateUrl: './list-course.component.html',
+  templateUrl: './course-trash.component.html',
 })
-export class ListCourseComponent implements OnInit{
+export class CourseTrashComponent implements OnInit {
 
   constructor(
     private courseService: CourseService,
@@ -27,7 +26,7 @@ export class ListCourseComponent implements OnInit{
 
   errorHandler = inject(ErrorHandler);
   router = inject(Router);
-  courses?: Course[];
+  coursesInTrash?: Course[];
   size!: number;
   number!: number;
   totalElements!: number;
@@ -36,8 +35,10 @@ export class ListCourseComponent implements OnInit{
 
   getMessage(key: string, details?: any) {
     const messages: Record<string, string> = {
-      confirm: 'Do you really want to delete this element?',
-      deleted: 'Course was removed successfully.'
+      confirmDelete: 'Do you really want to delete force this element?',
+      confirmRestore: 'Do you really want to restore this element?',
+      deleted: 'Course was removed successfully.',
+      restored: 'Course was restored successfully.'
     }
     return messages[key];
   }
@@ -65,13 +66,11 @@ export class ListCourseComponent implements OnInit{
     return pageRange;
   }
 
-
-
   loadData(pageNumber: number): void {
-    this.courseService.getAllCourses(pageNumber)
+    this.courseService.getAllCoursesInTrash(pageNumber)
       .subscribe({
         next: (pageWrapper) => {
-          this.courses = pageWrapper.content as Course[];
+          this.coursesInTrash = pageWrapper.content as Course[];
           this.size = pageWrapper.page.size;
           this.number = pageWrapper.page.number;
           this.totalElements = pageWrapper.page.totalElements;
@@ -81,9 +80,9 @@ export class ListCourseComponent implements OnInit{
       });
   }
 
-  confirmDelete(id: number) {
-    if (confirm(this.getMessage('confirm'))) {
-      this.courseService.deleteCourse(id)
+  confirmDeleteForce(course: Course) {
+    if (confirm(this.getMessage('confirmDelete'))) {
+      this.courseService.deleteCourseForce(course)
         .subscribe({
           next: () => this.router.navigate(['/administration/courses'], {
             state: {
@@ -97,8 +96,18 @@ export class ListCourseComponent implements OnInit{
 
   }
 
-  isAdminCourse(teacherId: string) {
-    return this.userService.current.hasAnyRole('ROLE_admin') && this.userService.current.name === teacherId;
-  }
+  confirmRestore(courseId: number) {
+    if (confirm(this.getMessage('confirmRestore'))) {
+      this.courseService.restoreCourse(courseId)
+        .subscribe({
+          next: () => this.router.navigate(['/administration/courses'], {
+            state: {
+              msgSuccess: this.getMessage('restored')
+            }
+          }),
+          error: (error) => this.errorHandler.handleServerError(error.error)
+        });
 
+    }
+  }
 }

@@ -322,6 +322,15 @@ class CourseManagementControllerTests {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void deleteForceCourse_ValidCourseId_ShouldReturnNoContent() throws Exception {
+        Mockito.doNothing().when(courseService).deleteCourseForce(1L);
+
+        mockMvc.perform(delete("/courses/1?force=true")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher")))
+                )
+                .andExpect(status().isNoContent());
+    }
 
     @Test
     void changePrice_ValidCourseIdAndPrice_ShouldReturnUpdatedCourse() throws Exception {

@@ -37,6 +37,11 @@ public class CourseManagementController {
         return ResponseEntity.ok(courseQueryService.findAllCourses(pageable));
     }
 
+    @GetMapping("/trash")
+    public ResponseEntity<Page<Course>> getTrashedCourses(Pageable pageable) {
+        return ResponseEntity.ok(courseQueryService.findTrashedCourses(pageable));
+    }
+
     @GetMapping("/{courseId}")
     public ResponseEntity<Course> getCourseById(@PathVariable Long courseId) {
         return ResponseEntity.ok(courseQueryService.findCourseById(courseId));
@@ -61,8 +66,13 @@ public class CourseManagementController {
     }
 
     @DeleteMapping("/{courseId}")
-    public ResponseEntity<Void> deleteCourse(@PathVariable Long courseId) {
-        courseService.deleteCourse(courseId);
+    public ResponseEntity<Void> deleteCourse(@PathVariable Long courseId, @RequestParam(required = false) boolean force) {
+        if (!force) {
+            courseService.deleteCourse(courseId);
+        } else {
+            courseService.deleteCourseForce(courseId);
+        }
+
         return ResponseEntity.noContent().build();
     }
 

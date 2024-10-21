@@ -8,7 +8,11 @@ public interface CourseQueryService {
 
     Page<Course> findAllCourses(Pageable pageable);
 
+    Page<Course> findTrashedCourses(Pageable pageable);
+
     Course findCourseById(Long courseId);
+
+    Course findCourseInTrashById(Long courseId);
 
     Page<Course> findAllPublishedCourses(Pageable pageable);
 

@@ -26,6 +26,11 @@ export class CourseService {
     return this.http.get<PageWrapper>(url)
   }
 
+  getAllCoursesInTrash(pageNumber: number = 0, pageSize: number = 10): Observable<PageWrapper> {
+    const url = `${this.resourcePath}/trash?page=${pageNumber}&size=${pageSize}`;
+    return this.http.get<PageWrapper>(url)
+  }
+
   getCourse(id: number): Observable<Course> {
     return this.http.get<Course>(this.resourcePath + '/' + id);
   }
@@ -34,7 +39,7 @@ export class CourseService {
     return this.http.post<Course>(this.resourcePath, data);
   }
 
-  deleteCourse(id: number, course?: Course) {
+  deleteCourseForce(course: Course) {
     const links: string[] = [];
 
     if (course?.thumbnailUrl) {
@@ -51,11 +56,20 @@ export class CourseService {
 
     if (links) {
       return this.uploadService.deleteAll(links).pipe(
-        switchMap(() => this.http.delete<void>(this.resourcePath + '/' + id))
+        switchMap(() => this.http.delete<void>(this.resourcePath + '/' + course.id, {
+          params: { force: 'true' }
+        }))
       );
     } else {
-      return this.http.delete<void>(this.resourcePath + '/' + id);
+      return this.http.delete<void>(this.resourcePath + '/' + course.id, {
+        params: { force: 'true' }
+      });
     }
+
+  }
+
+  deleteCourse(id: number) {
+    return this.http.delete<void>(this.resourcePath + '/' + id);
   }
 
   updateCourse(id: number, data: EditCourseDto) {
@@ -105,6 +119,10 @@ export class CourseService {
 
   assignTeacher(courseId: number, teacherId: string) {
     return this.http.put(`${this.resourcePath}/${courseId}/assign-teacher`, {teacherId});
+  }
+
+  restoreCourse(courseId: number) {
+    return this.http.post<Course>(`${this.resourcePath}/${courseId}/restore`, {});
   }
 
 }

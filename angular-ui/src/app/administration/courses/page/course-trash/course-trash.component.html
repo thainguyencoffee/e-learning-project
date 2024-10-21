@@ -1,12 +1,12 @@
 <div class="d-flex flex-wrap mb-4">
-  <h1 class="flex-grow-1">Courses</h1>
+  <h1 class="flex-grow-1">Courses trash</h1>
   <div>
-    <a routerLink="/administration/courses/add" class="btn btn-primary ms-2">Create new Course</a>
+    <a routerLink="/administration/courses" class="btn btn-primary ms-2">To to list course</a>
   </div>
 </div>
 
-@if (!courses || courses.length === 0) {
-  <div>No Courses could be found.</div>
+@if (!coursesInTrash || coursesInTrash.length === 0) {
+  <div>Trash is empty.</div>
 } @else {
   <div class="table-responsive">
     <table class="table table-striped table-hover align-middle">
@@ -21,7 +21,7 @@
       </tr>
       </thead>
       <tbody>
-        @for (course of courses; track course.id) {
+        @for (course of coursesInTrash; track course.id) {
           <tr>
             <td>{{course.id}}</td>
             <td>{{course.title}}</td>
@@ -36,11 +36,8 @@
             <td>{{course.published}}</td>
             <td>
               <div class="float-end text-nowrap d-flex">
-                <a [routerLink]="['/administration/courses/', course.id]" class="btn btn-sm btn-secondary me-2">View</a>
-                <a [routerLink]="['/administration/courses/', course.id, 'sections', 'add']" class="btn btn-sm btn-secondary me-2">Add Section</a>
-                <a [routerLink]="['/administration/courses/edit', course.id]" class="btn btn-sm btn-secondary me-2">Edit</a>
-                <a *ngIf="isAdminCourse(course.teacher)" [routerLink]="['/administration/courses/assign-teacher', course.id]" class="btn btn-sm btn-secondary me-2">Assign teacher</a>
-                <button type="button" (click)="confirmDelete(course.id!)" class="btn btn-sm btn-secondary me-2">Delete</button>
+                <button type="button" (click)="confirmRestore(course.id!)" class="btn btn-sm btn-secondary me-2">Restore</button>
+                <button type="button" (click)="confirmDeleteForce(course)" class="btn btn-sm btn-secondary me-2">Delete force</button>
               </div>
             </td>
           </tr>
@@ -64,4 +61,3 @@
 
   </div>
 }
-<a [routerLink]="['/administration/courses/trash']" class="btn btn-primary">Go to Trash</a>
