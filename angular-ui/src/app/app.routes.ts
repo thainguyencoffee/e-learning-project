@@ -12,6 +12,7 @@ import {AddLessonComponent} from "./administration/courses/page/add-lesson/add-l
 import {EditLessonComponent} from "./administration/courses/page/edit-lesson/edit-lesson.component";
 import {AssignTeacherComponent} from "./administration/courses/page/assign-teacher/assign-teacher.component";
 import {CourseTrashComponent} from "./administration/courses/page/course-trash/course-trash.component";
+import {SetPriceComponent} from "./administration/courses/page/set-price/set-price.component";
 
 export const routes: Routes = [
   {
@@ -49,6 +50,11 @@ export const routes: Routes = [
         title: 'Assign course to teacher',
         path: 'courses/assign-teacher/:courseId',
         component: AssignTeacherComponent
+      },
+      {
+        title: 'Set price to course',
+        path: 'courses/set-price/:courseId',
+        component: SetPriceComponent,
       },
       {
         title: 'Course detail management center!',

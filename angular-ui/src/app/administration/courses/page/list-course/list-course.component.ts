@@ -36,8 +36,12 @@ export class ListCourseComponent implements OnInit{
 
   getMessage(key: string, details?: any) {
     const messages: Record<string, string> = {
-      confirm: 'Do you really want to delete this element?',
-      deleted: 'Course was removed successfully.'
+      confirmDelete: 'Do you really want to delete this element?',
+      deleted: 'Course was removed successfully.',
+      confirmPublish: 'Do you really want to publish this course?. ' +
+        'Before publishing a course, you need to agree to the system requirements in the terms and conditions. ' +
+        'Are you sure you want to publish this course?',
+      published: 'Course was published successfully.',
     }
     return messages[key];
   }
@@ -82,7 +86,7 @@ export class ListCourseComponent implements OnInit{
   }
 
   confirmDelete(id: number) {
-    if (confirm(this.getMessage('confirm'))) {
+    if (confirm(this.getMessage('confirmDelete'))) {
       this.courseService.deleteCourse(id)
         .subscribe({
           next: () => this.router.navigate(['/administration/courses'], {
@@ -99,6 +103,46 @@ export class ListCourseComponent implements OnInit{
 
   isAdminCourse(teacherId: string) {
     return this.userService.current.hasAnyRole('ROLE_admin') && this.userService.current.name === teacherId;
+  }
+
+  isPublishButtonDisplay(course: Course): boolean {
+    return this.userService.current.hasAnyRole('ROLE_admin') && course.teacher !== this.userService.current.name && !course.published;
+  }
+
+  isSetPriceButtonDisplay(course: Course): boolean {
+    return this.isPublishButtonDisplay(course);
+  }
+
+  publishCourse(courseId: number) {
+    if (confirm(this.getMessage('confirmPublish'))) {
+      this.courseService.publishCourse(courseId)
+        .subscribe({
+          next: () => this.router.navigate(['/administration/courses'], {
+            state: {
+              msgSuccess: this.getMessage('published')
+            }
+          }),
+          error: (error) => this.errorHandler.handleServerError(error.error)
+        });
+
+    }
+  }
+
+  isTitleBlue(course: Course) {
+    if (course.sections && course.sections.length > 0) {
+      for (const section of course.sections) {
+        return section.lessons && section.lessons.length > 0;
+      }
+    }
+    return false;
+  }
+
+  isTitleGreen(course: Course) {
+    return this.isTitleBlue(course) && course.price;
+  }
+
+  isEditable(course: Course) {
+    return this.userService.current.hasAnyRole('ROLE_admin') || !course.published;
   }
 
 }

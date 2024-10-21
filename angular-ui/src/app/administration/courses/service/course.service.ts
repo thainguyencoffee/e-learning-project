@@ -125,4 +125,12 @@ export class CourseService {
     return this.http.post<Course>(`${this.resourcePath}/${courseId}/restore`, {});
   }
 
+  publishCourse(courseId: number) {
+    return this.http.put<Course>(`${this.resourcePath}/${courseId}/publish`, {});
+  }
+
+  updatePrice(courseId: number, price: string) {
+    return this.http.put<Course>(`${this.resourcePath}/${courseId}/update-price`, {price});
+  }
+
 }

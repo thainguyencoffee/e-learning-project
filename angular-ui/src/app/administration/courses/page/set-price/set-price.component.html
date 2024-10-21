@@ -1,0 +1,19 @@
+<div class="d-flex flex-wrap mb-4">
+
+  <span class="flex-grow-1 fs-3">
+    Set price to
+    <span class="flex-grow-1 text-decoration-underline badge bg-secondary">{{course?.title}}</span>
+  </span>
+
+
+  <div>
+    <a routerLink="/administration/courses" class="btn btn-secondary">Back to list</a>
+  </div>
+</div>
+
+
+<form [formGroup]="setForm" (ngSubmit)="handleSubmit()">
+  <app-input-row [group]="setForm" field="price" label="Price" rowType="number" />
+  <app-input-row [group]="setForm" field="currency" label="Currency" rowType="select" [options]="currenciesMap"/>
+  <input type="submit" value="Add Section" class="btn btn-primary mt-4" />
+</form>

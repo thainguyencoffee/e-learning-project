@@ -4,6 +4,10 @@
     <a routerLink="/administration/courses/add" class="btn btn-primary ms-2">Create new Course</a>
   </div>
 </div>
+<div class="d-block badge bg-info">About publishing course: The course can publish is courses has green title color.</div>
+<div class="d-block mt-1 badge bg-info">About course price: The course can set price is courses has blue title color.</div>
+<div class="d-block mt-1 badge bg-primary">When courses have sections then it's title is blue</div>
+<div class="d-block mt-1 badge bg-success">When courses have sections and price and teacher then it's title is green</div>
 
 @if (!courses || courses.length === 0) {
   <div>No Courses could be found.</div>
@@ -24,7 +28,13 @@
         @for (course of courses; track course.id) {
           <tr>
             <td>{{course.id}}</td>
-            <td>{{course.title}}</td>
+            <td>
+              @if (isTitleGreen(course)) {
+                <span class="text-success">{{course.title}}</span>
+              } @else if (isTitleBlue(course)) {
+                <span class="text-primary">{{course.title}}</span>
+              }
+            </td>
             <td>{{course.language}}</td>
             <td>
               @if(course.thumbnailUrl) {
@@ -37,10 +47,12 @@
             <td>
               <div class="float-end text-nowrap d-flex">
                 <a [routerLink]="['/administration/courses/', course.id]" class="btn btn-sm btn-secondary me-2">View</a>
-                <a [routerLink]="['/administration/courses/', course.id, 'sections', 'add']" class="btn btn-sm btn-secondary me-2">Add Section</a>
-                <a [routerLink]="['/administration/courses/edit', course.id]" class="btn btn-sm btn-secondary me-2">Edit</a>
+                <a *ngIf="isEditable(course)" [routerLink]="['/administration/courses/', course.id, 'sections', 'add']" class="btn btn-sm btn-secondary me-2">Add Section</a>
+                <a *ngIf="isEditable(course)" [routerLink]="['/administration/courses/edit', course.id]" class="btn btn-sm btn-secondary me-2">Edit</a>
                 <a *ngIf="isAdminCourse(course.teacher)" [routerLink]="['/administration/courses/assign-teacher', course.id]" class="btn btn-sm btn-secondary me-2">Assign teacher</a>
-                <button type="button" (click)="confirmDelete(course.id!)" class="btn btn-sm btn-secondary me-2">Delete</button>
+                <button *ngIf="isPublishButtonDisplay(course) && isTitleGreen(course)" (click)="publishCourse(course.id)" class="btn btn-sm btn-secondary me-2">Publish</button>
+                <a *ngIf="isSetPriceButtonDisplay(course) && isTitleBlue(course)" [routerLink]="['/administration/courses/set-price', course.id]" class="btn btn-sm btn-secondary me-2">Set price</a>
+                <button *ngIf="isEditable(course)" type="button" (click)="confirmDelete(course.id!)" class="btn btn-sm btn-secondary me-2">Delete</button>
               </div>
             </td>
           </tr>
