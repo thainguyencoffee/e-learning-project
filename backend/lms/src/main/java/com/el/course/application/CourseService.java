@@ -16,6 +16,8 @@ public interface CourseService {
 
     void deleteCourse(Long courseId);
 
+    void deleteCourseForce(Long courseId);
+
     void restoreCourse(Long courseId);
 
     Course publishCourse(Long courseId, String approvedBy);

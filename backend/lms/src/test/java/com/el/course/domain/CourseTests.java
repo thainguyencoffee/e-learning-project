@@ -163,6 +163,18 @@ class CourseTests {
     }
 
     @Test
+    void deleteForce_CourseNotDeleted_ThrowsException() {
+        assertThrows(InputInvalidException.class, courseNoSections::deleteForce);
+    }
+
+    @Test
+    void deleteForce_ValidCourse_DeletesCourse() {
+        courseNoSections.delete();
+        courseNoSections.deleteForce();
+        assertTrue(courseNoSections.isDeleted());
+    }
+
+    @Test
     void changePrice_ValidPrice_ChangesPrice() {
         MonetaryAmount newPrice = Money.of(100, Currencies.VND);
         courseNoSections.changePrice(newPrice);

@@ -11,6 +11,7 @@ import {EditSectionComponent} from "./administration/courses/page/edit-section/e
 import {AddLessonComponent} from "./administration/courses/page/add-lesson/add-lesson.component";
 import {EditLessonComponent} from "./administration/courses/page/edit-lesson/edit-lesson.component";
 import {AssignTeacherComponent} from "./administration/courses/page/assign-teacher/assign-teacher.component";
+import {CourseTrashComponent} from "./administration/courses/page/course-trash/course-trash.component";
 
 export const routes: Routes = [
   {
@@ -28,6 +29,11 @@ export const routes: Routes = [
         title: 'Course management center!',
         path: 'courses',
         component: ListCourseComponent
+      },
+      {
+        title: "Trash",
+        path: 'courses/trash',
+        component: CourseTrashComponent
       },
       {
         title: "Create new course",

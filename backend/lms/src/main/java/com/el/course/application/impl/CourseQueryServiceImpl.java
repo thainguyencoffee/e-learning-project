@@ -33,6 +33,17 @@ public class CourseQueryServiceImpl implements CourseQueryService {
     }
 
     @Override
+    public Page<Course> findTrashedCourses(Pageable pageable) {
+        if (rolesBaseUtil.isAdmin()) {
+            return courseRepository.findAllByDeleted(true, pageable);
+        } else if(rolesBaseUtil.isTeacher()) {
+            String teacherId = rolesBaseUtil.getCurrentSubjectFromJwt();
+            return courseRepository.findAllByTeacherAndDeleted(teacherId, true, pageable);
+        }
+        throw new AccessDeniedException("Access denied");
+    }
+
+    @Override
     public Course findCourseById(Long courseId) {
         if (rolesBaseUtil.isAdmin()) {
             return courseRepository.findByIdAndDeleted(courseId, false)
@@ -40,6 +51,19 @@ public class CourseQueryServiceImpl implements CourseQueryService {
         } else if(rolesBaseUtil.isTeacher()) {
             String teacherId = rolesBaseUtil.getCurrentSubjectFromJwt();
             return courseRepository.findByTeacherAndIdAndDeleted(teacherId, courseId, false)
+                    .orElseThrow(ResourceNotFoundException::new);
+        }
+        throw new AccessDeniedException("Access denied");
+    }
+
+    @Override
+    public Course findCourseInTrashById(Long courseId) {
+        if (rolesBaseUtil.isAdmin()) {
+            return courseRepository.findByIdAndDeleted(courseId, true)
+                    .orElseThrow(ResourceNotFoundException::new);
+        } else if(rolesBaseUtil.isTeacher()) {
+            String teacherId = rolesBaseUtil.getCurrentSubjectFromJwt();
+            return courseRepository.findByTeacherAndIdAndDeleted(teacherId, courseId, true)
                     .orElseThrow(ResourceNotFoundException::new);
         }
         throw new AccessDeniedException("Access denied");

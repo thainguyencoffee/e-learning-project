@@ -530,6 +530,41 @@ class LmsApplicationTests {
     }
 
     @Test
+    void testDeleteForceCourse_Successful() {
+        var courseDTO = new CourseDTO(
+                "Java Programming",
+                "Learn Java from scratch",
+                "http://example.com/thumbnail.jpg",
+                Set.of("Be a master OOP Java Programming"),
+                Language.ENGLISH,
+                Set.of("Basic Programming Knowledge"),
+                Set.of(Language.ENGLISH, Language.SPANISH)
+        );
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, null);
+
+        // Bắt buộc xóa mềm trước
+        webTestClient.delete().uri("/courses/{courseId}", course.getId())
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của admin
+                .exchange()
+                .expectStatus().isNoContent();  // Phản hồi trả về 204 No Content
+
+        // Kiểm tra rằng khóa học đã bị đánh dấu là deleted
+        Course deletedCourse = courseRepository.findById(course.getId()).orElseThrow();
+        assertThat(deletedCourse.isDeleted()).isTrue();  // Kiểm tra khóa học đã bị đánh dấu deleted
+
+
+        // act
+        // Xóa khóa học với token của giáo viên
+        webTestClient.delete().uri("/courses/{courseId}?force=true", course.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+                .exchange()
+                .expectStatus().isNoContent();  // Phản hồi trả về 204 No Content
+
+        // Kiểm tra rằng khóa học đã bị xóa hoàn toàn
+        assertThat(courseRepository.findById(course.getId())).isEmpty();  // Kiểm tra khóa học đã bị xóa hoàn toàn
+    }
+
+    @Test
     void testUpdatePrice_Successfully() {
         var courseDTO = new CourseDTO(
                 "Java Programming",
