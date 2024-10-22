@@ -8,10 +8,10 @@ create table student
 
 create table course
 (
-    id                 bigserial   not null,
-    title              varchar(255) not null ,
+    id                 bigserial    not null,
+    title              varchar(255) not null,
     thumbnail_url      varchar(500),
-    published          boolean     not null,
+    published          boolean      not null,
     description        varchar(2000),
     price              varchar(50),
     discounted_price   varchar(50),
@@ -21,13 +21,13 @@ create table course
     benefits           varchar(255)[],
     prerequisites      varchar(255)[],
     approved_by        varchar(50),
-    created_by         varchar(50) not null,
-    created_date       timestamp   not null,
-    last_modified_by   varchar(50) not null,
-    last_modified_date timestamp   not null,
+    created_by         varchar(50)  not null,
+    created_date       timestamp    not null,
+    last_modified_by   varchar(50)  not null,
+    last_modified_date timestamp    not null,
     discount_code      varchar(50),
-    deleted            boolean     not null,
-    version            int         not null,
+    deleted            boolean      not null,
+    version            int          not null,
     constraint fk_course primary key (id)
 );
 
@@ -85,9 +85,12 @@ create table discount
     code               varchar(50) not null,
     type               varchar(50) not null,
     percentage         int,
-    fixed_amount       varchar(50),
+    fixed_price        varchar(50),
     start_date         timestamp   not null,
     end_date           timestamp   not null,
+    current_usage      int         not null,
+    max_usage          int         not null,
+    deleted            boolean     not null,
     created_by         varchar(50) not null,
     created_date       timestamp   not null,
     last_modified_by   varchar(50) not null,

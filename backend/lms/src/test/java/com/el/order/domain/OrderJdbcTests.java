@@ -1,5 +1,6 @@
 package com.el.order.domain;
 
+import com.el.common.Currencies;
 import com.el.common.config.DataAuditConfig;
 import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.AfterEach;
@@ -34,7 +35,7 @@ class OrderJdbcTests {
     @BeforeEach
     void setUp() {
         // Arrange: Tạo Order với các item
-        OrderItem item = new OrderItem(1L, Money.of(100, "USD"));
+        OrderItem item = new OrderItem(1L, Money.of(100, Currencies.VND));
         Set<OrderItem> items = new HashSet<>();
         items.add(item);
         order = new Order(items); // Tạo đối tượng Order với 1 item

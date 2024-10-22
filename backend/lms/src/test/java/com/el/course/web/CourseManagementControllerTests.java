@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -90,7 +91,7 @@ class CourseManagementControllerTests {
     void getAllCourses_ShouldReturnPageOfCourses() throws Exception {
         Page<Course> coursePage = new PageImpl<>(List.of(course));
 
-        Mockito.when(courseQueryService.findAllCourses(any(Pageable.class))).thenReturn(coursePage);
+        when(courseQueryService.findAllCourses(any(Pageable.class))).thenReturn(coursePage);
 
         mockMvc.perform(get("/courses")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
@@ -113,7 +114,7 @@ class CourseManagementControllerTests {
 
     @Test
     void getCourseById_ShouldReturnCourse_WhenCourseExistsAndTeacherRole() throws Exception {
-        Mockito.when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L)).thenReturn(course);
 
         mockMvc.perform(get("/courses/1")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
@@ -123,7 +124,7 @@ class CourseManagementControllerTests {
 
     @Test
     void getCourseById_ShouldReturnCourse_WhenCourseExistsAndAdminRole() throws Exception {
-        Mockito.when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L)).thenReturn(course);
 
         mockMvc.perform(get("/courses/1")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
@@ -133,7 +134,7 @@ class CourseManagementControllerTests {
 
     @Test
     void getCourseById_ShouldReturnNotFound_WhenCourseDoesNotExist() throws Exception {
-        Mockito.when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
 
         mockMvc.perform(get("/courses/1")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
@@ -157,15 +158,15 @@ class CourseManagementControllerTests {
     public void testCreateCourse_ShouldReturnCreatedStatus() throws Exception {
         // Giả lập khóa học được tạo với ID
         Course createdCourse = Mockito.mock(Course.class);
-        Mockito.when(createdCourse.getId()).thenReturn(1L);  // Giả lập ID được gán sau khi lưu
+        when(createdCourse.getId()).thenReturn(1L);  // Giả lập ID được gán sau khi lưu
 
         // Giả lập các thuộc tính khác của khóa học
-        Mockito.when(createdCourse.getTitle()).thenReturn(courseDTO.title());
-        Mockito.when(createdCourse.getDescription()).thenReturn(courseDTO.description());
-        Mockito.when(createdCourse.getTeacher()).thenReturn("teacher123");
+        when(createdCourse.getTitle()).thenReturn(courseDTO.title());
+        when(createdCourse.getDescription()).thenReturn(courseDTO.description());
+        when(createdCourse.getTeacher()).thenReturn("teacher123");
 
         // Giả lập hành vi của CreateCourseUseCase trả về đối tượng khóa học với ID
-        Mockito.when(courseService.createCourse(any(String.class), any(CourseDTO.class)))
+        when(courseService.createCourse(any(String.class), any(CourseDTO.class)))
                 .thenReturn(createdCourse);
 
         // Thực thi HTTP POST request với JWT
@@ -214,12 +215,12 @@ class CourseManagementControllerTests {
     void testUpdateInfoCourse_ShouldReturnOKStatus() throws Exception {
         // Giả lập khóa học được cập nhật
         Course updatedCourse = Mockito.mock(Course.class);
-        Mockito.when(updatedCourse.getId()).thenReturn(1L);  // Giả lập ID của khóa học
-        Mockito.when(updatedCourse.getTitle()).thenReturn("Java Programming");  // Giả lập tiêu đề của khóa học
-        Mockito.when(updatedCourse.getDescription()).thenReturn("Learn Java from scratch");  // Giả lập mô tả của khóa học
+        when(updatedCourse.getId()).thenReturn(1L);  // Giả lập ID của khóa học
+        when(updatedCourse.getTitle()).thenReturn("Java Programming");  // Giả lập tiêu đề của khóa học
+        when(updatedCourse.getDescription()).thenReturn("Learn Java from scratch");  // Giả lập mô tả của khóa học
 
         // Giả lập hành vi của UpdateCourseUseCase trả về đối tượng khóa học đã cập nhật
-        Mockito.when(courseService.updateCourse(any(Long.class), any(CourseUpdateDTO.class)))
+        when(courseService.updateCourse(any(Long.class), any(CourseUpdateDTO.class)))
                 .thenReturn(updatedCourse);
 
         // Thực thi HTTP PUT request với JWT
@@ -335,8 +336,8 @@ class CourseManagementControllerTests {
     @Test
     void changePrice_ValidCourseIdAndPrice_ShouldReturnUpdatedCourse() throws Exception {
         Course updatedCourse = Mockito.mock(Course.class);
-        Mockito.when(updatedCourse.getId()).thenReturn(1L);
-        Mockito.when(courseService.updatePrice(1L, Money.of(100, Currencies.VND))).thenReturn(updatedCourse);
+        when(updatedCourse.getId()).thenReturn(1L);
+        when(courseService.updatePrice(1L, Money.of(100, Currencies.VND))).thenReturn(updatedCourse);
 
         String body = objectMapper.writeValueAsString(new UpdatePriceDTO(Money.of(100, Currencies.VND)));
 
@@ -400,8 +401,8 @@ class CourseManagementControllerTests {
     @Test
     void assignTeacher_ValidCourseIdAndTeacher_ShouldReturnOk() throws Exception {
         Course updatedCourse = Mockito.mock(Course.class);
-        Mockito.when(updatedCourse.getId()).thenReturn(1L);
-        Mockito.when(courseService.assignTeacher(1L, "NewTeacher")).thenReturn(updatedCourse);
+        when(updatedCourse.getId()).thenReturn(1L);
+        when(courseService.assignTeacher(1L, "NewTeacher")).thenReturn(updatedCourse);
 
         String body = objectMapper.writeValueAsString(new AssignTeacherDTO("NewTeacher"));
 
@@ -461,7 +462,7 @@ class CourseManagementControllerTests {
     @Test
     void publishCourse_ValidCourseIdAndJwt_PublishesCourse() throws Exception {
         Course updatedCourse = Mockito.mock(Course.class);
-        Mockito.when(courseService.publishCourse(any(Long.class), any(String.class)))
+        when(courseService.publishCourse(any(Long.class), any(String.class)))
                 .thenReturn(updatedCourse);
 
         mockMvc.perform(put("/courses/1/publish")
@@ -490,9 +491,9 @@ class CourseManagementControllerTests {
     @Test
     void applyDiscount_ValidCourseIdAndDiscount_ShouldReturnOk() throws Exception {
         Course updatedCourse = Mockito.mock(Course.class);
-        Mockito.when(updatedCourse.getId()).thenReturn(1L);
+        when(updatedCourse.getId()).thenReturn(1L);
         String discountCode = "DISCOUNT25";
-        Mockito.when(courseService.applyDiscount(1L, discountCode)).thenReturn(updatedCourse);
+        when(courseService.applyDiscount(1L, discountCode)).thenReturn(updatedCourse);
 
         String body = objectMapper.writeValueAsString(new ApplyDiscountDTO(discountCode));
 
@@ -544,7 +545,7 @@ class CourseManagementControllerTests {
     @Test
     void addSection_ValidCourseIdAndSection_ReturnsUpdatedCourse() throws Exception {
         Course updatedCourse = Mockito.mock(Course.class);
-        Mockito.when(courseService.addSection(any(Long.class), any(CourseSectionDTO.class)))
+        when(courseService.addSection(any(Long.class), any(CourseSectionDTO.class)))
                 .thenReturn(updatedCourse);
 
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
@@ -615,7 +616,7 @@ class CourseManagementControllerTests {
     @Test
     void updateSectionInfo_ValidCourseIdAndSectionIdAndTitle_UpdatesSection() throws Exception {
         Course updatedCourse = Mockito.mock(Course.class);
-        Mockito.when(courseService.updateSectionInfo(any(Long.class), any(Long.class), any(String.class)))
+        when(courseService.updateSectionInfo(any(Long.class), any(Long.class), any(String.class)))
                 .thenReturn(updatedCourse);
 
         UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("NewTitle");
@@ -678,7 +679,7 @@ class CourseManagementControllerTests {
     @Test
     void deleteSection_ValidCourseIdAndSectionId_RemovesSection() throws Exception {
         Course updatedCourse = Mockito.mock(Course.class);
-        Mockito.when(courseService.removeSection(1L, 2L)).thenReturn(updatedCourse);
+        when(courseService.removeSection(1L, 2L)).thenReturn(updatedCourse);
 
         mockMvc.perform(delete("/courses/1/sections/2")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
@@ -714,7 +715,7 @@ class CourseManagementControllerTests {
     void addLesson_ValidCourseIdAndSectionId_AddsLesson() throws Exception {
         LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null);
         Course updatedCourse = Mockito.mock(Course.class);
-        Mockito.when(courseService.addLesson(1L, 2L, lessonDTO.toLesson()))
+        when(courseService.addLesson(1L, 2L, lessonDTO.toLesson()))
                 .thenReturn(updatedCourse);
 
 
@@ -779,7 +780,7 @@ class CourseManagementControllerTests {
     void updateLesson_ValidCourseIdAndSectionIdAndLessonId_UpdatesLesson() throws Exception {
         LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
         Course updatedCourse = Mockito.mock(Course.class);
-        Mockito.when(courseService.updateLesson(1L, 2L, 3L, lessonDTO.toLesson()))
+        when(courseService.updateLesson(1L, 2L, 3L, lessonDTO.toLesson()))
                 .thenReturn(updatedCourse);
 
         mockMvc.perform(put("/courses/1/sections/2/lessons/3")
@@ -852,7 +853,7 @@ class CourseManagementControllerTests {
     @Test
     void deleteLesson_ValidCourseIdAndSectionIdAndLessonId_RemovesLesson() throws Exception {
         Course updatedCourse = Mockito.mock(Course.class);
-        Mockito.when(courseService.removeLesson(1L, 2L, 3L)).thenReturn(updatedCourse);
+        when(courseService.removeLesson(1L, 2L, 3L)).thenReturn(updatedCourse);
 
         mockMvc.perform(delete("/courses/1/sections/2/lessons/3")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
@@ -862,7 +863,7 @@ class CourseManagementControllerTests {
     @Test
     void deleteLesson_ValidCourseIdAndSectionIdAndLessonId_RemovesLesson2() throws Exception {
         Course updatedCourse = Mockito.mock(Course.class);
-        Mockito.when(courseService.removeLesson(1L, 2L, 3L)).thenReturn(updatedCourse);
+        when(courseService.removeLesson(1L, 2L, 3L)).thenReturn(updatedCourse);
 
         mockMvc.perform(delete("/courses/1/sections/2/lessons/3")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))

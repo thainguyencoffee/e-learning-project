@@ -12,9 +12,9 @@ public class JacksonCustomizations {
         return new MoneyModule();
     }
 
-    @Bean
-    Module dateTimeModule() {
-        return new DateTimeModule();
-    }
+//    @Bean
+//    Module dateTimeModule() {
+//        return new DateTimeModule();
+//    }
 
 }
