@@ -18,8 +18,11 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                // Define authorization rules
-                .authorizeHttpRequests(authorize -> authorize
+                        // Define authorization rules
+                        .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.GET, "/discounts/code/{code}").authenticated()
+                        .requestMatchers("/discounts/**").hasRole("admin")
+
                         .requestMatchers("/users/search/**").hasAnyRole("admin", "teacher")
                         .requestMatchers("/users/count/**").hasRole("admin")
 

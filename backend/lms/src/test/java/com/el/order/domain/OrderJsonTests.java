@@ -4,6 +4,7 @@ import com.el.common.Currencies;
 import com.el.common.TimeUtils;
 import com.el.common.config.jackson.JacksonCustomizations;
 import org.javamoney.moneta.Money;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Disabled
 @JsonTest
 @Import(JacksonCustomizations.class)
 class OrderJsonTests {

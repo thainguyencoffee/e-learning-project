@@ -2,7 +2,7 @@ package com.el.discount.domain;
 
 import com.el.common.AuditSupportClass;
 import com.el.common.exception.InputInvalidException;
-import com.el.discount.domain.exception.DiscountInvalidDateException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.javamoney.moneta.Money;
 import org.springframework.data.annotation.Id;
@@ -19,25 +19,33 @@ public class Discount extends AuditSupportClass {
     private String code;
     private Type type;
     private Double percentage;
-    private MonetaryAmount fixedAmount;
+    private MonetaryAmount fixedPrice;
     private Instant startDate;
     private Instant endDate;
+    private Integer currentUsage;
+    private Integer maxUsage;
+    @JsonIgnore
+    private boolean deleted;
 
     // Constructor với các logic kiểm tra
     public Discount(
             String code,
             Type type,
             Double percentage,
-            MonetaryAmount fixedAmount,
+            MonetaryAmount fixedPrice,
             Instant startDate,
-            Instant endDate
+            Instant endDate,
+            Integer maxUsage
     ) {
         this.code = code;
         this.type = type;
         this.percentage = percentage;
-        this.fixedAmount = fixedAmount;
+        this.fixedPrice = fixedPrice;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.maxUsage = maxUsage;
+        this.deleted = false;
+        this.currentUsage = 0;
 
         validateDiscount();
     }
@@ -57,25 +65,40 @@ public class Discount extends AuditSupportClass {
 
     public MonetaryAmount calculateDiscount(MonetaryAmount originalPrice) {
         if (!isValid()) {
-            throw new DiscountInvalidDateException("Discount is not valid.");
+            throw new InputInvalidException("Discount is not valid.");
         }
 
-        if (this.type == Type.PERCENTAGE) {
-            return originalPrice.multiply(this.percentage / 100);
-        } else if (this.type == Type.FIXED) {
-            return this.fixedAmount;
+        if (canIncreaseUsage()) {
+            if (this.type == Type.PERCENTAGE) {
+                return originalPrice.multiply(this.percentage / 100);
+            } else if (this.type == Type.FIXED) {
+                return this.fixedPrice;
+            }
         }
         return Money.zero(originalPrice.getCurrency());
     }
 
+    public void increaseUsage() {
+        if (canIncreaseUsage()) {
+            currentUsage++;
+        }
+    }
+
+    private boolean canIncreaseUsage() {
+        if (currentUsage >= maxUsage) {
+            throw new InputInvalidException("Discount has reached its maximum usage.");
+        }
+        return true;
+    }
+
     private void validateDiscount() {
-        if(code == null || code.isBlank()) {
+        if (code == null || code.isBlank()) {
             throw new InputInvalidException("Discount code must not be empty.");
         }
         if (type == null) {
             throw new InputInvalidException("Discount type must not be empty.");
         }
-        if (percentage == null && fixedAmount == null) {
+        if (percentage == null && fixedPrice == null) {
             throw new InputInvalidException("Discount percentage or fixed amount must be provided.");
         }
         if (startDate == null || endDate == null) {
@@ -99,9 +122,38 @@ public class Discount extends AuditSupportClass {
             throw new InputInvalidException("Percentage must be between 0 and 100.");
         }
 
-        if (type == Type.FIXED && fixedAmount.isLessThan(Money.zero(fixedAmount.getCurrency()))) {
+        if (type == Type.FIXED && fixedPrice.isLessThan(Money.zero(fixedPrice.getCurrency()))) {
             throw new InputInvalidException("Fixed amount must be greater than zero.");
         }
+    }
+
+    public void updateInfo(Discount discount) {
+
+        if (this.currentUsage >= 1) {
+            throw new InputInvalidException("Cannot update a discount that has been used.");
+        }
+
+        this.code = discount.code;
+        this.type = discount.type;
+        this.percentage = discount.percentage;
+        this.fixedPrice = discount.fixedPrice;
+        this.startDate = discount.startDate;
+        this.endDate = discount.endDate;
+        this.maxUsage = discount.maxUsage;
+
+        validateDiscount();
+    }
+
+    public void delete() {
+        if (this.currentUsage >= 1) {
+            throw new InputInvalidException("Cannot delete a discount that has been used.");
+        }
+        this.deleted = true;
+    }
+
+
+    public void restore() {
+        this.deleted = false;
     }
 
 }

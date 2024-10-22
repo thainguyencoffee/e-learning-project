@@ -1,13 +1,14 @@
 package com.el.course.application.dto;
 
+import com.el.common.ValidateMessages;
 import com.el.course.domain.Lesson;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record LessonDTO(
-        @NotBlank(message = "Lesson title is required")
+        @NotBlank(message = ValidateMessages.NOT_BLANK)
         String title,
-        @NotNull(message = "Lesson description is required")
+        @NotNull(message = ValidateMessages.NOT_NULL)
         Lesson.Type type,
         String link,
         Long quiz

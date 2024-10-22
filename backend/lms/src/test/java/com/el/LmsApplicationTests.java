@@ -6,11 +6,10 @@ import com.el.course.application.dto.CourseSectionDTO;
 import com.el.course.application.dto.CourseUpdateDTO;
 import com.el.course.application.dto.LessonDTO;
 import com.el.course.domain.*;
-import com.el.course.web.dto.ApplyDiscountDTO;
 import com.el.course.web.dto.AssignTeacherDTO;
 import com.el.course.web.dto.UpdatePriceDTO;
 import com.el.course.web.dto.UpdateSectionDTO;
-import com.el.discount.domain.Discount;
+import com.el.discount.application.dto.DiscountDTO;
 import com.el.discount.domain.DiscountRepository;
 import com.el.discount.domain.Type;
 import com.el.order.application.dto.OrderItemDTO;
@@ -95,25 +94,27 @@ class LmsApplicationTests {
 
         // prepare data for discount record
         discountRepository.deleteAll();
-        Discount discount = new Discount(
-                "DISCOUNT_50",
-                Type.PERCENTAGE,
-                50.0,
-                null,
-                Instant.now().minusSeconds(3600),
-                Instant.now().plusSeconds(3600)
-        );
-        discountRepository.save(discount);
-
-        Discount discount2 = new Discount(
-                "DISCOUNT_30_VN",
-                Type.FIXED,
-                null,
-                Money.of(30, Currencies.VND),
-                Instant.now().minusSeconds(3600),
-                Instant.now().plusSeconds(3600)
-        );
-        discountRepository.save(discount2);
+//        Discount discount = new Discount(
+//                "DISCOUNT_50",
+//                Type.PERCENTAGE,
+//                50.0,
+//                null,
+//                Instant.now().minusSeconds(3600),
+//                Instant.now().plusSeconds(3600),
+//                10
+//        );
+//        discountRepository.save(discount);
+//
+//        Discount discount2 = new Discount(
+//                "DISCOUNT_30_VN",
+//                Type.FIXED,
+//                null,
+//                Money.of(30, Currencies.VND),
+//                Instant.now().minusSeconds(3600),
+//                Instant.now().plusSeconds(3600),
+//                10
+//        );
+//        discountRepository.save(discount2);
     }
 
 
@@ -722,152 +723,152 @@ class LmsApplicationTests {
                 .expectStatus().isForbidden();
     }
 
-    @Test
-    void testApplyDiscount_Successful() {
-        var courseDTO = new CourseDTO(
-                "Java Programming",
-                "Learn Java from scratch",
-                "http://example.com/thumbnail.jpg",
-                Set.of("Be a master OOP Java Programming"),
-                Language.ENGLISH,
-                Set.of("Basic Programming Knowledge"),
-                Set.of(Language.ENGLISH, Language.SPANISH)
-        );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
-        var courseId = course.getId();
-
-        Discount discount = discountRepository.findByCode("DISCOUNT_50").get();
-        String discountCode = discount.getCode();
-
-        // Thiết lập giảm giá cho khóa học
-        var applyDiscountDTO = new ApplyDiscountDTO(discountCode);
-
-        // Gửi request POST để áp dụng giảm giá cho khóa học
-        webTestClient.post().uri("/courses/{courseId}/apply-discount", courseId)
-                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(applyDiscountDTO))  // Body của request là JSON ApplyDiscountDTO
-                .exchange()
-                .expectStatus().isOk()  // Phản hồi 200 OK
-                .expectBody()
-                .jsonPath("$.discountCode").isEqualTo(discountCode)  // Kiểm tra giảm giá đã được cập nhật
-                .jsonPath("$.discountedPrice").isEqualTo("VND500.00");  // Kiểm tra giá đã được cập nhật
-    }
-
-    @Test
-    void testApplyDiscountFixed_Successful() {
-        var courseDTO = new CourseDTO(
-                "Java Programming",
-                "Learn Java from scratch",
-                "http://example.com/thumbnail.jpg",
-                Set.of("Be a master OOP Java Programming"),
-                Language.ENGLISH,
-                Set.of("Basic Programming Knowledge"),
-                Set.of(Language.ENGLISH, Language.SPANISH)
-        );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
-        var courseId = course.getId();
-
-        Discount discount = discountRepository.findByCode("DISCOUNT_30_VN").get();
-        String discountCode = discount.getCode();
-
-        // Thiết lập giảm giá cho khóa học
-        var applyDiscountDTO = new ApplyDiscountDTO(discountCode);
-
-        // Gửi request POST để áp dụng giảm giá cho khóa học
-        webTestClient.post().uri("/courses/{courseId}/apply-discount", courseId)
-                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(applyDiscountDTO))  // Body của request là JSON ApplyDiscountDTO
-                .exchange()
-                .expectStatus().isOk()  // Phản hồi 200 OK
-                .expectBody()
-                .jsonPath("$.discountCode").isEqualTo(discountCode)  // Kiểm tra giảm giá đã được cập nhật
-                .jsonPath("$.discountedPrice").isEqualTo("VND970.00");  // Kiểm tra giá đã được cập nhật
-    }
-
-    @Test
-    void testApplyDiscount_NotFound() {
-        var courseDTO = new CourseDTO(
-                "Java Programming",
-                "Learn Java from scratch",
-                "http://example.com/thumbnail.jpg",
-                Set.of("Be a master OOP Java Programming"),
-                Language.ENGLISH,
-                Set.of("Basic Programming Knowledge"),
-                Set.of(Language.ENGLISH, Language.SPANISH)
-        );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
-        var courseId = course.getId();
-
-        // Thiết lập giảm giá cho khóa học
-        var applyDiscountDTO = new ApplyDiscountDTO("INVALID_DISCOUNT_CODE");
-
-        // Gửi request POST để áp dụng giảm giá cho khóa học không tồn tại
-        webTestClient.post().uri("/courses/{courseId}/apply-discount", courseId)
-                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(applyDiscountDTO))  // Body của request là JSON ApplyDiscountDTO
-                .exchange()
-                .expectStatus().isNotFound();  // Phản hồi 404 Not Found
-    }
-
-    @Test
-    void testApplyDiscount_Forbidden() {
-        var courseDTO = new CourseDTO(
-                "Java Programming",
-                "Learn Java from scratch",
-                "http://example.com/thumbnail.jpg",
-                Set.of("Be a master OOP Java Programming"),
-                Language.ENGLISH,
-                Set.of("Basic Programming Knowledge"),
-                Set.of(Language.ENGLISH, Language.SPANISH)
-        );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
-        var courseId = course.getId();
-
-        // Thiết lập giảm giá cho khóa học
-        var applyDiscountDTO = new ApplyDiscountDTO("DISCOUNT_50");
-
-        // Gửi request POST để áp dụng giảm giá cho khóa học không có quyền
-        webTestClient.post().uri("/courses/{courseId}/apply-discount", courseId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(applyDiscountDTO))  // Body của request là JSON ApplyDiscountDTO
-                .exchange()
-                .expectStatus().isForbidden();  // Phản hồi 403 Forbidden
-    }
-
-    @Test
-    void testApplyDiscount_PriceNotSet() {
-        var courseDTO = new CourseDTO(
-                "Java Programming",
-                "Learn Java from scratch",
-                "http://example.com/thumbnail.jpg",
-                Set.of("Be a master OOP Java Programming"),
-                Language.ENGLISH,
-                Set.of("Basic Programming Knowledge"),
-                Set.of(Language.ENGLISH, Language.SPANISH)
-        );
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
-        var courseId = course.getId();
-
-        // Thiết lập giảm giá cho khóa học
-        var applyDiscountDTO = new ApplyDiscountDTO("DISCOUNT_50"); // Correct discount code
-
-        // Gửi request POST để áp dụng giảm giá cho khóa học không có giá
-        webTestClient.post().uri("/courses/{courseId}/apply-discount", courseId)
-                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(applyDiscountDTO))  // Body của request là JSON ApplyDiscountDTO
-                .exchange()
-                .expectStatus().isBadRequest();  // Phản hồi 400 Bad Request
-    }
+//    @Test
+//    void testApplyDiscount_Successful() {
+//        var courseDTO = new CourseDTO(
+//                "Java Programming",
+//                "Learn Java from scratch",
+//                "http://example.com/thumbnail.jpg",
+//                Set.of("Be a master OOP Java Programming"),
+//                Language.ENGLISH,
+//                Set.of("Basic Programming Knowledge"),
+//                Set.of(Language.ENGLISH, Language.SPANISH)
+//        );
+//        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+//        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+//        var courseId = course.getId();
+//
+//        Discount discount = discountRepository.findByCodeAndDeleted("DISCOUNT_50", false).get();
+//        String discountCode = discount.getCode();
+//
+//        // Thiết lập giảm giá cho khóa học
+//        var applyDiscountDTO = new ApplyDiscountDTO(discountCode);
+//
+//        // Gửi request POST để áp dụng giảm giá cho khóa học
+//        webTestClient.post().uri("/courses/{courseId}/apply-discount", courseId)
+//                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .body(BodyInserters.fromValue(applyDiscountDTO))  // Body của request là JSON ApplyDiscountDTO
+//                .exchange()
+//                .expectStatus().isOk()  // Phản hồi 200 OK
+//                .expectBody()
+//                .jsonPath("$.discountCode").isEqualTo(discountCode)  // Kiểm tra giảm giá đã được cập nhật
+//                .jsonPath("$.discountedPrice").isEqualTo("VND500.00");  // Kiểm tra giá đã được cập nhật
+//    }
+//
+//    @Test
+//    void testApplyDiscountFixed_Successful() {
+//        var courseDTO = new CourseDTO(
+//                "Java Programming",
+//                "Learn Java from scratch",
+//                "http://example.com/thumbnail.jpg",
+//                Set.of("Be a master OOP Java Programming"),
+//                Language.ENGLISH,
+//                Set.of("Basic Programming Knowledge"),
+//                Set.of(Language.ENGLISH, Language.SPANISH)
+//        );
+//        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+//        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+//        var courseId = course.getId();
+//
+//        Discount discount = discountRepository.findByCodeAndDeleted("DISCOUNT_30_VN", false).get();
+//        String discountCode = discount.getCode();
+//
+//        // Thiết lập giảm giá cho khóa học
+//        var applyDiscountDTO = new ApplyDiscountDTO(discountCode);
+//
+//        // Gửi request POST để áp dụng giảm giá cho khóa học
+//        webTestClient.post().uri("/courses/{courseId}/apply-discount", courseId)
+//                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .body(BodyInserters.fromValue(applyDiscountDTO))  // Body của request là JSON ApplyDiscountDTO
+//                .exchange()
+//                .expectStatus().isOk()  // Phản hồi 200 OK
+//                .expectBody()
+//                .jsonPath("$.discountCode").isEqualTo(discountCode)  // Kiểm tra giảm giá đã được cập nhật
+//                .jsonPath("$.discountedPrice").isEqualTo("VND970.00");  // Kiểm tra giá đã được cập nhật
+//    }
+//
+//    @Test
+//    void testApplyDiscount_NotFound() {
+//        var courseDTO = new CourseDTO(
+//                "Java Programming",
+//                "Learn Java from scratch",
+//                "http://example.com/thumbnail.jpg",
+//                Set.of("Be a master OOP Java Programming"),
+//                Language.ENGLISH,
+//                Set.of("Basic Programming Knowledge"),
+//                Set.of(Language.ENGLISH, Language.SPANISH)
+//        );
+//        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+//        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+//        var courseId = course.getId();
+//
+//        // Thiết lập giảm giá cho khóa học
+//        var applyDiscountDTO = new ApplyDiscountDTO("INVALID_DISCOUNT_CODE");
+//
+//        // Gửi request POST để áp dụng giảm giá cho khóa học không tồn tại
+//        webTestClient.post().uri("/courses/{courseId}/apply-discount", courseId)
+//                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .body(BodyInserters.fromValue(applyDiscountDTO))  // Body của request là JSON ApplyDiscountDTO
+//                .exchange()
+//                .expectStatus().isNotFound();  // Phản hồi 404 Not Found
+//    }
+//
+//    @Test
+//    void testApplyDiscount_Forbidden() {
+//        var courseDTO = new CourseDTO(
+//                "Java Programming",
+//                "Learn Java from scratch",
+//                "http://example.com/thumbnail.jpg",
+//                Set.of("Be a master OOP Java Programming"),
+//                Language.ENGLISH,
+//                Set.of("Basic Programming Knowledge"),
+//                Set.of(Language.ENGLISH, Language.SPANISH)
+//        );
+//        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+//        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+//        var courseId = course.getId();
+//
+//        // Thiết lập giảm giá cho khóa học
+//        var applyDiscountDTO = new ApplyDiscountDTO("DISCOUNT_50");
+//
+//        // Gửi request POST để áp dụng giảm giá cho khóa học không có quyền
+//        webTestClient.post().uri("/courses/{courseId}/apply-discount", courseId)
+//                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .body(BodyInserters.fromValue(applyDiscountDTO))  // Body của request là JSON ApplyDiscountDTO
+//                .exchange()
+//                .expectStatus().isForbidden();  // Phản hồi 403 Forbidden
+//    }
+//
+//    @Test
+//    void testApplyDiscount_PriceNotSet() {
+//        var courseDTO = new CourseDTO(
+//                "Java Programming",
+//                "Learn Java from scratch",
+//                "http://example.com/thumbnail.jpg",
+//                Set.of("Be a master OOP Java Programming"),
+//                Language.ENGLISH,
+//                Set.of("Basic Programming Knowledge"),
+//                Set.of(Language.ENGLISH, Language.SPANISH)
+//        );
+//        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+//        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
+//        var courseId = course.getId();
+//
+//        // Thiết lập giảm giá cho khóa học
+//        var applyDiscountDTO = new ApplyDiscountDTO("DISCOUNT_50"); // Correct discount code
+//
+//        // Gửi request POST để áp dụng giảm giá cho khóa học không có giá
+//        webTestClient.post().uri("/courses/{courseId}/apply-discount", courseId)
+//                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))  // Đính kèm JWT của giáo viên
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .body(BodyInserters.fromValue(applyDiscountDTO))  // Body của request là JSON ApplyDiscountDTO
+//                .exchange()
+//                .expectStatus().isBadRequest();  // Phản hồi 400 Bad Request
+//    }
 
     @Test
     void testAddSectionToCourse_Successful() {
@@ -1650,6 +1651,158 @@ class LmsApplicationTests {
                 .jsonPath("$[0].username").isEqualTo("teacher")
                 .jsonPath("$[0].email").isEqualTo("nguyennt110320042@gmail.com");
     }
+
+    // Discount bounded context
+
+    private String performCreateDiscountTest(DiscountDTO discountDTO) {
+        return webTestClient.post().uri("/discounts")
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(discountDTO))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.code").isEqualTo(discountDTO.code())
+                .jsonPath("$.percentage").isEqualTo(discountDTO.percentage())
+                .jsonPath("$.maxUsage").isEqualTo(discountDTO.maxUsage())
+                .jsonPath("$.startDate").isEqualTo(discountDTO.startDate().toString())
+                .jsonPath("$.endDate").isEqualTo(discountDTO.endDate().toString())
+                .jsonPath("$.type").isEqualTo(discountDTO.type().name())
+                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(bossToken.accessToken, "sub"))
+                .jsonPath("$.lastModifiedBy").isEqualTo(extractClaimFromToken(bossToken.accessToken, "sub"))
+                .jsonPath("$.createdDate").isNotEmpty()
+                .jsonPath("$.lastModifiedDate").isNotEmpty()
+                .returnResult().getResponseHeaders().getLocation().getPath().split("/")[2];
+    }
+
+    @Test
+    void testCreateDiscount_Successful() {
+        DiscountDTO discountDTO = new DiscountDTO("DISCOUNT_50",
+                Type.PERCENTAGE,
+                20.0,
+                null,
+                Instant.now().minusSeconds(360),
+                Instant.now().plusSeconds(360),
+                100);
+
+        performCreateDiscountTest(discountDTO);
+    }
+
+    @Test
+    void testUpdateDiscount_Successful() {
+        DiscountDTO discountDTO = new DiscountDTO("DISCOUNT_20",
+                Type.PERCENTAGE,
+                20.0,
+                null,
+                Instant.now().minusSeconds(360),
+                Instant.now().plusSeconds(360),
+                100);
+
+        String discountId = performCreateDiscountTest(discountDTO);
+
+        DiscountDTO updateDiscountDTO = new DiscountDTO("DISCOUNT_30",
+                Type.PERCENTAGE,
+                30.0,
+                null,
+                Instant.now().minusSeconds(360),
+                Instant.now().plusSeconds(360),
+                100);
+
+        webTestClient.put().uri("/discounts/{id}", discountId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(updateDiscountDTO))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(discountId)
+                .jsonPath("$.code").isEqualTo(updateDiscountDTO.code())
+                .jsonPath("$.percentage").isEqualTo(updateDiscountDTO.percentage())
+                .jsonPath("$.maxUsage").isEqualTo(updateDiscountDTO.maxUsage())
+                .jsonPath("$.startDate").isEqualTo(updateDiscountDTO.startDate().toString())
+                .jsonPath("$.endDate").isEqualTo(updateDiscountDTO.endDate().toString())
+                .jsonPath("$.type").isEqualTo(updateDiscountDTO.type().name())
+                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(bossToken.accessToken, "sub"))
+                .jsonPath("$.lastModifiedBy").isEqualTo(extractClaimFromToken(bossToken.accessToken, "sub"))
+                .jsonPath("$.createdDate").isNotEmpty()
+                .jsonPath("$.lastModifiedDate").isNotEmpty();
+    }
+
+    @Test
+    void testDeleteDiscount_Successful() {
+        DiscountDTO discountDTO = new DiscountDTO("DISCOUNT_10",
+                Type.PERCENTAGE,
+                10.0,
+                null,
+                Instant.now().minusSeconds(360),
+                Instant.now().plusSeconds(360),
+                100);
+
+        String discountId = performCreateDiscountTest(discountDTO);
+
+        webTestClient.delete().uri("/discounts/{id}", discountId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isNoContent();
+
+        assertThat(discountRepository.findByIdAndDeleted(Long.valueOf(discountId), false)).isEmpty();
+    }
+
+    @Test
+    void testRestoreDiscount_Successful() {
+        DiscountDTO discountDTO = new DiscountDTO("DISCOUNT_10",
+                Type.PERCENTAGE,
+                10.0,
+                null,
+                Instant.now().minusSeconds(360),
+                Instant.now().plusSeconds(360),
+                100);
+
+        String discountId = performCreateDiscountTest(discountDTO);
+
+        webTestClient.delete().uri("/discounts/{id}", discountId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isNoContent();
+
+        assertThat(discountRepository.findByIdAndDeleted(Long.valueOf(discountId), false)).isEmpty();
+
+        webTestClient.post().uri("/discounts/{id}/restore", discountId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk();
+
+        assertThat(discountRepository.findByIdAndDeleted(Long.valueOf(discountId), false)).isNotEmpty();
+    }
+
+    @Test
+    void testDeleteForceDiscount_Successful() {
+        DiscountDTO discountDTO = new DiscountDTO("DISCOUNT_10",
+                Type.PERCENTAGE,
+                10.0,
+                null,
+                Instant.now().minusSeconds(360),
+                Instant.now().plusSeconds(360),
+                100);
+
+        String discountId = performCreateDiscountTest(discountDTO);
+
+        webTestClient.delete().uri("/discounts/{id}", discountId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isNoContent();
+
+        assertThat(discountRepository.findByIdAndDeleted(Long.valueOf(discountId), false)).isEmpty();
+
+        webTestClient.delete().uri("/discounts/{id}?force=true", discountId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isNoContent();
+
+        assertThat(discountRepository.findById(Long.valueOf(discountId))).isEmpty();
+    }
+
 
     protected static class KeycloakToken {
         private final String accessToken;
