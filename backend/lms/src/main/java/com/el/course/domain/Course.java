@@ -6,12 +6,10 @@ import com.el.common.exception.ResourceNotFoundException;
 import com.el.common.exception.InputInvalidException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
-import org.apache.commons.lang3.Validate;
 import org.javamoney.moneta.Money;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.util.Assert;
 
 import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
@@ -56,7 +54,17 @@ public class Course extends AuditSupportClass {
             String teacher
     ) {
 
-        Assert.hasText(title, "Title must not be empty.");
+        if (title == null || title.isEmpty()) {
+            throw new InputInvalidException("Title must not be empty.");
+        }
+
+        if (language == null) {
+            throw new InputInvalidException("Language must not be null.");
+        }
+
+        if (subtitles != null && subtitles.contains(language)) {
+            throw new InputInvalidException("Subtitles must not contain the same language as the course.");
+        }
 
         this.title = title;
         this.description = description;
@@ -82,7 +90,13 @@ public class Course extends AuditSupportClass {
             throw new InputInvalidException("Cannot update a published course.");
         }
 
-        Assert.hasText(title, "Title must not be empty.");
+        if (title == null || title.isEmpty()) {
+            throw new InputInvalidException("Title must not be empty.");
+        }
+
+        if (subtitles != null && subtitles.contains(this.language)) {
+            throw new InputInvalidException("Subtitles must not contain the same language as the course.");
+        }
 
         this.title = title;
         this.description = description;
@@ -109,7 +123,9 @@ public class Course extends AuditSupportClass {
         if (this.getPrice() == null) {
             throw new InputInvalidException("Cannot apply discount to a course without a price.");
         }
-        Validate.notNull(discountedPrice, "Discounted price must not be null.");
+        if (discountedPrice == null) {
+            throw new InputInvalidException("Discounted price must not be null.");
+        }
 
         this.discountCode = discountCode;
 
@@ -129,7 +145,9 @@ public class Course extends AuditSupportClass {
             throw new InputInvalidException("Cannot assign a teacher to a published course.");
         }
 
-        Validate.notNull(teacher, "Teacher must not be null.");
+        if (teacher == null || teacher.isEmpty()) {
+            throw new InputInvalidException("Teacher must not be empty.");
+        }
 
         this.teacher = teacher;
     }
@@ -160,15 +178,13 @@ public class Course extends AuditSupportClass {
             throw new InputInvalidException("Cannot add a section to a published course.");
         }
 
-        Validate.notNull(section, "Section must not be null.");
+        if (section == null) {
+            throw new InputInvalidException("Section must not be null.");
+        }
 
         if (this.sections.stream().anyMatch(existingSection -> existingSection.getTitle().equals(section.getTitle()))) {
             throw new InputInvalidException("A section with the same title already exists.");
         }
-
-//        if (section.getLessons().isEmpty()) {
-//            throw new InputInvalidException("Section must have at least one lesson.");
-//        }
 
         this.sections.add(section);
     }

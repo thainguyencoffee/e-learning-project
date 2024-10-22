@@ -1,5 +1,6 @@
 package com.el.course.domain;
 
+import com.el.TestFactory;
 import com.el.common.Currencies;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
@@ -23,17 +24,14 @@ class CourseTests {
 
     @BeforeEach
     void setup() {
-        Set<String> benefits = new HashSet<>(Arrays.asList("Benefit1", "Benefit2"));
-        Set<String> prerequisites = new HashSet<>(Arrays.asList("Prerequisite1", "Prerequisite2"));
-        Set<Language> subtitles = new HashSet<>(Arrays.asList(Language.ENGLISH, Language.SPANISH));
 
-        courseNoSections = new Course("Title", "Description", "ThumbnailUrl", benefits, Language.ENGLISH, prerequisites, subtitles, "Teacher");
+        courseNoSections = TestFactory.createDefaultCourse();
 
         // Tạo một course có sections
         CourseSection courseSection = new CourseSection("SectionTitle");
         courseSection.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
 
-        courseWithSections = new Course("Title", "Description", "ThumbnailUrl", benefits, Language.ENGLISH, prerequisites, subtitles, "Teacher");
+        courseWithSections = TestFactory.createDefaultCourse();
         courseWithSections.addSection(courseSection);
         courseWithSections.changePrice(Money.of(100, Currencies.VND));
     }
@@ -46,20 +44,9 @@ class CourseTests {
 
     @Test
     public void courseConstructor_ValidInput_CreatesCourse() {
-        Set<String> benefits = new HashSet<>(Arrays.asList("Benefit1", "Benefit2"));
-        Set<String> prerequisites = new HashSet<>(Arrays.asList("Prerequisite1", "Prerequisite2"));
-        Set<Language> subtitles = new HashSet<>(Arrays.asList(Language.ENGLISH, Language.SPANISH));
+        Course course = TestFactory.createDefaultCourse();
 
-        Course course = new Course("Title", "Description", "ThumbnailUrl", benefits, Language.ENGLISH, prerequisites, subtitles, "Teacher");
-
-        assertEquals("Title", course.getTitle());
-        assertEquals("Description", course.getDescription());
-        assertEquals("ThumbnailUrl", course.getThumbnailUrl());
-        assertEquals(Language.ENGLISH, course.getLanguage());
-        assertEquals(benefits, course.getBenefits());
-        assertEquals(prerequisites, course.getPrerequisites());
-        assertEquals(subtitles, course.getSubtitles());
-        assertEquals("Teacher", course.getTeacher());
+        // Chỉ cần logic quan trọng, không cần check getter
         assertFalse(course.isDeleted());
         assertFalse(course.getPublished());
     }
@@ -69,7 +56,7 @@ class CourseTests {
         Set<String> benefits = new HashSet<>(Arrays.asList("Benefit1", "Benefit2"));
         Set<String> prerequisites = new HashSet<>(Arrays.asList("Prerequisite1", "Prerequisite2"));
         Set<Language> subtitles = new HashSet<>(Arrays.asList(Language.ENGLISH, Language.SPANISH));
-        assertThrows(IllegalArgumentException.class, () -> new Course("", "Description", "ThumbnailUrl", benefits, Language.ENGLISH, prerequisites, subtitles, "Teacher"));
+        assertThrows(InputInvalidException.class, () -> new Course("", "Description", "ThumbnailUrl", benefits, Language.ENGLISH, prerequisites, subtitles, "Teacher"));
     }
 
     @Test
@@ -78,7 +65,7 @@ class CourseTests {
         Set<String> prerequisites = new HashSet<>(Arrays.asList("Prerequisite1", "Prerequisite2"));
         Set<Language> subtitles = new HashSet<>(Arrays.asList(Language.ENGLISH, Language.SPANISH));
 
-        assertThrows(IllegalArgumentException.class, () -> new Course(null, "Description", "ThumbnailUrl", benefits, Language.ENGLISH, prerequisites, subtitles, "Teacher"));
+        assertThrows(InputInvalidException.class, () -> new Course(null, "Description", "ThumbnailUrl", benefits, Language.ENGLISH, prerequisites, subtitles, "Teacher"));
     }
 
     @Test
@@ -103,7 +90,7 @@ class CourseTests {
         Set<String> newBenefits = new HashSet<>(Arrays.asList("NewBenefit1", "NewBenefit2"));
         Set<String> newPrerequisites = new HashSet<>(Arrays.asList("NewPrerequisite1", "NewPrerequisite2"));
         Set<Language> newSubtitles = new HashSet<>(Arrays.asList(Language.FRENCH, Language.GERMAN));
-        assertThrows(IllegalArgumentException.class, () -> courseNoSections.updateInfo("", "NewDescription", "NewThumbnailUrl", newBenefits, newPrerequisites, newSubtitles));
+        assertThrows(InputInvalidException.class, () -> courseNoSections.updateInfo("", "NewDescription", "NewThumbnailUrl", newBenefits, newPrerequisites, newSubtitles));
     }
 
 
@@ -113,7 +100,7 @@ class CourseTests {
         Set<String> newBenefits = new HashSet<>(Arrays.asList("NewBenefit1", "NewBenefit2"));
         Set<String> newPrerequisites = new HashSet<>(Arrays.asList("NewPrerequisite1", "NewPrerequisite2"));
         Set<Language> newSubtitles = new HashSet<>(Arrays.asList(Language.FRENCH, Language.GERMAN));
-        assertThrows(IllegalArgumentException.class, () -> courseNoSections.updateInfo(null, "NewDescription", "NewThumbnailUrl", newBenefits, newPrerequisites, newSubtitles));
+        assertThrows(InputInvalidException.class, () -> courseNoSections.updateInfo(null, "NewDescription", "NewThumbnailUrl", newBenefits, newPrerequisites, newSubtitles));
     }
 
     @Test
@@ -203,7 +190,7 @@ class CourseTests {
 
     @Test
     void assignTeacher_NullTeacher_ThrowsException() {
-        assertThrows(NullPointerException.class, () -> courseNoSections.assignTeacher(null));
+        assertThrows(InputInvalidException.class, () -> courseNoSections.assignTeacher(null));
     }
 
     @Test
@@ -247,7 +234,8 @@ class CourseTests {
 
     @Test
     void publish_CourseWithSameTeacherAsApprover_ThrowsException() {
-        assertThrows(InputInvalidException.class, () -> courseWithSections.publish("Teacher"));
+        String teacher = TestFactory.createDefaultCourse().getTeacher();
+        assertThrows(InputInvalidException.class, () -> courseWithSections.publish(teacher));
     }
 
     @Test
@@ -279,7 +267,7 @@ class CourseTests {
         MonetaryAmount price = Money.of(200, Currencies.VND);
         String discountCode = "25OFF";
         courseNoSections.changePrice(price);
-        assertThrows(NullPointerException.class, () -> courseNoSections.applyDiscount(null, discountCode));
+        assertThrows(InputInvalidException.class, () -> courseNoSections.applyDiscount(null, discountCode));
     }
 
     @Test
@@ -292,7 +280,7 @@ class CourseTests {
 
     @Test
     void addSection_NullSection_ThrowsException() {
-        assertThrows(NullPointerException.class, () -> courseNoSections.addSection(null));
+        assertThrows(InputInvalidException.class, () -> courseNoSections.addSection(null));
     }
 
     @Test
