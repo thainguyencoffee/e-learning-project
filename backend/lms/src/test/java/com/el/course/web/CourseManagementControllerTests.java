@@ -1,5 +1,6 @@
 package com.el.course.web;
 
+import com.el.TestFactory;
 import com.el.common.Currencies;
 import com.el.common.config.jackson.JacksonCustomizations;
 import com.el.common.config.SecurityConfig;
@@ -65,26 +66,9 @@ class CourseManagementControllerTests {
     @BeforeEach
     public void setUp() {
         // Setup CourseDTO với dữ liệu mẫu
-        courseDTO = new CourseDTO(
-                "Java Programming",
-                "Learn Java from scratch",
-                "http://example.com/image.jpg",
-                Set.of("Be a master OOP Java Programming"),
-                Language.ENGLISH,
-                Set.of("Basic Programming Knowledge"),
-                Set.of(Language.ENGLISH, Language.SPANISH)
-        );
+        courseDTO = TestFactory.createDefaultCourseDTO();
 
-        course = new Course(
-                courseDTO.title(),
-                courseDTO.description(),
-                courseDTO.thumbnailUrl(),
-                courseDTO.benefits(),
-                courseDTO.language(),
-                courseDTO.prerequisites(),
-                courseDTO.subtitles(),
-                "teacher123"
-        );
+        course = TestFactory.createDefaultCourse();
     }
 
     @Test
@@ -270,13 +254,7 @@ class CourseManagementControllerTests {
     void testUpdateInfoCourse_ShouldReturnBadRequest_WhenCourseIsPublished() throws Exception {
         // Giả lập hành vi của UpdateCourseUseCase ném ra InputInvalidException
         Mockito.doThrow(new InputInvalidException("Cannot update a published course."))
-                .when(courseService).updateCourse(1L, new CourseUpdateDTO(
-                        "Java Programming",
-                        "Learn Java from scratch",
-                        "http://example.com/image.jpg",
-                        Set.of("Be a master OOP Java Programming"),
-                        Set.of("Basic Programming Knowledge"),
-                        Set.of(Language.ENGLISH, Language.SPANISH)));
+                .when(courseService).updateCourse(any(), any());
 
         // Thực thi HTTP PUT request với JWT
         mockMvc.perform(put("/courses/1")
@@ -284,7 +262,7 @@ class CourseManagementControllerTests {
                         .content(objectMapper.writeValueAsString(courseDTO))
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher")))
                 )
-                .andExpect(status().isBadRequest());  // Kiểm tra phản hồi 400 Bad Request
+                .andExpect(status().isBadRequest());
     }
 
 

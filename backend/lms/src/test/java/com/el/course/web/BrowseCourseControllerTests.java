@@ -1,11 +1,11 @@
 package com.el.course.web;
 
+import com.el.TestFactory;
 import com.el.common.config.SecurityConfig;
 import com.el.common.config.jackson.JacksonCustomizations;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
 import com.el.course.domain.Course;
-import com.el.course.domain.Language;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -40,16 +39,7 @@ class BrowseCourseControllerTests {
 
     @BeforeEach
     public void setUp() {
-        course = new Course(
-                "Java Programming",
-                "Learn Java from scratch",
-                "http://example.com/image.jpg",
-                Set.of("OOP", "Concurrency"),
-                Language.ENGLISH,
-                Set.of("Basic Programming Knowledge"),
-                Set.of(Language.ENGLISH, Language.SPANISH),
-                "teacher123"
-        );
+        course = TestFactory.createDefaultCourse();
     }
 
     @Test
@@ -78,7 +68,7 @@ class BrowseCourseControllerTests {
 
         mockMvc.perform(get("/published-courses/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Java Programming"));
+                .andExpect(jsonPath("$.title").value(course.getTitle()));
     }
 
     @Test

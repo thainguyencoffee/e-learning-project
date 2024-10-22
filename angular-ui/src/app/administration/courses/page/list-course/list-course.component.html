@@ -33,6 +33,8 @@
                 <span class="text-success">{{course.title}}</span>
               } @else if (isTitleBlue(course)) {
                 <span class="text-primary">{{course.title}}</span>
+              } @else {
+                <span>{{course.title}}</span>
               }
             </td>
             <td>{{course.language}}</td>

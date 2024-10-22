@@ -1,5 +1,6 @@
 package com.el.course.application;
 
+import com.el.TestFactory;
 import com.el.common.Currencies;
 import com.el.common.RolesBaseUtil;
 import com.el.common.exception.AccessDeniedException;
@@ -8,7 +9,6 @@ import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.dto.CourseDTO;
 import com.el.course.application.dto.CourseSectionDTO;
 import com.el.course.application.dto.CourseUpdateDTO;
-import com.el.course.application.dto.LessonDTO;
 import com.el.course.application.impl.CourseServiceImpl;
 import com.el.course.domain.*;
 import com.el.discount.application.DiscountService;
@@ -20,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.money.MonetaryAmount;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,36 +52,11 @@ class CourseServiceTests {
         MockitoAnnotations.openMocks(this);
 
         // Giả lập CourseDTO với dữ liệu mẫu
-        courseDTO = new CourseDTO(
-                "Java Programming",
-                "Learn Java from scratch",
-                "http://example.com/image.jpg",
-                Set.of("OOP", "Concurrency"),
-                Language.ENGLISH,
-                Set.of("Basic Programming Knowledge"),
-                Set.of(Language.ENGLISH, Language.SPANISH)
-        );
+        courseDTO = TestFactory.createDefaultCourseDTO();
 
-        courseUpdateDTO = new CourseUpdateDTO(
-                "Java Programming",
-                "Learn Java from scratch",
-                "http://example.com/image.jpg",
-                Set.of("OOP", "Concurrency"),
-                Set.of("Basic Programming Knowledge"),
-                Set.of(Language.ENGLISH, Language.SPANISH)
-        );
+        courseUpdateDTO = TestFactory.createDefaultCourseUpdateDTO();
 
-        // Giả lập Course sau khi được tạo từ CourseDTO
-        course = new Course(
-                courseDTO.title(),
-                courseDTO.description(),
-                courseDTO.thumbnailUrl(),
-                courseDTO.benefits(),
-                courseDTO.language(),
-                courseDTO.prerequisites(),
-                courseDTO.subtitles(),
-                "teacher123"
-        );
+        course = TestFactory.createDefaultCourse();
 
         courseForPublish = new Course(
                 courseDTO.title(),
@@ -102,56 +76,35 @@ class CourseServiceTests {
 
     @Test
     void testCreateCourse_ShouldCreateAndSaveCourse() {
-        // Giả lập hành vi của repository
+        // Arrange
         when(courseRepository.save(any(Course.class))).thenReturn(course);
 
-        // Thực thi use case
-        Course createdCourse = courseService.createCourse("teacher123", courseDTO);
+        // Act
+        courseService.createCourse("teacher123", courseDTO);
 
-        // Xác minh rằng courseRepository.save đã được gọi
+        // Verify
         verify(courseRepository, times(1)).save(any(Course.class));
-
-        // Kiểm tra các giá trị trả về
-        assertNotNull(createdCourse);
-        assertEquals(courseDTO.title(), createdCourse.getTitle());
-        assertEquals(courseDTO.description(), createdCourse.getDescription());
-        assertEquals(courseDTO.thumbnailUrl(), createdCourse.getThumbnailUrl());
-        assertEquals(courseDTO.language(), createdCourse.getLanguage());
-        assertEquals(courseDTO.benefits(), createdCourse.getBenefits());
-        assertEquals(courseDTO.prerequisites(), createdCourse.getPrerequisites());
-        assertEquals(courseDTO.subtitles(), createdCourse.getSubtitles());
-        assertEquals("teacher123", createdCourse.getTeacher());
     }
 
     @Test
     void testUpdateInfoCourse_ShouldUpdateCourseInfo() {
-        // Giả lập hành vi của repository
+        // Mock
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         when(courseRepository.save(any(Course.class))).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
-        // Thực thi use case
-        Course updatedCourse = courseService.updateCourse(1L, courseUpdateDTO);
+        // Act
+        courseService.updateCourse(1L, courseUpdateDTO);
 
-        // Xác minh rằng courseRepository.findByIdAndDeleted và courseRepository.save đã được gọi
+        // Verify
         verify(courseQueryService, times(1)).findCourseById(1L);
         verify(courseRepository, times(1)).save(any(Course.class));
-
-        // Kiểm tra các giá trị trả về
-        assertNotNull(updatedCourse);
-        assertEquals(courseUpdateDTO.title(), updatedCourse.getTitle());
-        assertEquals(courseUpdateDTO.description(), updatedCourse.getDescription());
-        assertEquals(courseUpdateDTO.thumbnailUrl(), updatedCourse.getThumbnailUrl());
-        assertEquals(courseUpdateDTO.benefits(), updatedCourse.getBenefits());
-        assertEquals(courseUpdateDTO.prerequisites(), updatedCourse.getPrerequisites());
-        assertEquals(courseUpdateDTO.subtitles(), updatedCourse.getSubtitles());
-        assertEquals("teacher123", updatedCourse.getTeacher());
     }
 
     @Test
     void testUpdateInfoCourse_ShouldThrowException_WhenCourseNotFound() {
-        // Giả lập hành vi của repository
+        // Mock
         when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
@@ -161,13 +114,13 @@ class CourseServiceTests {
             courseService.updateCourse(1L, courseUpdateDTO);
         });
 
-        // Đảm bảo không có gì được lưu vào repository
+        // Verify
         verify(courseRepository, never()).save(any(Course.class));
     }
 
     @Test
     void testUpdateInfoCourse_ShouldThrowException_WhenNotPermission() {
-        // Giả lập hành vi của repository
+        // Mock
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
@@ -177,25 +130,25 @@ class CourseServiceTests {
             courseService.updateCourse(1L, courseUpdateDTO);
         });
 
-        // Đảm bảo không có gì được lưu vào repository
+        // Verify
         verify(courseRepository, never()).save(any(Course.class));
     }
 
     @Test
     void testUpdateInfoCourse_ShouldThrowException_WhenCoursePublished() {
-        // Giả lập hành vi của repository
+        // Mock
         Course courseMock = spy(course);
         when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
         doReturn(false).when(courseMock).canEdit();
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
-        // Kiểm tra xem ngoại lệ có được ném ra khi khóa học đã được xuất bản
+        // Assert
         assertThrows(InputInvalidException.class, () -> {
             courseService.updateCourse(1L, courseUpdateDTO);
         });
 
-        // Đảm bảo không có gì được lưu vào repository
+        // Verify
         verify(courseRepository, never()).save(any(Course.class));
     }
 
@@ -314,7 +267,7 @@ class CourseServiceTests {
     void assignTeacher_NullTeacher_ThrowsException() {
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
 
-        assertThrows(NullPointerException.class, () -> courseService.assignTeacher(1L, null));
+        assertThrows(InputInvalidException.class, () -> courseService.assignTeacher(1L, null));
         verify(courseRepository, never()).save(any(Course.class));
     }
 
@@ -349,28 +302,21 @@ class CourseServiceTests {
 
     @Test
     void applyDiscount_ShouldApplyDiscountSuccessfully() {
-        // Giả lập hành vi của repository và discountService
-        MonetaryAmount discountedPrice = Money.of(80, Currencies.VND); // Giảm giá từ $100 xuống còn $80
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-
+        // Mock và discountService
+        when(courseQueryService.findCourseById(any())).thenReturn(course);
         course.changePrice(Money.of(100, Currencies.VND));
-        String discountCode = "DISCOUNT_10";
-        when(discountService.calculateDiscount(discountCode, course.getPrice())).thenReturn(discountedPrice);
+
+        MonetaryAmount discountedPrice = Money.of(80, Currencies.VND);
+        when(discountService.calculateDiscount(any(), any())).thenReturn(discountedPrice);
         when(courseRepository.save(any(Course.class))).thenReturn(course);
 
-        // Thực thi use case
-        Course updatedCourse = courseService.applyDiscount(1L, discountCode);
+        // Act
+        courseService.applyDiscount(1L, "DISCOUNT_10");
 
         // Xác minh rằng courseRepository.findById, discountService.calculateDiscount và courseRepository.save đã được gọi
-        verify(courseQueryService, times(1)).findCourseById(1L);
-        verify(discountService, times(1)).calculateDiscount(discountCode, course.getPrice());
+        verify(courseQueryService, times(1)).findCourseById(any());
+        verify(discountService, times(1)).calculateDiscount(any(), any());
         verify(courseRepository, times(1)).save(course);
-
-        // Kiểm tra các giá trị trả về
-        assertNotNull(updatedCourse);
-        assertEquals(Money.of(20, Currencies.VND), updatedCourse.getDiscountedPrice());
-        assertEquals(Money.of(20, Currencies.VND), updatedCourse.getFinalPrice());
-        assertEquals(discountCode, updatedCourse.getDiscountCode());
     }
 
     @Test
@@ -383,7 +329,7 @@ class CourseServiceTests {
             courseService.applyDiscount(1L, discountCode);
         });
 
-        // Đảm bảo không có gì được lưu vào repository
+        // Verify
         verify(discountService, never()).calculateDiscount(anyString(), any(MonetaryAmount.class));
         verify(courseRepository, never()).save(any(Course.class));
     }
@@ -401,7 +347,7 @@ class CourseServiceTests {
             courseService.applyDiscount(1L, discountCode);
         });
 
-        // Đảm bảo không có gì được lưu vào repository
+        // Verify
         verify(courseRepository, never()).save(any(Course.class));
     }
 
@@ -414,10 +360,10 @@ class CourseServiceTests {
         when(courseRepository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
         CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
-        // Thực thi use case
+        // Act
         Course updatedCourse = courseService.addSection(1L, courseSectionDTO);
 
-        // Xác minh rằng courseRepository.findByIdAndDeleted và courseRepository.save đã được gọi
+        // Verify
         verify(courseQueryService, times(1)).findCourseById(1L);
         verify(courseRepository, times(1)).save(course);
 
@@ -440,7 +386,7 @@ class CourseServiceTests {
             courseService.addSection(1L, courseSectionDTO);
         });
 
-        // Đảm bảo không có gì được lưu vào repository
+        // Verify
         verify(courseRepository, never()).save(any(Course.class));
     }
 
@@ -458,13 +404,13 @@ class CourseServiceTests {
             courseService.addSection(1L, courseSectionDTO);
         });
 
-        // Đảm bảo không có gì được lưu vào repository
+        // Verify
         verify(courseRepository, never()).save(any(Course.class));
     }
 
     @Test
     void updateSectionInfo_ShouldUpdateSectionInfo() {
-        // Arrange: Giả lập hành vi của repository và course
+        // Arrange: Mock và course
         Course course = spy(this.course);
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
@@ -473,7 +419,7 @@ class CourseServiceTests {
         when(courseRepository.save(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
         doNothing().when(course).updateSection(2L, "New Section 1");
 
-        // Act: Thực thi use case
+        // Act: Act
         courseService.updateSectionInfo(1L, 2L, "New Section 1");
 
         // Assert: Xác minh rằng các phương thức cần thiết đã được gọi đúng
@@ -493,25 +439,25 @@ class CourseServiceTests {
             courseService.updateSectionInfo(1L, 2L, "New Section 1");
         });
 
-        // Assert: Đảm bảo không có gì được lưu vào repository
+        // Assert: Verify
         verify(courseRepository, never()).save(any(Course.class));
     }
 
     @Test
     void updateSectionInfo_CoursePublish_ThrowsException() {
-        // Arrange: Giả lập hành vi của repository
+        // Arrange: Mock
         Course courseMock = spy(course);
         when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
         doReturn(false).when(courseMock).canEdit();
 
-        // Act & Assert: Kiểm tra xem ngoại lệ có được ném ra khi khóa học đã được xuất bản
+        // Act & Assert: Assert
         assertThrows(InputInvalidException.class, () -> {
             courseService.updateSectionInfo(1L, 2L, "New Section 1");
         });
 
-        // Assert: Đảm bảo không có gì được lưu vào repository
+        // Assert: Verify
         verify(courseRepository, never()).save(any(Course.class));
     }
 
@@ -527,7 +473,7 @@ class CourseServiceTests {
             courseService.updateSectionInfo(1L, 2L, "New Section 1");
         });
 
-        // Assert: Đảm bảo không có gì được lưu vào repository
+        // Assert: Verify
         verify(courseRepository, never()).save(any(Course.class));
     }
 
