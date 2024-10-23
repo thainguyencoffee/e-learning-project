@@ -1,5 +1,6 @@
 import {KeyValuePipe, NgForOf, NgIf} from '@angular/common';
 import {
+  AfterViewInit,
   Component,
   ElementRef,
   EventEmitter,
@@ -22,6 +23,7 @@ import {InputErrorsComponent} from "./input-errors.component";
 import {UploadService} from "../upload/upload.service";
 import {ErrorHandler} from "../error-handler.injectable";
 import {Router} from "@angular/router";
+import flatpickr from 'flatpickr';
 
 
 @Component({
@@ -30,7 +32,7 @@ import {Router} from "@angular/router";
   templateUrl: './input-row.component.html',
   imports: [ReactiveFormsModule, InputErrorsComponent, KeyValuePipe /**/, FormsModule, NgForOf, NgIf]
 })
-export class InputRowComponent implements OnChanges, OnInit {
+export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
 
   uploadService = inject(UploadService)
   errorHandler = inject(ErrorHandler);
@@ -54,8 +56,13 @@ export class InputRowComponent implements OnChanges, OnInit {
   @Input({ required: true })
   label = '';
 
+  @Input()
+  datepicker?: 'datepicker'|'timepicker'|'datetimepicker';
+
   control?: AbstractControl;
   optionsMap?: Map<string | number, string>;
+
+  elRef = inject(ElementRef);
 
   previewUrl: string | null = null;
   previousUrl: string | null = null;
@@ -82,14 +89,16 @@ export class InputRowComponent implements OnChanges, OnInit {
 
   }
 
-
-
   ngOnChanges() {
     if (!this.options || this.options instanceof Map) {
       this.optionsMap = this.options;
     } else {
       this.optionsMap = new Map(Object.entries(this.options));
     }
+  }
+
+  ngAfterViewInit() {
+    this.initDatepicker();
   }
 
   onRadioOptionsSelected(option: any) {
@@ -113,6 +122,41 @@ export class InputRowComponent implements OnChanges, OnInit {
 
   hasErrors() {
     return this.control?.invalid && (this.control?.dirty || this.control?.touched);
+  }
+
+  initDatepicker() {
+    if (!this.datepicker) {
+      return;
+    }
+    const flatpickrConfig:any = {
+      allowInput: true,
+      time_24hr: true,
+      enableSeconds: true
+    };
+    if (this.datepicker === 'datepicker') {
+      flatpickrConfig.dateFormat = 'Y-m-d';
+    } else if (this.datepicker === 'timepicker') {
+      flatpickrConfig.enableTime = true;
+      flatpickrConfig.noCalendar = true;
+      flatpickrConfig.dateFormat = 'H:i:S';
+    } else { // datetimepicker
+      flatpickrConfig.enableTime = true;
+      flatpickrConfig.altInput = true;
+      flatpickrConfig.altFormat = 'Y-m-d H:i:S';
+      flatpickrConfig.dateFormat = 'Y-m-dTH:i:S';
+      // workaround label issue
+      flatpickrConfig.onReady = function() {
+        const id = this.input.id;
+        this.input.id = null;
+        this.altInput.id = id;
+      };
+    }
+    const input = this.elRef.nativeElement.querySelector('input');
+    const flatpicker = flatpickr(input, flatpickrConfig);
+    this.control!.valueChanges.subscribe(val => {
+      // update in case value changes after initialization
+      flatpicker.setDate(val);
+    });
   }
 
   onFileSelected(event: Event) {

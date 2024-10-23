@@ -13,8 +13,8 @@ export class ErrorHandler {
     if (!error || !error.fieldErrors) {
       this.router.navigate(['/error'], {
         state:{
-          errorStatus: error.status ? + '' + error.status : '503',
-          errorMessage: error.message || ''
+          errorStatus: (error && error.status) ? error.status : '503',
+          errorMessage: (error && error.message) ? error.message: ''
         }
       })
       return;
@@ -48,6 +48,9 @@ export function getGlobalErrorMessage(key: string, details?: any) {
     validDouble: 'Please provide a valid floating point number.',
     REQUIRED_NOT_NULL: 'Please provide a value.',
     REQUIRED_NOT_BLANK: 'Please provide a value.',
+  }
+  if (details && details.requiredPattern && details.requiredPattern === "/^\\S*$/") {
+    globalErrorMessage['pattern'] = 'Your value must not contain any whitespace';
   }
   return globalErrorMessage[key];
 }

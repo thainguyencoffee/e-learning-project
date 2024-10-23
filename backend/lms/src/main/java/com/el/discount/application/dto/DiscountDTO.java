@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import javax.money.MonetaryAmount;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @PercentageOrFixedPrice
 public record DiscountDTO(
@@ -22,9 +22,9 @@ public record DiscountDTO(
         Double percentage,
         MonetaryAmount fixedPrice,
         @NotNull(message = ValidateMessages.NOT_NULL)
-        Instant startDate,
+        LocalDateTime startDate,
         @NotNull(message = ValidateMessages.NOT_NULL)
-        Instant endDate,
+        LocalDateTime endDate,
         @NotNull(message = ValidateMessages.NOT_NULL)
         Integer maxUsage
 ) {

@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.money.MonetaryAmount;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Table("discount")
@@ -20,8 +20,8 @@ public class Discount extends AuditSupportClass {
     private Type type;
     private Double percentage;
     private MonetaryAmount fixedPrice;
-    private Instant startDate;
-    private Instant endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private Integer currentUsage;
     private Integer maxUsage;
     @JsonIgnore
@@ -33,8 +33,8 @@ public class Discount extends AuditSupportClass {
             Type type,
             Double percentage,
             MonetaryAmount fixedPrice,
-            Instant startDate,
-            Instant endDate,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
             Integer maxUsage
     ) {
         this.code = code;
@@ -51,11 +51,11 @@ public class Discount extends AuditSupportClass {
     }
 
     public boolean isExpired() {
-        return Instant.now().isAfter(endDate);
+        return LocalDateTime.now().isAfter(endDate);
     }
 
     public boolean isActive() {
-        Instant now = Instant.now();
+        LocalDateTime now = LocalDateTime.now();
         return now.isAfter(startDate) && now.isBefore(endDate);
     }
 
@@ -94,6 +94,9 @@ public class Discount extends AuditSupportClass {
     private void validateDiscount() {
         if (code == null || code.isBlank()) {
             throw new InputInvalidException("Discount code must not be empty.");
+        }
+        if (code.contains(" ")) {
+            throw new InputInvalidException("Discount code must not contain spaces.");
         }
         if (type == null) {
             throw new InputInvalidException("Discount type must not be empty.");

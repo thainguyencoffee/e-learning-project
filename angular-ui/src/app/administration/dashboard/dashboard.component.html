@@ -5,6 +5,9 @@
         <li>
           <a routerLink="/administration/courses">Course management</a>
         </li>
+        <li>
+          <a *ngIf="isAdmin()" routerLink="/administration/discounts">Discount management</a>
+        </li>
       </ul>
     </div>
     <div class="col-8">

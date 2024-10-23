@@ -1,5 +1,6 @@
 package com.el.discount.application;
 
+import com.el.TestFactory;
 import com.el.common.Currencies;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
@@ -7,7 +8,6 @@ import com.el.discount.application.dto.DiscountDTO;
 import com.el.discount.application.impl.DiscountServiceImpl;
 import com.el.discount.domain.Discount;
 import com.el.discount.domain.DiscountRepository;
-import com.el.discount.domain.Type;
 import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.money.MonetaryAmount;
-import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -42,22 +41,10 @@ class DiscountServiceTests {
     void setUp() {
         var code = UUID.randomUUID().toString();
 
-        discount = new Discount(code,
-                Type.PERCENTAGE,
-                10.0,
-                null,
-                Instant.now().minusSeconds(3600),
-                Instant.now().plusSeconds(3600),
-                100);
+        discount = TestFactory.createDefaultDiscount();
         discount = spy(discount); // mock :)
 
-        discountDTO = new DiscountDTO(code,
-                Type.PERCENTAGE,
-                10.0,
-                null,
-                Instant.now().minusSeconds(3600),
-                Instant.now().plusSeconds(3600),
-                100);
+        discountDTO = TestFactory.createDefaultDiscountDTO();
     }
 
     @Test
@@ -114,7 +101,7 @@ class DiscountServiceTests {
     void testUpdateDiscount_ShouldThrowExceptionWhenNewDiscountCodeNotExists() {
         when(discount.getId()).thenReturn(1L);
         when(discountRepository.findByIdAndDeleted(discount.getId(), false)).thenReturn(Optional.of(discount));
-        when(discountRepository.existsByCode(discount.getCode())).thenReturn(true);
+        when(discountRepository.existsByCode(discountDTO.code())).thenReturn(true);
         assertThrows(InputInvalidException.class, () -> discountService.updateDiscount(discount.getId(), discountDTO));
     }
 
@@ -171,7 +158,7 @@ class DiscountServiceTests {
         when(discountRepository.findByCodeAndDeleted(discount.getCode(), false)).thenReturn(Optional.of(discount));
 
         var originalDiscount = Money.of(1000, Currencies.VND);
-        MonetaryAmount discountedPrice = discountService.calculateDiscount(discountDTO.code(), originalDiscount);
+        MonetaryAmount discountedPrice = discountService.calculateDiscount(discount.getCode(), originalDiscount);
 
         verify(discountRepository, times(1)).findByCodeAndDeleted(discount.getCode(), false);
         verify(discount).calculateDiscount(originalDiscount);
