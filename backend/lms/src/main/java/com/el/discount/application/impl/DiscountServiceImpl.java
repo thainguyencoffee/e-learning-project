@@ -73,7 +73,8 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     public Discount updateDiscount(Long id, DiscountDTO discountDTO) {
         var discount = findById(id);
-        if (discountRepository.existsByCode(discountDTO.code())) {
+        if (!discountDTO.code().equals(discount.getCode()) &&
+                discountRepository.existsByCode(discountDTO.code())) {
             throw new InputInvalidException("Discount code already exists");
         }
         discount.updateInfo(discountDTO.toDiscount());

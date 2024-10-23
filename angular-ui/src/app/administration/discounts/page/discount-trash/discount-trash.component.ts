@@ -1,32 +1,28 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {NgForOf, NgIf} from "@angular/common";
-import {NavigationEnd, Router, RouterLink} from "@angular/router";
-import {Course} from "../../model/view/course";
-import {CourseService} from "../../service/course.service";
-import {UserService} from "../../../../common/auth/user.service";
+import {DiscountService} from "../../service/discount.service";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
+import {NavigationEnd, Router, RouterLink} from "@angular/router";
+import {Course} from "../../../courses/model/view/course";
 import {Subscription} from "rxjs";
+import {Discount} from "../../model/view/discount";
+import {NgForOf} from "@angular/common";
 
 @Component({
-  selector: 'app-course-trash',
+  selector: 'app-discount-trash',
   standalone: true,
   imports: [
     NgForOf,
-    NgIf,
     RouterLink
   ],
-  templateUrl: './course-trash.component.html',
+  templateUrl: './discount-trash.component.html',
 })
-export class CourseTrashComponent implements OnInit {
+export class DiscountTrashComponent implements OnInit{
 
-  constructor(
-    private courseService: CourseService,
-    private userService: UserService) {
-  }
+  discountService = inject(DiscountService);
 
   errorHandler = inject(ErrorHandler);
   router = inject(Router);
-  coursesInTrash?: Course[];
+  discountsInTrash?: Discount[];
   size!: number;
   number!: number;
   totalElements!: number;
@@ -67,10 +63,10 @@ export class CourseTrashComponent implements OnInit {
   }
 
   loadData(pageNumber: number): void {
-    this.courseService.getAllCoursesInTrash(pageNumber)
+    this.discountService.getAllDiscountsInTrash(pageNumber)
       .subscribe({
         next: (pageWrapper) => {
-          this.coursesInTrash = pageWrapper.content as Course[];
+          this.discountsInTrash = pageWrapper.content as Discount[];
           this.size = pageWrapper.page.size;
           this.number = pageWrapper.page.number;
           this.totalElements = pageWrapper.page.totalElements;
@@ -80,11 +76,11 @@ export class CourseTrashComponent implements OnInit {
       });
   }
 
-  confirmDeleteForce(course: Course) {
+  confirmDeleteForce(discount: Discount) {
     if (confirm(this.getMessage('confirmDelete'))) {
-      this.courseService.deleteCourseForce(course)
+      this.discountService.deleteDiscountForce(discount)
         .subscribe({
-          next: () => this.router.navigate(['/administration/courses'], {
+          next: () => this.router.navigate(['/administration/discounts'], {
             state: {
               msgSuccess: this.getMessage('deleted')
             }
@@ -96,11 +92,11 @@ export class CourseTrashComponent implements OnInit {
 
   }
 
-  confirmRestore(courseId: number) {
+  confirmRestore(discountId: number) {
     if (confirm(this.getMessage('confirmRestore'))) {
-      this.courseService.restoreCourse(courseId)
+      this.discountService.restoreDiscount(discountId)
         .subscribe({
-          next: () => this.router.navigate(['/administration/courses'], {
+          next: () => this.router.navigate(['/administration/discounts'], {
             state: {
               msgSuccess: this.getMessage('restored')
             }

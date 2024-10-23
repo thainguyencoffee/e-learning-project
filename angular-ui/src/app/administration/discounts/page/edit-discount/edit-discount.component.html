@@ -1,0 +1,20 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Edit Discount</h1>
+  <div>
+    <a routerLink="/administration/discounts" class="btn btn-secondary">Back to list</a>
+  </div>
+</div>
+
+<form [formGroup]="editForm" (ngSubmit)="handleSubmit()">
+  <app-input-row [group]="editForm" field="id" rowType="number" label="Id"/>
+  <app-input-row [group]="editForm" field="code" label="Discount code" />
+  <app-input-row [group]="editForm" field="type" label="Type" rowType="radio" [options]="typesMap" (optionsChange)="discountTypeChange($event)"/>
+  <app-input-row [group]="editForm" field="currency" label="Currency" rowType="radio" [options]="currenciesMap"/>
+  <app-input-row [group]="editForm" field="fixedPrice" label="Fixed price" rowType="number" />
+  <app-input-row [group]="editForm" field="percentage" label="Percentage" rowType="number" />
+  <div class="d-block badge bg-warning">Please set start date valid (must before end date)!!!</div>
+  <app-input-row [group]="editForm" field="startDate" datepicker="datetimepicker" label="Start date" />
+  <app-input-row [group]="editForm" field="endDate" datepicker="datetimepicker" label="End date" />
+  <app-input-row [group]="editForm" field="maxUsage" label="Max usage" rowType="number" />
+  <input type="submit" value="Update Discount" class="btn btn-primary mt-4" />
+</form>

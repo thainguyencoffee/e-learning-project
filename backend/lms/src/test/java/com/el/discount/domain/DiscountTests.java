@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.money.MonetaryAmount;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,8 +23,8 @@ class DiscountTests {
                 Type.PERCENTAGE,
                 10.0,
                 Money.of(5, Currencies.VND),
-                Instant.now().minusSeconds(3600),
-                Instant.now().plusSeconds(3600),
+                LocalDateTime.now().minusSeconds(3600),
+                LocalDateTime.now().plusSeconds(3600),
                 100
         );
     }
@@ -41,8 +41,8 @@ class DiscountTests {
                 Type.PERCENTAGE,
                 10.0,
                 Money.of(5, Currencies.VND),
-                Instant.now().minusSeconds(7200),
-                Instant.now().minusSeconds(3600),
+                LocalDateTime.now().minusSeconds(7200),
+                LocalDateTime.now().minusSeconds(3600),
                 100
         );
         assertTrue(discount.isExpired());
@@ -60,8 +60,8 @@ class DiscountTests {
                 Type.PERCENTAGE,
                 10.0,
                 Money.of(5, Currencies.VND),
-                Instant.now().plusSeconds(3600),
-                Instant.now().plusSeconds(7200),
+                LocalDateTime.now().plusSeconds(3600),
+                LocalDateTime.now().plusSeconds(7200),
                 100
         );
         assertFalse(discount.isActive());
@@ -81,8 +81,8 @@ class DiscountTests {
                 Type.PERCENTAGE,
                 10.0,
                 Money.of(5, Currencies.VND),
-                Instant.now().minusSeconds(7200),
-                Instant.now().minusSeconds(3600),
+                LocalDateTime.now().minusSeconds(7200),
+                LocalDateTime.now().minusSeconds(3600),
                 100
         );
         MonetaryAmount originalPrice = Money.of(100, Currencies.VND);
@@ -103,8 +103,8 @@ class DiscountTests {
                 Type.PERCENTAGE,
                 10.0,
                 Money.of(5, Currencies.VND),
-                Instant.now().minusSeconds(3600),
-                Instant.now().plusSeconds(3600),
+                LocalDateTime.now().minusSeconds(3600),
+                LocalDateTime.now().plusSeconds(3600),
                 1
         );
         discount.increaseUsage();
@@ -118,8 +118,8 @@ class DiscountTests {
                 Type.FIXED,
                 null,
                 Money.of(20, Currencies.VND),
-                Instant.now().minusSeconds(3600),
-                Instant.now().plusSeconds(3600),
+                LocalDateTime.now().minusSeconds(3600),
+                LocalDateTime.now().plusSeconds(3600),
                 100
         );
         discount.updateInfo(newDiscount);
@@ -136,8 +136,8 @@ class DiscountTests {
                 Type.FIXED,
                 null,
                 Money.of(20, Currencies.VND),
-                Instant.now().minusSeconds(3600),
-                Instant.now().plusSeconds(3600),
+                LocalDateTime.now().minusSeconds(3600),
+                LocalDateTime.now().plusSeconds(3600),
                 100
         );
         assertThrows(InputInvalidException.class, () -> discount.updateInfo(newDiscount));

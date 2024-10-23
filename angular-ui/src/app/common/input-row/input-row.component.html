@@ -5,14 +5,14 @@
         <input [id]="field" [formControlName]="field" type="checkbox"
                class="form-check-input {{ getInputClasses() }}"/>
         <label [for]="field" class="form-check-label">
-          {{ label + (isRequired() ? '*' : '') }}
+          {{ label }} <span class='text-danger' *ngIf="isRequired()">*</span>
         </label>
       </div>
       <app-input-errors [control]="control"/>
     </div>
   } @else {
     <label [for]="rowType === 'radio' ? '' : field" class="col-md-2 col-form-label">
-      {{ label + (isRequired() ? '*' : '') }}
+      {{ label }} <span class='text-danger' *ngIf="isRequired()">*</span>
     </label>
     <div class="col-md-10">
       @if (rowType === 'text' || rowType === 'password' || rowType === 'email' || rowType === 'tel') {

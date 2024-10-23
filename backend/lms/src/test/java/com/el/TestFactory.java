@@ -4,8 +4,13 @@ import com.el.course.application.dto.CourseDTO;
 import com.el.course.application.dto.CourseUpdateDTO;
 import com.el.course.domain.Course;
 import com.el.course.domain.Language;
+import com.el.discount.application.dto.DiscountDTO;
+import com.el.discount.domain.Discount;
+import com.el.discount.domain.Type;
 
+import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 public class TestFactory {
 
@@ -86,6 +91,30 @@ public class TestFactory {
                         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus purus augue, gravida a orci vitae, lacinia malesuada nunc. Integer ornare velit massa, id euismod leo. "),
                 Set.of("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam vehicula, magna vitae euismod feugiat, leo ex elementum ligula, ac consequat mi metus nec urna. Sed. "),
                 Set.of(Language.ENGLISH, Language.CHINESE)
+        );
+    }
+
+    public static Discount createDefaultDiscount() {
+        return new Discount(
+                UUID.randomUUID().toString(),
+                Type.PERCENTAGE,
+                10.0,
+                null,
+                LocalDateTime.now().minusSeconds(3600),
+                LocalDateTime.now().plusSeconds(3600),
+                100
+        );
+    }
+
+    public static DiscountDTO createDefaultDiscountDTO() {
+        return new DiscountDTO(
+                UUID.randomUUID().toString(),
+                Type.PERCENTAGE,
+                10.0,
+                null,
+                LocalDateTime.now().minusSeconds(3600),
+                LocalDateTime.now().plusSeconds(3600),
+                100
         );
     }
 

@@ -13,6 +13,10 @@ import {EditLessonComponent} from "./administration/courses/page/edit-lesson/edi
 import {AssignTeacherComponent} from "./administration/courses/page/assign-teacher/assign-teacher.component";
 import {CourseTrashComponent} from "./administration/courses/page/course-trash/course-trash.component";
 import {SetPriceComponent} from "./administration/courses/page/set-price/set-price.component";
+import {ListDiscountComponent} from "./administration/discounts/page/list-discount/list-discount.component";
+import {DiscountTrashComponent} from "./administration/discounts/page/discount-trash/discount-trash.component";
+import {AddDiscountComponent} from "./administration/discounts/page/add-discount/add-discount.component";
+import {EditDiscountComponent} from "./administration/discounts/page/edit-discount/edit-discount.component";
 
 export const routes: Routes = [
   {
@@ -32,7 +36,7 @@ export const routes: Routes = [
         component: ListCourseComponent
       },
       {
-        title: "Trash",
+        title: "Course trash",
         path: 'courses/trash',
         component: CourseTrashComponent
       },
@@ -80,6 +84,28 @@ export const routes: Routes = [
         title: "Edit Lesson",
         path: 'courses/:courseId/sections/:sectionId/lessons/edit/:lessonId',
         component: EditLessonComponent
+      },
+
+      // discount
+      {
+        title: 'Discount management center!',
+        path: 'discounts',
+        component: ListDiscountComponent
+      },
+      {
+        title: 'Discount trash',
+        path: 'discounts/trash',
+        component: DiscountTrashComponent
+      },
+      {
+        title: 'Create new discount',
+        path: 'discounts/add',
+        component: AddDiscountComponent
+      },
+      {
+        title: 'Edit discount',
+        path: 'discounts/edit/:id',
+        component: EditDiscountComponent
       }
     ]
   },
