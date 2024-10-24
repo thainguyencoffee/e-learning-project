@@ -34,10 +34,12 @@ public class Course extends AuditSupportClass {
     private MonetaryAmount price;
     private MonetaryAmount discountedPrice;
     private Boolean published;
+    private Boolean unpublished;
     private String teacher;
     private String approvedBy;
     private Set<StudentRef> students = new HashSet<>();
     private String discountCode;
+    private Set<CourseRequest> courseRequests = new HashSet<>();
     @JsonIgnore
     private boolean deleted;
     @Version
@@ -76,6 +78,7 @@ public class Course extends AuditSupportClass {
         this.teacher = teacher;
         deleted = false;
         published = false;
+        unpublished = false;
     }
 
     public void updateInfo(
@@ -86,7 +89,7 @@ public class Course extends AuditSupportClass {
             Set<String> prerequisites,
             Set<Language> subtitles
     ) {
-        if (!canEdit()) {
+        if (!isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot update a published course.");
         }
 
@@ -107,7 +110,7 @@ public class Course extends AuditSupportClass {
     }
 
     public void changePrice(MonetaryAmount newPrice) {
-        if (!canEdit()) {
+        if (!isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot change price of a published course.");
         }
         if (!isValidCurrency(newPrice.getCurrency())) {
@@ -141,7 +144,7 @@ public class Course extends AuditSupportClass {
     }
 
     public void assignTeacher(String teacher) {
-        if (!canEdit()) {
+        if (!isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot assign a teacher to a published course.");
         }
 
@@ -152,29 +155,136 @@ public class Course extends AuditSupportClass {
         this.teacher = teacher;
     }
 
-    public void publish(String approvedBy) {
-        if (!canEdit()) {
-            throw new InputInvalidException("Course is already published.");
+    public void requestPublish(CourseRequest courseRequest) {
+        // if this course is already published, throw exception
+        if (isPublishedAndNotDeleted()) {
+            throw new InputInvalidException("Cannot request publish for a published course.");
         }
-        validateForPublish(approvedBy);
+        if (this.getSections().isEmpty() || this.getPrice() == null || this.getTeacher() == null) {
+            throw new InputInvalidException("Cannot publish a course without sections, price or teacher.");
+        }
+        if (courseRequest.getType() != RequestType.PUBLISH) {
+            throw new InputInvalidException("Request type invalid.");
+        }
+        if (isAnyRequestsUnresolved()) {
+            throw new InputInvalidException("Cannot request publish while there are unresolved requests.");
+        }
+        if (!courseRequest.getRequestedBy().equals(teacher)) {
+            throw new InputInvalidException("Only the teacher can request publish.");
+        }
+
+        courseRequests.add(courseRequest);
+    }
+
+    public void approvePublish(Long courseRequestId, String approvedBy, String approveMessage) {
+        if (approveMessage.isBlank()) {
+            throw new InputInvalidException("Approve message must not be blank.");
+        }
+        if (isPublishedAndNotDeleted()) {
+            throw new InputInvalidException("Cannot approve publish for a published course.");
+        }
+        if (isTeacherRequestingSelfApproval(approvedBy)) {
+            throw new InputInvalidException("Teacher cannot approve their own course.");
+        }
+        courseRequests.stream().filter(courseRequest -> courseRequest.getId().equals(courseRequestId)).findFirst()
+                .map(unresolvedRequest -> {
+                    unresolvedRequest.approve(approvedBy, approveMessage);
+                    return unresolvedRequest;
+                }).orElseThrow(ResourceNotFoundException::new);
         this.approvedBy = approvedBy;
         this.published = true;
     }
 
-    private void validateForPublish(String approvedBy) {
-        if (this.getSections().isEmpty() || this.getPrice() == null || this.getTeacher() == null) {
-            throw new InputInvalidException("Cannot publish a course without sections, price or teacher.");
+    public void rejectPublish(Long courseRequestId, String rejectedBy, String rejectReason) {
+        if (rejectReason.isBlank()) {
+            throw new InputInvalidException("Reject reason must not be blank.");
         }
-        if (approvedBy == null || approvedBy.isEmpty()) {
-            throw new InputInvalidException("Approved by must not be empty.");
+        if (isPublishedAndNotDeleted()) {
+            throw new InputInvalidException("Cannot reject publish for a published course.");
         }
-        if (approvedBy.equals(this.getTeacher())) {
-            throw new InputInvalidException("Teacher cannot approve their own course.");
+        if (isTeacherRequestingSelfApproval(rejectedBy)) {
+            throw new InputInvalidException("Teacher cannot reject their own course.");
         }
+        courseRequests.stream().filter(course -> course.getId().equals(courseRequestId)).findFirst()
+                .map(unresolvedRequest -> {
+                    unresolvedRequest.reject(rejectedBy, rejectReason);
+                    return unresolvedRequest;
+                }).orElseThrow(ResourceNotFoundException::new);
     }
 
+    public void requestUnpublish(CourseRequest courseRequest) {
+        if (isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot request unpublish for an unpublished course.");
+        }
+        if (courseRequest.getType() != RequestType.UNPUBLISH) {
+            throw new InputInvalidException("Request type invalid.");
+        }
+        if (isAnyRequestsUnresolved()) {
+            throw new InputInvalidException("Cannot request unpublish while there are unresolved requests.");
+        }
+        if (!courseRequest.getRequestedBy().equals(teacher)) {
+            throw new InputInvalidException("Only the teacher can request unpublish.");
+        }
+
+        courseRequests.add(courseRequest);
+    }
+
+    public void approveUnpublish(Long courseRequestId, String approvedBy, String approveMessage) {
+        if (approveMessage.isBlank()) {
+            throw new InputInvalidException("Approve message must not be blank.");
+        }
+        if (isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot approve unpublish for a published course.");
+        }
+        if (isTeacherRequestingSelfApproval(approvedBy)) {
+            throw new InputInvalidException("Teacher cannot approve unpublish their own course.");
+        }
+        if (!approvedBy.equals(this.approvedBy)) {
+            throw new InputInvalidException("Only the approver can approve unpublish.");
+        }
+        courseRequests.stream().filter(course -> course.getId().equals(courseRequestId)).findFirst()
+                .map(unresolvedRequest -> {
+                    unresolvedRequest.approve(approvedBy, approveMessage);
+                    return unresolvedRequest;
+                }).orElseThrow(ResourceNotFoundException::new);
+        this.approvedBy = approvedBy;
+        this.published = false;
+        this.unpublished = true;
+    }
+
+    public void rejectUnpublish(Long courseRequestId, String rejectedBy, String rejectReason) {
+        if (rejectReason.isBlank()) {
+            throw new InputInvalidException("Reject reason must not be blank.");
+        }
+        if (isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot reject unpublish for an unpublished course.");
+        }
+        if (isTeacherRequestingSelfApproval(rejectedBy)) {
+            throw new InputInvalidException("Teacher cannot reject unpublish their own course.");
+        }
+        if (!rejectedBy.equals(this.approvedBy)) {
+            throw new InputInvalidException("Only the approver can reject unpublish.");
+        }
+        courseRequests.stream().filter(course -> course.getId().equals(courseRequestId)).findFirst()
+                .map(unresolvedRequest -> {
+                    unresolvedRequest.reject(rejectedBy, rejectReason);
+                    return unresolvedRequest;
+                }).orElseThrow(ResourceNotFoundException::new);
+    }
+
+    private boolean isAnyRequestsUnresolved() {
+        return courseRequests.stream().anyMatch(CourseRequest::isUnresolved);
+    }
+
+    private boolean isTeacherRequestingSelfApproval(String approvedBy) {
+        return approvedBy.equals(this.getTeacher());
+    }
+
+    // removal method
+//    public void publish(String approvedBy){}
+
     public void addSection(CourseSection section) {
-        if (!canEdit()) {
+        if (!isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot add a section to a published course.");
         }
 
@@ -190,7 +300,7 @@ public class Course extends AuditSupportClass {
     }
 
     public void updateSection(Long sectionId, String title) {
-        if (!canEdit()) {
+        if (!isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot update a section in a published course.");
         }
 
@@ -204,7 +314,7 @@ public class Course extends AuditSupportClass {
     }
 
     public void removeSection(Long sectionId) {
-        if (!canEdit()) {
+        if (!isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot remove a section from a published course.");
         }
         CourseSection courseSection = findSectionById(sectionId);
@@ -212,7 +322,7 @@ public class Course extends AuditSupportClass {
     }
 
     public void addLessonToSection(Long sectionId, Lesson lesson) {
-        if (!canEdit()) {
+        if (!isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot add a lesson to a published course.");
         }
         CourseSection section = findSectionById(sectionId);
@@ -220,7 +330,7 @@ public class Course extends AuditSupportClass {
     }
 
     public void updateLessonInSection(Long sectionId, Long lessonId, Lesson updatedLesson){
-        if (!canEdit()) {
+        if (!isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot add a lesson to a published course.");
         }
         CourseSection section = findSectionById(sectionId);
@@ -228,7 +338,7 @@ public class Course extends AuditSupportClass {
     }
 
     public void removeLessonFromSection(Long sectionId, Long lessonId){
-        if (!canEdit()) {
+        if (!isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot add a lesson to a published course.");
         }
         CourseSection section = findSectionById(sectionId);
@@ -236,7 +346,7 @@ public class Course extends AuditSupportClass {
     };
 
     public void delete() {
-        if (!canEdit()) {
+        if (!isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot delete a published course.");
         }
         if (this.deleted) {
@@ -265,13 +375,21 @@ public class Course extends AuditSupportClass {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
-    public boolean canEdit() {
-        return !published;
+    public boolean isNotPublishedAndDeleted() {
+        return !published && !deleted;
     }
 
-    public boolean isValidCurrency(CurrencyUnit inputCurrency) {
+    public boolean isPublishedAndNotDeleted() {
+        return published && !deleted;
+    }
+
+    private boolean isValidCurrency(CurrencyUnit inputCurrency) {
         var validCurrencies = Set.of(Currencies.VND);
         return validCurrencies.contains(inputCurrency);
+    }
+
+    public void unpublish(String unapprovedBy) {
+
     }
 
 }

@@ -1,8 +1,6 @@
 package com.el.course.application;
 
-import com.el.course.application.dto.CourseDTO;
-import com.el.course.application.dto.CourseSectionDTO;
-import com.el.course.application.dto.CourseUpdateDTO;
+import com.el.course.application.dto.*;
 import com.el.course.domain.Course;
 import com.el.course.domain.Lesson;
 
@@ -20,7 +18,7 @@ public interface CourseService {
 
     void restoreCourse(Long courseId);
 
-    Course publishCourse(Long courseId, String approvedBy);
+//    Course publishCourse(Long courseId, String approvedBy);
 
     Course assignTeacher(Long courseId, String teacher);
 
@@ -39,4 +37,17 @@ public interface CourseService {
     Course removeLesson(Long courseId, Long sectionId, Long lessonId);
 
     Course updatePrice(Long courseId, MonetaryAmount newPrice);
+
+    void requestPublish(Long courseId, CourseRequestDTO courseRequestDTO);
+
+    void requestUnpublish(Long courseId, CourseRequestDTO courseRequestDTO);
+
+    void approvePublish(Long courseId, Long courseRequestId, CourseRequestResolveDTO resolveDTO);
+
+    void rejectPublish(Long courseId, Long courseRequestId, CourseRequestResolveDTO resolveDTO);
+
+    void approveUnpublish(Long courseId, Long courseRequestId, CourseRequestResolveDTO resolveDTO);
+
+    void rejectUnpublish(Long courseId, Long courseRequestId, CourseRequestResolveDTO resolveDTO);
+
 }

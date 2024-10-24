@@ -5,9 +5,7 @@ import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.InputInvalidException;
 import com.el.course.application.CourseQueryService;
 import com.el.course.application.CourseService;
-import com.el.course.application.dto.CourseDTO;
-import com.el.course.application.dto.CourseSectionDTO;
-import com.el.course.application.dto.CourseUpdateDTO;
+import com.el.course.application.dto.*;
 import com.el.course.domain.Course;
 import com.el.course.domain.CourseRepository;
 import com.el.course.domain.CourseSection;
@@ -97,13 +95,6 @@ public class CourseServiceImpl implements CourseService {
         courseRepository.save(course);
     }
 
-    @Override
-    public Course publishCourse(Long courseId, String approvedBy) {
-        Course course = courseQueryService.findCourseById(courseId);
-
-        course.publish(approvedBy);
-        return courseRepository.save(course);
-    }
 
     @Override
     public Course assignTeacher(Long courseId, String teacher) {
@@ -214,6 +205,48 @@ public class CourseServiceImpl implements CourseService {
 
         String currentUserId = rolesBaseUtil.getCurrentSubjectFromJwt();
         return course.getTeacher().equals(currentUserId);
+    }
+
+    @Override
+    public void requestPublish(Long courseId, CourseRequestDTO courseRequestDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.requestPublish(courseRequestDTO.toCourseRequest());
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void requestUnpublish(Long courseId, CourseRequestDTO courseRequestDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.requestUnpublish(courseRequestDTO.toCourseRequest());
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void approvePublish(Long courseId, Long courseRequestId, CourseRequestResolveDTO resolveDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.approvePublish(courseRequestId, resolveDTO.resolvedBy(), resolveDTO.message());
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void rejectPublish(Long courseId, Long courseRequestId, CourseRequestResolveDTO resolveDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.rejectPublish(courseRequestId, resolveDTO.resolvedBy(), resolveDTO.message());
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void approveUnpublish(Long courseId, Long courseRequestId, CourseRequestResolveDTO resolveDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.approveUnpublish(courseRequestId, resolveDTO.resolvedBy(), resolveDTO.message());
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void rejectUnpublish(Long courseId, Long courseRequestId, CourseRequestResolveDTO resolveDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.rejectUnpublish(courseRequestId, resolveDTO.resolvedBy(), resolveDTO.message());
+        courseRepository.save(course);
     }
 
 }

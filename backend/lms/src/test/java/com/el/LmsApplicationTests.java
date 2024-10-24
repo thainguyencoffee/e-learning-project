@@ -5,6 +5,7 @@ import com.el.course.application.dto.CourseDTO;
 import com.el.course.application.dto.CourseSectionDTO;
 import com.el.course.application.dto.LessonDTO;
 import com.el.course.domain.*;
+import com.el.course.web.CourseRequestApproveDTO;
 import com.el.course.web.dto.AssignTeacherDTO;
 import com.el.course.web.dto.UpdatePriceDTO;
 import com.el.course.web.dto.UpdateSectionDTO;
@@ -93,27 +94,6 @@ class LmsApplicationTests {
 
         // prepare data for discount record
         discountRepository.deleteAll();
-//        Discount discount = new Discount(
-//                "DISCOUNT_50",
-//                Type.PERCENTAGE,
-//                50.0,
-//                null,
-//                LocalDateTime.now().minusSeconds(3600),
-//                LocalDateTime.now().plusSeconds(3600),
-//                10
-//        );
-//        discountRepository.save(discount);
-//
-//        Discount discount2 = new Discount(
-//                "DISCOUNT_30_VN",
-//                Type.FIXED,
-//                null,
-//                Money.of(30, Currencies.VND),
-//                LocalDateTime.now().minusSeconds(3600),
-//                LocalDateTime.now().plusSeconds(3600),
-//                10
-//        );
-//        discountRepository.save(discount2);
     }
 
 
@@ -523,48 +503,48 @@ class LmsApplicationTests {
                 .expectStatus().isNotFound();
     }
 
-    @Test
-    void testPublishCourse_Successful() {
-        var courseDTO = TestFactory.createDefaultCourseDTO();
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
-
-        // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
-                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.published").isEqualTo(true);
-
-        // Check các khóa học published không cần login
-        webTestClient.get().uri("/published-courses/{courseId}", course.getId())
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.published").isEqualTo(true);
-    }
-
-    @Test
-    void testPublishCourse_WithNoSetPriceOrNoSections_BadRequest() {
-        var courseDTO = TestFactory.createDefaultCourseDTO();
-        Course course = createCourseWithParameters(teacherToken, courseDTO, false, null); // admin has the same permission as teacher
-
-        // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
-                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isBadRequest();
-    }
-
-    @Test
-    void testPublishCourse_WithUserNotAdmin_Forbidden() {
-        // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", 111L)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isForbidden();
-    }
+//    @Test
+//    void testPublishCourse_Successful() {
+//        var courseDTO = TestFactory.createDefaultCourseDTO();
+//        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+//        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+//
+//        // Gửi request PUT để xuất bản khóa học
+//        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
+//                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+//                .exchange()
+//                .expectStatus().isOk()
+//                .expectBody()
+//                .jsonPath("$.published").isEqualTo(true);
+//
+//        // Check các khóa học published không cần login
+//        webTestClient.get().uri("/published-courses/{courseId}", course.getId())
+//                .exchange()
+//                .expectStatus().isOk()
+//                .expectBody()
+//                .jsonPath("$.published").isEqualTo(true);
+//    }
+//
+//    @Test
+//    void testPublishCourse_WithNoSetPriceOrNoSections_BadRequest() {
+//        var courseDTO = TestFactory.createDefaultCourseDTO();
+//        Course course = createCourseWithParameters(teacherToken, courseDTO, false, null); // admin has the same permission as teacher
+//
+//        // Gửi request PUT để xuất bản khóa học
+//        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
+//                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+//                .exchange()
+//                .expectStatus().isBadRequest();
+//    }
+//
+//    @Test
+//    void testPublishCourse_WithUserNotAdmin_Forbidden() {
+//        // Gửi request PUT để xuất bản khóa học
+//        webTestClient.put().uri("/courses/{courseId}/publish", 111L)
+//                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+//                .exchange()
+//                .expectStatus().isForbidden();
+//    }
 
 //    @Test
 //    void testApplyDiscount_Successful() {
@@ -674,6 +654,171 @@ class LmsApplicationTests {
 //    }
 
     @Test
+    void testRequestPublishCourse_Successful() {
+        var courseDTO = TestFactory.createDefaultCourseDTO();
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+
+        // Gửi request POST để yêu cầu xuất bản khóa học
+        webTestClient.post().uri("/courses/{courseId}/requests", course.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .body(BodyInserters.fromValue(TestFactory.createDefaultCourseRequestDTOPublish()))
+                .exchange()
+                .expectStatus().isOk();
+
+        // assert
+        course = courseRepository.findById(course.getId()).get();
+        assertThat(course.getCourseRequests().size()).isEqualTo(1);
+        assertThat(course.getCourseRequests().iterator().next().getStatus()).isEqualTo(RequestStatus.PENDING);
+    }
+
+    @Test
+    void testApproveRequest_Successful() {
+        var courseDTO = TestFactory.createDefaultCourseDTO();
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+
+        // Gửi request POST để yêu cầu xuất bản khóa học
+        webTestClient.post().uri("/courses/{courseId}/requests", course.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .body(BodyInserters.fromValue(TestFactory.createDefaultCourseRequestDTOPublish()))
+                .exchange()
+                .expectStatus().isOk();
+
+        var requestId = courseRepository.findById(course.getId()).get().getCourseRequests().iterator().next().getId();
+
+        CourseRequestApproveDTO approveDTO = TestFactory.createDefaultCourseRequestApproveDTOPublish();
+        // Gửi request PUT để duyệt yêu cầu xuất bản khóa học
+        webTestClient.put().uri("/courses/{courseId}/requests/{requestId}/approve", course.getId(), requestId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .body(BodyInserters.fromValue(approveDTO))
+                .exchange()
+                .expectStatus().isOk();
+
+        // assert
+        course = courseRepository.findById(course.getId()).get();
+        assertThat(course.getCourseRequests().size()).isEqualTo(1);
+        assertThat(course.getCourseRequests().iterator().next().getStatus()).isEqualTo(RequestStatus.APPROVED);
+        assertThat(course.isPublishedAndNotDeleted()).isTrue();
+    }
+
+    @Test
+    void testApproveRequest_Forbidden() {
+        webTestClient.put().uri("/courses/{courseId}/requests/{requestId}/approve", 999L,  999L)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .body(BodyInserters.fromValue(TestFactory.createDefaultCourseRequestApproveDTOPublish()))
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+
+    private void approvePublishByCourseId(Long courseId) {
+        webTestClient.post().uri("/courses/{courseId}/requests", courseId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .body(BodyInserters.fromValue(TestFactory.createDefaultCourseRequestDTOPublish()))
+                .exchange()
+                .expectStatus().isOk();
+
+        var requestId = courseRepository.findById(courseId).get().getCourseRequests().iterator().next().getId();
+
+        CourseRequestApproveDTO approveDTO = TestFactory.createDefaultCourseRequestApproveDTOPublish();
+
+        webTestClient.put().uri("/courses/{courseId}/requests/{requestId}/approve", courseId, requestId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .body(BodyInserters.fromValue(approveDTO))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    void testRequestUnpublishCourse_Successful() {
+        var courseDTO = TestFactory.createDefaultCourseDTO();
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+
+        approvePublishByCourseId(course.getId());
+
+        // Gửi request POST để yêu cầu hủy xuất bản khóa học
+        webTestClient.post().uri("/courses/{courseId}/requests", course.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .body(BodyInserters.fromValue(TestFactory.createDefaultCourseRequestDTOUnPublish()))
+                .exchange()
+                .expectStatus().isOk();
+
+        // assert
+        course = courseRepository.findById(course.getId()).get();
+        assertThat(course.getCourseRequests().size()).isEqualTo(2);
+        assertThat(course.getCourseRequests().stream().anyMatch(request -> request.getStatus() == RequestStatus.PENDING)).isTrue();
+    }
+
+    @Test
+    void testApproveUnpublishCourse_Successful() {
+        var courseDTO = TestFactory.createDefaultCourseDTO();
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+
+        approvePublishByCourseId(course.getId());
+
+        // Gửi request POST để yêu cầu hủy xuất bản khóa học
+        webTestClient.post().uri("/courses/{courseId}/requests", course.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .body(BodyInserters.fromValue(TestFactory.createDefaultCourseRequestDTOUnPublish()))
+                .exchange()
+                .expectStatus().isOk();
+
+        var requestId = courseRepository.findById(course.getId()).get().getCourseRequests().stream()
+                .filter(request -> request.getStatus() == RequestStatus.PENDING).findFirst().get().getId(); // damn this is ugly
+
+
+        CourseRequestApproveDTO approveDTOUnPublish = TestFactory.createDefaultCourseRequestApproveDTOUnPublish();
+
+        // Gửi request PUT để duyệt yêu cầu hủy xuất bản khóa học
+        webTestClient.put().uri("/courses/{courseId}/requests/{requestId}/approve", course.getId(), requestId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .body(BodyInserters.fromValue(approveDTOUnPublish))
+                .exchange()
+                .expectStatus().isOk();
+
+        // assert
+        course = courseRepository.findById(course.getId()).get();
+        assertThat(course.getCourseRequests().size()).isEqualTo(2);
+        assertThat(course.getCourseRequests().stream().anyMatch(request -> request.getStatus() == RequestStatus.APPROVED)).isTrue();
+        assertThat(course.isNotPublishedAndDeleted()).isTrue();
+        assertThat(course.getUnpublished()).isTrue();
+        assertThat(course.isPublishedAndNotDeleted()).isFalse();
+    }
+
+    @Test
+    void testRejectPublishCourse_Successful() {
+        var courseDTO = TestFactory.createDefaultCourseDTO();
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+
+        // Gửi request POST để yêu cầu xuất bản khóa học
+        webTestClient.post().uri("/courses/{courseId}/requests", course.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .body(BodyInserters.fromValue(TestFactory.createDefaultCourseRequestDTOPublish()))
+                .exchange()
+                .expectStatus().isOk();
+
+        var requestId = courseRepository.findById(course.getId()).get().getCourseRequests().iterator().next().getId();
+
+        // Gửi request PUT để từ chối yêu cầu xuất bản khóa học
+        webTestClient.put().uri("/courses/{courseId}/requests/{requestId}/reject", course.getId(), requestId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .body(BodyInserters.fromValue(TestFactory.createDefaultCourseRequestRejectDTOPublish()))
+                .exchange()
+                .expectStatus().isOk();
+
+        // assert
+        course = courseRepository.findById(course.getId()).get();
+        assertThat(course.getCourseRequests().size()).isEqualTo(1);
+        assertThat(course.getCourseRequests().stream().anyMatch(request -> request.getStatus() == RequestStatus.REJECTED)).isTrue();
+        assertThat(course.isPublishedAndNotDeleted()).isFalse();
+    }
+
+
+    @Test
     void testAddSectionToCourse_Successful() {
         var courseDTO = TestFactory.createDefaultCourseDTO();
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, null); // admin has the same permission as teacher
@@ -776,13 +921,7 @@ class LmsApplicationTests {
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
-        // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
-                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.published").isEqualTo(true);  // Kiểm tra khóa học đã được xuất bản
+        approvePublishByCourseId(course.getId());
 
         UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("New title");
 
@@ -818,14 +957,7 @@ class LmsApplicationTests {
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
-
-        // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
-                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.published").isEqualTo(true);  // Kiểm tra khóa học đã được xuất bản
+        approvePublishByCourseId(course.getId());
 
         // Gửi request DELETE để xóa section khỏi khóa học
         var sectionId = course.getSections().iterator().next().getId();
@@ -888,13 +1020,7 @@ class LmsApplicationTests {
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
-        // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
-                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.published").isEqualTo(true);  // Kiểm tra khóa học đã được xuất bản
+        approvePublishByCourseId(course.getId());
 
         LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
 
@@ -998,13 +1124,7 @@ class LmsApplicationTests {
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
-        // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
-                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.published").isEqualTo(true);  // Kiểm tra khóa học đã được xuất bản
+        approvePublishByCourseId(course.getId());
 
         LessonDTO updateLessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
 
@@ -1070,13 +1190,7 @@ class LmsApplicationTests {
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
-        // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", course.getId())
-                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.published").isEqualTo(true);  // Kiểm tra khóa học đã được xuất bản
+        approvePublishByCourseId(course.getId());
 
         // Gửi request DELETE để xóa lesson khỏi khóa học
         var courseSection = course.getSections().iterator().next();
@@ -1103,13 +1217,7 @@ class LmsApplicationTests {
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
-        // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", courseId)
-                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.published").isEqualTo(true);  // Kiểm tra khóa học đã được xuất bản
+        approvePublishByCourseId(course.getId());
 
         webTestClient.get()
                 .uri("/published-courses/{courseId}", courseId)
@@ -1188,13 +1296,7 @@ class LmsApplicationTests {
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
-        // Gửi request PUT để xuất bản khóa học
-        webTestClient.put().uri("/courses/{courseId}/publish", courseId)
-                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.published").isEqualTo(true);  // Kiểm tra khóa học đã được xuất bản
+        approvePublishByCourseId(course.getId());
 
         webTestClient.get()
                 .uri("/published-courses/{courseId}", courseId)

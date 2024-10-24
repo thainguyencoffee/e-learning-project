@@ -1,11 +1,9 @@
 package com.el.course.web;
 
 import com.el.course.application.*;
-import com.el.course.application.dto.CourseDTO;
-import com.el.course.application.dto.CourseSectionDTO;
-import com.el.course.application.dto.CourseUpdateDTO;
-import com.el.course.application.dto.LessonDTO;
+import com.el.course.application.dto.*;
 import com.el.course.domain.Course;
+import com.el.course.domain.RequestType;
 import com.el.course.web.dto.ApplyDiscountDTO;
 import com.el.course.web.dto.AssignTeacherDTO;
 import com.el.course.web.dto.UpdatePriceDTO;
@@ -89,10 +87,35 @@ public class CourseManagementController {
         return ResponseEntity.ok(updatedCourse);
     }
 
-    @PutMapping("/{courseId}/publish")
-    public ResponseEntity<Course> publishCourse(@AuthenticationPrincipal Jwt jwt, @PathVariable Long courseId) {
-        Course updatedCourse = courseService.publishCourse(courseId, jwt.getSubject());
-        return ResponseEntity.ok(updatedCourse);
+    @PostMapping("/{courseId}/requests")
+    public ResponseEntity<Course> requestPublish(@PathVariable Long courseId,
+                                                 @Valid @RequestBody CourseRequestDTO courseRequestDTO) {
+        if (courseRequestDTO.type() == RequestType.PUBLISH) {
+            courseService.requestPublish(courseId, courseRequestDTO);
+        } else {
+            courseService.requestUnpublish(courseId, courseRequestDTO);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{courseId}/requests/{requestId}/approve")
+    public ResponseEntity<Course> approvePublish(@PathVariable Long courseId, @PathVariable Long requestId, @Valid @RequestBody CourseRequestApproveDTO courseRequestApproveDTO) {
+        if (courseRequestApproveDTO.approveType() == RequestType.PUBLISH) {
+            courseService.approvePublish(courseId, requestId, courseRequestApproveDTO.toCourseRequestResolveDTO());
+        } else {
+            courseService.approveUnpublish(courseId, requestId, courseRequestApproveDTO.toCourseRequestResolveDTO());
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{courseId}/requests/{requestId}/reject")
+    public ResponseEntity<Course> rejectPublish(@PathVariable Long courseId, @PathVariable Long requestId, @Valid @RequestBody CourseRequestRejectDTO courseRequestRejectDTO) {
+        if (courseRequestRejectDTO.rejectType() == RequestType.PUBLISH) {
+            courseService.rejectPublish(courseId, requestId, courseRequestRejectDTO.toCourseRequestResolveDTO());
+        } else {
+            courseService.rejectUnpublish(courseId, requestId, courseRequestRejectDTO.toCourseRequestResolveDTO());
+        }
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{courseId}/update-price")
