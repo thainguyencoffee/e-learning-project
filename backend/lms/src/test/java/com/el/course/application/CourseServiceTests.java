@@ -6,9 +6,7 @@ import com.el.common.RolesBaseUtil;
 import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
-import com.el.course.application.dto.CourseDTO;
-import com.el.course.application.dto.CourseSectionDTO;
-import com.el.course.application.dto.CourseUpdateDTO;
+import com.el.course.application.dto.*;
 import com.el.course.application.impl.CourseServiceImpl;
 import com.el.course.domain.*;
 import com.el.discount.application.DiscountService;
@@ -139,7 +137,7 @@ class CourseServiceTests {
         // Mock
         Course courseMock = spy(course);
         when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
-        doReturn(false).when(courseMock).canEdit();
+        doReturn(false).when(courseMock).isNotPublishedAndDeleted();
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
@@ -190,7 +188,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        doReturn(false).when(courseMock).canEdit();
+        doReturn(false).when(courseMock).isNotPublishedAndDeleted();
 
         assertThrows(InputInvalidException.class, () -> courseService.deleteCourse(1L));
         verify(courseRepository, never()).save(any(Course.class));
@@ -239,7 +237,7 @@ class CourseServiceTests {
     void updatePrice_CoursePublished_ThrowsException() {
         Course courseMock = spy(course);
         when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
-        doReturn(false).when(courseMock).canEdit();
+        doReturn(false).when(courseMock).isNotPublishedAndDeleted();
 
         MonetaryAmount newPrice = Money.of(100, Currencies.VND);
         assertThrows(InputInvalidException.class, () -> courseService.updatePrice(1L, newPrice));
@@ -276,80 +274,80 @@ class CourseServiceTests {
         Course courseMock = spy(course);
         when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
 
-        doReturn(false).when(courseMock).canEdit();
+        doReturn(false).when(courseMock).isNotPublishedAndDeleted();
 
         assertThrows(InputInvalidException.class, () -> courseService.assignTeacher(1L, "NewTeacher"));
         verify(courseRepository, never()).save(any(Course.class));
     }
 
-    @Test
-    void publishCourse_ValidCourseIdAndApprovedBy_PublishesCourse() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(courseForPublish);
-
-        courseService.publishCourse(1L, "Admin");
-
-        verify(courseRepository, times(1)).save(courseForPublish);
-    }
-
-    @Test
-    void publishCourse_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
-
-        assertThrows(ResourceNotFoundException.class, () -> courseService.publishCourse(1L, "Admin"));
-
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void applyDiscount_ShouldApplyDiscountSuccessfully() {
-        // Mock và discountService
-        when(courseQueryService.findCourseById(any())).thenReturn(course);
-        course.changePrice(Money.of(100, Currencies.VND));
-
-        MonetaryAmount discountedPrice = Money.of(80, Currencies.VND);
-        when(discountService.calculateDiscount(any(), any())).thenReturn(discountedPrice);
-        when(courseRepository.save(any(Course.class))).thenReturn(course);
-
-        // Act
-        courseService.applyDiscount(1L, "DISCOUNT_10");
-
-        // Xác minh rằng courseRepository.findById, discountService.calculateDiscount và courseRepository.save đã được gọi
-        verify(courseQueryService, times(1)).findCourseById(any());
-        verify(discountService, times(1)).calculateDiscount(any(), any());
-        verify(courseRepository, times(1)).save(course);
-    }
-
-    @Test
-    void applyDiscount_ShouldThrowException_WhenCoursePriceIsNull() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        String discountCode = "DISCOUNT_10";
-
-        // Kiểm tra xem ngoại lệ có được ném ra khi giá của khóa học là null
-        assertThrows(InputInvalidException.class, () -> {
-            courseService.applyDiscount(1L, discountCode);
-        });
-
-        // Verify
-        verify(discountService, never()).calculateDiscount(anyString(), any(MonetaryAmount.class));
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void applyDiscount_ShouldThrowException_WhenDiscountNotFound() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-
-        course.changePrice(Money.of(100, Currencies.VND));
-        String discountCode = "DISCOUNT_10";
-        when(discountService.calculateDiscount(discountCode, course.getPrice())).thenThrow(ResourceNotFoundException.class);
-
-        // Kiểm tra xem ngoại lệ có được ném ra khi không tìm thấy mã giảm giá
-        assertThrows(ResourceNotFoundException.class, () -> {
-            courseService.applyDiscount(1L, discountCode);
-        });
-
-        // Verify
-        verify(courseRepository, never()).save(any(Course.class));
-    }
+//    @Test
+//    void publishCourse_ValidCourseIdAndApprovedBy_PublishesCourse() {
+//        when(courseQueryService.findCourseById(1L)).thenReturn(courseForPublish);
+//
+//        courseService.publishCourse(1L, "Admin");
+//
+//        verify(courseRepository, times(1)).save(courseForPublish);
+//    }
+//
+//    @Test
+//    void publishCourse_CourseNotFound_ThrowsException() {
+//        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+//
+//        assertThrows(ResourceNotFoundException.class, () -> courseService.publishCourse(1L, "Admin"));
+//
+//        verify(courseRepository, never()).save(any(Course.class));
+//    }
+//
+//    @Test
+//    void applyDiscount_ShouldApplyDiscountSuccessfully() {
+//        // Mock và discountService
+//        when(courseQueryService.findCourseById(any())).thenReturn(course);
+//        course.changePrice(Money.of(100, Currencies.VND));
+//
+//        MonetaryAmount discountedPrice = Money.of(80, Currencies.VND);
+//        when(discountService.calculateDiscount(any(), any())).thenReturn(discountedPrice);
+//        when(courseRepository.save(any(Course.class))).thenReturn(course);
+//
+//        // Act
+//        courseService.applyDiscount(1L, "DISCOUNT_10");
+//
+//        // Xác minh rằng courseRepository.findById, discountService.calculateDiscount và courseRepository.save đã được gọi
+//        verify(courseQueryService, times(1)).findCourseById(any());
+//        verify(discountService, times(1)).calculateDiscount(any(), any());
+//        verify(courseRepository, times(1)).save(course);
+//    }
+//
+//    @Test
+//    void applyDiscount_ShouldThrowException_WhenCoursePriceIsNull() {
+//        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+//        String discountCode = "DISCOUNT_10";
+//
+//        // Kiểm tra xem ngoại lệ có được ném ra khi giá của khóa học là null
+//        assertThrows(InputInvalidException.class, () -> {
+//            courseService.applyDiscount(1L, discountCode);
+//        });
+//
+//        // Verify
+//        verify(discountService, never()).calculateDiscount(anyString(), any(MonetaryAmount.class));
+//        verify(courseRepository, never()).save(any(Course.class));
+//    }
+//
+//    @Test
+//    void applyDiscount_ShouldThrowException_WhenDiscountNotFound() {
+//        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+//
+//        course.changePrice(Money.of(100, Currencies.VND));
+//        String discountCode = "DISCOUNT_10";
+//        when(discountService.calculateDiscount(discountCode, course.getPrice())).thenThrow(ResourceNotFoundException.class);
+//
+//        // Kiểm tra xem ngoại lệ có được ném ra khi không tìm thấy mã giảm giá
+//        assertThrows(ResourceNotFoundException.class, () -> {
+//            courseService.applyDiscount(1L, discountCode);
+//        });
+//
+//        // Verify
+//        verify(courseRepository, never()).save(any(Course.class));
+//    }
 
     @Test
     void addCourseSection_ShouldAddCourseSection() {
@@ -450,7 +448,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        doReturn(false).when(courseMock).canEdit();
+        doReturn(false).when(courseMock).isNotPublishedAndDeleted();
 
         // Act & Assert: Assert
         assertThrows(InputInvalidException.class, () -> {
@@ -522,7 +520,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        doReturn(false).when(course).canEdit();
+        doReturn(false).when(course).isNotPublishedAndDeleted();
 
         assertThrows(InputInvalidException.class, () -> courseService.removeSection(1L, 2L));
 
@@ -589,7 +587,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        doReturn(false).when(course).canEdit();
+        doReturn(false).when(course).isNotPublishedAndDeleted();
         Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null);
 
         assertThrows(InputInvalidException.class, () -> courseService.addLesson(1L, 2L, lesson));
@@ -723,9 +721,225 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        doReturn(false).when(course).canEdit();
+        doReturn(false).when(course).isNotPublishedAndDeleted();
 
         assertThrows(InputInvalidException.class, () -> courseService.removeLesson(1L, 2L, 3L));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void requestPublish_shouldAddRequest_whenValidRequest() {
+        CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOPublish();
+        Course course = spy(this.course);
+        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        doNothing().when(course).requestPublish(any(CourseRequest.class));
+
+        courseService.requestPublish(1L, courseRequestDTO);
+
+        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(course, times(1)).requestPublish(any(CourseRequest.class));
+        verify(courseRepository, times(1)).save(course);
+    }
+
+    @Test
+    void requestPublish_shouldThrowException_whenCourseNotFound() {
+        CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOPublish();
+        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.requestPublish(1L, courseRequestDTO));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void requestPublish_shouldThrowException_whenBusinessLogicThrow() {
+        CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOPublish();
+        Course course = spy(this.course);
+        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        doThrow(new InputInvalidException("something err")).when(course).requestPublish(any(CourseRequest.class));
+
+        assertThrows(InputInvalidException.class, () -> courseService.requestPublish(1L, courseRequestDTO));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void requestUnpublish_shouldAddRequest_whenValidRequest() {
+        CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOUnPublish();
+        Course course = spy(this.course);
+        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        doNothing().when(course).requestUnpublish(any(CourseRequest.class));
+
+        courseService.requestUnpublish(1L, courseRequestDTO);
+
+        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(course, times(1)).requestUnpublish(any(CourseRequest.class));
+        verify(courseRepository, times(1)).save(course);
+    }
+
+    @Test
+    void requestUnpublish_shouldThrowException_whenCourseNotFound() {
+        CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOUnPublish();
+        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.requestUnpublish(1L, courseRequestDTO));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void requestUnpublish_shouldThrowException_whenBusinessLogicThrow() {
+        CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOUnPublish();
+        Course course = spy(this.course);
+        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        doThrow(new InputInvalidException("something err")).when(course).requestUnpublish(any(CourseRequest.class));
+
+        assertThrows(InputInvalidException.class, () -> courseService.requestUnpublish(1L, courseRequestDTO));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void approvePublish_shouldApprovePublishRequest_whenValidRequest() {
+        CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
+        Course course = spy(this.course);
+        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        doNothing().when(course).approvePublish(anyLong(), anyString(), anyString());
+
+        courseService.approvePublish(1L, 2L, resolveDTO);
+
+        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(course, times(1)).approvePublish(2L, resolveDTO.resolvedBy(), resolveDTO.message());
+        verify(courseRepository, times(1)).save(course);
+    }
+
+    @Test
+    void approvePublish_shouldThrowException_whenCourseNotFound() {
+        CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
+        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.approvePublish(1L, 2L, resolveDTO));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void approvePublish_shouldThrowException_whenBusinessLogicThrow() {
+        CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
+        Course course = spy(this.course);
+        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        doThrow(new InputInvalidException("something err")).when(course).approvePublish(anyLong(), anyString(), anyString());
+
+        assertThrows(InputInvalidException.class, () -> courseService.approvePublish(1L, 2L, resolveDTO));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void rejectPublish_shouldRejectPublishRequest_whenValidRequest() {
+        CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
+        Course course = spy(this.course);
+        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        doNothing().when(course).rejectPublish(anyLong(), anyString(), anyString());
+
+        courseService.rejectPublish(1L, 2L, resolveDTO);
+
+        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(course, times(1)).rejectPublish(2L, resolveDTO.resolvedBy(), resolveDTO.message());
+        verify(courseRepository, times(1)).save(course);
+    }
+
+    @Test
+    void rejectPublish_shouldThrowException_whenCourseNotFound() {
+        CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
+        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.rejectPublish(1L, 2L, resolveDTO));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void rejectPublish_shouldThrowException_whenBusinessLogicThrow() {
+        CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
+        Course course = spy(this.course);
+        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        doThrow(new InputInvalidException("something err")).when(course).rejectPublish(anyLong(), anyString(), anyString());
+
+        assertThrows(InputInvalidException.class, () -> courseService.rejectPublish(1L, 2L, resolveDTO));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void approveUnPublish_shouldApproveUnPublishRequest_whenValidRequest() {
+        CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
+        Course course = spy(this.course);
+        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        doNothing().when(course).approveUnpublish(anyLong(), anyString(), anyString());
+
+        courseService.approveUnpublish(1L, 2L,  resolveDTO);
+
+        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(course, times(1)).approveUnpublish(2L, resolveDTO.resolvedBy(), resolveDTO.message());
+        verify(courseRepository, times(1)).save(course);
+    }
+
+    @Test
+    void approveUnPublish_shouldThrowException_whenCourseNotFound() {
+        CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
+        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.approveUnpublish(1L, 2L, resolveDTO));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void approveUnPublish_shouldThrowException_whenBusinessLogicThrow() {
+        CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
+        Course course = spy(this.course);
+        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        doThrow(new InputInvalidException("something err")).when(course).approveUnpublish(anyLong(), anyString(), anyString());
+
+        assertThrows(InputInvalidException.class, () -> courseService.approveUnpublish(1L, 2L, resolveDTO));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void rejectUnPublish_shouldRejectUnPublishRequest_whenValidRequest() {
+        CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
+        Course course = spy(this.course);
+        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        doNothing().when(course).rejectUnpublish(anyLong(), anyString(), anyString());
+
+        courseService.rejectUnpublish(1L, 2L,  resolveDTO);
+
+        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(course, times(1)).rejectUnpublish(any(), any(), any());
+        verify(courseRepository, times(1)).save(course);
+    }
+
+    @Test
+    void rejectUnPublish_shouldThrowException_whenCourseNotFound() {
+        CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
+        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.rejectUnpublish(1L, 2L, resolveDTO));
+
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void rejectUnPublish_shouldThrowException_whenBusinessLogicThrow() {
+        CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
+        Course course = spy(this.course);
+        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        doThrow(new InputInvalidException("something err")).when(course).rejectUnpublish(anyLong(), anyString(), anyString());
+
+        assertThrows(InputInvalidException.class, () -> courseService.rejectUnpublish(1L, 2L, resolveDTO));
 
         verify(courseRepository, never()).save(any(Course.class));
     }

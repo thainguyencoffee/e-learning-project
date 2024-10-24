@@ -12,6 +12,7 @@ create table course
     title              varchar(255) not null,
     thumbnail_url      varchar(500),
     published          boolean      not null,
+    unpublished        boolean      not null,
     description        varchar(2000),
     price              varchar(50),
     discounted_price   varchar(50),
@@ -31,6 +32,20 @@ create table course
     constraint fk_course primary key (id)
 );
 
+create table course_request
+(
+    id              bigserial     not null,
+    course          bigint        not null references course (id) on DELETE cascade,
+    type            varchar(50)   not null,
+    status          varchar(50)   not null,
+    resolved        boolean       not null,
+    resolved_by     varchar(50),
+    requested_by    varchar(50)   not null,
+    message         varchar(2000) not null,
+    reject_reason   varchar(2000),
+    approve_message varchar(2000),
+    constraint fk_course_request primary key (id)
+);
 
 create table course_section
 (

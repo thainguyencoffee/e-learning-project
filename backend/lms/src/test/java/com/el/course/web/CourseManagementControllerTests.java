@@ -7,15 +7,11 @@ import com.el.common.config.SecurityConfig;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
-import com.el.course.application.dto.CourseDTO;
-import com.el.course.application.dto.CourseSectionDTO;
-import com.el.course.application.dto.CourseUpdateDTO;
-import com.el.course.application.dto.LessonDTO;
+import com.el.course.application.dto.*;
 import com.el.course.application.impl.CourseServiceImpl;
 import com.el.course.domain.Course;
 import com.el.course.domain.Language;
 import com.el.course.domain.Lesson;
-import com.el.course.web.dto.ApplyDiscountDTO;
 import com.el.course.web.dto.AssignTeacherDTO;
 import com.el.course.web.dto.UpdatePriceDTO;
 import com.el.course.web.dto.UpdateSectionDTO;
@@ -437,88 +433,271 @@ class CourseManagementControllerTests {
                 .andExpect(status().isBadRequest());
     }
 
+//    @Test
+//    void publishCourse_ValidCourseIdAndJwt_PublishesCourse() throws Exception {
+//        Course updatedCourse = Mockito.mock(Course.class);
+//        when(courseService.publishCourse(any(Long.class), any(String.class)))
+//                .thenReturn(updatedCourse);
+//
+//        mockMvc.perform(put("/courses/1/publish")
+//                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.id").value(updatedCourse.getId()));
+//    }
+//
+//    @Test
+//    void publishCourse_CourseNotFound_ThrowsException() throws Exception {
+//        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).publishCourse(any(Long.class), any(String.class));
+//
+//        mockMvc.perform(put("/courses/1/publish")
+//                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+//                .andExpect(status().isNotFound());
+//    }
+//
+//    @Test
+//    void publishCourse_UserNotTeacher_ShouldReturnForbidden() throws Exception {
+//        mockMvc.perform(put("/courses/1/publish")
+//                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+//                .andExpect(status().isForbidden());
+//    }
+//
+//
+//    @Test
+//    void applyDiscount_ValidCourseIdAndDiscount_ShouldReturnOk() throws Exception {
+//        Course updatedCourse = Mockito.mock(Course.class);
+//        when(updatedCourse.getId()).thenReturn(1L);
+//        String discountCode = "DISCOUNT25";
+//        when(courseService.applyDiscount(1L, discountCode)).thenReturn(updatedCourse);
+//
+//        String body = objectMapper.writeValueAsString(new ApplyDiscountDTO(discountCode));
+//
+//        mockMvc.perform(post("/courses/1/apply-discount")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(body)
+//                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.id").value(1L));
+//    }
+//
+//    @Test
+//    void applyDiscount_CourseNotFound_ShouldReturnNotFound() throws Exception {
+//        String discountCode = "DISCOUNT25";
+//        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).applyDiscount(1L, discountCode);
+//
+//        String body = objectMapper.writeValueAsString(new ApplyDiscountDTO(discountCode));
+//
+//        mockMvc.perform(post("/courses/1/apply-discount")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(body)
+//                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+//                .andExpect(status().isNotFound());
+//    }
+//
+//    @Test
+//    void applyDiscount_UserNotAdmin_ShouldReturnForbidden() throws Exception {
+//        String discountCode = "DISCOUNT25";
+//        String body = objectMapper.writeValueAsString(new ApplyDiscountDTO(discountCode));
+//
+//        mockMvc.perform(post("/courses/1/apply-discount")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(body)
+//                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+//                .andExpect(status().isForbidden());
+//    }
+//
+//    @Test
+//    void applyDiscount_InvalidDiscountId_ShouldReturnBadRequest() throws Exception {
+//        String body = objectMapper.writeValueAsString(new ApplyDiscountDTO(null));
+//
+//        mockMvc.perform(post("/courses/1/apply-discount")
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(body)
+//                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+//                .andExpect(status().isBadRequest());
+//    }
+
     @Test
-    void publishCourse_ValidCourseIdAndJwt_PublishesCourse() throws Exception {
-        Course updatedCourse = Mockito.mock(Course.class);
-        when(courseService.publishCourse(any(Long.class), any(String.class)))
-                .thenReturn(updatedCourse);
+    void requestPublish_shouldReturnOk_whenValidPublishRequest() throws Exception {
+        CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOPublish();
+        String body = objectMapper.writeValueAsString(courseRequestDTO);
 
-        mockMvc.perform(put("/courses/1/publish")
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(updatedCourse.getId()));
-    }
-
-    @Test
-    void publishCourse_CourseNotFound_ThrowsException() throws Exception {
-        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).publishCourse(any(Long.class), any(String.class));
-
-        mockMvc.perform(put("/courses/1/publish")
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void publishCourse_UserNotTeacher_ShouldReturnForbidden() throws Exception {
-        mockMvc.perform(put("/courses/1/publish")
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
-                .andExpect(status().isForbidden());
-    }
-
-
-    @Test
-    void applyDiscount_ValidCourseIdAndDiscount_ShouldReturnOk() throws Exception {
-        Course updatedCourse = Mockito.mock(Course.class);
-        when(updatedCourse.getId()).thenReturn(1L);
-        String discountCode = "DISCOUNT25";
-        when(courseService.applyDiscount(1L, discountCode)).thenReturn(updatedCourse);
-
-        String body = objectMapper.writeValueAsString(new ApplyDiscountDTO(discountCode));
-
-        mockMvc.perform(post("/courses/1/apply-discount")
+        mockMvc.perform(post("/courses/1/requests")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L));
+                .andExpect(status().isOk());
     }
 
     @Test
-    void applyDiscount_CourseNotFound_ShouldReturnNotFound() throws Exception {
-        String discountCode = "DISCOUNT25";
-        Mockito.doThrow(new ResourceNotFoundException()).when(courseService).applyDiscount(1L, discountCode);
+    void requestPublish_shouldReturn400_whenServiceThrows() throws Exception {
+        CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOPublish();
+        String body = objectMapper.writeValueAsString(courseRequestDTO);
 
-        String body = objectMapper.writeValueAsString(new ApplyDiscountDTO(discountCode));
+        Mockito.doThrow(new InputInvalidException("some thing err"))
+                .when(courseService).requestPublish(1L, courseRequestDTO);
 
-        mockMvc.perform(post("/courses/1/apply-discount")
+        mockMvc.perform(post("/courses/1/requests")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void applyDiscount_UserNotAdmin_ShouldReturnForbidden() throws Exception {
-        String discountCode = "DISCOUNT25";
-        String body = objectMapper.writeValueAsString(new ApplyDiscountDTO(discountCode));
-
-        mockMvc.perform(post("/courses/1/apply-discount")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void applyDiscount_InvalidDiscountId_ShouldReturnBadRequest() throws Exception {
-        String body = objectMapper.writeValueAsString(new ApplyDiscountDTO(null));
-
-        mockMvc.perform(post("/courses/1/apply-discount")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin")))
+                )
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void requestPublish_shouldReturnOk_whenValidPublishRequestAndRoleIsTeacher() throws Exception {
+        CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOPublish();
+        String body = objectMapper.writeValueAsString(courseRequestDTO);
+
+        mockMvc.perform(post("/courses/1/requests")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void requestUnPublish_shouldReturnOk_whenValidUnPublishRequest() throws Exception {
+        CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOUnPublish();
+        String body = objectMapper.writeValueAsString(courseRequestDTO);
+
+        mockMvc.perform(post("/courses/1/requests")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void requestUnPublish_shouldReturn400_whenServiceThrows() throws Exception {
+        CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOUnPublish();
+        String body = objectMapper.writeValueAsString(courseRequestDTO);
+
+        Mockito.doThrow(new InputInvalidException("some thing err"))
+                .when(courseService).requestUnpublish(1L, courseRequestDTO);
+
+        mockMvc.perform(post("/courses/1/requests")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin")))
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void requestUnPublish_shouldReturnOk_whenValidUnPublishRequestAndRoleIsTeacher() throws Exception {
+        CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOUnPublish();
+        String body = objectMapper.writeValueAsString(courseRequestDTO);
+
+        mockMvc.perform(post("/courses/1/requests")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void approvePublish_shouldReturnOk_whenValidApprovePublishRequest() throws Exception {
+        CourseRequestApproveDTO approveDTO = TestFactory.createDefaultCourseRequestApproveDTOPublish();
+
+        mockMvc.perform(put("/courses/1/requests/1/approve")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(approveDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin")))
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void approvePublish_shouldReturn400_whenServiceThrows() throws Exception {
+        CourseRequestApproveDTO approveDTO = TestFactory.createDefaultCourseRequestApproveDTOPublish();
+
+        Mockito.doThrow(new InputInvalidException("some thing err"))
+                .when(courseService).approvePublish(any(), any(), any());
+
+        mockMvc.perform(put("/courses/1/requests/1/approve")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(approveDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin")))
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void approvePublish_shouldReturn400_whenInvalidData() throws Exception {
+        CourseRequestApproveDTO approveDTO = new CourseRequestApproveDTO(null, "", "");
+
+        mockMvc.perform(put("/courses/1/requests/1/approve")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(approveDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin")))
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void approvePublish_shouldReturn403_whenRoleIsTeacher() throws Exception {
+        CourseRequestApproveDTO approveDTO = TestFactory.createDefaultCourseRequestApproveDTOPublish();
+
+        mockMvc.perform(put("/courses/1/requests/1/approve")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(approveDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher")))
+                )
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void rejectPublish_shouldReturnOk_whenValidRejectPublishRequest() throws Exception {
+        CourseRequestRejectDTO rejectDTO = TestFactory.createDefaultCourseRequestRejectDTOPublish();
+
+        mockMvc.perform(put("/courses/1/requests/1/reject")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(rejectDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin")))
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void rejectPublish_shouldReturn400_whenServiceThrows() throws Exception {
+        CourseRequestRejectDTO rejectDTO = TestFactory.createDefaultCourseRequestRejectDTOPublish();
+
+        Mockito.doThrow(new InputInvalidException("some thing err"))
+                .when(courseService).rejectPublish(any(), any(), any());
+
+        mockMvc.perform(put("/courses/1/requests/1/reject")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(rejectDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin")))
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void rejectPublish_shouldReturn400_whenInvalidData() throws Exception {
+        CourseRequestRejectDTO rejectDTO = new CourseRequestRejectDTO(null, "", "");
+
+        mockMvc.perform(put("/courses/1/requests/1/reject")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(rejectDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin")))
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void rejectPublish_shouldReturn403_whenRolesTeacher() throws Exception {
+        CourseRequestRejectDTO rejectDTO = TestFactory.createDefaultCourseRequestRejectDTOPublish();
+
+        mockMvc.perform(put("/courses/1/requests/1/reject")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(rejectDTO))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher")))
+                )
+                .andExpect(status().isForbidden());
+    }
+
 
     @Test
     void addSection_ValidCourseIdAndSection_ReturnsUpdatedCourse() throws Exception {

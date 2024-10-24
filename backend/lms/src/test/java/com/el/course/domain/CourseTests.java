@@ -109,7 +109,7 @@ class CourseTests {
         Course course = spy(courseNoSections);
 
         // Giả lập trạng thái đã publish bằng cách mock canEdit trả về false
-        when(course.canEdit()).thenReturn(false);
+        when(course.isNotPublishedAndDeleted()).thenReturn(false);
 
         // Tạo dữ liệu để cập nhật
         Set<String> newBenefits = new HashSet<>(Arrays.asList("NewBenefit1", "NewBenefit2"));
@@ -145,7 +145,7 @@ class CourseTests {
     @Test
     void delete_PublishedCourse_ThrowsException() {
         Course courseMock = spy(courseNoSections);
-        when(courseMock.canEdit()).thenReturn(false);
+        when(courseMock.isNotPublishedAndDeleted()).thenReturn(false);
         assertThrows(InputInvalidException.class, courseMock::delete);
     }
 
@@ -177,7 +177,7 @@ class CourseTests {
     @Test
     void changePrice_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
-        when(course.canEdit()).thenReturn(false);
+        when(course.isNotPublishedAndDeleted()).thenReturn(false);
         MonetaryAmount newPrice = Money.of(100, Currencies.VND);
         assertThrows(InputInvalidException.class, () -> course.changePrice(newPrice));
     }
@@ -196,60 +196,60 @@ class CourseTests {
     @Test
     void assignTeacher_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
-        when(course.canEdit()).thenReturn(false);
+        when(course.isNotPublishedAndDeleted()).thenReturn(false);
         assertThrows(InputInvalidException.class, () -> course.assignTeacher("NewTeacher"));
     }
 
-    @Test
-    void publish_ValidCourse_PublishesCourse() {
-        courseWithSections.publish("Admin");
-
-        assertTrue(courseWithSections.getPublished());
-        assertEquals("Admin", courseWithSections.getApprovedBy());
-    }
-
-    @Test
-    void publish_AlreadyPublishedCourse_ThrowsException() {
-        Course course = spy(courseWithSections);
-        when(course.canEdit()).thenReturn(false);
-
-        assertThrows(InputInvalidException.class, () -> course.publish("Admin"));
-    }
-
-    @Test
-    void publish_CourseWithoutSections_ThrowsException() {
-        // Tạo một course không có sections nhưng đã set giá
-        courseNoSections.changePrice(Money.of(100, Currencies.VND));
-
-        assertThrows(InputInvalidException.class, () -> courseNoSections.publish("Admin"));
-    }
-
-    @Test
-    void publish_CourseWithoutPrice_ThrowsException() {
-        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
-        course.addSection(courseWithSections.getSections().iterator().next());
-
-        assertThrows(InputInvalidException.class, () -> course.publish("Admin"));
-    }
-
-    @Test
-    void publish_CourseWithSameTeacherAsApprover_ThrowsException() {
-        String teacher = TestFactory.createDefaultCourse().getTeacher();
-        assertThrows(InputInvalidException.class, () -> courseWithSections.publish(teacher));
-    }
-
-    @Test
-    void publish_CourseWithoutTeacher_ThrowsException() {
-        Course courseMock = spy(courseWithSections);
-        when(courseMock.getTeacher()).thenReturn(null);
-
-        assertThrows(InputInvalidException.class, () -> courseMock.publish("Admin"));
-    }
-
-    @Test
-    void publish_NullApprovedBy_ThrowsException() {
-        assertThrows(InputInvalidException.class, () -> courseWithSections.publish(null));
-    }
+//    @Test
+//    void publish_ValidCourse_PublishesCourse() {
+//        courseWithSections.publish("Admin");
+//
+//        assertTrue(courseWithSections.getPublished());
+//        assertEquals("Admin", courseWithSections.getApprovedBy());
+//    }
+//
+//    @Test
+//    void publish_AlreadyPublishedCourse_ThrowsException() {
+//        Course course = spy(courseWithSections);
+//        when(course.isNotPublishedAndDeleted()).thenReturn(false);
+//
+//        assertThrows(InputInvalidException.class, () -> course.publish("Admin"));
+//    }
+//
+//    @Test
+//    void publish_CourseWithoutSections_ThrowsException() {
+//        // Tạo một course không có sections nhưng đã set giá
+//        courseNoSections.changePrice(Money.of(100, Currencies.VND));
+//
+//        assertThrows(InputInvalidException.class, () -> courseNoSections.publish("Admin"));
+//    }
+//
+//    @Test
+//    void publish_CourseWithoutPrice_ThrowsException() {
+//        Course course = new Course("Title", "Description", "ThumbnailUrl", new HashSet<>(), Language.ENGLISH, new HashSet<>(), new HashSet<>(), "Teacher");
+//        course.addSection(courseWithSections.getSections().iterator().next());
+//
+//        assertThrows(InputInvalidException.class, () -> course.publish("Admin"));
+//    }
+//
+//    @Test
+//    void publish_CourseWithSameTeacherAsApprover_ThrowsException() {
+//        String teacher = TestFactory.createDefaultCourse().getTeacher();
+//        assertThrows(InputInvalidException.class, () -> courseWithSections.publish(teacher));
+//    }
+//
+//    @Test
+//    void publish_CourseWithoutTeacher_ThrowsException() {
+//        Course courseMock = spy(courseWithSections);
+//        when(courseMock.getTeacher()).thenReturn(null);
+//
+//        assertThrows(InputInvalidException.class, () -> courseMock.publish("Admin"));
+//    }
+//
+//    @Test
+//    void publish_NullApprovedBy_ThrowsException() {
+//        assertThrows(InputInvalidException.class, () -> courseWithSections.publish(null));
+//    }
 
     @Test
     void applyDiscount_ValidDiscount_AppliesDiscount() {
@@ -293,7 +293,7 @@ class CourseTests {
     @Test
     void addSection_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
-        when(course.canEdit()).thenReturn(false); // Giả lập khóa học đã publish
+        when(course.isNotPublishedAndDeleted()).thenReturn(false); // Giả lập khóa học đã publish
 
         CourseSection section = new CourseSection("SectionTitle");
         assertThrows(InputInvalidException.class, () -> course.addSection(section));
@@ -333,7 +333,7 @@ class CourseTests {
     @Test
     void testUpdateSection_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
-        when(course.canEdit()).thenReturn(false); // Giả lập khóa học đã publish
+        when(course.isNotPublishedAndDeleted()).thenReturn(false); // Giả lập khóa học đã publish
 
         CourseSection section = new CourseSection("SectionTitle");
         assertThrows(InputInvalidException.class, () -> course.addSection(section));
@@ -364,7 +364,7 @@ class CourseTests {
     @Test
     void removeSection_PublishedCourse_ThrowsException() {
         Course course = spy(courseWithSections);
-        when(course.canEdit()).thenReturn(false);
+        when(course.isNotPublishedAndDeleted()).thenReturn(false);
 
         assertThrows(InputInvalidException.class, () -> course.removeSection(1L));
     }
@@ -410,7 +410,7 @@ class CourseTests {
     @Test
     void addLessonToSection_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
-        when(course.canEdit()).thenReturn(false);
+        when(course.isNotPublishedAndDeleted()).thenReturn(false);
 
         assertThrows(InputInvalidException.class, () -> course.addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null)));
     }
@@ -465,7 +465,7 @@ class CourseTests {
     @Test
     void updateLessonInSection_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
-        when(course.canEdit()).thenReturn(false);
+        when(course.isNotPublishedAndDeleted()).thenReturn(false);
 
         assertThrows(InputInvalidException.class, () -> course.updateLessonInSection(1L, 1L, new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com", null)));
     }
@@ -521,9 +521,361 @@ class CourseTests {
     @Test
     void removeLessonFromSection_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
-        when(course.canEdit()).thenReturn(false);
+        when(course.isNotPublishedAndDeleted()).thenReturn(false);
 
         assertThrows(InputInvalidException.class, () -> course.removeLessonFromSection(1L, 1L));
     }
+
+    @Test
+    void requestPublish_shouldAddRequest_whenValidRequest() {
+        assertFalse(courseNoSections.isPublishedAndNotDeleted());
+        assertNotNull(courseWithSections.getPrice());
+        assertNotNull(courseWithSections.getTeacher());
+        assertFalse(courseWithSections.getSections().isEmpty());
+
+        CourseRequest courseRequest = TestFactory.createDefaultCourseRequestPublish();
+
+        courseWithSections.requestPublish(courseRequest);
+
+        assertTrue(courseWithSections.getCourseRequests().contains(courseRequest));
+    }
+
+    @Test
+    void requestPublish_shouldThrowException_whenCourseAlreadyPublished() {
+        assertFalse(courseNoSections.isPublishedAndNotDeleted());
+        assertNotNull(courseWithSections.getPrice());
+        assertNotNull(courseWithSections.getTeacher());
+        assertFalse(courseWithSections.getSections().isEmpty());
+
+        CourseRequest courseRequest = TestFactory.createDefaultCourseRequestPublish();
+
+        courseWithSections.requestPublish(courseRequest);
+
+        assertTrue(courseWithSections.getCourseRequests().contains(courseRequest));
+
+        assertThrows(InputInvalidException.class, () -> courseWithSections.requestPublish(courseRequest));
+    }
+
+    @Test
+    void requestPublish_shouldThrowException_whenCourseWithoutSections() {
+        assertFalse(courseNoSections.isPublishedAndNotDeleted());
+        assertFalse(courseNoSections.getTeacher().isBlank());
+        assertNull(courseNoSections.getPrice());
+        assertTrue(courseNoSections.getSections().isEmpty());
+
+        CourseRequest courseRequest = TestFactory.createDefaultCourseRequestPublish();
+
+        assertThrows(InputInvalidException.class, () -> courseNoSections.requestPublish(courseRequest));
+    }
+
+    @Test
+    void requestPublish_shouldThrowException_whenRequestTypeInvalid() {
+        assertFalse(courseNoSections.isPublishedAndNotDeleted());
+        assertNotNull(courseWithSections.getPrice());
+        assertNotNull(courseWithSections.getTeacher());
+        assertFalse(courseWithSections.getSections().isEmpty());
+
+        CourseRequest courseRequest = TestFactory.createDefaultCourseRequestUnPublish();
+        assertThrows(InputInvalidException.class, () -> courseWithSections.requestPublish(courseRequest));
+    }
+
+    @Test
+    void requestPublish_shouldThrowException_whenUnresolvedRequestsExist() {
+        assertFalse(courseNoSections.isPublishedAndNotDeleted());
+        assertNotNull(courseWithSections.getPrice());
+        assertNotNull(courseWithSections.getTeacher());
+        assertFalse(courseWithSections.getSections().isEmpty());
+
+        CourseRequest courseRequest = TestFactory.createDefaultCourseRequestPublish();
+        courseWithSections.requestPublish(courseRequest);
+
+        assertTrue(courseWithSections.getCourseRequests().contains(courseRequest));
+
+        // Tạo một request khác
+        assertThrows(InputInvalidException.class, () -> courseNoSections.requestPublish(
+                TestFactory.createDefaultCourseRequestPublish()
+        ));
+    }
+
+    @Test
+    void approvePublish_shouldApproveRequest_whenValid() {
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest);
+        courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
+
+        assertTrue(courseWithSections.isPublishedAndNotDeleted());
+        assertEquals("admin", courseWithSections.getApprovedBy());
+    }
+
+    @Test
+    void approvePublish_shouldThrowException_whenCourseAlreadyPublished() {
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest);
+        courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
+
+        assertThrows(InputInvalidException.class, () ->
+                courseWithSections.approvePublish(courseRequest.getId(), "admin", "Another approval")
+        );
+    }
+
+    @Test
+    void approvePublish_shouldThrowException_whenTeacherApprovesSelf() {
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest);
+
+        assertThrows(InputInvalidException.class, () ->
+                courseWithSections.approvePublish(courseRequest.getId(), courseWithSections.getTeacher(), "Looks good!")
+        );
+    }
+
+    @Test
+    void approvePublish_shouldThrowException_whenRequestNotFound() {
+        assertThrows(ResourceNotFoundException.class, () ->
+                courseWithSections.approvePublish(999L, "admin", "Looks good!")
+        );
+    }
+
+    @Test
+    void rejectPublish_shouldRejectRequest_whenValid() {
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest);
+        courseWithSections.rejectPublish(courseRequest.getId(), "admin", "Not good!");
+
+        assertFalse(courseWithSections.isPublishedAndNotDeleted());
+        assertNull(courseWithSections.getApprovedBy());
+        assertEquals(1, courseWithSections.getCourseRequests().size());
+        assertEquals(RequestStatus.REJECTED, courseRequest.getStatus());
+        assertTrue(courseRequest.getResolved());
+    }
+
+    @Test
+    void rejectPublish_shouldThrowException_whenCourseAlreadyPublished() {
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest);
+        courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
+
+        assertThrows(InputInvalidException.class, () ->
+                courseWithSections.rejectPublish(courseRequest.getId(), "admin", "Not good!")
+        );
+    }
+
+    @Test
+    void rejectPublish_shouldThrowException_whenTeacherRejectsSelf() {
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest);
+
+        assertThrows(InputInvalidException.class, () ->
+                courseWithSections.rejectPublish(courseRequest.getId(), courseWithSections.getTeacher(), "Not good!")
+        );
+    }
+
+    @Test
+    void rejectPublish_shouldThrowException_whenRequestNotFound() {
+        assertThrows(ResourceNotFoundException.class, () ->
+                courseWithSections.rejectPublish(999L, "admin", "Not good!")
+        );
+    }
+
+    @Test
+    void requestUnpublish_shouldAddRequest_whenValidRequest() {
+        // Tạo một course đã publish
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest);
+        courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
+
+        assertEquals("admin", courseWithSections.getApprovedBy());
+        assertFalse(courseWithSections.isNotPublishedAndDeleted());
+
+        CourseRequest courseRequestUnPublish = TestFactory.createDefaultCourseRequestUnPublish();
+
+        courseWithSections.requestUnpublish(courseRequestUnPublish);
+
+        assertTrue(courseWithSections.getCourseRequests().contains(courseRequestUnPublish));
+    }
+
+    @Test
+    void requestUnpublish_shouldThrowException_whenCourseNotPublished() {
+        assertFalse(courseNoSections.isPublishedAndNotDeleted());
+
+        CourseRequest courseRequestUnPublish = TestFactory.createDefaultCourseRequestUnPublish();
+
+        assertThrows(InputInvalidException.class, () -> courseNoSections.requestUnpublish(courseRequestUnPublish));
+    }
+
+    @Test
+    void requestUnpublish_shouldThrowException_whenRequestTypeInvalid() {
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest);
+        courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
+
+        assertEquals("admin", courseWithSections.getApprovedBy());
+        assertTrue(courseWithSections.getCourseRequests().contains(courseRequest));
+        assertTrue(courseWithSections.isPublishedAndNotDeleted());
+
+        CourseRequest courseRequestUnPublish = TestFactory.createDefaultCourseRequestPublish();
+        assertThrows(InputInvalidException.class, () -> courseWithSections.requestUnpublish(courseRequestUnPublish));
+    }
+
+    @Test
+    void requestUnpublish_shouldThrowException_whenUnresolvedRequestsExist() {
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest); // ain't be approved yet
+
+        assertTrue(courseWithSections.getCourseRequests().contains(courseRequest));
+        assertTrue(courseWithSections.isNotPublishedAndDeleted());
+
+        // Tạo một request khác
+        assertThrows(InputInvalidException.class, () -> courseNoSections.requestUnpublish(
+                TestFactory.createDefaultCourseRequestUnPublish()
+        ));
+    }
+
+    @Test
+    void approveUnpublish_shouldApproveRequest_whenValid() {
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest);
+        courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
+
+        CourseRequest courseRequestUnPublish = spy(TestFactory.createDefaultCourseRequestUnPublish());
+        when(courseRequestUnPublish.getId()).thenReturn(2L);
+        courseWithSections.requestUnpublish(courseRequestUnPublish);
+        courseWithSections.approveUnpublish(courseRequestUnPublish.getId(), "admin", "Looks not good!");
+
+        assertTrue(courseWithSections.isNotPublishedAndDeleted());
+        assertEquals("admin", courseWithSections.getApprovedBy());
+    }
+
+    @Test
+    void approveUnpublish_shouldThrowException_whenCourseNotPublished() {
+        assertFalse(courseNoSections.isPublishedAndNotDeleted());
+
+        assertThrows(InputInvalidException.class, () -> courseNoSections.approveUnpublish(999L, "admin", "Looks not good!"),
+                "Cannot approve unpublish for a published course.");
+    }
+
+    @Test
+    void approveUnpublish_shouldThrowException_whenTeacherApprovesSelf() {
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest);
+        courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
+
+        CourseRequest courseRequestUnPublish = spy(TestFactory.createDefaultCourseRequestUnPublish());
+        when(courseRequestUnPublish.getId()).thenReturn(2L);
+        courseWithSections.requestUnpublish(courseRequestUnPublish);
+
+        assertThrows(InputInvalidException.class, () -> courseWithSections.approveUnpublish(courseRequestUnPublish.getId(), courseWithSections.getTeacher(), "Looks not good!"),
+                "Teacher cannot approve unpublish for their own course.");
+    }
+
+    @Test
+    void approveUnpublish_shouldThrowException_whenRequestNotFound() {
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest);
+        courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                courseWithSections.approveUnpublish(999L, "admin", "Looks not good!")
+        );
+    }
+
+    @Test
+    void approveUnpublish_shouldThrowException_whenApproverUnpublishNotApproverPublish() {
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest);
+        courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
+
+        CourseRequest courseRequestUnPublish = spy(TestFactory.createDefaultCourseRequestUnPublish());
+        when(courseRequestUnPublish.getId()).thenReturn(2L);
+        courseWithSections.requestUnpublish(courseRequestUnPublish);
+
+        assertThrows(InputInvalidException.class, () -> courseWithSections.approveUnpublish(courseRequestUnPublish.getId(), "anotherAdmin", "Looks not good!"),
+                "Cannot approve unpublish for a course that you did not approve publish.");
+    }
+
+    @Test
+    void rejectUnpublish_shouldRejectRequest_whenValid() {
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest);
+        courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
+
+        CourseRequest courseRequestUnPublish = spy(TestFactory.createDefaultCourseRequestUnPublish());
+        when(courseRequestUnPublish.getId()).thenReturn(2L);
+        courseWithSections.requestUnpublish(courseRequestUnPublish);
+        courseWithSections.rejectUnpublish(courseRequestUnPublish.getId(), "admin", "Not good!");
+
+        assertTrue(courseWithSections.isPublishedAndNotDeleted());
+        assertNotNull(courseWithSections.getApprovedBy()); // err
+        assertEquals(2, courseWithSections.getCourseRequests().size());
+        assertEquals(RequestStatus.REJECTED, courseRequestUnPublish.getStatus());
+        assertTrue(courseRequestUnPublish.getResolved());
+    }
+
+    @Test
+    void rejectUnpublish_shouldThrowException_whenCourseNotPublished() {
+        assertTrue(courseWithSections.isNotPublishedAndDeleted());
+
+        assertThrows(InputInvalidException.class, () -> courseNoSections.rejectUnpublish(999L, "admin", "Not good!"),
+                "Cannot reject unpublish for a course that is not published.");
+    }
+
+    @Test
+    void rejectUnpublish_shouldThrowException_whenTeacherRejectsSelf() {
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest);
+        courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
+        assertTrue(courseWithSections.isPublishedAndNotDeleted());
+
+        CourseRequest courseRequestUnPublish = spy(TestFactory.createDefaultCourseRequestUnPublish());
+        when(courseRequestUnPublish.getId()).thenReturn(2L);
+        courseWithSections.requestUnpublish(courseRequestUnPublish);
+
+        assertThrows(InputInvalidException.class, () -> courseWithSections.rejectUnpublish(courseRequestUnPublish.getId(), courseWithSections.getTeacher(), "Not good!"),
+                "Teacher cannot reject unpublish for their own course.");
+    }
+
+    @Test
+    void rejectUnpublish_shouldThrowException_whenRequestNotFound() {
+        CourseRequest courseRequest = spy(TestFactory.createDefaultCourseRequestPublish());
+        // mock
+        when(courseRequest.getId()).thenReturn(1L);
+        courseWithSections.requestPublish(courseRequest);
+        courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
+        assertTrue(courseWithSections.isPublishedAndNotDeleted());
+
+        assertThrows(ResourceNotFoundException.class, () ->
+                courseWithSections.rejectUnpublish(999L, "admin", "Not good!")
+        );
+    }
+
 
 }
