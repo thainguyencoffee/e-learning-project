@@ -16,6 +16,6 @@ public interface OrderService {
 
     List<Order> findOrdersByCreatedBy(String createdBy, Pageable pageable);
 
-    Order createOrder(OrderRequestDTO orderRequestDTO);
+    Order createOrder(String student, OrderRequestDTO orderRequestDTO);
 
 }

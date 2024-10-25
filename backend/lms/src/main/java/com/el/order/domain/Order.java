@@ -3,7 +3,6 @@ package com.el.order.domain;
 import com.el.common.Currencies;
 import com.el.common.exception.InputInvalidException;
 import lombok.Getter;
-import org.apache.commons.lang3.Validate;
 import org.javamoney.moneta.Money;
 import org.springframework.data.annotation.*;
 import org.springframework.data.domain.AbstractAggregateRoot;
@@ -26,6 +25,7 @@ public class Order extends AbstractAggregateRoot<Order> {
     private MonetaryAmount discountedPrice;
     private String discountCode;
     private Status status;
+    private String student;
     @CreatedBy
     private String createdBy;
     @CreatedDate
@@ -35,9 +35,11 @@ public class Order extends AbstractAggregateRoot<Order> {
     @LastModifiedDate
     private Instant lastModifiedDate;
 
-    public Order(Set<OrderItem> items) {
-        Validate.notEmpty(items, "Order must contain at least one item.");
+    public Order(Set<OrderItem> items, String student) {
+        if (items.isEmpty()) throw new InputInvalidException("Order must contain at least one item.");
+        if (student.isBlank()) throw new InputInvalidException("Student can't be blank.");
 
+        this.student = student;
         this.orderDate = Instant.now();
         this.status = Status.PENDING;
 
@@ -49,7 +51,9 @@ public class Order extends AbstractAggregateRoot<Order> {
         if (status == Status.PAID || status == Status.CANCELLED) {
             throw new InputInvalidException("You can't add items to a completed order.");
         }
-        Validate.notNull(item, "Item can't be null");
+        if (item == null) {
+            throw new InputInvalidException("Item can't be null.");
+        }
 
         // Business rule: You can't add the same item to the order
         if (items.contains(item)) {
@@ -66,7 +70,9 @@ public class Order extends AbstractAggregateRoot<Order> {
             throw new InputInvalidException("You can't remove items from a completed order.");
         }
 
-        Validate.notNull(item, "Item can't be null");
+        if (item == null) {
+            throw new InputInvalidException("Item can't be null.");
+        }
 
         // Business rule: You can't remove an item that doesn't exist in the order
         if (!items.contains(item)) {

@@ -2,7 +2,6 @@ package com.el.payment.domain;
 
 import com.el.common.exception.InputInvalidException;
 import lombok.Getter;
-import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -23,9 +22,9 @@ public class Payment {
     private String transactionId;
 
     public Payment(UUID orderId, MonetaryAmount amount, PaymentMethod paymentMethod) {
-        Validate.notNull(orderId, "Order ID must not be null.");
-        Validate.notNull(amount, "Amount must not be null.");
-        Validate.notNull(paymentMethod, "Payment method must not be null.");
+        if (orderId == null) throw new InputInvalidException("Order ID must not be null.");
+        if (amount == null) throw new InputInvalidException("Amount must not be null.");
+        if (paymentMethod == null) throw new InputInvalidException("Payment method must not be null.");
 
         if (amount.isNegativeOrZero()) {
             throw new InputInvalidException("Amount must be positive.");
@@ -38,7 +37,7 @@ public class Payment {
     }
 
     public void markPaid(String transactionId) {
-        Validate.notEmpty(transactionId, "Transaction ID must not be empty.");
+        if (transactionId.isEmpty()) throw new InputInvalidException("Transaction ID must not be empty.");
 
         if (this.status != PaymentStatus.PENDING) {
             throw new InputInvalidException("Payment cannot be marked as paid in current state.");

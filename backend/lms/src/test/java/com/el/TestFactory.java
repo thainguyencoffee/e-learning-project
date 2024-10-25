@@ -1,5 +1,6 @@
 package com.el;
 
+import com.el.common.Currencies;
 import com.el.course.application.dto.CourseDTO;
 import com.el.course.application.dto.CourseRequestDTO;
 import com.el.course.application.dto.CourseRequestResolveDTO;
@@ -13,6 +14,9 @@ import com.el.course.web.CourseRequestRejectDTO;
 import com.el.discount.application.dto.DiscountDTO;
 import com.el.discount.domain.Discount;
 import com.el.discount.domain.Type;
+import com.el.order.domain.Order;
+import com.el.order.domain.OrderItem;
+import org.javamoney.moneta.Money;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -22,6 +26,7 @@ public class TestFactory {
 
     public static final String teacherId = "9db2e8a4-ca81-43ca-bfb4-bef6fa9e0844";
     public static final String adminId = "fc23d891-5df9-4fbf-a063-6d77c11f884a";
+    public static final String userId = "b75ab7d9-86c7-4cce-a81b-1e4e33036b0a";
 
     public static Course createDefaultCourse() {
         return new Course(
@@ -167,6 +172,15 @@ public class TestFactory {
     public static CourseRequestRejectDTO createDefaultCourseRequestRejectDTOPublish() {
         return new CourseRequestRejectDTO(RequestType.PUBLISH, " Quisque orci metus, dignissim et ultrices vitae, condimentum at augue. Etiam euismod commodo accumsan. Suspendisse at tellus lectus. Vivamus est velit, hendrerit a erat sed, tempor sollicitudin turpis. Mauris porttitor sagittis sem, aliquet tempor mauris consectetur in. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Etiam accumsan leo eget risus hendrerit, eu euismod ligula pulvinar. Donec ut turpis quis metus lacinia sollicitudin. Proin ut tellus dolor. Nam quis tincidunt tellus. Mauris ultricies dolor quam, eu feugiat mauris condimentum vitae. Maecenas non aliquam nisi, et efficitur dui. ",
                 adminId);
+    }
+
+    // Orders
+    public static Order createDefaultOrder() {
+        Set<OrderItem> items = Set.of(
+                new OrderItem(1L, Money.of(1000, Currencies.VND)),
+                new OrderItem(2L, Money.of(2000, Currencies.VND))
+        );
+        return new Order(items, userId);
     }
 
 }
