@@ -17,6 +17,12 @@ import {ListDiscountComponent} from "./administration/discounts/page/list-discou
 import {DiscountTrashComponent} from "./administration/discounts/page/discount-trash/discount-trash.component";
 import {AddDiscountComponent} from "./administration/discounts/page/add-discount/add-discount.component";
 import {EditDiscountComponent} from "./administration/discounts/page/edit-discount/edit-discount.component";
+import {RequestCourseComponent} from "./administration/courses/page/request-course/request-course.component";
+import {RequestListComponent} from "./administration/courses/page/request-list/request-list.component";
+import {ResolveRequestComponent} from "./administration/courses/page/resolve-request/resolve-request.component";
+import {
+  RequestCourseDetailComponent
+} from "./administration/courses/page/request-course-detail/request-course-detail.component";
 
 export const routes: Routes = [
   {
@@ -84,6 +90,48 @@ export const routes: Routes = [
         title: "Edit Lesson",
         path: 'courses/:courseId/sections/:sectionId/lessons/edit/:lessonId',
         component: EditLessonComponent
+      },
+      {
+        title: 'Request course list',
+        path: 'courses/:courseId/requests',
+        component: RequestListComponent
+      },
+      {
+        title: 'Request course detail',
+        path: 'courses/:courseId/requests/:requestId',
+        component: RequestCourseDetailComponent
+      },
+      {
+        title: 'Request publish course',
+        path: 'courses/request-publish/:courseId',
+        component: RequestCourseComponent,
+        data: {
+          requestType: 'publish'
+        }
+      },
+      {
+        title: 'Request unpublish course',
+        path: 'courses/request-unpublish/:courseId',
+        component: RequestCourseComponent,
+        data: {
+          requestType: 'unpublish'
+        }
+      },
+      {
+        title: 'Approve course request',
+        path: 'courses/:courseId/requests/approve/:requestId',
+        component: ResolveRequestComponent,
+        data: {
+          resolveType: 'Approve'
+        }
+      },
+      {
+        title: 'Reject course request',
+        path: 'courses/:courseId/requests/reject/:requestId',
+        component: ResolveRequestComponent,
+        data: {
+          resolveType: 'Reject'
+        }
       },
 
       // discount

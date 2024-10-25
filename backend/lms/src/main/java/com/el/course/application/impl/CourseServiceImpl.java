@@ -22,16 +22,13 @@ public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
     private final CourseQueryService courseQueryService;
-    private final DiscountService discountService;
     private final RolesBaseUtil rolesBaseUtil;
 
     public CourseServiceImpl(CourseRepository courseRepository,
                              CourseQueryService courseQueryService,
-                             DiscountService discountService,
                              RolesBaseUtil rolesBaseUtil) {
         this.courseRepository = courseRepository;
         this.courseQueryService = courseQueryService;
-        this.discountService = discountService;
         this.rolesBaseUtil = rolesBaseUtil;
     }
 
@@ -104,17 +101,6 @@ public class CourseServiceImpl implements CourseService {
         return existsCourse;
     }
 
-    @Override
-    public Course applyDiscount(Long courseId, String code) {
-        Course course = courseQueryService.findCourseById(courseId);
-        if (course.getPrice() == null) {
-            throw new InputInvalidException("Cannot apply discount to a course without a price.");
-        }
-        MonetaryAmount discountedPrice = discountService.calculateDiscount(code, course.getPrice());
-        course.applyDiscount(discountedPrice, code);
-
-        return courseRepository.save(course);
-    }
 
     @Override
     public Course addSection(Long courseId, CourseSectionDTO courseSectionDTO) {

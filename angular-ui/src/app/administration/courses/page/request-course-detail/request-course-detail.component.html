@@ -1,0 +1,19 @@
+<p>request-course-detail works!</p>
+<div class="container-fluid" *ngIf="requestCourse">
+  <h5>ID: {{ requestCourse.id }}</h5>
+  <h5>Type: {{ requestCourse.type }}</h5>
+  <h5>Status: {{ requestCourse.status }}</h5>
+  <h5>Requested By: {{ requestCourse.requestedBy === userService.current.name ? 'This account' : requestCourse.requestedBy }}</h5>
+  <h5>Message: {{ requestCourse.message }}</h5>
+  <h5>Course Ref: <a [routerLink]="['/administration/courses', courseId]">Course ref</a></h5>
+
+  @if(requestCourse.resolved) {
+    <span class="badge bg-success">Resolved</span>
+  } @else {
+    <a [routerLink]="['/administration/courses', courseId, 'requests', 'approve', requestCourse.id]" class="btn btn-success ms-2"
+       *ngIf="canResolveRequest(requestCourse)">Approve</a>
+    <a [routerLink]="['/administration/courses', courseId, 'requests', 'reject', requestCourse.id]" class="btn btn-secondary ms-2"
+       *ngIf="canResolveRequest(requestCourse)">Reject</a>
+  }
+
+</div>

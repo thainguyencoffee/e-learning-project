@@ -1,3 +1,7 @@
+<div *ngIf="getIdRequestUnresolved() as idRequest" class="alert alert-warning">
+  This course has request unresolved. Please <a [routerLink]="['/administration/courses', currentId, 'requests', idRequest]">resolve</a> the request.
+</div>
+
 <div class="d-flex flex-wrap mb-4">
   <h1 class="flex-grow-1">Course Detail Center!</h1>
   <div>
@@ -34,7 +38,7 @@
 
     <!-- Price and Discounted Price -->
     <p>Price: {{ courseDto.price || 'Price not available' }}</p>
-    <p>Discounted Price: {{ courseDto.discountedPrice || 'No discount available' }}</p>
+<!--    <p>Discounted Price: {{ courseDto.discountedPrice || 'No discount available' }}</p>-->
 
     <!-- Published Status -->
     <p [class]="courseDto.published ? 'badge bg-success' : 'badge bg-primary'">

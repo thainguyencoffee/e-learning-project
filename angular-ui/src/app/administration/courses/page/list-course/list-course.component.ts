@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {CourseService} from "../../service/course.service";
 import {Course} from "../../model/view/course";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
@@ -18,7 +18,7 @@ import {UserService} from "../../../../common/auth/user.service";
   ],
   templateUrl: './list-course.component.html',
 })
-export class ListCourseComponent implements OnInit{
+export class ListCourseComponent implements OnInit {
 
   constructor(
     private courseService: CourseService,
@@ -70,7 +70,6 @@ export class ListCourseComponent implements OnInit{
   }
 
 
-
   loadData(pageNumber: number): void {
     this.courseService.getAllCourses(pageNumber)
       .subscribe({
@@ -105,29 +104,6 @@ export class ListCourseComponent implements OnInit{
     return this.userService.current.hasAnyRole('ROLE_admin') && this.userService.current.name === teacherId;
   }
 
-  isPublishButtonDisplay(course: Course): boolean {
-    return this.userService.current.hasAnyRole('ROLE_admin') && course.teacher !== this.userService.current.name && !course.published;
-  }
-
-  isSetPriceButtonDisplay(course: Course): boolean {
-    return this.isPublishButtonDisplay(course);
-  }
-
-  publishCourse(courseId: number) {
-    if (confirm(this.getMessage('confirmPublish'))) {
-      this.courseService.publishCourse(courseId)
-        .subscribe({
-          next: () => this.router.navigate(['/administration/courses'], {
-            state: {
-              msgSuccess: this.getMessage('published')
-            }
-          }),
-          error: (error) => this.errorHandler.handleServerError(error.error)
-        });
-
-    }
-  }
-
   isTitleBlue(course: Course) {
     if (course.sections && course.sections.length > 0) {
       for (const section of course.sections) {
@@ -142,7 +118,7 @@ export class ListCourseComponent implements OnInit{
   }
 
   isEditable(course: Course) {
-    return this.userService.current.hasAnyRole('ROLE_admin') || !course.published;
+    return !course.published || course.unpublished;
   }
 
 }

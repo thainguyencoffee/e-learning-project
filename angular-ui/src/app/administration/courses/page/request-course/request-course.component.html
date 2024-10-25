@@ -1,0 +1,12 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Request {{requestType}}</h1>
+  <div>
+    <a [routerLink]="['/administration/courses', courseId, 'requests']" class="btn btn-secondary">Back to list</a>
+  </div>
+</div>
+
+<form [formGroup]="requestPublishAddForm" (ngSubmit)="handleSubmit()">
+  <app-input-row [group]="requestPublishAddForm" field="type" label="Request type" />
+  <app-input-row [group]="requestPublishAddForm" field="message" label="Message" rowType="textarea"/>
+  <input type="submit" value="Submit Request" class="btn btn-primary mt-4" />
+</form>

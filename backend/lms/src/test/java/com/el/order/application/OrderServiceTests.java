@@ -51,7 +51,7 @@ class OrderServiceTests {
         Course course = Mockito.mock(Course.class);
         when(courseQueryService.findPublishedCourseById(any(Long.class))).thenReturn(course);
         // Just mock the behavior of the course object called in the createOrder method
-        when(course.getFinalPrice()).thenReturn(Money.of(100, Currencies.VND));
+        when(course.getPrice()).thenReturn(Money.of(100, Currencies.VND));
         when(discountService.calculateDiscount(anyString(), any(MonetaryAmount.class)))
                 .thenReturn(Money.of(10, Currencies.VND));
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -76,7 +76,7 @@ class OrderServiceTests {
         Course course = Mockito.mock(Course.class);
         when(courseQueryService.findPublishedCourseById(any(Long.class))).thenReturn(course);
         // Just mock the behavior of the course object called in the createOrder method
-        when(course.getFinalPrice()).thenReturn(Money.of(100, Currencies.VND));
+        when(course.getPrice()).thenReturn(Money.of(100, Currencies.VND));
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Order order = orderService.createOrder(orderRequestDTO);
@@ -106,7 +106,7 @@ class OrderServiceTests {
         OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
                 Set.of(new OrderItemDTO(1L)), "INVALID_DISCOUNT");
         Course course = Mockito.mock(Course.class);
-        when(course.getFinalPrice()).thenReturn(Money.of(100, Currencies.VND));
+        when(course.getPrice()).thenReturn(Money.of(100, Currencies.VND));
         when(courseQueryService.findPublishedCourseById(any(Long.class))).thenReturn(course);
         when(discountService.calculateDiscount(anyString(), any(MonetaryAmount.class)))
                 .thenThrow(new InputInvalidException("Invalid discount code"));

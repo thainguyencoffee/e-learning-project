@@ -1,0 +1,59 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Request list</h1>
+  <div>
+    <a *ngIf="course && canRequestPublish(course)" [routerLink]="['/administration/courses/request-publish', courseId]"
+       class="btn btn-primary ms-2">Request publish
+    </a>
+    <a *ngIf="course && canRequestUnPublish(course)" [routerLink]="['/administration/courses/request-unpublish', courseId]"
+       class="btn btn-primary ms-2">Request unpublish
+    </a>
+    <a routerLink="/administration/courses"
+       class="btn btn-secondary ms-2">Back to list
+    </a>
+  </div>
+</div>
+
+@if (course && course.courseRequests?.length === 0) {
+  <div>No Course Requests could be found.</div>
+} @else {
+  <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+      <thead>
+      <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Type</th>
+        <th scope="col">Status</th>
+        <th scope="col">RequestBy</th>
+        <th scope="col">Message</th>
+        <th scope="col">Course Ref</th>
+        <th><!-- --></th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (request of course?.courseRequests; track request.id) {
+          <tr>
+            <td>{{request.id}}</td>
+            <td>{{request.type}}</td>
+            <td>{{request.status}}</td>
+            <td>{{request.requestedBy === userService.current.name ? 'This account': request.requestedBy}}</td>
+            <td>{{request.message}}</td>
+            <td>
+              <a [routerLink]="['/administration/courses', courseId]">Course ref
+              </a>
+            </td>
+            <td>
+              @if(request.resolved) {
+                <span class="badge bg-success">Resolved</span>
+              } @else {
+                <a [routerLink]="['/administration/courses', courseId, 'requests', 'approve', request.id]" class="btn btn-success ms-2"
+                   *ngIf="canResolveRequest(request)">Approve</a>
+                <a [routerLink]="['/administration/courses', courseId, 'requests', 'reject', request.id]" class="btn btn-secondary ms-2"
+                   *ngIf="canResolveRequest(request)">Reject</a>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

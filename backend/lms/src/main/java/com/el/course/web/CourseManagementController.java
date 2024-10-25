@@ -80,12 +80,6 @@ public class CourseManagementController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{courseId}/apply-discount")
-    public ResponseEntity<Course> applyDiscount(@PathVariable Long courseId,
-                                                @Valid @RequestBody ApplyDiscountDTO applyDiscountDTO) {
-        Course updatedCourse = courseService.applyDiscount(courseId, applyDiscountDTO.code());
-        return ResponseEntity.ok(updatedCourse);
-    }
 
     @PostMapping("/{courseId}/requests")
     public ResponseEntity<Course> requestPublish(@PathVariable Long courseId,
