@@ -42,8 +42,6 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.PUT, "/courses/{courseId}/update-price").hasRole("admin")
                         .requestMatchers(HttpMethod.PUT, "/courses/{courseId}/assign-teacher").hasRole("admin")
-                        .requestMatchers(HttpMethod.PUT, "/courses/{courseId}/publish").hasRole("admin")
-                        .requestMatchers(HttpMethod.POST, "/courses/{courseId}/apply-discount").hasRole("admin")
 
                         // Require "teacher" role for all other requests
                         .anyRequest().hasAnyRole("teacher", "admin")

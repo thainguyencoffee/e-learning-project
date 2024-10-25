@@ -15,7 +15,7 @@ create table course
     unpublished        boolean      not null,
     description        varchar(2000),
     price              varchar(50),
-    discounted_price   varchar(50),
+--     discounted_price   varchar(50),
     teacher            varchar(50),
     language           varchar(50),
     subtitles          varchar(50)[],
@@ -26,7 +26,7 @@ create table course
     created_date       timestamp    not null,
     last_modified_by   varchar(50)  not null,
     last_modified_date timestamp    not null,
-    discount_code      varchar(50),
+--     discount_code      varchar(50),
     deleted            boolean      not null,
     version            int          not null,
     constraint fk_course primary key (id)

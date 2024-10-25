@@ -10,6 +10,9 @@ import {SectionDto} from "../model/section-dto";
 import {LessonDto} from "../model/lesson-dto";
 import {Section} from "../model/view/section";
 import {Lesson} from "../model/view/lesson";
+import {CourseRequestDto} from "../model/course-request.dto";
+import {ApproveRequestDto} from "../model/approve-request.dto";
+import {RejectRequestDto} from "../model/reject-request.dto";
 
 @Injectable(
   {providedIn: 'root'}
@@ -131,6 +134,18 @@ export class CourseService {
 
   updatePrice(courseId: number, price: string) {
     return this.http.put<Course>(`${this.resourcePath}/${courseId}/update-price`, {price});
+  }
+
+  createRequestCourse(courseId: number, data: CourseRequestDto) {
+    return this.http.post<void>(`${this.resourcePath}/${courseId}/requests`, data);
+  }
+
+  approveRequest(courseId: number, requestId: number, data: ApproveRequestDto) {
+    return this.http.put<void>(`${this.resourcePath}/${courseId}/requests/${requestId}/approve`, data);
+  }
+
+  rejectRequest(courseId: number, requestId: number, data: RejectRequestDto) {
+    return this.http.put<void>(`${this.resourcePath}/${courseId}/requests/${requestId}/reject`, data);
   }
 
 }

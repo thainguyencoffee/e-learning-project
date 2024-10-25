@@ -1,4 +1,5 @@
 import {Section} from "./section";
+import {CourseRequest} from "./course-request";
 
 export interface Course {
   id: number;
@@ -11,12 +12,12 @@ export interface Course {
   prerequisites?: string[],
   sections?: Section[],
   price?: string,
-  discountedPrice?: string,
   published: boolean,
+  unpublished: boolean,
   teacher: string,
   approvedBy?: string,
-  // students: string[],
-  discountCode?: string,
+  courseRequests?: CourseRequest[],
+  students: string[],
   createdBy: string,
   createdDate: string,
   lastModifiedBy: string,

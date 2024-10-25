@@ -1,0 +1,43 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">{{resolveType}} request <span class="badge bg-success">{{requestType}}</span></h1>
+  <div>
+    <a [routerLink]="['/administration/courses', courseId, 'requests']" class="btn btn-secondary">Back to list</a>
+  </div>
+</div>
+
+@if (resolveType === 'Approve') {
+  @if (requestType === 'PUBLISH') {
+    @if(!course?.price) {
+      <div class="alert alert-warning">This course has no price. Please
+        <a [routerLink]="['/administration/courses/set-price', courseId]">
+          Set price
+        </a>
+        the price before approving the request.</div>
+    } @else {
+      <div class="alert alert-warning">Are you sure about it's price is {{course!.price}}? You can
+        <a [routerLink]="['/administration/courses/set-price', courseId]">
+          change price
+        </a>.</div>
+
+      <form [formGroup]="approveRequestAddForm" (ngSubmit)="handleSubmit()">
+        <app-input-row [group]="approveRequestAddForm" field="approveType" label="Approve type" />
+        <app-input-row [group]="approveRequestAddForm" field="approveMessage" label="Approve Message" rowType="textarea"/>
+        <input type="submit" value="Submit Approve" class="btn btn-primary mt-4" />
+      </form>
+    }
+  } @else if (requestType === 'UNPUBLISH') {
+    <form [formGroup]="approveRequestAddForm" (ngSubmit)="handleSubmit()">
+      <app-input-row [group]="approveRequestAddForm" field="approveType" label="Approve type" />
+      <app-input-row [group]="approveRequestAddForm" field="approveMessage" label="Approve Message" rowType="textarea"/>
+      <input type="submit" value="Submit Approve" class="btn btn-primary mt-4" />
+    </form>
+  }
+
+} @else {
+  <form [formGroup]="rejectRequestAddForm" (ngSubmit)="handleSubmit()">
+    <app-input-row [group]="rejectRequestAddForm" field="rejectType" label="Reject type" />
+    <app-input-row [group]="rejectRequestAddForm" field="rejectCause" label="Reject Cause" rowType="textarea"/>
+    <input type="submit" value="Submit Reject" class="btn btn-primary mt-4" />
+  </form>
+}
+

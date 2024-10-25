@@ -32,13 +32,11 @@ public class Course extends AuditSupportClass {
     @MappedCollection(idColumn = "course")
     private Set<CourseSection> sections = new HashSet<>();
     private MonetaryAmount price;
-    private MonetaryAmount discountedPrice;
     private Boolean published;
     private Boolean unpublished;
     private String teacher;
     private String approvedBy;
     private Set<StudentRef> students = new HashSet<>();
-    private String discountCode;
     private Set<CourseRequest> courseRequests = new HashSet<>();
     @JsonIgnore
     private boolean deleted;
@@ -122,26 +120,6 @@ public class Course extends AuditSupportClass {
         this.price = newPrice;
     }
 
-    public void applyDiscount(MonetaryAmount discountedPrice, String discountCode) {
-        if (this.getPrice() == null) {
-            throw new InputInvalidException("Cannot apply discount to a course without a price.");
-        }
-        if (discountedPrice == null) {
-            throw new InputInvalidException("Discounted price must not be null.");
-        }
-
-        this.discountCode = discountCode;
-
-        if (this.price.subtract(discountedPrice).isNegativeOrZero()) {
-            this.discountedPrice = Money.zero(this.price.getCurrency());
-        } else {
-            this.discountedPrice = this.price.subtract(discountedPrice);
-        }
-    }
-
-    public MonetaryAmount getFinalPrice() {
-        return this.discountedPrice != null ? this.discountedPrice : this.price;
-    }
 
     public void assignTeacher(String teacher) {
         if (!isNotPublishedAndDeleted()) {
@@ -160,8 +138,8 @@ public class Course extends AuditSupportClass {
         if (isPublishedAndNotDeleted()) {
             throw new InputInvalidException("Cannot request publish for a published course.");
         }
-        if (this.getSections().isEmpty() || this.getPrice() == null || this.getTeacher() == null) {
-            throw new InputInvalidException("Cannot publish a course without sections, price or teacher.");
+        if (this.getSections().isEmpty() || /*this.getPrice() == null ||*/ this.getTeacher() == null) {
+            throw new InputInvalidException("Cannot publish a course without sections or teacher.");
         }
         if (courseRequest.getType() != RequestType.PUBLISH) {
             throw new InputInvalidException("Request type invalid.");
@@ -280,8 +258,6 @@ public class Course extends AuditSupportClass {
         return approvedBy.equals(this.getTeacher());
     }
 
-    // removal method
-//    public void publish(String approvedBy){}
 
     public void addSection(CourseSection section) {
         if (!isNotPublishedAndDeleted()) {
@@ -388,8 +364,5 @@ public class Course extends AuditSupportClass {
         return validCurrencies.contains(inputCurrency);
     }
 
-    public void unpublish(String unapprovedBy) {
-
-    }
 
 }

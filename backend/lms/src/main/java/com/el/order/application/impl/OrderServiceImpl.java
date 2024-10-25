@@ -58,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
         for (OrderItemDTO itemDto : orderRequestDTO.items()) {
             Course course = courseQueryService.findPublishedCourseById(itemDto.id());
             Long courseId = course.getId();
-            MonetaryAmount finalPrice = course.getFinalPrice();
+            MonetaryAmount finalPrice = course.getPrice();
             items.add(new OrderItem(courseId, finalPrice));
         }
 

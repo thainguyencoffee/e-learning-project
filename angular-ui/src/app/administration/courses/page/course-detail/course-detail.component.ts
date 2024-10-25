@@ -98,7 +98,14 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
   }
 
   isEditable() {
-    return this.userService.current.hasAnyRole('ROLE_admin') || !this.courseDto?.published;
+    return !this.courseDto?.published || this.courseDto?.unpublished;
+  }
+
+  getIdRequestUnresolved() {
+    if (this.courseDto?.courseRequests) {
+      return this.courseDto?.courseRequests.find(request => !request.resolved)?.id;
+    }
+    return null;
   }
 
 }

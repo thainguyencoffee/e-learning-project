@@ -18,11 +18,7 @@ public interface CourseService {
 
     void restoreCourse(Long courseId);
 
-//    Course publishCourse(Long courseId, String approvedBy);
-
     Course assignTeacher(Long courseId, String teacher);
-
-    Course applyDiscount(Long courseId, String discountCode);
 
     Course addSection(Long courseId, CourseSectionDTO courseSectionDTO);
 
