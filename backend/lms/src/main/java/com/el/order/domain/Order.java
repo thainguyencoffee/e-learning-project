@@ -25,6 +25,7 @@ public class Order extends AbstractAggregateRoot<Order> {
     private MonetaryAmount discountedPrice;
     private String discountCode;
     private Status status;
+    private String student;
     @CreatedBy
     private String createdBy;
     @CreatedDate
@@ -34,11 +35,11 @@ public class Order extends AbstractAggregateRoot<Order> {
     @LastModifiedDate
     private Instant lastModifiedDate;
 
-    public Order(Set<OrderItem> items) {
-        if (items.isEmpty()) {
-            throw new InputInvalidException("Order must contain at least one item.");
-        }
+    public Order(Set<OrderItem> items, String student) {
+        if (items.isEmpty()) throw new InputInvalidException("Order must contain at least one item.");
+        if (student.isBlank()) throw new InputInvalidException("Student can't be blank.");
 
+        this.student = student;
         this.orderDate = Instant.now();
         this.status = Status.PENDING;
 

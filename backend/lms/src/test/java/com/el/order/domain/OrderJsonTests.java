@@ -1,5 +1,6 @@
 package com.el.order.domain;
 
+import com.el.TestFactory;
 import com.el.common.Currencies;
 import com.el.common.TimeUtils;
 import com.el.common.config.jackson.JacksonCustomizations;
@@ -35,7 +36,7 @@ class OrderJsonTests {
         Set<OrderItem> items = new HashSet<>();
         items.add(new OrderItem(111L, Money.of(1000, Currencies.VND)));
         items.add(new OrderItem(222L, Money.of(2000, Currencies.VND)));
-        Order order = new Order(items);
+        Order order = new Order(items, TestFactory.userId);
 
         // Mock
         Order orderMock = Mockito.spy(order);

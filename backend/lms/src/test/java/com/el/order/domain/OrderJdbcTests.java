@@ -1,5 +1,6 @@
 package com.el.order.domain;
 
+import com.el.TestFactory;
 import com.el.common.Currencies;
 import com.el.common.config.DataAuditConfig;
 import org.javamoney.moneta.Money;
@@ -34,28 +35,28 @@ class OrderJdbcTests {
 
     @BeforeEach
     void setUp() {
-        // Arrange: Tạo Order với các item
+        // Arrange
         OrderItem item = new OrderItem(1L, Money.of(100, Currencies.VND));
         Set<OrderItem> items = new HashSet<>();
         items.add(item);
-        order = new Order(items); // Tạo đối tượng Order với 1 item
+        order = new Order(items, TestFactory.userId);
     }
 
     @AfterEach
     void tearDown() {
-        // Xóa dữ liệu sau mỗi test
         orderRepository.deleteAll();
     }
 
     @Test
     void testCreateOrder() {
-        // Act: Lưu Order vào repository
+        // Act
         Order savedOrder = orderRepository.save(order);
 
-        // Assert: Kiểm tra Order được lưu vào cơ sở dữ liệu
+        // Assert
         assertNotNull(savedOrder.getId(), "Order ID should not be null after saving");
         assertEquals(1, savedOrder.getItems().size(), "Order should contain 1 item");
         assertEquals(Status.PENDING, savedOrder.getStatus(), "Order status should be PENDING");
+        assertEquals(TestFactory.userId, savedOrder.getStudent(), "CreatedBy should be 'user1'");
     }
 
     @Test
@@ -64,10 +65,10 @@ class OrderJdbcTests {
 
         Pageable pageable = PageRequest.of(0, 1); // Trang 0, kích thước trang là 2
 
-        // Act: Lấy tất cả các Order với phân trang
+        // Act
         Page<Order> orderPage = orderRepository.findAll(pageable);
 
-        // Assert: Kiểm tra phân trang trả về kết quả đúng
+        // Assert
         assertNotNull(orderPage, "Order page should not be null");
         assertEquals(1, orderPage.getSize(), "Page size should be 1");
         assertEquals(1, orderPage.getTotalElements(), "There should be 1 total orders");
@@ -79,10 +80,10 @@ class OrderJdbcTests {
     void testFindAllByCreatedBy() {
         orderRepository.save(order);
 
-        // Act: Lấy tất cả các Order được tạo bởi 'user1' với phân trang
+        // Act
         List<Order> guestOrders = orderRepository.findAllByCreatedBy("guest", 0, 10); // Trang 0, kích thước 10
 
-        // Assert: Kiểm tra chỉ có các order của 'user1' được trả về
+        // Assert
         assertNotNull(guestOrders, "Order list should not be null");
         assertEquals(1, guestOrders.size(), "There should be 1 order for 'guest'");
         assertEquals("guest", guestOrders.get(0).getCreatedBy(), "CreatedBy should be 'guest'");

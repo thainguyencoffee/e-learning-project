@@ -52,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order createOrder(OrderRequestDTO orderRequestDTO) {
+    public Order createOrder(String student, OrderRequestDTO orderRequestDTO) {
         Set<OrderItem> items = new HashSet<>();
 
         for (OrderItemDTO itemDto : orderRequestDTO.items()) {
@@ -60,7 +60,7 @@ public class OrderServiceImpl implements OrderService {
             items.add(new OrderItem(course.getId(), course.getPrice()));
         }
 
-        Order newOrder = new Order(items);
+        Order newOrder = new Order(items, student);
 
         if (orderRequestDTO.discountCode() != null) {
             // Apply discount code

@@ -41,8 +41,9 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(@Valid @RequestBody OrderRequestDTO orderRequestDTO) {
-        Order orderCreated = orderService.createOrder(orderRequestDTO);
+    public ResponseEntity<Order> createOrder(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody OrderRequestDTO orderRequestDTO) {
+        String student = jwt.getSubject();
+        Order orderCreated = orderService.createOrder(student, orderRequestDTO);
         return ResponseEntity.created(URI.create("/orders/" + orderCreated.getId())).body(orderCreated);
     }
 

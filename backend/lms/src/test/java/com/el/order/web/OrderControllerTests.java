@@ -49,7 +49,7 @@ class OrderControllerTests {
         var orderId = UUID.randomUUID();
         when(orderCreated.getId()).thenReturn(orderId);
 
-        when(orderService.createOrder(any(OrderRequestDTO.class))).thenReturn(orderCreated);
+        when(orderService.createOrder(any(), any(OrderRequestDTO.class))).thenReturn(orderCreated);
 
         mockMvc.perform(post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -77,7 +77,7 @@ class OrderControllerTests {
         OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
                 Set.of(new OrderItemDTO(1L)), null);
 
-        when(orderService.createOrder(any(OrderRequestDTO.class))).thenThrow(new InputInvalidException("Something went wrong"));
+        when(orderService.createOrder(any(), any(OrderRequestDTO.class))).thenThrow(new InputInvalidException("Something went wrong"));
 
         mockMvc.perform(post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
