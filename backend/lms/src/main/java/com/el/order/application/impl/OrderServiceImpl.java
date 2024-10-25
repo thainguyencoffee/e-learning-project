@@ -57,9 +57,7 @@ public class OrderServiceImpl implements OrderService {
 
         for (OrderItemDTO itemDto : orderRequestDTO.items()) {
             Course course = courseQueryService.findPublishedCourseById(itemDto.id());
-            Long courseId = course.getId();
-            MonetaryAmount finalPrice = course.getPrice();
-            items.add(new OrderItem(courseId, finalPrice));
+            items.add(new OrderItem(course.getId(), course.getPrice()));
         }
 
         Order newOrder = new Order(items);
@@ -70,6 +68,7 @@ public class OrderServiceImpl implements OrderService {
                     orderRequestDTO.discountCode(),
                     newOrder.getTotalPrice());
             newOrder.applyDiscount(monetaryAmount, orderRequestDTO.discountCode());
+            discountService.increaseUsage(orderRequestDTO.discountCode());
         }
 
         return orderRepository.save(newOrder);

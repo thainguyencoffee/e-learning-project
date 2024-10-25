@@ -4,7 +4,6 @@ import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import lombok.Getter;
 import lombok.ToString;
-import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
@@ -30,7 +29,9 @@ public class CourseSection {
     }
 
     public void updateInfo(String newTitle) {
-        Validate.notBlank(title, "Title must not be blank.");
+        if (title.isBlank()) {
+            throw new InputInvalidException("Title must not be empty.");
+        }
         this.title = newTitle;
     }
 
