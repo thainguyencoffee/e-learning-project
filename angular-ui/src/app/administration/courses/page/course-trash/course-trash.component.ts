@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {NgForOf, NgIf} from "@angular/common";
 import {NavigationEnd, Router, RouterLink} from "@angular/router";
 import {Course} from "../../model/view/course";
@@ -17,7 +17,7 @@ import {Subscription} from "rxjs";
   ],
   templateUrl: './course-trash.component.html',
 })
-export class CourseTrashComponent implements OnInit {
+export class CourseTrashComponent implements OnInit, OnDestroy {
 
   constructor(
     private courseService: CourseService,
@@ -50,6 +50,10 @@ export class CourseTrashComponent implements OnInit {
         this.loadData(0);
       }
     })
+  }
+
+  ngOnDestroy(): void {
+    this.navigationSubscription!.unsubscribe();
   }
 
   onPageChange(pageNumber: number): void {
