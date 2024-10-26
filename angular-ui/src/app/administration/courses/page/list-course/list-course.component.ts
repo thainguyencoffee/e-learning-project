@@ -6,6 +6,7 @@ import {NavigationEnd, Router, RouterLink} from "@angular/router";
 import {Subscription} from "rxjs";
 import {NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
 import {UserService} from "../../../../common/auth/user.service";
+import {PaginationUtils} from "../../model/view/page-wrapper";
 
 @Component({
   selector: 'app-list-course',
@@ -20,18 +21,13 @@ import {UserService} from "../../../../common/auth/user.service";
 })
 export class ListCourseComponent implements OnInit, OnDestroy {
 
-  constructor(
-    private courseService: CourseService,
-    private userService: UserService) {
-  }
-
+  courseService = inject(CourseService);
+  userService = inject(UserService);
   errorHandler = inject(ErrorHandler);
   router = inject(Router);
+
   courses?: Course[];
-  size!: number;
-  number!: number;
-  totalElements!: number;
-  totalPages!: number;
+  paginationUtils?: PaginationUtils;
   navigationSubscription?: Subscription;
 
   getMessage(key: string, details?: any) {
@@ -60,17 +56,13 @@ export class ListCourseComponent implements OnInit, OnDestroy {
   }
 
   onPageChange(pageNumber: number): void {
-    if (pageNumber >= 0 && pageNumber < this.totalPages) {
+    if (pageNumber >= 0 && pageNumber < this.paginationUtils!.totalPages) {
       this.loadData(pageNumber);
     }
   }
 
   getPageRange(): number[] {
-    const pageRange = [];
-    for (let i = 0; i < this.totalPages; i++) {
-      pageRange.push(i);
-    }
-    return pageRange;
+    return this.paginationUtils?.getPageRange() || [];
   }
 
 
@@ -78,11 +70,8 @@ export class ListCourseComponent implements OnInit, OnDestroy {
     this.courseService.getAllCourses(pageNumber)
       .subscribe({
         next: (pageWrapper) => {
+          this.paginationUtils = new PaginationUtils(pageWrapper.page);
           this.courses = pageWrapper.content as Course[];
-          this.size = pageWrapper.page.size;
-          this.number = pageWrapper.page.number;
-          this.totalElements = pageWrapper.page.totalElements;
-          this.totalPages = pageWrapper.page.totalPages;
         },
         error: (error) => this.errorHandler.handleServerError(error.error)
       });

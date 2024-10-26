@@ -17,6 +17,16 @@
             <li><a class="dropdown-item" routerLink="/administration">Administration</a></li>
           </ul>
         </li>
+
+        <li class="nav-item dropdown" *ngIf="isAuthenticated">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            More
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" routerLink="/my-orders">My Orders</a></li>
+          </ul>
+        </li>
+
         <li class="nav-item">
           <app-login *ngIf="!isAuthenticated"></app-login>
           <app-logout *ngIf="isAuthenticated"></app-logout>

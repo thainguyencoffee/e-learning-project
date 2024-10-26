@@ -14,9 +14,9 @@ export class DiscountService {
 
   resourcePath = '/bff/api/discounts'
 
-  getAllDiscounts(pageNumber: number = 0, pageSize: number = 10): Observable<PageWrapper> {
+  getAllDiscounts(pageNumber: number = 0, pageSize: number = 10): Observable<PageWrapper<Discount>> {
     const url = `${this.resourcePath}?page=${pageNumber}&size=${pageSize}`;
-    return this.http.get<PageWrapper>(url)
+    return this.http.get<PageWrapper<Discount>>(url)
   }
 
   getDiscount(currentId: number) {
@@ -31,9 +31,9 @@ export class DiscountService {
     return this.http.delete(`${this.resourcePath}/${id}`);
   }
 
-  getAllDiscountsInTrash(pageNumber: number = 0, pageSize: number = 10) {
+  getAllDiscountsInTrash(pageNumber: number = 0, pageSize: number = 10): Observable<PageWrapper<Discount>> {
     const url = `${this.resourcePath}/trash?page=${pageNumber}&size=${pageSize}`;
-    return this.http.get<PageWrapper>(url);
+    return this.http.get<PageWrapper<Discount>>(url);
   }
 
   deleteDiscountForce(discount: Discount) {
@@ -48,6 +48,10 @@ export class DiscountService {
 
   updateDiscount(id: number, data: DiscountDto) {
     return this.http.put<Discount>(this.resourcePath + '/' + id, data);
+  }
+
+  getDiscountByCode(code: string) {
+    return this.http.get<Discount>(`${this.resourcePath}/code/${code}`);
   }
 
 }

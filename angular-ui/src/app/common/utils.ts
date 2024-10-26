@@ -39,3 +39,27 @@ export const validJson: ValidatorFn = (control: AbstractControl): ValidationErro
   }
 };
 
+export function calcDifference(price1: string, price2: string): string | null {
+  const currency1 = price1.substring(0, 3);
+  const currency2 = price2.substring(0, 3);
+
+  if (currency1 !== currency2) {
+    throw new Error('Currencies are not the same');
+  }
+
+  const numericPrice1 = parseFloat(price1.substring(3).replace(/,/g, ''));
+  const numericPrice2 = parseFloat(price2.substring(3).replace(/,/g, ''));
+
+  const difference = numericPrice1 - numericPrice2;
+
+  return `${currency1}${difference.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+export function calcMultiplier(price: string, multiplier: number): string {
+  const currency = price.substring(0, 3);
+  const numericPrice = parseFloat(price.substring(3).replace(/,/g, ''));
+
+  const result = numericPrice - (numericPrice * multiplier / 100);
+
+  return `${currency}${result.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}

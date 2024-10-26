@@ -45,6 +45,7 @@ class PaymentServiceTests {
                 PaymentMethod.STRIPE, UUID.randomUUID().toString());
 
         when(charge.getId()).thenReturn("ch_1J2Y3Z4A5B6C7D8E9F0G");
+        when(charge.getReceiptUrl()).thenReturn("https://example.com/receipt");
         when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(stripePaymentGateway.charge(any(PaymentRequest.class))).thenReturn(charge);
 
@@ -54,6 +55,7 @@ class PaymentServiceTests {
         assertNotNull(result);
         assertEquals(PaymentStatus.PAID, result.getStatus());
         assertEquals("ch_1J2Y3Z4A5B6C7D8E9F0G", result.getTransactionId());
+        assertEquals("https://example.com/receipt", result.getReceiptUrl());
 
         verify(paymentRepository, times(1)).save(any(Payment.class));
         verify(orderService, times(1)).paymentSucceeded(paymentRequest.orderId());

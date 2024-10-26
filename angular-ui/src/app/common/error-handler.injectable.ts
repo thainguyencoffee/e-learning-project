@@ -73,3 +73,29 @@ interface ErrorResponse {
   fieldErrors?: FieldError[];
 
 }
+
+export function createErrNotFoundByProperty(propertyName: string, message: string): ErrorResponse {
+  return {
+    status: 404,
+    code: 'NOT_FOUND',
+    message: message,
+    fieldErrors: [
+      {
+        code: 'NOT_FOUND',
+        property: propertyName,
+        message: message,
+        rejectedValue: null,
+        path: null
+      }
+    ]
+  }
+}
+
+
+export function createErr(status: number, message: string): ErrorResponse {
+  return {
+    status: status,
+    code: 'ERROR',
+    message: message
+  }
+}

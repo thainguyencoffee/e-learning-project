@@ -43,8 +43,9 @@ class PaymentTests {
         PaymentMethod paymentMethod = PaymentMethod.STRIPE;
         Payment payment = new Payment(orderId, amount, paymentMethod);
         String transactionId = "TX123456";
+        String receiptUrl = "https://example.com/receipt";
 
-        payment.markPaid(transactionId);
+        payment.markPaid(transactionId, receiptUrl);
 
         assertEquals(PaymentStatus.PAID, payment.getStatus());
         assertNotNull(payment.getPaymentDate());
@@ -57,9 +58,10 @@ class PaymentTests {
         MonetaryAmount amount = Money.of(100, Currencies.VND);
         PaymentMethod paymentMethod = PaymentMethod.STRIPE;
         Payment payment = new Payment(orderId, amount, paymentMethod);
-        payment.markPaid("TX123456");
+        String receiptUrl = "https://example.com/receipt";
+        payment.markPaid("TX123456", receiptUrl);
 
-        assertThrows(InputInvalidException.class, () -> payment.markPaid("TX789012"));
+        assertThrows(InputInvalidException.class, () -> payment.markPaid("TX789012", receiptUrl));
     }
 
     @Test
@@ -80,9 +82,11 @@ class PaymentTests {
         MonetaryAmount amount = Money.of(100, Currencies.VND);
         PaymentMethod paymentMethod = PaymentMethod.STRIPE;
         Payment payment = new Payment(orderId, amount, paymentMethod);
-        payment.markPaid("TX123456");
 
-        assertThrows(IllegalStateException.class, payment::markFailed);
+        String receiptUrl = "https://example.com/receipt";
+        payment.markPaid("TX123456", receiptUrl);
+
+        assertThrows(InputInvalidException.class, payment::markFailed);
     }
 
 

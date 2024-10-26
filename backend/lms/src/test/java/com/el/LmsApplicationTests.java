@@ -1281,6 +1281,15 @@ class LmsApplicationTests {
                 .exchange()
                 .expectStatus().isCreated();
 
+        // Verify get all payments by orderId
+        webTestClient.get().uri("/payments/orders/{orderId}", orderId)
+                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.length()").isEqualTo(1)
+                .jsonPath("$[0].orderId").isEqualTo(orderId);
+
         // verify Discount was increased usage
         webTestClient.get().uri("/discounts/code/{code}", code)
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))

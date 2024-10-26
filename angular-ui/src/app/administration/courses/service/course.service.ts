@@ -24,14 +24,14 @@ export class CourseService {
 
   resourcePath = '/bff/api/courses'
 
-  getAllCourses(pageNumber: number = 0, pageSize: number = 10): Observable<PageWrapper> {
+  getAllCourses(pageNumber: number = 0, pageSize: number = 10): Observable<PageWrapper<Course>> {
     const url = `${this.resourcePath}?page=${pageNumber}&size=${pageSize}`;
-    return this.http.get<PageWrapper>(url)
+    return this.http.get<PageWrapper<Course>>(url)
   }
 
-  getAllCoursesInTrash(pageNumber: number = 0, pageSize: number = 10): Observable<PageWrapper> {
+  getAllCoursesInTrash(pageNumber: number = 0, pageSize: number = 10): Observable<PageWrapper<Course>> {
     const url = `${this.resourcePath}/trash?page=${pageNumber}&size=${pageSize}`;
-    return this.http.get<PageWrapper>(url)
+    return this.http.get<PageWrapper<Course>>(url)
   }
 
   getCourse(id: number): Observable<Course> {
