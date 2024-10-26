@@ -6,6 +6,9 @@ import com.el.payment.domain.PaymentRepository;
 import com.stripe.model.Charge;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.UUID;
+
 
 @Service
 public class PaymentService {
@@ -20,15 +23,19 @@ public class PaymentService {
         this.orderService = orderService;
     }
 
+    public List<Payment> getAllPaymentsByCreatedByAndId(UUID orderId) {
+        return paymentRepository.findAllByOrderId(orderId);
+    }
+
     public Payment pay (PaymentRequest paymentRequest) {
         Payment payment = new Payment(paymentRequest.orderId(),
                 paymentRequest.amount(), paymentRequest.paymentMethod());
 
         switch (payment.getPaymentMethod()) {
             case STRIPE -> {
-                try {
+                try { // receipt_url
                     Charge charge = stripePaymentGateway.charge(paymentRequest);
-                    payment.markPaid(charge.getId());
+                    payment.markPaid(charge.getId(), charge.getReceiptUrl());
                     orderService.paymentSucceeded(paymentRequest.orderId());
                 } catch (Exception e) {
                     payment.markFailed();

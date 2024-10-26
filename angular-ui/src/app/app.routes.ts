@@ -23,12 +23,36 @@ import {ResolveRequestComponent} from "./administration/courses/page/resolve-req
 import {
   RequestCourseDetailComponent
 } from "./administration/courses/page/request-course-detail/request-course-detail.component";
+import {CheckoutComponent} from "./orders/checkout/checkout.component";
+import {PaymentComponent} from "./orders/payment/payment.component";
+import {MyOrdersComponent} from "./orders/my-orders/my-orders.component";
+import {MyOrderDetailComponent} from "./orders/my-order-detail/my-order-detail.component";
 
 export const routes: Routes = [
   {
     title: 'Welcome to E learning!',
     path: '',
     component: HomeComponent,
+  },
+  {
+    title: 'Checkout course',
+    path: 'checkout/:courseId',
+    component: CheckoutComponent
+  },
+  {
+    title: 'Checkout payment',
+    path: 'checkout/pay/:orderId',
+    component: PaymentComponent
+  },
+  {
+    title: 'My Orders',
+    path: 'my-orders',
+    component: MyOrdersComponent
+  },
+  {
+    title: 'My order detail',
+    path: 'my-orders/:orderId',
+    component: MyOrderDetailComponent
   },
   {
     title: 'Welcome to dashboard!',

@@ -76,14 +76,14 @@
 
     <nav aria-label="Page navigation example">
       <ul class="pagination">
-        <li class="page-item" [class.disabled]="number === 0">
-          <button class="page-link" (click)="onPageChange(number - 1)">Previous</button>
+        <li class="page-item" [class.disabled]="paginationUtils!.number === 0">
+          <button class="page-link" (click)="onPageChange(paginationUtils!.number - 1)">Previous</button>
         </li>
-        <li class="page-item" *ngFor="let page of getPageRange()" [class.active]="page === number">
+        <li class="page-item" *ngFor="let page of getPageRange()" [class.active]="page === paginationUtils!.number">
           <button class="page-link" (click)="onPageChange(page)">{{ page + 1 }}</button>
         </li>
-        <li class="page-item" [class.disabled]="number === totalPages - 1">
-          <button class="page-link" (click)="onPageChange(number + 1)">Next</button>
+        <li class="page-item" [class.disabled]="paginationUtils!.number === paginationUtils!.totalPages - 1">
+          <button class="page-link" (click)="onPageChange(paginationUtils!.number + 1)">Next</button>
         </li>
       </ul>
     </nav>

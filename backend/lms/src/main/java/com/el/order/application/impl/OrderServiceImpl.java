@@ -1,6 +1,5 @@
 package com.el.order.application.impl;
 
-import com.el.common.RolesBaseUtil;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;

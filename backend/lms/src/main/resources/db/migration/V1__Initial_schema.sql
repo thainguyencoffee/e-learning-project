@@ -145,5 +145,6 @@ create table payment
     payment_method varchar(50)                    not null,
     status         varchar(50)                    not null,
     transaction_id varchar(50),
+    receipt_url    varchar(500),
     constraint fk_payment primary key (id)
 );

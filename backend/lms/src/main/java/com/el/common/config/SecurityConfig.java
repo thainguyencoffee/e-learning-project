@@ -39,8 +39,8 @@ public class SecurityConfig {
 //                        .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/orders").authenticated() // users, admin, teacher
-                        .requestMatchers("/orders", "/orders/{orderId}").hasRole("admin")
                         .requestMatchers("/orders/my-orders/**").authenticated()
+                        .requestMatchers("/orders", "/orders/{orderId}").hasRole("admin")
                         .requestMatchers("/payments/**").authenticated()
 
                         .requestMatchers(HttpMethod.PUT, "/courses/{courseId}/update-price").hasRole("admin")
