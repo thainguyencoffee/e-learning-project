@@ -177,4 +177,10 @@ class DiscountServiceTests {
         verify(discount).increaseUsage();
     }
 
+    @Test
+    void testIncreaseUsage_ShouldThrowExceptionWhenDiscountNotFound() {
+        when(discountRepository.findByCodeAndDeleted(discount.getCode(), false)).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> discountService.increaseUsage(discount.getCode()));
+    }
+
 }

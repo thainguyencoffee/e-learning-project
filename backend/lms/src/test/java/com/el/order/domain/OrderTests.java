@@ -35,4 +35,26 @@ class OrderTests {
 
         assertThrows(InputInvalidException.class, executable, "Order must contain at least one item.");
     }
+
+    @Test
+    void makePaid_ShouldMarkOrderAsPaid_WhenOrderIsPending() {
+        Set<OrderItem> items = Set.of(new OrderItem(1L, Money.of(1000, Currencies.VND)));
+        Order order = new Order(items, TestFactory.userId);
+
+        order.makePaid();
+
+        assertEquals(Status.PAID, order.getStatus());
+    }
+
+    @Test
+    void makePaid_ShouldThrowException_WhenOrderIsAlreadyPaid() {
+        Set<OrderItem> items = Set.of(new OrderItem(1L, Money.of(1000, Currencies.VND)));
+        Order order = new Order(items, TestFactory.userId);
+        order.makePaid();
+
+        Executable executable = order::makePaid;
+        InputInvalidException exception = assertThrows(InputInvalidException.class, executable);
+        assertEquals("You can't pay for a completed order.", exception.getMessage());
+    }
+
 }

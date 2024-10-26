@@ -1,9 +1,10 @@
 package com.el.order.application.dto;
 
+import com.el.common.ValidateMessages;
 import jakarta.validation.constraints.NotNull;
 
 public record OrderItemDTO(
-        @NotNull(message = "Course ID can't be null")
+        @NotNull(message = ValidateMessages.NOT_NULL)
         Long id
 ) {
 }

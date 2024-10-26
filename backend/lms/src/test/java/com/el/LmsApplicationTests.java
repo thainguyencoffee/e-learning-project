@@ -10,6 +10,7 @@ import com.el.course.web.dto.AssignTeacherDTO;
 import com.el.course.web.dto.UpdatePriceDTO;
 import com.el.course.web.dto.UpdateSectionDTO;
 import com.el.discount.application.dto.DiscountDTO;
+import com.el.discount.domain.Discount;
 import com.el.discount.domain.DiscountRepository;
 import com.el.discount.domain.Type;
 import com.el.order.application.dto.OrderItemDTO;
@@ -50,6 +51,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class LmsApplicationTests {
 
     protected static KeycloakToken userToken;
+    protected static KeycloakToken user2Token;
     protected static KeycloakToken teacherToken;
     protected static KeycloakToken bossToken;
 
@@ -84,6 +86,7 @@ class LmsApplicationTests {
                         MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();
         userToken = authenticateWith("user", "1", webClient);
+        user2Token = authenticateWith("user2", "1", webClient);
         teacherToken = authenticateWith("teacher", "1", webClient);
         bossToken = authenticateWith("boss", "1", webClient);
     }
@@ -1083,7 +1086,7 @@ class LmsApplicationTests {
         var orderRequestDto = new OrderRequestDTO(orderItemsDto, null);
 
         // Gửi request POST để tạo order
-        webTestClient.post().uri("/orders")
+        String location = webTestClient.post().uri("/orders")
                 .headers(header -> header.setBearerAuth(userToken.getAccessToken())) 
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(orderRequestDto))
@@ -1095,7 +1098,27 @@ class LmsApplicationTests {
                 .jsonPath("$.items[0].price").isEqualTo("VND1,000.00")
                 .jsonPath("$.status").isEqualTo(Status.PENDING.name())
                 .jsonPath("$.totalPrice").isEqualTo("VND1,000.00")
-                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(userToken.accessToken, "sub"));
+                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(userToken.accessToken, "sub"))
+                .returnResult().getResponseHeaders().getLocation().toString();
+
+        String orderId = location.substring(location.lastIndexOf("/") + 1);
+
+        webTestClient.get().uri("/orders/my-orders/{orderId}", orderId)
+                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk();
+
+        // verify if another user can't access this order
+        webTestClient.get().uri("/orders/my-orders/{orderId}", orderId)
+                .headers(header -> header.setBearerAuth(user2Token.getAccessToken()))
+                .exchange()
+                .expectStatus().isNotFound();
+
+        // verify admin can access this order
+        webTestClient.get().uri("/orders/{orderId}", orderId)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk();
     }
 
     @Test
@@ -1190,6 +1213,82 @@ class LmsApplicationTests {
                 .body(BodyInserters.fromValue(paymentRequestDto))
                 .exchange()
                 .expectStatus().isCreated();
+
+        // verify order as paid
+        webTestClient.get().uri("/orders/my-orders/{orderId}", orderId)
+                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo(Status.PAID.name());
+    }
+
+    @Test
+    void testCreateOrderWithDiscount_Successful() {
+        DiscountDTO discountDTO = TestFactory.createDefaultDiscountDTO();
+        String id = performCreateDiscountTest(discountDTO);
+        Discount discount = discountRepository.findByIdAndDeleted(Long.valueOf(id), false).get();
+        String code = discount.getCode();
+
+        var courseDTO = TestFactory.createDefaultCourseDTO();
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        var courseId = course.getId();
+
+        approvePublishByCourseId(course.getId());
+
+        webTestClient.get()
+                .uri("/published-courses/{courseId}", courseId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(courseId.intValue());
+
+        // Chuẩn bị dữ liệu cho request tạo order
+        Set<OrderItemDTO> orderItemsDto = new HashSet<>();
+        orderItemsDto.add(new OrderItemDTO(courseId));
+        var orderRequestDto = new OrderRequestDTO(orderItemsDto, code);
+
+
+        // Gửi request POST để tạo order
+        String location = webTestClient.post().uri("/orders")
+                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(orderRequestDto))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(1)
+                .jsonPath("$.items[0].course").isEqualTo(courseId.intValue())
+                .jsonPath("$.items[0].price").isEqualTo("VND1,000.00")
+                .jsonPath("$.status").isEqualTo(Status.PENDING.name())
+                .jsonPath("$.totalPrice").isEqualTo("VND1,000.00")
+                .jsonPath("$.discountedPrice").isEqualTo("VND900.00")
+                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(userToken.accessToken, "sub"))
+                .returnResult().getResponseHeaders().getLocation().toString();
+
+        String orderId = location.substring(location.lastIndexOf("/") + 1);
+
+        // Gửi request POST để thanh toán order
+        var paymentRequestDto = new PaymentRequest(
+                UUID.fromString(orderId),
+                Money.of(50000, Currencies.VND),
+                PaymentMethod.STRIPE, "tok_visa");
+        webTestClient.post().uri("/payments")
+                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(paymentRequestDto))
+                .exchange()
+                .expectStatus().isCreated();
+
+        // verify Discount was increased usage
+        webTestClient.get().uri("/discounts/code/{code}", code)
+                .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.currentUsage").isEqualTo(1)
+                .jsonPath("$.maxUsage").isEqualTo(discountDTO.maxUsage());
     }
 
 
@@ -1199,7 +1298,7 @@ class LmsApplicationTests {
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(Integer.class).isEqualTo(3);
+                .expectBody(Integer.class).isEqualTo(4);
     }
 
     @Test
@@ -1208,7 +1307,7 @@ class LmsApplicationTests {
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(Integer.class).isEqualTo(2);
+                .expectBody(Integer.class).isEqualTo(3);
     }
 
     @Test
@@ -1227,7 +1326,7 @@ class LmsApplicationTests {
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(Integer.class).isEqualTo(1);
+                .expectBody(Integer.class).isEqualTo(2);
     }
 
     @Test
@@ -1290,26 +1389,13 @@ class LmsApplicationTests {
 
     @Test
     void testCreateDiscount_Successful() {
-        DiscountDTO discountDTO = new DiscountDTO("DISCOUNT_50",
-                Type.PERCENTAGE,
-                20.0,
-                null,
-                LocalDateTime.now().minusSeconds(360),
-                LocalDateTime.now().plusSeconds(360),
-                100);
-
+        DiscountDTO discountDTO = TestFactory.createDefaultDiscountDTO();
         performCreateDiscountTest(discountDTO);
     }
 
     @Test
     void testUpdateDiscount_Successful() {
-        DiscountDTO discountDTO = new DiscountDTO("DISCOUNT_20",
-                Type.PERCENTAGE,
-                20.0,
-                null,
-                LocalDateTime.now().minusSeconds(360),
-                LocalDateTime.now().plusSeconds(360),
-                100);
+        DiscountDTO discountDTO = TestFactory.createDefaultDiscountDTO();
 
         String discountId = performCreateDiscountTest(discountDTO);
 
@@ -1343,14 +1429,7 @@ class LmsApplicationTests {
 
     @Test
     void testDeleteDiscount_Successful() {
-        DiscountDTO discountDTO = new DiscountDTO("DISCOUNT_10",
-                Type.PERCENTAGE,
-                10.0,
-                null,
-                LocalDateTime.now().minusSeconds(360),
-                LocalDateTime.now().plusSeconds(360),
-                100);
-
+        DiscountDTO discountDTO = TestFactory.createDefaultDiscountDTO();
         String discountId = performCreateDiscountTest(discountDTO);
 
         webTestClient.delete().uri("/discounts/{id}", discountId)
@@ -1363,13 +1442,7 @@ class LmsApplicationTests {
 
     @Test
     void testRestoreDiscount_Successful() {
-        DiscountDTO discountDTO = new DiscountDTO("DISCOUNT_10",
-                Type.PERCENTAGE,
-                10.0,
-                null,
-                LocalDateTime.now().minusSeconds(360),
-                LocalDateTime.now().plusSeconds(360),
-                100);
+        DiscountDTO discountDTO = TestFactory.createDefaultDiscountDTO();
 
         String discountId = performCreateDiscountTest(discountDTO);
 
@@ -1390,13 +1463,7 @@ class LmsApplicationTests {
 
     @Test
     void testDeleteForceDiscount_Successful() {
-        DiscountDTO discountDTO = new DiscountDTO("DISCOUNT_10",
-                Type.PERCENTAGE,
-                10.0,
-                null,
-                LocalDateTime.now().minusSeconds(360),
-                LocalDateTime.now().plusSeconds(360),
-                100);
+        DiscountDTO discountDTO = TestFactory.createDefaultDiscountDTO();
 
         String discountId = performCreateDiscountTest(discountDTO);
 

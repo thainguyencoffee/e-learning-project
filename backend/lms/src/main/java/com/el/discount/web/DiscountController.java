@@ -1,9 +1,12 @@
 package com.el.discount.web;
 
+import com.el.common.ValidateMessages;
 import com.el.discount.application.DiscountService;
 import com.el.discount.application.dto.DiscountDTO;
 import com.el.discount.domain.Discount;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.money.MonetaryAmount;
 import java.net.URI;
 
 @RestController
@@ -34,6 +38,11 @@ public class DiscountController {
     @GetMapping("/code/{code}")
     public ResponseEntity<Discount> getDiscountByCode(@PathVariable String code) {
         return ResponseEntity.ok(discountService.findByCode(code));
+    }
+
+    @PostMapping("/calculate")
+    public ResponseEntity<MonetaryAmount> calculateDiscountByCode(@Valid @RequestBody CalculateDiscountRequest request) {
+        return ResponseEntity.ok(discountService.calculateDiscount(request.code(), request.price()));
     }
 
     @GetMapping("/trash")
@@ -72,5 +81,11 @@ public class DiscountController {
         discountService.restoreDiscount(id);
         return ResponseEntity.ok().build();
     }
+
+    public record CalculateDiscountRequest(
+            @NotBlank(message = ValidateMessages.NOT_BLANK)
+            String code,
+            @NotNull(message = ValidateMessages.NOT_NULL)
+            MonetaryAmount price) {}
 
 }
