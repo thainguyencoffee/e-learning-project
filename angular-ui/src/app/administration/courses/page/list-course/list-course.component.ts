@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {CourseService} from "../../service/course.service";
 import {Course} from "../../model/view/course";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
@@ -18,7 +18,7 @@ import {UserService} from "../../../../common/auth/user.service";
   ],
   templateUrl: './list-course.component.html',
 })
-export class ListCourseComponent implements OnInit {
+export class ListCourseComponent implements OnInit, OnDestroy {
 
   constructor(
     private courseService: CourseService,
@@ -53,6 +53,10 @@ export class ListCourseComponent implements OnInit {
         this.loadData(0);
       }
     })
+  }
+
+  ngOnDestroy(): void {
+    this.navigationSubscription!.unsubscribe();
   }
 
   onPageChange(pageNumber: number): void {

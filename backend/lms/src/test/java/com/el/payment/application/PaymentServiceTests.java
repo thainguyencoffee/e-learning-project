@@ -1,6 +1,7 @@
 package com.el.payment.application;
 
 import com.el.common.Currencies;
+import com.el.order.application.OrderService;
 import com.el.payment.domain.Payment;
 import com.el.payment.domain.PaymentMethod;
 import com.el.payment.domain.PaymentRepository;
@@ -29,6 +30,9 @@ class PaymentServiceTests {
     @Mock
     private StripePaymentGateway stripePaymentGateway;
 
+    @Mock
+    private OrderService orderService;
+
     @InjectMocks
     private PaymentService paymentService;
 
@@ -52,6 +56,7 @@ class PaymentServiceTests {
         assertEquals("ch_1J2Y3Z4A5B6C7D8E9F0G", result.getTransactionId());
 
         verify(paymentRepository, times(1)).save(any(Payment.class));
+        verify(orderService, times(1)).paymentSucceeded(paymentRequest.orderId());
     }
 
 

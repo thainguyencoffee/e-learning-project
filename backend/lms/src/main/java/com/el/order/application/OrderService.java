@@ -18,4 +18,8 @@ public interface OrderService {
 
     Order createOrder(String student, OrderRequestDTO orderRequestDTO);
 
+    Order findOrderByCreatedByAndId(String createdBy, UUID id);
+
+    void paymentSucceeded(UUID orderId);
+
 }

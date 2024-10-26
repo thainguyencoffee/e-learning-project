@@ -21,7 +21,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.money.MonetaryAmount;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -113,6 +115,56 @@ class OrderServiceTests {
                 .thenThrow(new InputInvalidException("Invalid discount code"));
 
         assertThrows(InputInvalidException.class, () -> orderService.createOrder(TestFactory.userId, orderRequestDTO));
+    }
+
+    @Test
+    void paymentSucceeded_ShouldMarkOrderAsPaid_WhenOrderExists() {
+        UUID orderId = UUID.randomUUID();
+        Order order = Mockito.mock(Order.class);
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+        orderService.paymentSucceeded(orderId);
+
+        verify(order, times(1)).makePaid();
+        verify(orderRepository, times(1)).save(order);
+    }
+
+    @Test
+    void paymentSucceeded_ShouldIncreaseDiscountUsage_WhenOrderHasDiscountCode() {
+        UUID orderId = UUID.randomUUID();
+        Order order = Mockito.mock(Order.class);
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        when(order.getDiscountCode()).thenReturn("DISCOUNT10");
+
+        orderService.paymentSucceeded(orderId);
+
+        verify(order, times(1)).makePaid();
+        verify(discountService, times(1)).increaseUsage("DISCOUNT10");
+        verify(orderRepository, times(1)).save(order);
+    }
+
+    @Test
+    void paymentSucceeded_ShouldNotIncreaseDiscountUsage_WhenOrderHasNoDiscountCode() {
+        UUID orderId = UUID.randomUUID();
+        Order order = Mockito.mock(Order.class);
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        when(order.getDiscountCode()).thenReturn("");
+
+        orderService.paymentSucceeded(orderId);
+
+        verify(order, times(1)).makePaid();
+        verify(discountService, never()).increaseUsage(anyString());
+        verify(orderRepository, times(1)).save(order);
+    }
+
+    @Test
+    void paymentSucceeded_ShouldThrowException_WhenOrderNotFound() {
+        UUID orderId = UUID.randomUUID();
+        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> orderService.paymentSucceeded(orderId));
+
+        verify(orderRepository, never()).save(any(Order.class));
     }
 
 }

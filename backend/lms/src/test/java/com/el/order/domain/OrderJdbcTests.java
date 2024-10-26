@@ -89,4 +89,15 @@ class OrderJdbcTests {
         assertEquals("guest", guestOrders.get(0).getCreatedBy(), "CreatedBy should be 'guest'");
     }
 
+    @Test
+    void testHasPurchasedCourse() {
+        orderRepository.save(order);
+
+        // Act
+        boolean hasPurchased = orderRepository.hasPurchasedCourse(1L, TestFactory.userId);
+
+        // Assert
+        assertTrue(hasPurchased, "User should have purchased course 1");
+    }
+
 }

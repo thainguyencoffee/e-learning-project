@@ -1,5 +1,7 @@
 package com.el.order.application.impl;
 
+import com.el.common.RolesBaseUtil;
+import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
 import com.el.course.domain.Course;
@@ -52,10 +54,30 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Order findOrderByCreatedByAndId(String createdBy, UUID id) {
+        return orderRepository.findByCreatedByAndId(createdBy, id)
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Override
+    public void paymentSucceeded(UUID orderId) {
+        Order order = findOrderById(orderId);
+        order.makePaid();
+        if (order.getDiscountCode() != null && !order.getDiscountCode().isBlank()) {
+            discountService.increaseUsage(order.getDiscountCode());
+        }
+        orderRepository.save(order);
+    }
+
+    @Override
     public Order createOrder(String student, OrderRequestDTO orderRequestDTO) {
+
         Set<OrderItem> items = new HashSet<>();
 
         for (OrderItemDTO itemDto : orderRequestDTO.items()) {
+            if (orderRepository.hasPurchasedCourse(itemDto.id(), student)) {
+                throw new InputInvalidException("You cannot purchase the same course twice");
+            }
             Course course = courseQueryService.findPublishedCourseById(itemDto.id());
             items.add(new OrderItem(course.getId(), course.getPrice()));
         }
@@ -68,7 +90,6 @@ public class OrderServiceImpl implements OrderService {
                     orderRequestDTO.discountCode(),
                     newOrder.getTotalPrice());
             newOrder.applyDiscount(monetaryAmount, orderRequestDTO.discountCode());
-            discountService.increaseUsage(orderRequestDTO.discountCode());
         }
 
         return orderRepository.save(newOrder);

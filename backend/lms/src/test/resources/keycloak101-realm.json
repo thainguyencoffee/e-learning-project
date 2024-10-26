@@ -486,6 +486,29 @@
     "realmRoles" : [ "default-roles-keycloak101" ],
     "notBefore" : 0,
     "groups" : [ ]
+  }, {
+    "id" : "a32aee3b-d6db-4b22-83c8-2d813d48e50e",
+    "username" : "user2",
+    "firstName" : "thai ",
+    "lastName" : "nguyen 2",
+    "email" : "demo2@gmail.com",
+    "emailVerified" : true,
+    "createdTimestamp" : 1729939430945,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "2cb3c208-7c61-4edf-8d7d-f72093084745",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1729939459921,
+      "secretData" : "{\"value\":\"TuXRbM4QLzmg0BeGrRG5unam45Uat2dClIV7ZTAY+5EN5Hyis/zi9XnDxq3rtudvnhszKwvtyan0Mv6dYyJ10g==\",\"salt\":\"4HG1/TDDPLkwToBSqah3xA==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-keycloak101" ],
+    "notBefore" : 0,
+    "groups" : [ ]
   } ],
   "scopeMappings" : [ {
     "clientScope" : "offline_access",
