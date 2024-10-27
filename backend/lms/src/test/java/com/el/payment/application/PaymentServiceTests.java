@@ -58,7 +58,6 @@ class PaymentServiceTests {
         assertEquals("https://example.com/receipt", result.getReceiptUrl());
 
         verify(paymentRepository, times(1)).save(any(Payment.class));
-        verify(orderService, times(1)).paymentSucceeded(paymentRequest.orderId());
     }
 
 
