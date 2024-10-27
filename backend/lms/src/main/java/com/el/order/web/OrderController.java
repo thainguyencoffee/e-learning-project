@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,19 +41,21 @@ public class OrderController {
     // User can access only their own orders
     @GetMapping("/my-orders")
     public ResponseEntity<Page<Order>> myOrders(@AuthenticationPrincipal Jwt jwt, Pageable pageable) {
-        List<Order> result = orderService.findOrdersByCreatedBy(jwt.getSubject(), pageable);
+        String createdBy = jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME);
+        List<Order> result = orderService.findOrdersByCreatedBy(createdBy, pageable);
         return ResponseEntity.ok(new PageImpl<>(result, pageable, result.size()));
     }
 
     @GetMapping("/my-orders/{id}")
     public ResponseEntity<Order> myOrderById(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id) {
-        return ResponseEntity.ok(orderService.findOrderByCreatedByAndId(jwt.getSubject(), id));
+        String createdBy = jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME);
+        return ResponseEntity.ok(orderService.findOrderByCreatedByAndId(createdBy, id));
     }
 
     @PostMapping
     public ResponseEntity<Order> createOrder(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody OrderRequestDTO orderRequestDTO) {
-        String student = jwt.getSubject();
-        Order orderCreated = orderService.createOrder(student, orderRequestDTO);
+        String currentUsername = jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME);
+        Order orderCreated = orderService.createOrder(currentUsername, orderRequestDTO);
         return ResponseEntity.created(URI.create("/orders/" + orderCreated.getId())).body(orderCreated);
     }
 

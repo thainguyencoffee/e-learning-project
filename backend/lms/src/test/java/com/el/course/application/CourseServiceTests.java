@@ -106,7 +106,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
-        when(rolesBaseUtil.getCurrentSubjectFromJwt()).thenReturn("teacher123");
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("teacher123");
 
         assertThrows(ResourceNotFoundException.class, () -> {
             courseService.updateCourse(1L, courseUpdateDTO);
@@ -122,7 +122,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
-        when(rolesBaseUtil.getCurrentSubjectFromJwt()).thenReturn("otherTeacher"); // course's is teacher123
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher"); // course's is teacher123
 
         assertThrows(AccessDeniedException.class, () -> {
             courseService.updateCourse(1L, courseUpdateDTO);
@@ -199,7 +199,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
-        when(rolesBaseUtil.getCurrentSubjectFromJwt()).thenReturn("otherTeacher");
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher");
 
         assertThrows(AccessDeniedException.class, () -> courseService.deleteCourse(1L));
         verify(courseRepository, never()).save(any(Course.class));
@@ -393,7 +393,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
-        when(rolesBaseUtil.getCurrentSubjectFromJwt()).thenReturn("otherTeacher");
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher");
 
         CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
@@ -464,7 +464,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
-        when(rolesBaseUtil.getCurrentSubjectFromJwt()).thenReturn("otherTeacher");
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher");
 
         // Act & Assert: Kiểm tra xem ngoại lệ có được ném ra khi không có quyền cập nhật section
         assertThrows(AccessDeniedException.class, () -> {
@@ -532,7 +532,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
-        when(rolesBaseUtil.getCurrentSubjectFromJwt()).thenReturn("otherTeacher");
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher");
 
         assertThrows(AccessDeniedException.class, () -> courseService.removeSection(1L, 2L));
 
@@ -600,7 +600,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
-        when(rolesBaseUtil.getCurrentSubjectFromJwt()).thenReturn("otherTeacher");
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher");
         Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null);
 
         assertThrows(AccessDeniedException.class, () -> courseService.addLesson(1L, 2L, lesson));
@@ -655,7 +655,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
-        when(rolesBaseUtil.getCurrentSubjectFromJwt()).thenReturn("otherTeacher");
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher");
         Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/updated", null);
 
         assertThrows(AccessDeniedException.class, () -> courseService.updateLesson(1L, 2L, 3L, updatedLesson));

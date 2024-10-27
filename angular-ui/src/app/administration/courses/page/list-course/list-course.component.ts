@@ -93,8 +93,8 @@ export class ListCourseComponent implements OnInit, OnDestroy {
 
   }
 
-  isAdminCourse(teacherId: string) {
-    return this.userService.current.hasAnyRole('ROLE_admin') && this.userService.current.name === teacherId;
+  isAdminCourse(teacher: string) {
+    return this.userService.current.hasAnyRole('ROLE_admin') && this.userService.current.name === teacher;
   }
 
   isTitleBlue(course: Course) {

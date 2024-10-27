@@ -59,7 +59,7 @@ class OrderServiceTests {
                 .thenReturn(Money.of(10, Currencies.VND));
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Order order = orderService.createOrder(TestFactory.userId, orderRequestDTO);
+        Order order = orderService.createOrder(TestFactory.user, orderRequestDTO);
 
         // Assert and Verify
         assertNotNull(order);
@@ -82,7 +82,7 @@ class OrderServiceTests {
         when(course.getPrice()).thenReturn(Money.of(100, Currencies.VND));
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Order order = orderService.createOrder(TestFactory.userId, orderRequestDTO);
+        Order order = orderService.createOrder(TestFactory.user, orderRequestDTO);
 
         // Assert and Verify
         assertNotNull(order);
@@ -101,7 +101,7 @@ class OrderServiceTests {
                 Set.of(new OrderItemDTO(1L)), "DISCOUNT10");
         when(courseQueryService.findPublishedCourseById(any(Long.class))).thenThrow(new ResourceNotFoundException());
 
-        assertThrows(ResourceNotFoundException.class, () -> orderService.createOrder(TestFactory.userId, orderRequestDTO));
+        assertThrows(ResourceNotFoundException.class, () -> orderService.createOrder(TestFactory.user, orderRequestDTO));
     }
 
     @Test
@@ -114,7 +114,7 @@ class OrderServiceTests {
         when(discountService.calculateDiscount(anyString(), any(MonetaryAmount.class)))
                 .thenThrow(new InputInvalidException("Invalid discount code"));
 
-        assertThrows(InputInvalidException.class, () -> orderService.createOrder(TestFactory.userId, orderRequestDTO));
+        assertThrows(InputInvalidException.class, () -> orderService.createOrder(TestFactory.user, orderRequestDTO));
     }
 
     @Test

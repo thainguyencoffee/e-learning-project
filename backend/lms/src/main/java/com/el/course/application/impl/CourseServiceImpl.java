@@ -2,7 +2,6 @@ package com.el.course.application.impl;
 
 import com.el.common.RolesBaseUtil;
 import com.el.common.exception.AccessDeniedException;
-import com.el.common.exception.InputInvalidException;
 import com.el.course.application.CourseQueryService;
 import com.el.course.application.CourseService;
 import com.el.course.application.dto.*;
@@ -10,7 +9,6 @@ import com.el.course.domain.Course;
 import com.el.course.domain.CourseRepository;
 import com.el.course.domain.CourseSection;
 import com.el.course.domain.Lesson;
-import com.el.discount.application.DiscountService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,8 +31,8 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course createCourse(String teacherId, CourseDTO courseDTO) {
-        Course course = courseDTO.toCourse(teacherId);
+    public Course createCourse(String teacher, CourseDTO courseDTO) {
+        Course course = courseDTO.toCourse(teacher);
         return courseRepository.save(course);
     }
 
@@ -189,7 +187,7 @@ public class CourseServiceImpl implements CourseService {
             return true;
         }
 
-        String currentUserId = rolesBaseUtil.getCurrentSubjectFromJwt();
+        String currentUserId = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
         return course.getTeacher().equals(currentUserId);
     }
 

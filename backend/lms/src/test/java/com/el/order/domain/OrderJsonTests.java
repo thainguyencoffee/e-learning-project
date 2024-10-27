@@ -36,7 +36,7 @@ class OrderJsonTests {
         Set<OrderItem> items = new HashSet<>();
         items.add(new OrderItem(111L, Money.of(1000, Currencies.VND)));
         items.add(new OrderItem(222L, Money.of(2000, Currencies.VND)));
-        Order order = new Order(items, TestFactory.userId);
+        Order order = new Order(items);
 
         // Mock
         Order orderMock = Mockito.spy(order);

@@ -44,12 +44,12 @@ export class ResolveRequestComponent implements OnInit{
 
   approveRequestAddForm = new FormGroup({
     approveType: new FormControl(this.requestType || null),
-    approveMessage: new FormControl(null, [Validators.required, Validators.max(2000), Validators.min(25)])
+    approveMessage: new FormControl(null, [Validators.required, Validators.maxLength(2000), Validators.minLength(25)])
   })
 
   rejectRequestAddForm = new FormGroup({
     rejectType: new FormControl(this.requestType || null),
-    rejectCause: new FormControl(null, [Validators.required, Validators.max(2000), Validators.min(25)])
+    rejectCause: new FormControl(null, [Validators.required, Validators.maxLength(2000), Validators.minLength(25)])
   })
 
   handleSubmit() {

@@ -1,21 +1,10 @@
-<div class="container">
-
-  <div *ngIf="order?.status === 'PENDING'" class="alert alert-warning">
-    Please pay to enroll to course! Or pay it later in <a routerLink="/my-orders">My Orders</a>
-  </div>
-
-  <form [formGroup]="paymentForm">
-    <app-input-row [group]="paymentForm" field="orderId" label="Order ID"/>
-    <app-input-row [group]="paymentForm" field="amount" label="Amount" />
-    <app-input-row [group]="paymentForm" field="paymentMethod" label="Payment Method"
-                   rowType="radio" [options]="paymentMethodsMap" (optionsChange)="paymentMethodSelected($event)"/>
-<!--    <input type="submit" value="Submit" class="btn btn-primary mt-4" />-->
-  </form>
-
-<!--  <div>-->
-<!--&lt;!&ndash;    <label>Price: {{ amount / 100 | currency: currency }}</label>&ndash;&gt;-->
-<!--    <button (click)="openCheckout()">Pay</button>-->
-<!--  </div>-->
-
-
+<div *ngIf="order?.status === 'PENDING'" class="alert alert-warning">
+  Please pay to enroll to course! Or pay it later in <a routerLink="/my-orders">My Orders</a>
 </div>
+
+<form [formGroup]="paymentForm">
+  <app-input-row [group]="paymentForm" field="orderId" label="Order ID"/>
+  <app-input-row [group]="paymentForm" field="amount" label="Amount" />
+  <app-input-row [group]="paymentForm" field="paymentMethod" label="Payment Method"
+                 rowType="radio" [options]="paymentMethodsMap" (optionsChange)="paymentMethodSelected($event)"/>
+</form>

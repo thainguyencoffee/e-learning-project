@@ -5,16 +5,17 @@ import {Order} from "../order";
 import {PaginationUtils} from "../../administration/courses/model/view/page-wrapper";
 import {Subscription} from "rxjs";
 import {ErrorHandler} from "../../common/error-handler.injectable";
-import {NgForOf, NgIf} from "@angular/common";
+import {DatePipe, NgForOf, NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-my-orders',
   standalone: true,
-  imports: [
-    RouterLink,
-    NgForOf,
-    NgIf
-  ],
+    imports: [
+        RouterLink,
+        NgForOf,
+        NgIf,
+        DatePipe
+    ],
   templateUrl: './my-orders.component.html',
 })
 export class MyOrdersComponent implements OnInit, OnDestroy {

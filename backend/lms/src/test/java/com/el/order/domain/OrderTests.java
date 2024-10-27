@@ -24,14 +24,13 @@ class OrderTests {
         assertEquals(Money.of(3000, Currencies.VND), order.getTotalPrice());
         assertNull(order.getDiscountCode());
         assertNull(order.getDiscountedPrice());
-        assertEquals(TestFactory.userId, order.getStudent());
     }
 
     @Test
     void orderConstructor_ShouldThrowException_WhenItemsIsEmpty() {
         Set<OrderItem> items = new HashSet<>();
 
-        Executable executable = () -> new Order(items, TestFactory.userId);
+        Executable executable = () -> new Order(items);
 
         assertThrows(InputInvalidException.class, executable, "Order must contain at least one item.");
     }
@@ -39,7 +38,7 @@ class OrderTests {
     @Test
     void makePaid_ShouldMarkOrderAsPaid_WhenOrderIsPending() {
         Set<OrderItem> items = Set.of(new OrderItem(1L, Money.of(1000, Currencies.VND)));
-        Order order = new Order(items, TestFactory.userId);
+        Order order = new Order(items);
 
         order.makePaid();
 
@@ -49,7 +48,7 @@ class OrderTests {
     @Test
     void makePaid_ShouldThrowException_WhenOrderIsAlreadyPaid() {
         Set<OrderItem> items = Set.of(new OrderItem(1L, Money.of(1000, Currencies.VND)));
-        Order order = new Order(items, TestFactory.userId);
+        Order order = new Order(items);
         order.makePaid();
 
         Executable executable = order::makePaid;

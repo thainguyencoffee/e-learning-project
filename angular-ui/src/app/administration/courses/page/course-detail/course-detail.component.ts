@@ -93,8 +93,8 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
 
   }
 
-  isCreateByYou(teacherId: string) {
-    return this.userService.current.name === teacherId;
+  isCreateByYou(teacher: string) {
+    return this.userService.current.name === teacher;
   }
 
   isEditable() {
@@ -102,7 +102,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
   }
 
   getIdRequestUnresolved() {
-    if (this.courseDto?.courseRequests) {
+    if (this.courseDto?.courseRequests && this.userService.current.hasAnyRole('ROLE_admin')) {
       return this.courseDto?.courseRequests.find(request => !request.resolved)?.id;
     }
     return null;

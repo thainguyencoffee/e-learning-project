@@ -27,6 +27,7 @@ import {CheckoutComponent} from "./orders/checkout/checkout.component";
 import {PaymentComponent} from "./orders/payment/payment.component";
 import {MyOrdersComponent} from "./orders/my-orders/my-orders.component";
 import {MyOrderDetailComponent} from "./orders/my-order-detail/my-order-detail.component";
+import {MyCoursesComponent} from "./my-courses/my-courses.component";
 
 export const routes: Routes = [
   {
@@ -53,6 +54,11 @@ export const routes: Routes = [
     title: 'My order detail',
     path: 'my-orders/:orderId',
     component: MyOrderDetailComponent
+  },
+  {
+    title: 'Welcome to my courses!',
+    path: 'my-courses',
+    component: MyCoursesComponent
   },
   {
     title: 'Welcome to dashboard!',

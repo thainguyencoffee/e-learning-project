@@ -21,7 +21,7 @@ public interface OrderRepository extends CrudRepository<Order, UUID> {
 
     @Query("SELECT COUNT(*) > 0 FROM orders o " +
             "JOIN order_items oi ON o.id = oi.orders " +
-            "WHERE o.student = :student AND oi.course = :courseId")
-    boolean hasPurchasedCourse(@Param("courseId") Long courseId, @Param("student") String student);
+            "WHERE o.created_by = :username AND oi.course = :courseId")
+    boolean hasPurchasedCourse(@Param("courseId") Long courseId, @Param("username") String username);
 
 }
