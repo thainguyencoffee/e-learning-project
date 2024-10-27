@@ -1,7 +1,7 @@
 <app-header/>
 
 <main class="my-5">
-  <div class="container-fluid">
+  <div class="container">
     @if (msgSuccess) { <p class="alert alert-success mb-4" role="alert">{{ msgSuccess }}</p> }
     @if (msgInfo) { <p class="alert alert-info mb-4" role="alert">{{ msgInfo }}</p> }
     <router-outlet />

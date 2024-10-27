@@ -102,7 +102,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
   }
 
   getIdRequestUnresolved() {
-    if (this.courseDto?.courseRequests) {
+    if (this.courseDto?.courseRequests && this.userService.current.hasAnyRole('ROLE_admin')) {
       return this.courseDto?.courseRequests.find(request => !request.resolved)?.id;
     }
     return null;

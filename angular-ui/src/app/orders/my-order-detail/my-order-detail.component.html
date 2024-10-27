@@ -1,28 +1,24 @@
-<div class="container">
-
-  <div class="d-flex flex-wrap mb-4">
-    <h1 class="flex-grow-1">Order Detail!</h1>
-    <div>
-      <a routerLink="/my-orders" class="btn btn-secondary">Back to list</a>
-    </div>
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Order Detail!</h1>
+  <div>
+    <a routerLink="/my-orders" class="btn btn-secondary">Back to list</a>
   </div>
+</div>
 
-  <div class="col-md-6" *ngIf="order">
-    <p><strong>Order ID:</strong> {{ order.id }}</p>
-    <p><strong>Order Date:</strong> {{ order.orderDate | date }}</p>
-    <p><strong>Order Total:</strong> {{ order.discountedPrice || order.totalPrice }}</p>
-    <p><strong>Order Status:</strong> {{ order.status }}</p>
-  </div>
+<div class="col-md-6" *ngIf="order">
+  <p><strong>Order ID:</strong> {{ order.id }}</p>
+  <p><strong>Order Date:</strong> {{ order.orderDate | date }}</p>
+  <p><strong>Order Total:</strong> {{ order.discountedPrice || order.totalPrice }}</p>
+  <p><strong>Order Status:</strong> {{ order.status }}</p>
+</div>
 
-  <h1>Payment</h1>
-  <div class="col-md-6" *ngIf="payments && payments.length > 0">
-    @for (payment of payments; track payment.id) {
-      <p><strong>ID:</strong> {{ payment.id }}</p>
-      <p><strong>Payment Date:</strong> {{ payment.paymentDate | date }}</p>
-      <p><strong>Method:</strong> {{ payment.paymentMethod }}</p>
-      <p><strong>Status:</strong> {{ payment.status }}</p>
-      <p><strong>Receipt URL: </strong> <a [href]="payment.receiptUrl" target="_blank">Receipt URL</a></p>
-    }
-  </div>
-
+<h1>Payment</h1>
+<div class="col-md-6" *ngIf="payments && payments.length > 0">
+  @for (payment of payments; track payment.id) {
+    <p><strong>ID:</strong> {{ payment.id }}</p>
+    <p><strong>Payment Date:</strong> {{ payment.paymentDate | date }}</p>
+    <p><strong>Method:</strong> {{ payment.paymentMethod }}</p>
+    <p><strong>Status:</strong> {{ payment.status }}</p>
+    <p><strong>Receipt URL: </strong> <a [href]="payment.receiptUrl" target="_blank">Receipt URL</a></p>
+  }
 </div>
