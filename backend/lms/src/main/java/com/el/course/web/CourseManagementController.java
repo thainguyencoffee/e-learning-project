@@ -75,7 +75,7 @@ public class CourseManagementController {
     }
 
     @PostMapping("/{courseId}/restore")
-    public ResponseEntity<Course> restoreCourse(@PathVariable Long courseId) {
+    public ResponseEntity<Void> restoreCourse(@PathVariable Long courseId) {
         courseService.restoreCourse(courseId);
         return ResponseEntity.ok().build();
     }
@@ -141,9 +141,9 @@ public class CourseManagementController {
     }
 
     @DeleteMapping("/{courseId}/sections/{sectionId}")
-    public ResponseEntity<Course> deleteSection(@PathVariable Long courseId, @PathVariable Long sectionId) {
-        Course updatedCourse = courseService.removeSection(courseId, sectionId);
-        return ResponseEntity.ok(updatedCourse);
+    public ResponseEntity<Void> deleteSection(@PathVariable Long courseId, @PathVariable Long sectionId) {
+        courseService.removeSection(courseId, sectionId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{courseId}/sections/{sectionId}/lessons")
@@ -164,11 +164,11 @@ public class CourseManagementController {
     }
 
     @DeleteMapping("/{courseId}/sections/{sectionId}/lessons/{lessonId}")
-    public ResponseEntity<Course> deleteLesson(@PathVariable Long courseId,
+    public ResponseEntity<Void> deleteLesson(@PathVariable Long courseId,
                                                @PathVariable Long sectionId,
                                                @PathVariable Long lessonId) {
-        Course updatedCourse = courseService.removeLesson(courseId, sectionId, lessonId);
-        return ResponseEntity.ok(updatedCourse);
+        courseService.removeLesson(courseId, sectionId, lessonId);
+        return ResponseEntity.noContent().build();
     }
 
 }

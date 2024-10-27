@@ -92,10 +92,10 @@ export class CourseService {
     });
     if (links) {
       return this.uploadService.deleteAll(links)
-        .pipe(switchMap(() => this.http.delete(`${this.resourcePath}/${currentId}/sections/${sectionId}`)))
+        .pipe(switchMap(() => this.http.delete<void>(`${this.resourcePath}/${currentId}/sections/${sectionId}`)))
     }
     else {
-      return this.http.delete(`${this.resourcePath}/${currentId}/sections/${sectionId}`)
+      return this.http.delete<void>(`${this.resourcePath}/${currentId}/sections/${sectionId}`)
     }
   }
 
@@ -110,9 +110,9 @@ export class CourseService {
   deleteLesson(courseId: number, sectionId: number, lessonId: number, lesson: Lesson) {
     if (lesson.link) {
       return this.uploadService.deleteAll([lesson.link])
-        .pipe(switchMap(() => this.http.delete(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons/${lessonId}`)))
+        .pipe(switchMap(() => this.http.delete<void>(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons/${lessonId}`)))
     } else {
-      return this.http.delete(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons/${lessonId}`);
+      return this.http.delete<void>(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons/${lessonId}`);
     }
   }
 
@@ -125,7 +125,7 @@ export class CourseService {
   }
 
   restoreCourse(courseId: number) {
-    return this.http.post<Course>(`${this.resourcePath}/${courseId}/restore`, {});
+    return this.http.post<void>(`${this.resourcePath}/${courseId}/restore`, {});
   }
 
   publishCourse(courseId: number) {
