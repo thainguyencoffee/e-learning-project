@@ -51,8 +51,8 @@ export class AssignTeacherComponent implements OnInit{
 
   }
 
-  canAssignable(teacherId: string) {
-    return this.userService.current.name !== teacherId && this.course?.teacher !== teacherId;
+  canAssignable(teacher: string) {
+    return this.userService.current.name !== teacher && this.course?.teacher !== teacher;
   }
 
   getMessage(key: string, details?: any) {
@@ -62,8 +62,8 @@ export class AssignTeacherComponent implements OnInit{
     return messages[key];
   }
 
-  assignTeacher(teacherId: string) {
-    this.courseService.assignTeacher(this.courseId!, teacherId)
+  assignTeacher(teacher: string) {
+    this.courseService.assignTeacher(this.courseId!, teacher)
       .subscribe({
         next: _ => this.router.navigate(['/administration/courses', this.courseId], {
           state: {

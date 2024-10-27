@@ -17,19 +17,20 @@ import java.util.Optional;
 public class DataAuditConfig {
 
     @Bean
-    AuditorAware<String> auditorAware() {
+    public AuditorAware<String> auditorAware() {
         return () -> Optional.ofNullable(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)
                 .map(authentication -> {
                     Object principal = authentication.getPrincipal();
                     if (principal instanceof Jwt) {
-                        return ((Jwt) principal).getClaim(StandardClaimNames.SUB);
+                        return ((Jwt) principal).getClaim(StandardClaimNames.PREFERRED_USERNAME);
                     } else {
-                        return "guest";
+                        throw new IllegalStateException("Unknown principal type: " + principal.getClass());
                     }
                 })
-                .orElse("guest").describeConstable();
+                .map(String::valueOf)
+                .or(() -> Optional.of("guest"));
     }
 
 }

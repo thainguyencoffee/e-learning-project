@@ -21,26 +21,34 @@ public class MeController {
         if (auth instanceof JwtAuthenticationToken jwtAuth) {
             final var email = (String) jwtAuth.getTokenAttributes()
                     .getOrDefault(StandardClaimNames.EMAIL, "");
+
+            // Lấy preferred_username
+            final var preferredUsername = (String) jwtAuth.getTokenAttributes()
+                    .getOrDefault(StandardClaimNames.PREFERRED_USERNAME, "");
+
             final var roles = auth.getAuthorities()
                     .stream()
                     .map(GrantedAuthority::getAuthority)
                     .toList();
+
             final var exp = Optional.ofNullable(jwtAuth.getTokenAttributes()
                     .get(JwtClaimNames.EXP)).map(expClaim -> {
-                if(expClaim instanceof Long lexp) {
+                if (expClaim instanceof Long lexp) {
                     return lexp;
                 }
-                if(expClaim instanceof Instant iexp) {
+                if (expClaim instanceof Instant iexp) {
                     return iexp.getEpochSecond();
                 }
-                if(expClaim instanceof Date dexp) {
+                if (expClaim instanceof Date dexp) {
                     return dexp.toInstant().getEpochSecond();
                 }
                 return Long.MAX_VALUE;
             }).orElse(Long.MAX_VALUE);
-            return new UserLoginInfo(auth.getName(), email, roles, exp);
+
+            return new UserLoginInfo(preferredUsername, email, roles, exp);
         }
         return UserLoginInfo.anonymous();
     }
+
 
 }

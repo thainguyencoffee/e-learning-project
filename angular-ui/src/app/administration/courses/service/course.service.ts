@@ -120,8 +120,8 @@ export class CourseService {
     return this.http.put<Course>(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons/${lessonId}`, data);
   }
 
-  assignTeacher(courseId: number, teacherId: string) {
-    return this.http.put(`${this.resourcePath}/${courseId}/assign-teacher`, {teacherId});
+  assignTeacher(courseId: number, teacher: string) {
+    return this.http.put(`${this.resourcePath}/${courseId}/assign-teacher`, {teacher: teacher});
   }
 
   restoreCourse(courseId: number) {

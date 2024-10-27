@@ -14,9 +14,9 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
 
     Optional<Course> findByIdAndDeleted(Long courseId, Boolean deleted);
 
-    Page<Course> findAllByTeacherAndDeleted(String teacherId, Boolean deleted, Pageable pageable);
+    Page<Course> findAllByTeacherAndDeleted(String teacher, Boolean deleted, Pageable pageable);
 
-    Optional<Course> findByTeacherAndIdAndDeleted(String teacherId, Long courseId, Boolean deleted);
+    Optional<Course> findByTeacherAndIdAndDeleted(String teacher, Long courseId, Boolean deleted);
 
     Page<Course> findAllByPublishedAndDeleted(Boolean published, Boolean deleted, Pageable pageable);
 

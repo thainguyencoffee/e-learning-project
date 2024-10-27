@@ -16,6 +16,7 @@
         <th scope="col">Ordered date</th>
         <th scope="col">Total price</th>
         <th scope="col">Status</th>
+        <th scope="col">Created by</th>
         <th><!-- --></th>
       </tr>
       </thead>
@@ -23,13 +24,14 @@
         @for (order of orders; track order.id) {
           <tr>
             <td>{{ order.id }}</td>
-            <td>{{ order.orderDate }}</td>
+            <td>{{ order.orderDate | date }}</td>
             <td>{{ order.totalPrice }}</td>
             <td>
               <span *ngIf="order.status === 'PAID'" class="badge bg-success">{{order.status}}</span>
               <span *ngIf="order.status === 'PENDING'" class="badge bg-warning">{{order.status}}</span>
               <span *ngIf="order.status === 'CANCELLED'" class="badge bg-secondary">{{order.status}}</span>
             </td>
+            <td>{{ order.createdBy }}</td>
             <td>
               <a class="btn btn-secondary" *ngIf="order.status === 'PENDING'" [routerLink]="['/checkout/pay', order.id]">Pay now</a>
               <a class="btn btn-secondary" [routerLink]="['/my-orders', order.id]">Detail</a>

@@ -37,7 +37,7 @@
     <td>{{teacher.email}}</td>
     <td>
       @if (canAssignable(teacher.id)) {
-        <button type="button" (click)="assignTeacher(teacher.id!)"
+        <button type="button" (click)="assignTeacher(teacher.username!)"
                 class="btn btn-sm btn-secondary me-2">Assign</button>
       } @else {
         <div class="badge bg-warning">Cannot assign</div>

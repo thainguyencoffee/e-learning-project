@@ -147,7 +147,7 @@ class LmsApplicationTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.username")
-                .isEqualTo(extractClaimFromToken(userToken.getAccessToken(), "sub"))
+                .isEqualTo(extractClaimFromToken(userToken.getAccessToken(), "preferred_username"))
                 .jsonPath("$.email")
                 .isEqualTo(extractClaimFromToken(userToken.getAccessToken(), "email"))
                 .jsonPath("$.roles")
@@ -158,8 +158,8 @@ class LmsApplicationTests {
     void testCreateCourse_Successful() {
         var courseDTO = TestFactory.createDefaultCourseDTO();
 
-        // Extract the "sub" claim from the teacherToken (which represents the teacher's user ID)
-        String teacherId = extractClaimFromToken(teacherToken.getAccessToken(), "sub");
+        // Extract the "preferred_username" claim from the teacherToken (which represents the teacher's user ID)
+        String teacher = extractClaimFromToken(teacherToken.getAccessToken(), "preferred_username");
 
         // Gửi request POST với token của "teacher"
         webTestClient.post().uri("/courses")
@@ -171,7 +171,7 @@ class LmsApplicationTests {
                 .expectHeader().value("Location", location -> assertThat(location).contains("/courses/"))
                 .expectBody()
                 .jsonPath("$.title").isEqualTo(courseDTO.title())
-                .jsonPath("$.teacher").isEqualTo(teacherId);
+                .jsonPath("$.teacher").isEqualTo(teacher);
     }
 
     @Test
@@ -1009,11 +1009,12 @@ class LmsApplicationTests {
 
     @Test
     void testRemoveLesson_Successful() {
+        // Arrange: Create course and add lesson
         var courseDTO = TestFactory.createDefaultCourseDTO();
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
-        // Gửi request POST để thêm lesson cho section của khóa học
+        // Arrange: Add lesson
         LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
 
         var sectionId = course.getSections().iterator().next().getId();
@@ -1028,7 +1029,7 @@ class LmsApplicationTests {
                 .jsonPath("$.sections[0].lessons.length()").isEqualTo(1)
                 .jsonPath("$.sections[0].lessons[0].id").value(lessonId::set);
 
-        // Gửi request DELETE để xóa lesson khỏi khóa học
+        // Act: Delete lesson
         var section = course.getSections().iterator().next();
         webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lessonId.get())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
@@ -1046,7 +1047,7 @@ class LmsApplicationTests {
 
         approvePublishByCourseId(course.getId());
 
-        // Gửi request DELETE để xóa lesson khỏi khóa học
+        // Act: Delete lesson
         var courseSection = course.getSections().iterator().next();
         var lessonId = 1234567L; // not need lessonId because course is published then throws exception
         webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), courseSection.getId(), lessonId)
@@ -1057,7 +1058,7 @@ class LmsApplicationTests {
 
     @Test
     void testRemoveLesson_UserIsNotTeacherOrAdmin_Forbidden() {
-        // Gửi request DELETE để xóa lesson khỏi khóa học
+        // Act: Delete lesson
         webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", 100L, 200L, 300L)
                 .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
                 .exchange()
@@ -1098,7 +1099,7 @@ class LmsApplicationTests {
                 .jsonPath("$.items[0].price").isEqualTo("VND1,000.00")
                 .jsonPath("$.status").isEqualTo(Status.PENDING.name())
                 .jsonPath("$.totalPrice").isEqualTo("VND1,000.00")
-                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(userToken.accessToken, "sub"))
+                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(userToken.accessToken, "preferred_username"))
                 .returnResult().getResponseHeaders().getLocation().toString();
 
         String orderId = location.substring(location.lastIndexOf("/") + 1);
@@ -1197,12 +1198,12 @@ class LmsApplicationTests {
                 .jsonPath("$.items[0].price").isEqualTo("VND1,000.00")
                 .jsonPath("$.status").isEqualTo(Status.PENDING.name())
                 .jsonPath("$.totalPrice").isEqualTo("VND1,000.00")
-                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(userToken.accessToken, "sub"))
+                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(userToken.accessToken, "preferred_username"))
                 .returnResult().getResponseHeaders().getLocation().toString();
 
         String orderId = location.substring(location.lastIndexOf("/") + 1);
 
-        // Gửi request POST để thanh toán order
+        // Act: Pay order
         var paymentRequestDto = new PaymentRequest(
                 UUID.fromString(orderId),
                 Money.of(50000, Currencies.VND),
@@ -1225,6 +1226,7 @@ class LmsApplicationTests {
 
     @Test
     void testCreateOrderWithDiscount_Successful() {
+        // Arrange discount
         DiscountDTO discountDTO = TestFactory.createDefaultDiscountDTO();
         String id = performCreateDiscountTest(discountDTO);
         Discount discount = discountRepository.findByIdAndDeleted(Long.valueOf(id), false).get();
@@ -1244,13 +1246,13 @@ class LmsApplicationTests {
                 .expectBody()
                 .jsonPath("$.id").isEqualTo(courseId.intValue());
 
-        // Chuẩn bị dữ liệu cho request tạo order
+        // Arrange order
         Set<OrderItemDTO> orderItemsDto = new HashSet<>();
         orderItemsDto.add(new OrderItemDTO(courseId));
         var orderRequestDto = new OrderRequestDTO(orderItemsDto, code);
 
 
-        // Gửi request POST để tạo order
+        // Act
         String location = webTestClient.post().uri("/orders")
                 .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -1264,12 +1266,12 @@ class LmsApplicationTests {
                 .jsonPath("$.status").isEqualTo(Status.PENDING.name())
                 .jsonPath("$.totalPrice").isEqualTo("VND1,000.00")
                 .jsonPath("$.discountedPrice").isEqualTo("VND900.00")
-                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(userToken.accessToken, "sub"))
+                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(userToken.accessToken, "preferred_username"))
                 .returnResult().getResponseHeaders().getLocation().toString();
 
         String orderId = location.substring(location.lastIndexOf("/") + 1);
 
-        // Gửi request POST để thanh toán order
+        // Act: Pay order
         var paymentRequestDto = new PaymentRequest(
                 UUID.fromString(orderId),
                 Money.of(50000, Currencies.VND),
@@ -1389,8 +1391,8 @@ class LmsApplicationTests {
                 .jsonPath("$.startDate").isNotEmpty()
                 .jsonPath("$.endDate").isNotEmpty()
                 .jsonPath("$.type").isEqualTo(discountDTO.type().name())
-                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(bossToken.accessToken, "sub"))
-                .jsonPath("$.lastModifiedBy").isEqualTo(extractClaimFromToken(bossToken.accessToken, "sub"))
+                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(bossToken.accessToken, "preferred_username"))
+                .jsonPath("$.lastModifiedBy").isEqualTo(extractClaimFromToken(bossToken.accessToken, "preferred_username"))
                 .jsonPath("$.createdDate").isNotEmpty()
                 .jsonPath("$.lastModifiedDate").isNotEmpty()
                 .returnResult().getResponseHeaders().getLocation().getPath().split("/")[2];
@@ -1430,8 +1432,8 @@ class LmsApplicationTests {
                 .jsonPath("$.startDate").isNotEmpty()
                 .jsonPath("$.endDate").isNotEmpty()
                 .jsonPath("$.type").isEqualTo(updateDiscountDTO.type().name())
-                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(bossToken.accessToken, "sub"))
-                .jsonPath("$.lastModifiedBy").isEqualTo(extractClaimFromToken(bossToken.accessToken, "sub"))
+                .jsonPath("$.createdBy").isEqualTo(extractClaimFromToken(bossToken.accessToken, "preferred_username"))
+                .jsonPath("$.lastModifiedBy").isEqualTo(extractClaimFromToken(bossToken.accessToken, "preferred_username"))
                 .jsonPath("$.createdDate").isNotEmpty()
                 .jsonPath("$.lastModifiedDate").isNotEmpty();
     }
@@ -1531,7 +1533,7 @@ class LmsApplicationTests {
 
         try {
             Map<String, Object> claims = mapper.readValue(payload, Map.class);
-            return claims.get(claimName).toString();  // Trả về giá trị của claim "sub"
+            return claims.get(claimName).toString();  // Trả về giá trị của claim "preferred_username"
         } catch (IOException e) {
             throw new RuntimeException("Error decoding JWT", e);
         }
@@ -1548,7 +1550,7 @@ class LmsApplicationTests {
 
         try {
             Map<String, Object> claims = mapper.readValue(payload, Map.class);
-            return (List<String>) claims.get(claimName);  // Trả về giá trị của claim "sub"
+            return (List<String>) claims.get(claimName);  // Trả về giá trị của claim "preferred_username"
         } catch (IOException e) {
             throw new RuntimeException("Error decoding JWT", e);
         }

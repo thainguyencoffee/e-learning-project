@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class RolesBaseUtil {
 
-    public String getCurrentSubjectFromJwt() {
+    public String getCurrentPreferredUsernameFromJwt() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) authentication.getPrincipal();
-        return jwt.getClaim(StandardClaimNames.SUB);
+        return jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME);
     }
 
     public boolean isAdmin() {

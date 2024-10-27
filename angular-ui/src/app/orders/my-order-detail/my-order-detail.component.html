@@ -6,10 +6,16 @@
 </div>
 
 <div class="col-md-6" *ngIf="order">
-  <p><strong>Order ID:</strong> {{ order.id }}</p>
+  <p><strong>ID:</strong> {{ order.id }}</p>
   <p><strong>Order Date:</strong> {{ order.orderDate | date }}</p>
-  <p><strong>Order Total:</strong> {{ order.discountedPrice || order.totalPrice }}</p>
-  <p><strong>Order Status:</strong> {{ order.status }}</p>
+  <p><strong>Total price:</strong> {{ order.discountedPrice || order.totalPrice }}</p>
+  <p><strong>Discount:</strong> {{ order.discountCode || 'No discount' }}</p>
+  <p><strong>Created by:</strong> {{ order.createdBy }}</p>
+  <p><strong>Status: </strong>
+    <span *ngIf="order.status === 'PAID'" class="badge bg-success">{{order.status}}</span>
+    <span *ngIf="order.status === 'PENDING'" class="badge bg-warning">{{order.status}}</span>
+    <span *ngIf="order.status === 'CANCELLED'" class="badge bg-secondary">{{order.status}}</span>
+  </p>
 </div>
 
 <h1>Payment</h1>

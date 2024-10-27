@@ -119,7 +119,6 @@ create table orders
     status             varchar(50)                    not null,
     discount_code      varchar(50),
     discounted_price   varchar(50),
-    student            varchar(50)                    not null,
     created_by         varchar(50)                    not null,
     created_date       timestamp                      not null,
     last_modified_by   varchar(50)                    not null,

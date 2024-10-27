@@ -4,7 +4,6 @@ import com.el.course.application.*;
 import com.el.course.application.dto.*;
 import com.el.course.domain.Course;
 import com.el.course.domain.RequestType;
-import com.el.course.web.dto.ApplyDiscountDTO;
 import com.el.course.web.dto.AssignTeacherDTO;
 import com.el.course.web.dto.UpdatePriceDTO;
 import com.el.course.web.dto.UpdateSectionDTO;
@@ -13,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,8 +50,8 @@ public class CourseManagementController {
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody @Valid CourseDTO courseDTO
     ) {
-        String teacherId = jwt.getSubject();
-        Course createdCourse = courseService.createCourse(teacherId, courseDTO);
+        String teacher = jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME);
+        Course createdCourse = courseService.createCourse(teacher, courseDTO);
         URI location = URI.create("/courses/" + createdCourse.getId());
         return ResponseEntity.created(location).body(createdCourse);
     }
@@ -122,7 +122,7 @@ public class CourseManagementController {
     @PutMapping("/{courseId}/assign-teacher")
     public ResponseEntity<Course> assignTeacher(@PathVariable Long courseId,
                                                 @Valid @RequestBody AssignTeacherDTO assignTeacherDTO) {
-        return ResponseEntity.ok(courseService.assignTeacher(courseId, assignTeacherDTO.teacherId()));
+        return ResponseEntity.ok(courseService.assignTeacher(courseId, assignTeacherDTO.teacher()));
     }
 
     @PostMapping("/{courseId}/sections")

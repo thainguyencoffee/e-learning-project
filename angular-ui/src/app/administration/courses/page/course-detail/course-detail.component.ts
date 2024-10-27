@@ -93,8 +93,8 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
 
   }
 
-  isCreateByYou(teacherId: string) {
-    return this.userService.current.name === teacherId;
+  isCreateByYou(teacher: string) {
+    return this.userService.current.name === teacher;
   }
 
   isEditable() {

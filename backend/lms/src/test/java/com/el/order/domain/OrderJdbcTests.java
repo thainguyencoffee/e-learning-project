@@ -39,7 +39,7 @@ class OrderJdbcTests {
         OrderItem item = new OrderItem(1L, Money.of(100, Currencies.VND));
         Set<OrderItem> items = new HashSet<>();
         items.add(item);
-        order = new Order(items, TestFactory.userId);
+        order = new Order(items);
     }
 
     @AfterEach
@@ -56,7 +56,6 @@ class OrderJdbcTests {
         assertNotNull(savedOrder.getId(), "Order ID should not be null after saving");
         assertEquals(1, savedOrder.getItems().size(), "Order should contain 1 item");
         assertEquals(Status.PENDING, savedOrder.getStatus(), "Order status should be PENDING");
-        assertEquals(TestFactory.userId, savedOrder.getStudent(), "CreatedBy should be 'user1'");
     }
 
     @Test
@@ -81,7 +80,7 @@ class OrderJdbcTests {
         orderRepository.save(order);
 
         // Act
-        List<Order> guestOrders = orderRepository.findAllByCreatedBy("guest", 0, 10); // Trang 0, kích thước 10
+        List<Order> guestOrders = orderRepository.findAllByCreatedBy("guest", 0, 10);
 
         // Assert
         assertNotNull(guestOrders, "Order list should not be null");
@@ -94,7 +93,7 @@ class OrderJdbcTests {
         orderRepository.save(order);
 
         // Act
-        boolean hasPurchased = orderRepository.hasPurchasedCourse(1L, TestFactory.userId);
+        boolean hasPurchased = orderRepository.hasPurchasedCourse(1L, "guest");
 
         // Assert
         assertTrue(hasPurchased, "User should have purchased course 1");

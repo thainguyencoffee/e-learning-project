@@ -136,43 +136,39 @@ class CourseManagementControllerTests {
 
     @Test
     public void testCreateCourse_ShouldReturnCreatedStatus() throws Exception {
-        // Giả lập khóa học được tạo với ID
         Course createdCourse = Mockito.mock(Course.class);
-        when(createdCourse.getId()).thenReturn(1L);  // Giả lập ID được gán sau khi lưu
+        when(createdCourse.getId()).thenReturn(1L);
 
-        // Giả lập các thuộc tính khác của khóa học
+        // Mock
         when(createdCourse.getTitle()).thenReturn(courseDTO.title());
         when(createdCourse.getDescription()).thenReturn(courseDTO.description());
         when(createdCourse.getTeacher()).thenReturn("teacher123");
 
-        // Giả lập hành vi của CreateCourseUseCase trả về đối tượng khóa học với ID
-        when(courseService.createCourse(any(String.class), any(CourseDTO.class)))
+        // Mock
+        when(courseService.createCourse(any(), any()))
                 .thenReturn(createdCourse);
 
-        // Thực thi HTTP POST request với JWT
         mockMvc.perform(post("/courses")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(courseDTO))
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
-                .andExpect(status().isCreated())  // Kiểm tra phản hồi 201 Created
-                .andExpect(header().string("Location", "/courses/1"))  // Kiểm tra header Location với URI chính xác
-                .andExpect(jsonPath("$.title").value(courseDTO.title()))  // Kiểm tra giá trị trả về
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/courses/1"))
+                .andExpect(jsonPath("$.title").value(courseDTO.title()))
                 .andExpect(jsonPath("$.teacher").value("teacher123"));
     }
 
     @Test
     public void testCreateCourse_ShouldReturnForbidden_WhenUserIsNotTeacher() throws Exception {
-        // Thực thi HTTP POST request với JWT không có quyền "teacher"
         mockMvc.perform(post("/courses")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(courseDTO))
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
-                .andExpect(status().isForbidden());  // Kiểm tra phản hồi 403 Forbidden
+                .andExpect(status().isForbidden());
     }
 
     @Test
     public void testCreateCourse_ShouldReturnBadRequest_WhenTitleIsBlank() throws Exception {
-        // CourseDTO với tiêu đề trống
         CourseDTO invalidCourseDTO = new CourseDTO(
                 "",
                 "Learn Java from scratch",
@@ -183,7 +179,6 @@ class CourseManagementControllerTests {
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
 
-        // Thực thi HTTP POST request với dữ liệu không hợp lệ
         mockMvc.perform(post("/courses")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidCourseDTO))
@@ -193,30 +188,27 @@ class CourseManagementControllerTests {
 
     @Test
     void testUpdateInfoCourse_ShouldReturnOKStatus() throws Exception {
-        // Giả lập khóa học được cập nhật
         Course updatedCourse = Mockito.mock(Course.class);
-        when(updatedCourse.getId()).thenReturn(1L);  // Giả lập ID của khóa học
-        when(updatedCourse.getTitle()).thenReturn("Java Programming");  // Giả lập tiêu đề của khóa học
-        when(updatedCourse.getDescription()).thenReturn("Learn Java from scratch");  // Giả lập mô tả của khóa học
+        when(updatedCourse.getId()).thenReturn(1L);
+        when(updatedCourse.getTitle()).thenReturn("Java Programming");
+        when(updatedCourse.getDescription()).thenReturn("Learn Java from scratch");
 
-        // Giả lập hành vi của UpdateCourseUseCase trả về đối tượng khóa học đã cập nhật
         when(courseService.updateCourse(any(Long.class), any(CourseUpdateDTO.class)))
                 .thenReturn(updatedCourse);
 
-        // Thực thi HTTP PUT request với JWT
         mockMvc.perform(put("/courses/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(courseDTO))
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher")))
                 )
-                .andExpect(status().isOk())  // Kiểm tra phản hồi 200 OK
-                .andExpect(jsonPath("$.title").value("Java Programming"))  // Kiểm tra giá trị trả về
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Java Programming"))
                 .andExpect(jsonPath("$.description").value("Learn Java from scratch"));
     }
 
     @Test
     void testUpdateInfoCourse_ShouldReturnBadRequest_WhenTitleIsBlank() throws Exception {
-        // CourseUpdateDTO với tiêu đề trống
+        // CourseUpdateDTO with title blank
         CourseUpdateDTO invalidCourseUpdateDTO = new CourseUpdateDTO(
                 "",
                 "Learn Java from scratch",
@@ -226,7 +218,6 @@ class CourseManagementControllerTests {
                 Set.of(Language.ENGLISH, Language.SPANISH)
         );
 
-        // Thực thi HTTP PUT request với dữ liệu không hợp lệ
         mockMvc.perform(put("/courses/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidCourseUpdateDTO))
@@ -252,7 +243,6 @@ class CourseManagementControllerTests {
         Mockito.doThrow(new InputInvalidException("Cannot update a published course."))
                 .when(courseService).updateCourse(any(), any());
 
-        // Thực thi HTTP PUT request với JWT
         mockMvc.perform(put("/courses/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(courseDTO))
@@ -264,7 +254,6 @@ class CourseManagementControllerTests {
 
     @Test
     void deleteCourse_ValidCourseId_ShouldReturnNoContent() throws Exception {
-        // Chuẩn bị hành vi của deleteCourse
         Mockito.doNothing().when(courseService).deleteCourse(1L);
 
         mockMvc.perform(delete("/courses/1")

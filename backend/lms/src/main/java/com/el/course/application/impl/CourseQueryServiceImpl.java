@@ -26,8 +26,8 @@ public class CourseQueryServiceImpl implements CourseQueryService {
         if (rolesBaseUtil.isAdmin()) {
             return courseRepository.findAllByDeleted(false, pageable);
         } else if(rolesBaseUtil.isTeacher()) {
-            String teacherId = rolesBaseUtil.getCurrentSubjectFromJwt();
-            return courseRepository.findAllByTeacherAndDeleted(teacherId, false, pageable);
+            String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+            return courseRepository.findAllByTeacherAndDeleted(teacher, false, pageable);
         }
         throw new AccessDeniedException("Access denied");
     }
@@ -37,8 +37,8 @@ public class CourseQueryServiceImpl implements CourseQueryService {
         if (rolesBaseUtil.isAdmin()) {
             return courseRepository.findAllByDeleted(true, pageable);
         } else if(rolesBaseUtil.isTeacher()) {
-            String teacherId = rolesBaseUtil.getCurrentSubjectFromJwt();
-            return courseRepository.findAllByTeacherAndDeleted(teacherId, true, pageable);
+            String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+            return courseRepository.findAllByTeacherAndDeleted(teacher, true, pageable);
         }
         throw new AccessDeniedException("Access denied");
     }
@@ -49,8 +49,8 @@ public class CourseQueryServiceImpl implements CourseQueryService {
             return courseRepository.findByIdAndDeleted(courseId, false)
                     .orElseThrow(ResourceNotFoundException::new);
         } else if(rolesBaseUtil.isTeacher()) {
-            String teacherId = rolesBaseUtil.getCurrentSubjectFromJwt();
-            return courseRepository.findByTeacherAndIdAndDeleted(teacherId, courseId, false)
+            String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+            return courseRepository.findByTeacherAndIdAndDeleted(teacher, courseId, false)
                     .orElseThrow(ResourceNotFoundException::new);
         }
         throw new AccessDeniedException("Access denied");
@@ -62,8 +62,8 @@ public class CourseQueryServiceImpl implements CourseQueryService {
             return courseRepository.findByIdAndDeleted(courseId, true)
                     .orElseThrow(ResourceNotFoundException::new);
         } else if(rolesBaseUtil.isTeacher()) {
-            String teacherId = rolesBaseUtil.getCurrentSubjectFromJwt();
-            return courseRepository.findByTeacherAndIdAndDeleted(teacherId, courseId, true)
+            String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+            return courseRepository.findByTeacherAndIdAndDeleted(teacher, courseId, true)
                     .orElseThrow(ResourceNotFoundException::new);
         }
         throw new AccessDeniedException("Access denied");

@@ -5,7 +5,6 @@ export interface Order {
   discountedPrice: string;
   discountCode: string;
   status: string;
-  student: string;
   createdBy: string;
   createdDate: string;
   lastModifiedBy: string;

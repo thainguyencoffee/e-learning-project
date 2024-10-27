@@ -69,19 +69,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order createOrder(String student, OrderRequestDTO orderRequestDTO) {
+    public Order createOrder(String currentUsername, OrderRequestDTO orderRequestDTO) {
 
         Set<OrderItem> items = new HashSet<>();
 
         for (OrderItemDTO itemDto : orderRequestDTO.items()) {
-            if (orderRepository.hasPurchasedCourse(itemDto.id(), student)) {
+            if (orderRepository.hasPurchasedCourse(itemDto.id(), currentUsername)) {
                 throw new InputInvalidException("You cannot purchase the same course twice");
             }
             Course course = courseQueryService.findPublishedCourseById(itemDto.id());
             items.add(new OrderItem(course.getId(), course.getPrice()));
         }
 
-        Order newOrder = new Order(items, student);
+        Order newOrder = new Order(items);
 
         if (orderRequestDTO.discountCode() != null) {
             // Apply discount code

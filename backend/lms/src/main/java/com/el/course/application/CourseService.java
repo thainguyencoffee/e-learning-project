@@ -8,7 +8,7 @@ import javax.money.MonetaryAmount;
 
 public interface CourseService {
 
-    Course createCourse(String teacherId, CourseDTO courseDTO);
+    Course createCourse(String teacher, CourseDTO courseDTO);
 
     Course updateCourse(Long courseId, CourseUpdateDTO courseUpdateDTO);
 
