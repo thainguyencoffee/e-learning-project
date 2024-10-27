@@ -127,7 +127,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course removeSection(Long courseId, Long sectionId) {
+    public void removeSection(Long courseId, Long sectionId) {
         Course course = courseQueryService.findCourseById(courseId);
 
         if (!canUpdateCourse(course)) {
@@ -135,7 +135,7 @@ public class CourseServiceImpl implements CourseService {
         }
 
         course.removeSection(sectionId);
-        return courseRepository.save(course);
+        courseRepository.save(course);
     }
 
     @Override
@@ -163,7 +163,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course removeLesson(Long courseId, Long sectionId, Long lessonId) {
+    public void removeLesson(Long courseId, Long sectionId, Long lessonId) {
         Course course = courseQueryService.findCourseById(courseId);
 
         if (!canUpdateCourse(course)) {
@@ -171,7 +171,7 @@ public class CourseServiceImpl implements CourseService {
         }
 
         course.removeLessonFromSection(sectionId, lessonId);
-        return courseRepository.save(course);
+        courseRepository.save(course);
     }
 
     @Override

@@ -24,13 +24,13 @@ public interface CourseService {
 
     Course updateSectionInfo(Long courseId, Long sectionId, String newTitle);
 
-    Course removeSection(Long courseId, Long sectionId);
+    void removeSection(Long courseId, Long sectionId);
 
     Course addLesson(Long courseId, Long sectionId, Lesson lesson);
 
     Course updateLesson(Long courseId, Long sectionId, Long lessonId, Lesson updatedLesson);
 
-    Course removeLesson(Long courseId, Long sectionId, Long lessonId);
+    void removeLesson(Long courseId, Long sectionId, Long lessonId);
 
     Course updatePrice(Long courseId, MonetaryAmount newPrice);
 

@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -742,12 +743,11 @@ class CourseManagementControllerTests {
 
     @Test
     void deleteSection_ValidCourseIdAndSectionId_RemovesSection() throws Exception {
-        Course updatedCourse = Mockito.mock(Course.class);
-        when(courseService.removeSection(1L, 2L)).thenReturn(updatedCourse);
+        doNothing().when(courseService).removeSection(1L, 2L);
 
         mockMvc.perform(delete("/courses/1/sections/2")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -916,22 +916,20 @@ class CourseManagementControllerTests {
 
     @Test
     void deleteLesson_ValidCourseIdAndSectionIdAndLessonId_RemovesLesson() throws Exception {
-        Course updatedCourse = Mockito.mock(Course.class);
-        when(courseService.removeLesson(1L, 2L, 3L)).thenReturn(updatedCourse);
+        doNothing().when(courseService).removeLesson(1L, 2L, 3L);
 
         mockMvc.perform(delete("/courses/1/sections/2/lessons/3")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
     void deleteLesson_ValidCourseIdAndSectionIdAndLessonId_RemovesLesson2() throws Exception {
-        Course updatedCourse = Mockito.mock(Course.class);
-        when(courseService.removeLesson(1L, 2L, 3L)).thenReturn(updatedCourse);
+        doNothing().when(courseService).removeLesson(1L, 2L, 3L);
 
         mockMvc.perform(delete("/courses/1/sections/2/lessons/3")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
