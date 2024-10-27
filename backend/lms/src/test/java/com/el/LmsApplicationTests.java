@@ -800,9 +800,7 @@ class LmsApplicationTests {
         webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}", course.getId(), sectionId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .exchange()
-                .expectStatus().isNoContent()
-                .expectBody()
-                .jsonPath("$.sections.length()").isEqualTo(0);
+                .expectStatus().isNoContent();
     }
 
     @Test
@@ -1034,9 +1032,7 @@ class LmsApplicationTests {
         webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lessonId.get())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .exchange()
-                .expectStatus().isNoContent()
-                .expectBody()
-                .jsonPath("$.sections[0].lessons.length()").isEqualTo(0);
+                .expectStatus().isNoContent();
     }
 
     @Test
