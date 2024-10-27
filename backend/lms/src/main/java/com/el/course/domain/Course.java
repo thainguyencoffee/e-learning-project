@@ -36,7 +36,6 @@ public class Course extends AuditSupportClass {
     private Boolean unpublished;
     private String teacher;
     private String approvedBy;
-    private Set<StudentRef> students = new HashSet<>();
     private Set<CourseRequest> courseRequests = new HashSet<>();
     @JsonIgnore
     private boolean deleted;

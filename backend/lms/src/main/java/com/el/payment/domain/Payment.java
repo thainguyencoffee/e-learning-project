@@ -3,6 +3,7 @@ package com.el.payment.domain;
 import com.el.common.exception.InputInvalidException;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.money.MonetaryAmount;
@@ -11,7 +12,7 @@ import java.util.UUID;
 
 @Getter
 @Table("payment")
-public class Payment {
+public class Payment extends AbstractAggregateRoot<Payment> {
     @Id
     private UUID id;
     private UUID orderId;
@@ -49,6 +50,7 @@ public class Payment {
         this.transactionId = transactionId;
         this.receiptUrl = receiptUrl;
         this.status = PaymentStatus.PAID;
+        registerEvent(new PaymentPaid(this.id, this.orderId));
     }
 
     public void markFailed() {
@@ -58,5 +60,6 @@ public class Payment {
         this.status = PaymentStatus.FAILED;
     }
 
+    public record PaymentPaid(UUID id, UUID orderId) {}
 
 }

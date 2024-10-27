@@ -1,6 +1,5 @@
 package com.el.payment.application;
 
-import com.el.order.application.OrderService;
 import com.el.payment.domain.Payment;
 import com.el.payment.domain.PaymentRepository;
 import com.stripe.model.Charge;
@@ -15,12 +14,10 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository; // Repository để thao tác với DB
     private final StripePaymentGateway stripePaymentGateway; // Adapter cho Stripe
-    private final OrderService orderService;
 
-    public PaymentService(PaymentRepository paymentRepository, StripePaymentGateway stripePaymentGateway, OrderService orderService) {
+    public PaymentService(PaymentRepository paymentRepository, StripePaymentGateway stripePaymentGateway) {
         this.paymentRepository = paymentRepository;
         this.stripePaymentGateway = stripePaymentGateway;
-        this.orderService = orderService;
     }
 
     public List<Payment> getAllPaymentsByCreatedByAndId(UUID orderId) {
@@ -36,7 +33,6 @@ public class PaymentService {
                 try { // receipt_url
                     Charge charge = stripePaymentGateway.charge(paymentRequest);
                     payment.markPaid(charge.getId(), charge.getReceiptUrl());
-                    orderService.paymentSucceeded(paymentRequest.orderId());
                 } catch (Exception e) {
                     payment.markFailed();
                     paymentRepository.save(payment);
@@ -49,7 +45,6 @@ public class PaymentService {
                 throw new IllegalArgumentException("Unsupported payment method: " + payment.getPaymentMethod());
             }
         }
-
         return paymentRepository.save(payment);
     }
 }
