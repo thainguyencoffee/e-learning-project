@@ -27,4 +27,10 @@ public class RolesBaseUtil {
         return jwt.getClaimAsString("roles").contains("teacher");
     }
 
+    public boolean isUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        return jwt.getClaimAsString("roles").contains("user");
+    }
+
 }

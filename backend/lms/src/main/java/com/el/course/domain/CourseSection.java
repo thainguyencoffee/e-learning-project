@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Getter
 @Table("course_section")
-@ToString(exclude = "lessons")
+@ToString
 public class CourseSection {
     @Id
     private Long id;
@@ -67,6 +67,10 @@ public class CourseSection {
                 .filter(lesson -> lesson.getId().equals(lessonId))
                 .findFirst()
                 .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    public boolean hasLessons() {
+        return !this.lessons.isEmpty();
     }
 
 }

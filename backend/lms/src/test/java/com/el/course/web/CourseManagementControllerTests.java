@@ -609,9 +609,9 @@ class CourseManagementControllerTests {
 
     @Test
     void addSection_ValidCourseIdAndSection_ReturnsUpdatedCourse() throws Exception {
-        Course updatedCourse = Mockito.mock(Course.class);
+        long expectedSectionId = 1L;
         when(courseService.addSection(any(Long.class), any(CourseSectionDTO.class)))
-                .thenReturn(updatedCourse);
+                .thenReturn(expectedSectionId);
 
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
@@ -619,9 +619,8 @@ class CourseManagementControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sectionDTO))
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
-                .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/courses/1"))
-                .andExpect(jsonPath("$.id").value(updatedCourse.getId()));
+                .andExpect(status().isOk())
+                .andExpect(content().string(expectedSectionId + ""));
     }
 
     @Test
@@ -680,9 +679,7 @@ class CourseManagementControllerTests {
 
     @Test
     void updateSectionInfo_ValidCourseIdAndSectionIdAndTitle_UpdatesSection() throws Exception {
-        Course updatedCourse = Mockito.mock(Course.class);
-        when(courseService.updateSectionInfo(any(Long.class), any(Long.class), any(String.class)))
-                .thenReturn(updatedCourse);
+        doNothing().when(courseService).updateSectionInfo(any(Long.class), any(Long.class), any(String.class));
 
         UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("NewTitle");
 
@@ -778,16 +775,15 @@ class CourseManagementControllerTests {
     @Test
     void addLesson_ValidCourseIdAndSectionId_AddsLesson() throws Exception {
         LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null);
-        Course updatedCourse = Mockito.mock(Course.class);
-        when(courseService.addLesson(1L, 2L, lessonDTO.toLesson()))
-                .thenReturn(updatedCourse);
-
+        when(courseService.addLesson(any(), any(), any()))
+                .thenReturn(1L);
 
         mockMvc.perform(post("/courses/1/sections/2/lessons")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(lessonDTO))
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().string("1"));
     }
 
     @Test
@@ -843,9 +839,7 @@ class CourseManagementControllerTests {
     @Test
     void updateLesson_ValidCourseIdAndSectionIdAndLessonId_UpdatesLesson() throws Exception {
         LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
-        Course updatedCourse = Mockito.mock(Course.class);
-        when(courseService.updateLesson(1L, 2L, 3L, lessonDTO.toLesson()))
-                .thenReturn(updatedCourse);
+        doNothing().when(courseService).updateLesson(1L, 2L, 3L, lessonDTO.toLesson());
 
         mockMvc.perform(put("/courses/1/sections/2/lessons/3")
                         .contentType(MediaType.APPLICATION_JSON)

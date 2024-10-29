@@ -101,7 +101,7 @@ public class CourseServiceImpl implements CourseService {
 
 
     @Override
-    public Course addSection(Long courseId, CourseSectionDTO courseSectionDTO) {
+    public Long addSection(Long courseId, CourseSectionDTO courseSectionDTO) {
         Course course = courseQueryService.findCourseById(courseId);
 
         if (!canUpdateCourse(course)) {
@@ -109,13 +109,13 @@ public class CourseServiceImpl implements CourseService {
         }
 
         CourseSection courseSection = courseSectionDTO.toCourseSection();
-
         course.addSection(courseSection);
-        return courseRepository.save(course);
+        courseRepository.save(course);
+        return courseSection.getId();
     }
 
     @Override
-    public Course updateSectionInfo(Long courseId, Long sectionId, String newTitle) {
+    public void updateSectionInfo(Long courseId, Long sectionId, String newTitle) {
         Course course = courseQueryService.findCourseById(courseId);
 
         if (!canUpdateCourse(course)) {
@@ -123,7 +123,7 @@ public class CourseServiceImpl implements CourseService {
         }
 
         course.updateSection(sectionId, newTitle);
-        return courseRepository.save(course);
+        courseRepository.save(course);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course addLesson(Long courseId, Long sectionId, Lesson lesson) {
+    public Long addLesson(Long courseId, Long sectionId, Lesson lesson) {
         Course course = courseQueryService.findCourseById(courseId);
 
         if (!canUpdateCourse(course)) {
@@ -147,11 +147,12 @@ public class CourseServiceImpl implements CourseService {
         }
 
         course.addLessonToSection(sectionId, lesson);
-        return courseRepository.save(course);
+        courseRepository.save(course);
+        return lesson.getId();
     }
 
     @Override
-    public Course updateLesson(Long courseId, Long sectionId, Long lessonId, Lesson updatedLesson) {
+    public void updateLesson(Long courseId, Long sectionId, Long lessonId, Lesson updatedLesson) {
         Course course = courseQueryService.findCourseById(courseId);
 
         if (!canUpdateCourse(course)) {
@@ -159,7 +160,7 @@ public class CourseServiceImpl implements CourseService {
         }
 
         course.updateLessonInSection(sectionId, lessonId, updatedLesson);
-        return courseRepository.save(course);
+        courseRepository.save(course);
     }
 
     @Override

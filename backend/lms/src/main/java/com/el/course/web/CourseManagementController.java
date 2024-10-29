@@ -126,18 +126,18 @@ public class CourseManagementController {
     }
 
     @PostMapping("/{courseId}/sections")
-    public ResponseEntity<Course> addSection(@PathVariable Long courseId,
+    public ResponseEntity<Long> addSection(@PathVariable Long courseId,
                                              @RequestBody @Valid CourseSectionDTO courseSectionDTO) {
-        Course updatedCourse = courseService.addSection(courseId, courseSectionDTO);
-        return ResponseEntity.created(URI.create("/courses/" + courseId)).body(updatedCourse);
+        Long sectionId = courseService.addSection(courseId, courseSectionDTO);
+        return ResponseEntity.ok(sectionId);
     }
 
     @PutMapping("/{courseId}/sections/{sectionId}")
-    public ResponseEntity<Course> updateSectionInfo(@PathVariable Long courseId,
+    public ResponseEntity<Void> updateSectionInfo(@PathVariable Long courseId,
                                                     @PathVariable Long sectionId,
                                                     @RequestBody @Valid UpdateSectionDTO updateSectionDTO) {
-        Course updatedCourse = courseService.updateSectionInfo(courseId, sectionId, updateSectionDTO.title());
-        return ResponseEntity.ok(updatedCourse);
+        courseService.updateSectionInfo(courseId, sectionId, updateSectionDTO.title());
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{courseId}/sections/{sectionId}")
@@ -147,20 +147,20 @@ public class CourseManagementController {
     }
 
     @PostMapping("/{courseId}/sections/{sectionId}/lessons")
-    public ResponseEntity<Course> addLesson(@PathVariable Long courseId,
+    public ResponseEntity<Long> addLesson(@PathVariable Long courseId,
                                             @PathVariable Long sectionId,
                                             @RequestBody @Valid LessonDTO lessonDTO) {
-        Course updatedCourse = courseService.addLesson(courseId, sectionId, lessonDTO.toLesson());
-        return ResponseEntity.ok(updatedCourse);
+        Long lessonId = courseService.addLesson(courseId, sectionId, lessonDTO.toLesson());
+        return ResponseEntity.ok(lessonId);
     }
 
     @PutMapping("/{courseId}/sections/{sectionId}/lessons/{lessonId}")
-    public ResponseEntity<Course> updateLesson(@PathVariable Long courseId,
+    public ResponseEntity<Void> updateLesson(@PathVariable Long courseId,
                                                @PathVariable Long sectionId,
                                                @PathVariable Long lessonId,
                                                @RequestBody @Valid LessonDTO lessonDTO) {
-        Course updatedCourse = courseService.updateLesson(courseId, sectionId, lessonId, lessonDTO.toLesson());
-        return ResponseEntity.ok(updatedCourse);
+        courseService.updateLesson(courseId, sectionId, lessonId, lessonDTO.toLesson());
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{courseId}/sections/{sectionId}/lessons/{lessonId}")

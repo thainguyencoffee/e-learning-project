@@ -27,55 +27,46 @@ class CourseJdbcTests {
     @Autowired
     private CourseRepository courseRepository;
 
-    private Course course;
+    private Course courseWithSections;
 
     @BeforeEach
     void setUp() {
-        course = TestFactory.createDefaultCourse();
-        course.changePrice(Money.of(100, Currencies.VND));
+        courseWithSections = TestFactory.createCourseWithSections();
+        courseWithSections.changePrice(Money.of(100, Currencies.VND));
     }
 
     @Test
     public void testSaveCourse() {
-        // Lưu một course vào repository
-        Course savedCourse = courseRepository.save(course);
+        Course savedCourse = courseRepository.save(courseWithSections);
 
-        // Kiểm tra xem course có được lưu không
         assertNotNull(savedCourse.getId());
-        assertEquals(course.getTitle(), savedCourse.getTitle());
-        assertEquals(course.getTeacher(), savedCourse.getTeacher());
+        assertEquals(courseWithSections.getTitle(), savedCourse.getTitle());
+        assertEquals(courseWithSections.getTeacher(), savedCourse.getTeacher());
     }
 
     @Test
     public void testFindById() {
-        // Lưu course vào database trước
-        Course savedCourse = courseRepository.save(course);
+        Course savedCourse = courseRepository.save(courseWithSections);
 
-        // Tìm course theo ID
         Optional<Course> retrievedCourse = courseRepository.findById(savedCourse.getId());
 
-        // Kiểm tra kết quả
         assertTrue(retrievedCourse.isPresent());
         assertEquals(savedCourse.getTitle(), retrievedCourse.get().getTitle());
     }
 
     @Test
     public void testFindAllCourses() {
-        // Tạo và lưu nhiều course vào database
-        courseRepository.save(course);
+        courseRepository.save(courseWithSections);
 
-        // Phân trang và tìm tất cả course
         Page<Course> coursesPage = courseRepository.findAll(PageRequest.of(0, 10));
 
-        // Kiểm tra số lượng và nội dung các course
         assertEquals(1, coursesPage.getTotalElements());
-        assertEquals(course.getTitle(), coursesPage.getContent().get(0).getTitle());
+        assertEquals(courseWithSections.getTitle(), coursesPage.getContent().get(0).getTitle());
     }
 
     @Test
     public void testDeleteCourse() {
-        // Lưu course vào database trước
-        Course savedCourse = courseRepository.save(course);
+        Course savedCourse = courseRepository.save(courseWithSections);
 
         // Xóa course
         savedCourse.delete();

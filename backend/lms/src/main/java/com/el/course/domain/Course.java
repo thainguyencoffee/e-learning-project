@@ -6,6 +6,7 @@ import com.el.common.exception.ResourceNotFoundException;
 import com.el.common.exception.InputInvalidException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import lombok.ToString;
 import org.javamoney.moneta.Money;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.MappedCollection;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 @Getter
 @Table("course")
+@ToString
 public class Course extends AuditSupportClass {
     @Id
     private Long id;
@@ -110,6 +112,9 @@ public class Course extends AuditSupportClass {
         if (!isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot change price of a published course.");
         }
+        if (!validSections()) {
+            throw new InputInvalidException("Cannot change price of a course without sections or section without lessons");
+        }
         if (!isValidCurrency(newPrice.getCurrency())) {
             throw new InputInvalidException("Currency is not supported. We support VND only.");
         }
@@ -117,6 +122,10 @@ public class Course extends AuditSupportClass {
             throw new InputInvalidException("Price cannot be negative.");
         }
         this.price = newPrice;
+    }
+
+    private boolean validSections() {
+        return !this.sections.isEmpty() && this.sections.stream().allMatch(CourseSection::hasLessons);
     }
 
 
@@ -137,7 +146,7 @@ public class Course extends AuditSupportClass {
         if (isPublishedAndNotDeleted()) {
             throw new InputInvalidException("Cannot request publish for a published course.");
         }
-        if (this.getSections().isEmpty() || /*this.getPrice() == null ||*/ this.getTeacher() == null) {
+        if (!validSections() || this.getTeacher() == null) {
             throw new InputInvalidException("Cannot publish a course without sections or teacher.");
         }
         if (courseRequest.getType() != RequestType.PUBLISH) {
@@ -363,5 +372,34 @@ public class Course extends AuditSupportClass {
         return validCurrencies.contains(inputCurrency);
     }
 
+    public Set<Long> getLessonIds() {
+        Set<Long> lessonIds = new HashSet<>();
+        for (CourseSection section : sections) {
+            for (Lesson lesson : section.getLessons()) {
+                lessonIds.add(lesson.getId());
+            }
+        }
+        return lessonIds;
+    }
+
+//    public double calculateDoneLessonsPercentage(int completedLessons) {
+//        int totalLessons = this.sections.stream()
+//                .mapToInt(section -> section.getLessons().size())
+//                .sum();
+//        if (totalLessons == 0) throw new InputInvalidException("Cannot do calculation on a draft course.");
+//        if (totalLessons < completedLessons) throw new InputInvalidException("Completed lessons must not exceed total lessons.");
+//
+//        return (completedLessons / (double) totalLessons) * 100;
+//    }
+//
+//    public double calculateDoneLessonsPercentageForSection(Long sectionId, int completedLessons) {
+//        CourseSection section = findSectionById(sectionId);
+//        int totalLessons = section.getLessons().size();
+//
+//        if (totalLessons == 0) throw new InputInvalidException("Cannot do calculation on a draft course.");
+//        if (totalLessons < completedLessons) throw new InputInvalidException("Completed lessons must not exceed total lessons.");
+//
+//        return (completedLessons / (double) totalLessons) * 100;
+//    }
 
 }

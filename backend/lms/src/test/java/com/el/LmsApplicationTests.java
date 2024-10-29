@@ -42,7 +42,6 @@ import org.testcontainers.shaded.com.google.common.net.HttpHeaders;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -157,6 +156,7 @@ class LmsApplicationTests {
 
     @Test
     void testCreateCourse_Successful() {
+        // Arrange
         var courseDTO = TestFactory.createDefaultCourseDTO();
 
         // Extract the "preferred_username" claim from the teacherToken (which represents the teacher's user ID)
@@ -177,6 +177,7 @@ class LmsApplicationTests {
 
     @Test
     void testCreateCourse_Unauthorized() {
+        // Arrange
         var courseDTO = TestFactory.createDefaultCourseDTO();
 
         // Gửi request POST mà không có token
@@ -189,7 +190,7 @@ class LmsApplicationTests {
 
     @Test
     void testCreateCourse_Forbidden() {
-        // Thiết lập dữ liệu CourseDTO
+        // Arrange
         var courseDTO = TestFactory.createDefaultCourseDTO();
 
         // Gửi request POST với token  không có quyền "teacher"
@@ -203,7 +204,7 @@ class LmsApplicationTests {
 
     @Test
     void testCreateCourse_BadRequest_EmptyTitle() {
-        // Thiết lập dữ liệu CourseDTO với tiêu đề trống
+        // Arrange
         var invalidCourseDTO = TestFactory.createCourseDTOBlankTitle();
 
         // Gửi request POST với dữ liệu không hợp lệ
@@ -218,6 +219,7 @@ class LmsApplicationTests {
 
     @Test
     void testCreateCourse_PayloadTooLarge() {
+        // Arrange
         var largeCourseDTO = TestFactory.createCourseDTOTooLargeString();
 
         // Gửi request POST với payload quá lớn
@@ -231,6 +233,7 @@ class LmsApplicationTests {
 
     @Test
     void testUpdateInfoCourse_Successful() {
+        // Arrange
         var courseDTO = TestFactory.createDefaultCourseDTO();
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, null);
 
@@ -246,6 +249,14 @@ class LmsApplicationTests {
                 .jsonPath("$.title").isEqualTo(courseUpdateDTO.title())
                 .jsonPath("$.description").isEqualTo(courseUpdateDTO.description())
                 .jsonPath("$.thumbnailUrl").isEqualTo(courseUpdateDTO.thumbnailUrl());
+    }
+
+    @Test
+    void testDemo() {
+        var courseDTO = TestFactory.createDefaultCourseDTO();
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO));
+        System.out.println(course);
     }
 
     private Course createCourseWithParameters(KeycloakToken token, CourseDTO courseDTO, boolean hasPrice, Set<CourseSectionDTO> sectionDTOs) {
@@ -264,6 +275,32 @@ class LmsApplicationTests {
                 .getPath()
                 .split("/")[2];
 
+        if (sectionDTOs != null && !sectionDTOs.isEmpty()) {
+            for (CourseSectionDTO sectionDTO : sectionDTOs) {
+                Long sectionId = webTestClient.post().uri("/courses/{courseId}/sections", courseId)
+                        .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(sectionDTO))
+                        .exchange()
+                        .expectStatus().isOk()
+                        .expectBody(Long.class)
+                        .returnResult()
+                        .getResponseBody();
+
+                webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", courseId, sectionId)
+                        .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(new LessonDTO(
+                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vestibulum mi quis libero luctus sollicitudin. Suspendisse laoreet vulputate est",
+                                Lesson.Type.VIDEO,
+                                "https://www.youtube.com/watch?v=1",
+                                null)
+                        ))
+                        .exchange()
+                        .expectStatus().isOk();
+            }
+        }
+
         if (hasPrice) {
             webTestClient.put().uri("/courses/{courseId}/update-price", courseId)
                     .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
@@ -273,21 +310,13 @@ class LmsApplicationTests {
                     .expectStatus().isOk();
         }
 
-        if (sectionDTOs != null && !sectionDTOs.isEmpty()) {
-            for (CourseSectionDTO sectionDTO : sectionDTOs) {
-                webTestClient.post().uri("/courses/{courseId}/sections", courseId)
-                        .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromValue(sectionDTO))
-                        .exchange()
-                        .expectStatus().isCreated();
-            }
-        }
-        return courseRepository.findById(Long.valueOf(courseId)).orElseThrow();
+        return courseRepository.findById(Long.valueOf(courseId))
+                .orElseThrow(() -> new IllegalStateException("createCourseWithParameters something went wrong!"));
     }
 
     @Test
     void testUpdateInfoCourse_Unauthorized() {
+        // Arrange
         var courseUpdateDTO = TestFactory.createDefaultCourseUpdateDTO();
 
         // Gửi request PUT mà không có token
@@ -300,7 +329,7 @@ class LmsApplicationTests {
 
     @Test
     void testUpdateInfoCourse_Forbidden() {
-        // Thiết lập dữ liệu CourseUpdateDTO để cập nhật thông tin khóa học
+        // Arrange
         var courseUpdateDTO = TestFactory.createDefaultCourseUpdateDTO();
 
         // Gửi request PUT với token  không có quyền "teacher"
@@ -314,7 +343,7 @@ class LmsApplicationTests {
 
     @Test
     void testUpdateInfoCourse_NotFound() {
-        // Thiết lập dữ liệu CourseUpdateDTO để cập nhật thông tin khóa học
+        // Arrange
         var courseUpdateDTO = TestFactory.createDefaultCourseUpdateDTO();
 
         // Gửi request PUT với token của "teacher" để cập nhật khóa học không tồn tại
@@ -328,7 +357,7 @@ class LmsApplicationTests {
 
     @Test
     void testUpdateInfoCourse_BadRequest_EmptyTitle() {
-        // Thiết lập dữ liệu CourseUpdateDTO để cập nhật thông tin khóa học
+        // Arrange
         var courseUpdateDTO = TestFactory.createCourseUpdateDTOBlankTitle();
 
         // Gửi request PUT với token của "teacher" để cập nhật khóa học
@@ -374,7 +403,7 @@ class LmsApplicationTests {
 
     @Test
     void testDeleteCourse_AlreadyDeleted() {
-        // Lấy khóa học và đánh dấu là đã xóa
+        // Arrange
         var courseDTO = TestFactory.createDefaultCourseDTO();
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, null);
 
@@ -383,7 +412,7 @@ class LmsApplicationTests {
                 .exchange()
                 .expectStatus().isNoContent();
 
-        // Gửi request DELETE lần nữa
+        // Act
         webTestClient.delete().uri("/courses/{courseId}", course.getId())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .exchange()
@@ -392,7 +421,7 @@ class LmsApplicationTests {
 
     @Test
     void testDeleteCourse_Unauthorized() {
-        // Gửi request DELETE mà không đính kèm token
+        // Act
         webTestClient.delete().uri("/courses/{courseId}", 1000L) // dont need to be a valid course id
                 .exchange()
                 .expectStatus().isUnauthorized();
@@ -403,26 +432,24 @@ class LmsApplicationTests {
         var courseDTO = TestFactory.createDefaultCourseDTO();
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, null);
 
-        // Bắt buộc xóa mềm trước
+        // Act
         webTestClient.delete().uri("/courses/{courseId}", course.getId())
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
                 .exchange()
                 .expectStatus().isNoContent();
 
-        // Kiểm tra rằng khóa học đã bị đánh dấu là deleted
+        // Assert
         Course deletedCourse = courseRepository.findById(course.getId()).orElseThrow();
-        assertThat(deletedCourse.isDeleted()).isTrue();  // Kiểm tra khóa học đã bị đánh dấu deleted
+        assertThat(deletedCourse.isDeleted()).isTrue();
 
 
         // act
-        // Xóa khóa học với token của giáo viên
         webTestClient.delete().uri("/courses/{courseId}?force=true", course.getId())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .exchange()
                 .expectStatus().isNoContent();
 
-        // Kiểm tra rằng khóa học đã bị xóa hoàn toàn
-        assertThat(courseRepository.findById(course.getId())).isEmpty();  // Kiểm tra khóa học đã bị xóa hoàn toàn
+        assertThat(courseRepository.findById(course.getId())).isEmpty();
     }
 
     @Test
@@ -432,10 +459,9 @@ class LmsApplicationTests {
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
-        // Thiết lập giá mới cho khóa học
         var newPrice = new UpdatePriceDTO(Money.of(1000, Currencies.VND));
 
-        // Gửi request PUT để cập nhật giá khóa học
+        // Act
         webTestClient.put().uri("/courses/{courseId}/update-price", courseId)
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -448,10 +474,9 @@ class LmsApplicationTests {
 
     @Test
     void testUpdatePrice_Forbidden() {
-        // Thiết lập giá mới cho khóa học
         var newPrice = new UpdatePriceDTO(Money.of(1000, Currencies.VND));
 
-        // Gửi request PUT để cập nhật giá khóa học
+        // Act
         webTestClient.put().uri("/courses/{courseId}/update-price", 1)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -680,15 +705,17 @@ class LmsApplicationTests {
 
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
-        // Gửi request POST để thêm section cho khóa học
-        webTestClient.post().uri("/courses/{courseId}/sections", course.getId())
+        // Act
+        Long sectionId = webTestClient.post().uri("/courses/{courseId}/sections", course.getId())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(sectionDTO))
                 .exchange()
-                .expectStatus().isCreated()
-                .expectBody()
-                .jsonPath("$.sections.length()").isEqualTo(1);
+                .expectStatus().isOk()
+                .expectBody(Long.class).returnResult().getResponseBody();
+
+        // Assert
+        assertThat(sectionId).isNotNull();
     }
 
     @Test
@@ -732,9 +759,7 @@ class LmsApplicationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(updateSectionDTO))
                 .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.sections[0].title").isEqualTo(updateSectionDTO.title());
+                .expectStatus().isOk();
     }
 
     @Test
@@ -745,16 +770,14 @@ class LmsApplicationTests {
 
         UpdateSectionDTO updateSectionDTO = new UpdateSectionDTO("New title");
 
-        // Gửi request PUT để cập nhật section info cho khóa học
+        // Act
         var sectionId = course.getSections().iterator().next().getId();
         webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}", course.getId(), sectionId)
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(updateSectionDTO))
                 .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.sections[0].title").isEqualTo(updateSectionDTO.title());
+                .expectStatus().isOk();
     }
 
     @Test
@@ -822,22 +845,25 @@ class LmsApplicationTests {
 
     @Test
     void testAddLesson_Successful() {
+        // Arrange
         var courseDTO = TestFactory.createDefaultCourseDTO();
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
 
-        // Gửi request POST để thêm lesson cho section của khóa học
+        // Act
         var sectionId = course.getSections().iterator().next().getId();
-        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
+        Long lessonId = webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(lessonDTO))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.sections[0].lessons.length()").isEqualTo(1);
+                .expectBody(Long.class).returnResult().getResponseBody();
+
+        // Assert
+        assertThat(lessonId).isNotNull();
     }
 
     @Test
@@ -911,29 +937,27 @@ class LmsApplicationTests {
         LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
 
         var sectionId = course.getSections().iterator().next().getId();
-        AtomicReference<Integer> lessonId = new AtomicReference<>();
-        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
+        var lessonId = webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(lessonDTO))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.sections[0].lessons.length()").isEqualTo(1)
-                .jsonPath("$.sections[0].lessons[0].id").value(lessonId::set);
+                .expectBody(Long.class).returnResult().getResponseBody();
+
+        // Assert
+        assertThat(lessonId).isNotNull();;
 
         LessonDTO updateLessonDTO = new LessonDTO("New title", Lesson.Type.TEXT, "http://example.com/lesson1.txt", null);
 
-        // Gửi request PUT để cập nhật lesson của khóa học
+        // Act
         var section = course.getSections().iterator().next();
-        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lessonId.get())
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lessonId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(updateLessonDTO))
                 .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.sections[0].lessons[0].title").isEqualTo(updateLessonDTO.title());
+                .expectStatus().isOk();
     }
 
     @Test
@@ -947,23 +971,24 @@ class LmsApplicationTests {
 
         // Gửi request POST để thêm lesson cho section của khóa học
         var sectionId = course.getSections().iterator().next().getId();
-        AtomicReference<Integer> lessonId = new AtomicReference<>();
-        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
+
+        var lessonId = webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(lessonDTO))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.sections[0].lessons.length()").isEqualTo(1)
-                .jsonPath("$.sections[0].lessons[0].id").value(lessonId::set);
+                .expectBody(Long.class).returnResult().getResponseBody();
+
+        // Assert
+        assertThat(lessonId).isNotNull();
 
         //act
         LessonDTO updateLessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
 
         // Gửi request PUT để cập nhật lesson của khóa học
         var section = course.getSections().iterator().next();
-        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lessonId.get())
+        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lessonId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(updateLessonDTO))
@@ -1017,20 +1042,20 @@ class LmsApplicationTests {
         LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
 
         var sectionId = course.getSections().iterator().next().getId();
-        AtomicReference<Integer> lessonId = new AtomicReference<>();
-        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
+        var lessonId = webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(lessonDTO))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.sections[0].lessons.length()").isEqualTo(1)
-                .jsonPath("$.sections[0].lessons[0].id").value(lessonId::set);
+                .expectBody(Long.class).returnResult().getResponseBody();
+
+        // Assert
+        assertThat(lessonId).isNotNull();;
 
         // Act: Delete lesson
         var section = course.getSections().iterator().next();
-        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lessonId.get())
+        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", course.getId(), section.getId(), lessonId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .exchange()
                 .expectStatus().isNoContent();
@@ -1078,12 +1103,12 @@ class LmsApplicationTests {
                 .expectBody()
                 .jsonPath("$.id").isEqualTo(courseId.intValue());
 
-        // Chuẩn bị dữ liệu cho request tạo order
+        // Arrange: Prepare data for order request
         Set<OrderItemDTO> orderItemsDto = new HashSet<>();
         orderItemsDto.add(new OrderItemDTO(courseId));
         var orderRequestDto = new OrderRequestDTO(orderItemsDto, null);
 
-        // Gửi request POST để tạo order
+        // Act: Send POST request to create order
         String location = webTestClient.post().uri("/orders")
                 .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -1126,12 +1151,12 @@ class LmsApplicationTests {
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
-        // Chuẩn bị dữ liệu cho request tạo order
+        // Arrange: Prepare data for order request
         Set<OrderItemDTO> orderItemsDto = new HashSet<>();
         orderItemsDto.add(new OrderItemDTO(courseId));
         var orderRequestDto = new OrderRequestDTO(orderItemsDto, null);
 
-        // Gửi request POST để tạo order
+        // Act: Send POST request to create order
         webTestClient.post().uri("/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(orderRequestDto))
@@ -1146,7 +1171,7 @@ class LmsApplicationTests {
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
         var courseId = course.getId();
 
-        // Chuẩn bị dữ liệu cho request tạo order
+        // Arrange: Prepare data for order request
         Set<OrderItemDTO> orderItemsDto = new HashSet<>();
         orderItemsDto.add(new OrderItemDTO(courseId));
         var orderRequestDto = new OrderRequestDTO(orderItemsDto, null);
@@ -1214,14 +1239,6 @@ class LmsApplicationTests {
                 .expectBody()
                 .jsonPath("$.orderId").isEqualTo(orderId)
                 .jsonPath("$.status").isEqualTo(PaymentStatus.PAID.name());
-
-        // verify order as paid
-//        webTestClient.get().uri("/orders/my-orders/{orderId}", orderId)
-//                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody()
-//                .jsonPath("$.status").isEqualTo(Status.PAID.name());
     }
 
     @Test
@@ -1493,6 +1510,51 @@ class LmsApplicationTests {
         assertThat(discountRepository.findById(Long.valueOf(discountId))).isEmpty();
     }
 
+
+    // Enrollment bounded context
+
+//    private Long performCreateEnrollment(KeycloakToken actor) {
+//        var courseDTO = TestFactory.createDefaultCourseDTO();
+//        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+//        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO));
+//        var courseId = course.getId();
+//
+//        approvePublishByCourseId(course.getId());
+//
+//        webTestClient.get()
+//                .uri("/published-courses/{courseId}", courseId)
+//                .exchange()
+//                .expectStatus().isOk();
+//
+//        Set<OrderItemDTO> orderItemsDto = new HashSet<>();
+//        orderItemsDto.add(new OrderItemDTO(courseId));
+//        var orderRequestDto = new OrderRequestDTO(orderItemsDto, null);
+//
+//        // Gửi request POST để tạo order
+//        String location = webTestClient.post().uri("/orders")
+//                .headers(header -> header.setBearerAuth(actor.getAccessToken()))
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .body(BodyInserters.fromValue(orderRequestDto))
+//                .exchange()
+//                .expectStatus().isCreated()
+//                .expectBody()
+//                .returnResult().getResponseHeaders().getLocation().toString();
+//
+//        String orderId = location.substring(location.lastIndexOf("/") + 1);
+//
+//        // Act: Pay order
+//        var paymentRequestDto = new PaymentRequest(
+//                UUID.fromString(orderId),
+//                Money.of(50000, Currencies.VND),
+//                PaymentMethod.STRIPE, "tok_visa");
+//        webTestClient.post().uri("/payments")
+//                .headers(header -> header.setBearerAuth(actor.getAccessToken()))
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .body(BodyInserters.fromValue(paymentRequestDto))
+//                .exchange()
+//                .expectStatus().isCreated();
+//        return courseId;
+//    }
 
     protected static class KeycloakToken {
         private final String accessToken;
