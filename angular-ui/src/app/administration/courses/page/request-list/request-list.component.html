@@ -38,7 +38,7 @@
             <td>{{request.requestedBy === userService.current.name ? 'This account': request.requestedBy}}</td>
             <td>{{request.message}}</td>
             <td>
-              <a [routerLink]="['/administration/courses', courseId]">Course ref
+              <a [routerLink]="['/administration/courses', courseId]" class="btn btn-outline-primary">Course ref
               </a>
             </td>
             <td>

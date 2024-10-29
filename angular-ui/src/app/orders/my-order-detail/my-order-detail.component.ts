@@ -11,6 +11,7 @@ import {DatePipe, NgIf} from "@angular/common";
 @Component({
   selector: 'app-my-order-detail',
   standalone: true,
+  styleUrls: ['./my-order-detail.component.css'],
   imports: [
     NgIf,
     DatePipe,
@@ -25,7 +26,6 @@ export class MyOrderDetailComponent implements OnInit, OnDestroy{
   orderService = inject(OrdersService);
   paymentService = inject(PaymentService);
   errorHandler = inject(ErrorHandler);
-
   orderId?: string;
   order?: Order;
   payments: Payment[] = [];

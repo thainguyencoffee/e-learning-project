@@ -1,111 +1,93 @@
-<div *ngIf="getIdRequestUnresolved() as idRequest" class="alert alert-warning">
-  This course has request unresolved. Please <a [routerLink]="['/administration/courses', currentId, 'requests', idRequest]">resolve</a> the request.
+<div *ngIf="getIdRequestUnresolved() as idRequest" class="alert alert-warning rounded shadow-sm mb-4">
+  This course has a pending request. Please
+  <a [routerLink]="['/administration/courses', currentId, 'requests', idRequest]">resolve</a> the request.
 </div>
 
-<div class="d-flex flex-wrap mb-4">
-  <h1 class="flex-grow-1">Course Detail Center!</h1>
-  <div>
-    <a routerLink="/administration/courses" class="btn btn-secondary">Back to list</a>
-  </div>
+<div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+  <h1 class="text-primary fw-bold">Course Detail Center</h1>
+  <a routerLink="/administration/courses" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Back to list
+  </a>
 </div>
 
-<div class="container-fluid" *ngIf="courseDto">
+<div class="container-fluid bg-light p-4 rounded shadow-sm" *ngIf="courseDto">
   <!-- Basic Info Section -->
-  <section id="basic" class="pt-3">
-    <h2>Basic information</h2>
-    <!-- Title -->
-    <h5>Title: {{ courseDto.title }}</h5>
-
-    @if (isCreateByYou(courseDto.teacher)) {
-      <p>Teacher: <span class="badge bg-secondary">this account</span></p>
-    } @else {
-      <p>Teacher: {{ courseDto.teacher }}</p>
-    }
-
-    <!-- Image -->
-    <img [src]="courseDto.thumbnailUrl || 'https://placehold.jp/200x200.png'"
-         class="img-thumbnail mb-2" alt="Course Thumbnail"
-         style="max-height: 200px;">
-
-    <!-- Description -->
-    <p class="d-block">
-      Description: {{ courseDto.description || 'No description available' }}</p>
-
-    <!-- Language -->
-    <p class="d-block">Language:
-      <span class="fw-bold">{{ courseDto.language }}</span>
-    </p>
-
-    <!-- Price and Discounted Price -->
-    <p>Price: {{ courseDto.price || 'Price not available' }}</p>
-<!--    <p>Discounted Price: {{ courseDto.discountedPrice || 'No discount available' }}</p>-->
-
-    <!-- Published Status -->
-    <p [class]="courseDto.published ? 'badge bg-success' : 'badge bg-primary'">
-      Status: {{ courseDto.published ? 'Published' : 'Not published' }}</p>
-
-    <!--Subtitles-->
-    <div id="subtitles">
-      <h5>Subtitles</h5>
-      <ul>
-        <li *ngFor="let subtitle of courseDto?.subtitles">
-          <span class="fw-bold">{{ subtitle }}</span>
-        </li>
-        <li *ngIf="courseDto?.subtitles?.length === 0">
-              <span class="badge bg-dark">
-                No subtitles available
-              </span>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Benefits -->
-    <div id="benefits">
-      <h5>Benefits</h5>
-      <ul>
-        <li *ngFor="let benefit of courseDto?.benefits">
-          <span class="fw-bold">{{ benefit }}</span>
-        </li>
-        <li *ngIf="courseDto?.benefits?.length === 0">
-              <span class="badge bg-dark">
-                No benefits available
-              </span>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Prerequisites -->
-    <div id="prerequisites">
-      <h5>Prerequisites</h5>
-      <ul>
-        <li *ngFor="let prerequisite of courseDto?.prerequisites">
-          {{ prerequisite }}
-        </li>
-        <li *ngIf="courseDto?.prerequisites?.length === 0">
-              <span class="badge bg-dark">
-                No prerequisites available
-              </span>
-        </li>
-      </ul>
+  <section id="basic" class="p-4 border rounded mb-4 bg-white">
+    <h2 class="mb-4 border-bottom pb-2">Basic Information</h2>
+    <div class="row">
+      <div class="col-lg-4 text-center">
+        <img
+          [src]="courseDto.thumbnailUrl || 'https://placehold.jp/200x200.png'"
+          class="img-fluid rounded shadow-sm mb-3"
+          alt="Course Thumbnail">
+      </div>
+      <div class="col-lg-8">
+        <p><strong>Title:</strong> {{ courseDto.title }}</p>
+        <p>
+          <strong>Teacher:</strong>
+          <span *ngIf="isCreateByYou(courseDto.teacher)" class="badge bg-secondary">This account</span>
+          <span *ngIf="!isCreateByYou(courseDto.teacher)">{{ courseDto.teacher }}</span>
+        </p>
+        <p><strong>Description:</strong> {{ courseDto.description || 'No description available' }}</p>
+        <p><strong>Language:</strong> <span class="fw-bold">{{ courseDto.language }}</span></p>
+        <p><strong>Price:</strong> {{ courseDto.price || 'Price not available' }}</p>
+        <p class="badge {{ courseDto.published ? 'bg-success' : 'bg-primary' }}">
+          Status: {{ courseDto.published ? 'Published' : 'Not published' }}
+        </p>
+      </div>
     </div>
   </section>
 
-  <!-- Accessibility Section -->
-  <section id="accessibility" class="pt-3">
-    <h2>Accessibility</h2>
-    @if (isCreateByYou(courseDto.createdBy)) {
-      <p>Created by: <span class="badge bg-secondary">this account</span></p>
-    } @else {
-      <p>Created by: {{ courseDto.createdBy }}</p>
-    }
-    <p>Created date: {{ courseDto.createdDate }}</p>
+  <!-- Subtitles, Benefits, and Prerequisites -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="p-3 border rounded bg-white">
+        <h5>Subtitles</h5>
+        <ul class="list-group">
+          <li *ngFor="let subtitle of courseDto?.subtitles" class="list-group-item">
+            {{ subtitle }}
+          </li>
+          <li *ngIf="!courseDto?.subtitles?.length" class="list-group-item text-muted">No subtitles available</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="p-3 border rounded bg-white">
+        <h5>Benefits</h5>
+        <ul class="list-group">
+          <li *ngFor="let benefit of courseDto?.benefits" class="list-group-item">
+            {{ benefit }}
+          </li>
+          <li *ngIf="!courseDto?.benefits?.length" class="list-group-item text-muted">No benefits available</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="p-3 border rounded bg-white">
+        <h5>Prerequisites</h5>
+        <ul class="list-group">
+          <li *ngFor="let prerequisite of courseDto?.prerequisites" class="list-group-item">
+            {{ prerequisite }}
+          </li>
+          <li *ngIf="!courseDto?.prerequisites?.length" class="list-group-item text-muted">No prerequisites available</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 
-    @if (isCreateByYou(courseDto.lastModifiedBy)) {
-      <p>Last modified by: <span class="badge bg-secondary">this account</span></p>
-    } @else {
-      <p>Last modified by: {{ courseDto.lastModifiedBy }}</p>
-    }
-    <p>Last modified date: {{ courseDto.lastModifiedDate }}</p>
+  <!-- Accessibility Section -->
+  <section id="accessibility" class="p-4 border rounded mb-4 bg-white">
+    <h2 class="mb-4 border-bottom pb-2">Accessibility</h2>
+    <p><strong>Created By:</strong>
+      <span *ngIf="isCreateByYou(courseDto.createdBy)" class="badge bg-secondary">This account</span>
+      <span *ngIf="!isCreateByYou(courseDto.createdBy)">{{ courseDto.createdBy }}</span>
+    </p>
+    <p><strong>Created Date:</strong> {{ courseDto.createdDate }}</p>
+    <p><strong>Last Modified By:</strong>
+      <span *ngIf="isCreateByYou(courseDto.lastModifiedBy)" class="badge bg-secondary">This account</span>
+      <span *ngIf="!isCreateByYou(courseDto.lastModifiedBy)">{{ courseDto.lastModifiedBy }}</span>
+    </p>
+    <p><strong>Last Modified Date:</strong> {{ courseDto.lastModifiedDate }}</p>
   </section>
 
   <!--Section-->
@@ -181,13 +163,10 @@
                       class="btn btn-sm btn-secondary me-2">Delete
               </button>
             </td>
-
           </tr>
           </tbody>
         </table>
       </div>
     </div>
-
   </div>
-
 </div>
