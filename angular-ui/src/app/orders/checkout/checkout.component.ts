@@ -99,6 +99,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
             this.applyDiscount(undefined);
             this.errorHandler.handleServerError(
               createErrNotFoundByProperty("discountCode", "Discount code not found"), this.discountCodeForm)
+          } else {
+            this.errorHandler.handleServerError(error.error)
           }
         }
       })

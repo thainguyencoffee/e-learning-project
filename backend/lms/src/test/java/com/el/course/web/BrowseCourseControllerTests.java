@@ -1,6 +1,7 @@
 package com.el.course.web;
 
 import com.el.TestFactory;
+import com.el.common.config.CustomAuthenticationEntryPoint;
 import com.el.common.config.SecurityConfig;
 import com.el.common.config.jackson.JacksonCustomizations;
 import com.el.common.exception.ResourceNotFoundException;
@@ -26,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BrowseCourseController.class)
-@Import({SecurityConfig.class, JacksonCustomizations.class})
+@Import({SecurityConfig.class, JacksonCustomizations.class, CustomAuthenticationEntryPoint.class})
 class BrowseCourseControllerTests {
 
     @Autowired

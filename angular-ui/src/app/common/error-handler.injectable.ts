@@ -1,22 +1,33 @@
 import {inject, Injectable} from "@angular/core";
 import {Router} from "@angular/router";
 import {FormGroup, ValidationErrors} from "@angular/forms";
+import {loginOptions} from "./auth/login.component";
+import {HttpClient} from "@angular/common/http";
+import {baseUri} from "../app.config";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ErrorHandler {
   router = inject(Router);
+  http = inject(HttpClient);
 
   handleServerError(error: ErrorResponse, group?: FormGroup, getMessage?: (key: string) => string) {
-    // show general error page
+    const errorStatus = error?.status || '503';
+    const errorMessage = error?.message || '';
+
+    if (error && errorStatus === 401) {
+      this.handleUnauthenticated();
+      return;
+    }
+
     if (!error || !error.fieldErrors) {
       this.router.navigate(['/error'], {
-        state:{
-          errorStatus: (error && error.status) ? error.status : '503',
-          errorMessage: (error && error.message) ? error.message: ''
+        state: {
+          errorStatus: errorStatus,
+          errorMessage: errorMessage
         }
-      })
+      });
       return;
     }
 
@@ -38,6 +49,32 @@ export class ErrorHandler {
       group?.get(key)?.setErrors(value);
     }
   }
+
+  private handleUnauthenticated() {
+    loginOptions(this.http).subscribe({
+      next: opts => {
+        if (opts.length) {
+          const loginUri = opts[0].loginUri;
+          const url = new URL(loginUri);
+          url.searchParams.append('post_login_success_uri', `${baseUri}${this.router.url}`);
+          url.searchParams.append('post_login_failure_uri', `${baseUri}/login-error`);
+          window.location.href = url.toString();
+        } else {
+          throw new Error('No login options available');
+        }
+      },
+      error: error => {
+        this.router.navigate(['/error'], {
+          state: {
+            errorStatus: '503',
+            errorMessage: 'Service is unavailable'
+          }
+        })
+      }
+    })
+  }
+
+
 }
 
 export function getGlobalErrorMessage(key: string, details?: any) {
@@ -60,8 +97,8 @@ interface FieldError {
   code: string;
   property: string;
   message: string;
-  rejectedValue: any|null;
-  path: string|null;
+  rejectedValue: any | null;
+  path: string | null;
 
 }
 

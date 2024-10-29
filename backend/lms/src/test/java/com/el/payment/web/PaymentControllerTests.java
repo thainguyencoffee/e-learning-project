@@ -1,6 +1,7 @@
 package com.el.payment.web;
 
 import com.el.common.Currencies;
+import com.el.common.config.CustomAuthenticationEntryPoint;
 import com.el.common.config.jackson.JacksonCustomizations;
 import com.el.common.config.SecurityConfig;
 import com.el.payment.application.PaymentRequest;
@@ -28,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(PaymentController.class)
-@Import({SecurityConfig.class, JacksonCustomizations.class})
+@Import({SecurityConfig.class, JacksonCustomizations.class, CustomAuthenticationEntryPoint.class})
 class PaymentControllerTests {
     
     @Autowired
