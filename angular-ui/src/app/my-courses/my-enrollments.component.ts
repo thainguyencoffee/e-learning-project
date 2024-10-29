@@ -1,31 +1,30 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
-import {OrdersService} from "../orders.service";
-import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
-import {Order} from "../order";
-import {PaginationUtils} from "../../administration/courses/model/view/page-wrapper";
+import {NavigationEnd, Router, RouterLink} from "@angular/router";
+import {ErrorHandler} from "../common/error-handler.injectable";
+import {CourseEnrollmentDTO} from "./model";
+import {PaginationUtils} from "../administration/courses/model/view/page-wrapper";
 import {Subscription} from "rxjs";
-import {ErrorHandler} from "../../common/error-handler.injectable";
+import {EnrollmentService} from "./enrollment.service";
 import {DatePipe, NgForOf, NgIf} from "@angular/common";
 
 @Component({
-  selector: 'app-my-orders',
+  selector: 'app-my-courses',
   standalone: true,
-    imports: [
-        RouterLink,
-        NgForOf,
-        NgIf,
-        DatePipe
-    ],
-  templateUrl: './my-orders.component.html',
+  imports: [
+    NgForOf,
+    NgIf,
+    DatePipe,
+    RouterLink
+  ],
+  templateUrl: './my-enrollments.component.html',
 })
-export class MyOrdersComponent implements OnInit, OnDestroy {
+export class MyEnrollmentsComponent implements OnInit, OnDestroy{
 
-  orderService = inject(OrdersService);
+  enrollmentService = inject(EnrollmentService);
   router = inject(Router);
-  route = inject(ActivatedRoute);
   errorHandler = inject(ErrorHandler);
 
-  orders: Order[] = [];
+  enrollments: CourseEnrollmentDTO[] = [];
   paginationUtils?: PaginationUtils;
   navigationSubscription?: Subscription;
 
@@ -43,7 +42,6 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
     this.navigationSubscription!.unsubscribe();
   }
 
-
   onPageChange(pageNumber: number): void {
     if (pageNumber >= 0 && pageNumber < this.paginationUtils!.totalPages) {
       this.loadData(pageNumber);
@@ -55,15 +53,14 @@ export class MyOrdersComponent implements OnInit, OnDestroy {
   }
 
   loadData(pageNumber: number): void {
-    this.orderService.getAllOrders(pageNumber)
+    this.enrollmentService.getAllEnrollments(pageNumber)
       .subscribe({
         next: (pageWrapper) => {
           this.paginationUtils = new PaginationUtils(pageWrapper.page);
-          this.orders = pageWrapper.content as Order[];
+          this.enrollments = pageWrapper.content as CourseEnrollmentDTO[];
         },
         error: (error) => this.errorHandler.handleServerError(error.error)
       });
   }
-
 
 }

@@ -27,26 +27,14 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    // Admin can access all orders
     @GetMapping
-    public ResponseEntity<Page<Order>> orders(Pageable pageable) {
-        return ResponseEntity.ok(orderService.findAllOrders(pageable));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Order> orderById(@PathVariable UUID id) {
-        return ResponseEntity.ok(orderService.findOrderById(id));
-    }
-
-    // User can access only their own orders
-    @GetMapping("/my-orders")
     public ResponseEntity<Page<Order>> myOrders(@AuthenticationPrincipal Jwt jwt, Pageable pageable) {
         String createdBy = jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME);
         List<Order> result = orderService.findOrdersByCreatedBy(createdBy, pageable);
         return ResponseEntity.ok(new PageImpl<>(result, pageable, result.size()));
     }
 
-    @GetMapping("/my-orders/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Order> myOrderById(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id) {
         String createdBy = jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME);
         return ResponseEntity.ok(orderService.findOrderByCreatedByAndId(createdBy, id));
@@ -57,6 +45,16 @@ public class OrderController {
         String currentUsername = jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME);
         Order orderCreated = orderService.createOrder(currentUsername, orderRequestDTO);
         return ResponseEntity.created(URI.create("/orders/" + orderCreated.getId())).body(orderCreated);
+    }
+
+    @GetMapping("/has-purchase/{courseId}")
+    public ResponseEntity<Boolean> hasPurchase(@PathVariable Long courseId, @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(orderService.hasPurchase(jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME), courseId));
+    }
+
+    @GetMapping("/purchased-courses")
+    public ResponseEntity<List<Long>> purchasedCourses(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(orderService.purchasedCourses(jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME)));
     }
 
 }

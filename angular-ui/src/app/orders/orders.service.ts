@@ -17,13 +17,21 @@ export class OrdersService {
     return this.http.post<Order>(this.resourcePath, data);
   }
 
-  getAllMyOrders(pageNumber: number = 0, pageSize: number = 10) {
-    const url = `${this.resourcePath}/my-orders?page=${pageNumber}&size=${pageSize}`;
+  getAllOrders(pageNumber: number = 0, pageSize: number = 10) {
+    const url = `${this.resourcePath}?page=${pageNumber}&size=${pageSize}`;
     return this.http.get<PageWrapper<Order>>(url)
   }
 
-  getMyOrder(orderId: string) {
-    return this.http.get<Order>(`${this.resourcePath}/my-orders/${orderId}`);
+  getOrder(orderId: string) {
+    return this.http.get<Order>(`${this.resourcePath}/${orderId}`);
+  }
+
+  purchasedCourses() {
+    return this.http.get<number[]>(`${this.resourcePath}/purchased-courses`);
+  }
+
+  hasPurchase(courseId: number) {
+    return this.http.get<boolean>(`${this.resourcePath}/has-purchase/${courseId}`);
   }
 
 }

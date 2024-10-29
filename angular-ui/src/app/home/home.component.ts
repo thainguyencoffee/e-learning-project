@@ -3,9 +3,11 @@ import {BrowseCourseService} from "../browse-course.service";
 import {Course} from "../administration/courses/model/view/course";
 import {Subscription} from "rxjs";
 import {ErrorHandler} from "../common/error-handler.injectable";
-import {PageWrapper, PaginationUtils} from "../administration/courses/model/view/page-wrapper";
+import {PaginationUtils} from "../administration/courses/model/view/page-wrapper";
 import {NavigationEnd, Router, RouterLink} from "@angular/router";
 import {NgForOf} from "@angular/common";
+import {UserService} from "../common/auth/user.service";
+import {OrdersService} from "../orders/orders.service";
 
 @Component({
   selector: 'app-home',
@@ -19,6 +21,8 @@ import {NgForOf} from "@angular/common";
 export class HomeComponent implements OnInit, OnDestroy {
 
   browseCourseService = inject(BrowseCourseService);
+  orderService = inject(OrdersService);
+  userService = inject(UserService);
   errorHandler = inject(ErrorHandler);
   router = inject(Router);
 
@@ -39,8 +43,20 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.browseCourseService.getAllPublishedCourses(pageNumber)
       .subscribe({
         next: (pageWrapper) => {
-          this.courses = pageWrapper.content as Course[];
+
+          if (this.userService.current.isAuthenticated) {
+            this.orderService.purchasedCourses().subscribe({
+              next: (purchasedCourses) => {
+                const allCourses = pageWrapper.content as Course[];
+                this.courses = allCourses.filter(course => !purchasedCourses.includes(course.id))
+              }
+            })
+          } else {
+            this.courses = pageWrapper.content as Course[];
+          }
+
           this.paginationUtils = new PaginationUtils(pageWrapper.page);
+
         },
         error: (error) => this.errorHandler.handleServerError(error.error)
       });
