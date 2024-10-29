@@ -21,4 +21,4 @@ jobs:
       - name: Build with Gradle
         run: |
           cd backend/
-          ./gradlew build
+          ./gradlew build --debug

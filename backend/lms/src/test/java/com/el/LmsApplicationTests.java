@@ -93,10 +93,10 @@ class LmsApplicationTests {
 
     @BeforeEach
     void setupData() {
-        courseRepository.deleteAll();
-
-        // prepare data for discount record
-        discountRepository.deleteAll();
+//        courseRepository.deleteAll();
+//
+//        // prepare data for discount record
+//        discountRepository.deleteAll();
     }
 
 
