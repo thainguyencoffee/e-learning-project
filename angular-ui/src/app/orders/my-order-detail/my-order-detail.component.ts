@@ -48,7 +48,7 @@ export class MyOrderDetailComponent implements OnInit, OnDestroy{
 
   loadData() {
     this.orderId = this.route.snapshot.params['orderId'];
-    this.orderService.getMyOrder(this.orderId!)
+    this.orderService.getOrder(this.orderId!)
       .subscribe({
         next: (data) => this.order = data,
         error: (error) => this.errorHandler.handleServerError(error.error)

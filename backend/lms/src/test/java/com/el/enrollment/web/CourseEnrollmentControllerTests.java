@@ -4,6 +4,7 @@ import com.el.TestFactory;
 import com.el.common.config.SecurityConfig;
 import com.el.common.config.jackson.JacksonCustomizations;
 import com.el.common.exception.ResourceNotFoundException;
+import com.el.enrollment.application.CourseEnrollmentDTO;
 import com.el.enrollment.application.impl.CourseEnrollmentServiceImpl;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,13 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.Instant;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -48,8 +48,17 @@ class CourseEnrollmentControllerTests {
         Pageable pageable = PageRequest.of(0, 10);
 
         CourseEnrollment enrollment = TestFactory.createDefaultCourseEnrollment();
-        Page<CourseEnrollment> enrollments = new PageImpl<>(List.of(enrollment));
-        when(courseEnrollmentService.findAllCourseEnrollments(pageable)).thenReturn(enrollments);
+        CourseEnrollmentDTO enrollmentDTO = new CourseEnrollmentDTO(
+                enrollment.getId(),
+                enrollment.getStudent(),
+                enrollment.getCourseId(),
+                "demo title",
+                "https://example.com",
+                TestFactory.teacher,
+                Instant.now(),
+                false
+        );
+        when(courseEnrollmentService.findAllCourseEnrollments(pageable)).thenReturn(List.of(enrollmentDTO));
 
         mockMvc.perform(get("/enrollments")
                         .param("page", "0")

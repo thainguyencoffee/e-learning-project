@@ -5,14 +5,15 @@ import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
 import com.el.course.domain.Course;
+import com.el.enrollment.application.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
 import com.el.enrollment.domain.LessonProgress;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,12 +33,15 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     }
 
     @Override
-    public Page<CourseEnrollment> findAllCourseEnrollments(Pageable pageable) {
+    public List<CourseEnrollmentDTO> findAllCourseEnrollments(Pageable pageable) {
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+
         if (rolesBaseUtil.isAdmin()) {
-            return repository.findAll(pageable);
+            return repository.findAllCourseEnrollmentDTOs(page, size);
         } else if (rolesBaseUtil.isUser()) {
             String student = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
-            return repository.findAllByStudent(student, pageable);
+            return repository.findAllCourseEnrollmentDTOsByStudent(student, page, size);
         }
         throw new AccessDeniedException("Access denied");
     }

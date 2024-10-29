@@ -1,12 +1,13 @@
 package com.el.enrollment.application;
 
 import com.el.enrollment.domain.CourseEnrollment;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface CourseEnrollmentService {
 
-    Page<CourseEnrollment> findAllCourseEnrollments(Pageable pageable);
+    List<CourseEnrollmentDTO> findAllCourseEnrollments(Pageable pageable);
 
     CourseEnrollment findCourseEnrollmentById(Long id);
 

@@ -1126,13 +1126,13 @@ class LmsApplicationTests {
 
         String orderId = location.substring(location.lastIndexOf("/") + 1);
 
-        webTestClient.get().uri("/orders/my-orders/{orderId}", orderId)
+        webTestClient.get().uri("/orders/{orderId}", orderId)
                 .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
                 .exchange()
                 .expectStatus().isOk();
 
         // verify if another user can't access this order
-        webTestClient.get().uri("/orders/my-orders/{orderId}", orderId)
+        webTestClient.get().uri("/orders/{orderId}", orderId)
                 .headers(header -> header.setBearerAuth(user2Token.getAccessToken()))
                 .exchange()
                 .expectStatus().isNotFound();

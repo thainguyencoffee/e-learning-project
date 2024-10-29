@@ -1,5 +1,6 @@
 package com.el.order.application.impl;
 
+import com.el.common.RolesBaseUtil;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
@@ -25,21 +26,17 @@ import java.util.UUID;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final RolesBaseUtil rolesBaseUtil;
     private final DiscountService discountService;
     private final CourseQueryService courseQueryService;
 
-    public OrderServiceImpl(OrderRepository orderRepository, DiscountService discountService, CourseQueryService courseQueryService) {
+    public OrderServiceImpl(OrderRepository orderRepository, RolesBaseUtil rolesBaseUtil, DiscountService discountService, CourseQueryService courseQueryService) {
         this.orderRepository = orderRepository;
+        this.rolesBaseUtil = rolesBaseUtil;
         this.discountService = discountService;
         this.courseQueryService = courseQueryService;
     }
 
-    @Override
-    public Page<Order> findAllOrders(Pageable pageable) {
-        return orderRepository.findAll(pageable);
-    }
-
-    @Override
     public Order findOrderById(UUID orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(ResourceNotFoundException::new);
@@ -49,13 +46,22 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> findOrdersByCreatedBy(String createdBy, Pageable pageable) {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
-        return orderRepository.findAllByCreatedBy(createdBy, page, size);
+        if (rolesBaseUtil.isAdmin()) {
+            return orderRepository.findAll(pageable).getContent();
+        } else {
+            return orderRepository.findAllByCreatedBy(createdBy, page, size);
+        }
     }
 
     @Override
     public Order findOrderByCreatedByAndId(String createdBy, UUID id) {
-        return orderRepository.findByCreatedByAndId(createdBy, id)
-                .orElseThrow(ResourceNotFoundException::new);
+        if (rolesBaseUtil.isAdmin()) {
+            return orderRepository.findById(id)
+                    .orElseThrow(ResourceNotFoundException::new);
+        } else {
+            return orderRepository.findByCreatedByAndId(createdBy, id)
+                    .orElseThrow(ResourceNotFoundException::new);
+        }
     }
 
     @Override
@@ -66,6 +72,16 @@ public class OrderServiceImpl implements OrderService {
             discountService.increaseUsage(order.getDiscountCode());
         }
         orderRepository.save(order);
+    }
+
+    @Override
+    public boolean hasPurchase(String createdBy, Long courseId) {
+        return orderRepository.hasPurchasedCourse(courseId, createdBy);
+    }
+
+    @Override
+    public List<Long> purchasedCourses(String createdBy) {
+        return orderRepository.findPurchasedCourseIdsByUserId(createdBy);
     }
 
     @Override

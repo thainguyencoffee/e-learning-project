@@ -39,5 +39,10 @@ class CourseEnrollmentJdbcTests {
         assertEquals(courseEnrollment.getId(), byIdAndStudent.get().getId());
     }
 
+    @Test
+    void findAllCourseEnrollmentDTOsByStudent() {
+        repository.findAllCourseEnrollmentDTOsByStudent("student", 0, 10);
+    }
+
 
 }

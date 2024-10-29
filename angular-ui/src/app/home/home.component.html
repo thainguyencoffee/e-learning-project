@@ -4,7 +4,9 @@
 
   @for (course of courses; track course.id) {
     <div class="card" style="width: 18rem;">
-      <img [src]="course.thumbnailUrl || 'https://placehold.co/600x400/000000/FFF'" class="card-img-top" alt="...">
+      <a [routerLink]="['course-view', course.id]">
+        <img [src]="course.thumbnailUrl || 'https://placehold.co/600x400/000000/FFF'" class="card-img-top" alt="...">
+      </a>
       <div class="card-body">
         <h5 class="card-title">{{course.title}}</h5>
         <p class="card-text">{{course.description}}</p>

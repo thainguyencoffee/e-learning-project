@@ -50,7 +50,7 @@ export class PaymentComponent implements OnInit {
 
   ngOnInit(): void {
     this.orderId = this.route.snapshot.params['orderId'];
-    this.orderService.getMyOrder(this.orderId!).subscribe({
+    this.orderService.getOrder(this.orderId!).subscribe({
       next: order => {
         this.order = order;
         updateForm(this.paymentForm, {
@@ -114,9 +114,7 @@ export class PaymentComponent implements OnInit {
 
   }
 
-
   paymentMethodSelected(key: string) {
-    console.log("fawifujweafoiwef")
     if (key === 'STRIPE') {
       this.openCheckout();
     }

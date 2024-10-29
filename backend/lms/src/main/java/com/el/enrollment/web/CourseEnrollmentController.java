@@ -1,12 +1,16 @@
 package com.el.enrollment.web;
 
 import com.el.common.exception.InputInvalidException;
+import com.el.enrollment.application.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
 import com.el.enrollment.domain.CourseEnrollment;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("enrollments")
@@ -19,8 +23,9 @@ public class CourseEnrollmentController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CourseEnrollment>> getAllEnrollments(Pageable pageable) {
-        return ResponseEntity.ok(courseEnrollmentService.findAllCourseEnrollments(pageable));
+    public ResponseEntity<Page<CourseEnrollmentDTO>> getAllEnrollments(Pageable pageable) {
+        List<CourseEnrollmentDTO> result = courseEnrollmentService.findAllCourseEnrollments(pageable);
+        return ResponseEntity.ok(new PageImpl<>(result, pageable, result.size()));
     }
 
     @GetMapping("/{enrollmentId}")

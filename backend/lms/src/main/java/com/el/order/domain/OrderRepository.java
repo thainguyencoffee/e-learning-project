@@ -24,4 +24,8 @@ public interface OrderRepository extends CrudRepository<Order, UUID> {
             "WHERE o.created_by = :username AND oi.course = :courseId")
     boolean hasPurchasedCourse(@Param("courseId") Long courseId, @Param("username") String username);
 
+    @Query("SELECT oi.course FROM orders o JOIN order_items oi on o.id = oi.orders " +
+            "WHERE o.created_by = :createdBy")
+    List<Long> findPurchasedCourseIdsByUserId(String createdBy);
+
 }

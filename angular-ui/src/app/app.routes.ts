@@ -27,13 +27,19 @@ import {CheckoutComponent} from "./orders/checkout/checkout.component";
 import {PaymentComponent} from "./orders/payment/payment.component";
 import {MyOrdersComponent} from "./orders/my-orders/my-orders.component";
 import {MyOrderDetailComponent} from "./orders/my-order-detail/my-order-detail.component";
-import {MyCoursesComponent} from "./my-courses/my-courses.component";
+import {MyEnrollmentsComponent} from "./my-courses/my-enrollments.component";
+import {CourseViewComponent} from "./course-view/course-view.component";
 
 export const routes: Routes = [
   {
     title: 'Welcome to E learning!',
     path: '',
     component: HomeComponent,
+  },
+  {
+    title: 'Course detail',
+    path: 'course-view/:id',
+    component: CourseViewComponent
   },
   {
     title: 'Checkout course',
@@ -57,8 +63,8 @@ export const routes: Routes = [
   },
   {
     title: 'Welcome to my courses!',
-    path: 'my-courses',
-    component: MyCoursesComponent
+    path: 'my-enrollments',
+    component: MyEnrollmentsComponent
   },
   {
     title: 'Welcome to dashboard!',
