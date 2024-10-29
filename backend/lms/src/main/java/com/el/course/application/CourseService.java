@@ -20,15 +20,15 @@ public interface CourseService {
 
     Course assignTeacher(Long courseId, String teacher);
 
-    Course addSection(Long courseId, CourseSectionDTO courseSectionDTO);
+    Long addSection(Long courseId, CourseSectionDTO courseSectionDTO);
 
-    Course updateSectionInfo(Long courseId, Long sectionId, String newTitle);
+    void updateSectionInfo(Long courseId, Long sectionId, String newTitle);
 
     void removeSection(Long courseId, Long sectionId);
 
-    Course addLesson(Long courseId, Long sectionId, Lesson lesson);
+    Long addLesson(Long courseId, Long sectionId, Lesson lesson);
 
-    Course updateLesson(Long courseId, Long sectionId, Long lessonId, Lesson updatedLesson);
+    void updateLesson(Long courseId, Long sectionId, Long lessonId, Lesson updatedLesson);
 
     void removeLesson(Long courseId, Long sectionId, Long lessonId);
 

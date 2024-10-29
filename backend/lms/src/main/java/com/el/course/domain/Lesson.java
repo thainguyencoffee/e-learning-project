@@ -2,12 +2,13 @@ package com.el.course.domain;
 
 import com.el.common.exception.InputInvalidException;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Table;
-import org.springframework.util.Assert;
 
 @Getter
 @Table("lesson")
+@ToString
 public class Lesson {
 
     @Id
@@ -22,12 +23,10 @@ public class Lesson {
     }
 
     public Lesson (String title, Type type, String link, Long quiz) {
-        // Kiểm tra tính hợp lệ ngay trong constructor
-        Assert.hasText(title, "Lesson title must not be empty.");
-        Assert.notNull(type, "Lesson type must not be null.");
+        if (title.isBlank()) throw new InputInvalidException("Lesson title must not be empty.");
+        if (type == null) throw new InputInvalidException("Lesson type must not be null.");
 
         validateLinkOrQuiz(type, link, quiz);
-        // Gán giá trị sau khi đã kiểm tra tính hợp lệ
         this.title = title;
         this.type = type;
         this.link = link;
@@ -35,8 +34,9 @@ public class Lesson {
     }
 
     public void updateFrom(Lesson updatedLesson) {
-        Assert.hasText(updatedLesson.getTitle(), "Updated lesson title must not be empty.");
-        Assert.notNull(updatedLesson.getType(), "Updated lesson type must not be null.");
+        if (updatedLesson.getTitle().isBlank()) throw new InputInvalidException("Lesson title must not be empty.");
+        if (updatedLesson.getType() == null) throw new InputInvalidException("Lesson type must not be null.");
+
         this.title = updatedLesson.getTitle();
         this.type = updatedLesson.getType();
         validateLinkOrQuiz(updatedLesson.getType(), updatedLesson.getLink(), updatedLesson.getQuiz());

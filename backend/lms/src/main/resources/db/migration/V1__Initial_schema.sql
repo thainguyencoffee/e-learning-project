@@ -8,25 +8,25 @@ create table student
 
 create table course
 (
-    id                   bigserial    not null,
-    title                varchar(255) not null,
-    thumbnail_url        varchar(500),
-    published            boolean      not null,
-    unpublished          boolean      not null,
-    description          varchar(2000),
-    price                varchar(50),
-    teacher              varchar(50),
-    language             varchar(50),
-    subtitles            varchar(50)[],
-    benefits             varchar(255)[],
-    prerequisites        varchar(255)[],
-    approved_by          varchar(50),
-    created_by           varchar(50)  not null,
-    created_date         timestamp    not null,
-    last_modified_by     varchar(50)  not null,
-    last_modified_date   timestamp    not null,
-    deleted              boolean      not null,
-    version              int          not null,
+    id                 bigserial    not null,
+    title              varchar(255) not null,
+    thumbnail_url      varchar(500),
+    published          boolean      not null,
+    unpublished        boolean      not null,
+    description        varchar(2000),
+    price              varchar(50),
+    teacher            varchar(50),
+    language           varchar(50),
+    subtitles          varchar(50)[],
+    benefits           varchar(255)[],
+    prerequisites      varchar(255)[],
+    approved_by        varchar(50),
+    created_by         varchar(50)  not null,
+    created_date       timestamp    not null,
+    last_modified_by   varchar(50)  not null,
+    last_modified_date timestamp    not null,
+    deleted            boolean      not null,
+    version            int          not null,
     constraint fk_course primary key (id)
 );
 
@@ -151,13 +151,23 @@ create table payment
 create table course_enrollment
 (
     id                 bigserial   not null,
-    course_id          bigint      not null references course (id) on DELETE cascade,
+    course_id          bigint      not null,
     student            varchar(50) not null,
     enrollment_date    timestamp   not null,
-    progress           float       not null,
+    completed          boolean     not null,
     created_by         varchar(50) not null,
     created_date       timestamp   not null,
     last_modified_by   varchar(50) not null,
     last_modified_date timestamp   not null,
     constraint fk_course_enrollment primary key (id)
-)
+);
+
+create table lesson_progress
+(
+    id                bigserial not null,
+    course_enrollment bigint    not null references course_enrollment (id) on DELETE cascade,
+    lesson_id         bigint    not null,
+    completed         boolean   not null,
+    completed_date    timestamp,
+    constraint fk_lesson_progress primary key (id)
+);

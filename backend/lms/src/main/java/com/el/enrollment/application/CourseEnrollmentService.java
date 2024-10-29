@@ -1,21 +1,26 @@
 package com.el.enrollment.application;
 
 import com.el.enrollment.domain.CourseEnrollment;
-import com.el.enrollment.domain.CourseEnrollmentRepository;
-import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-@Service
-public class CourseEnrollmentService {
+public interface CourseEnrollmentService {
 
-    private final CourseEnrollmentRepository repository;
+    Page<CourseEnrollment> findAllCourseEnrollments(Pageable pageable);
 
-    public CourseEnrollmentService(CourseEnrollmentRepository repository) {
-        this.repository = repository;
-    }
+    CourseEnrollment findCourseEnrollmentById(Long id);
 
-    public void enrollment(String student, Long courseId) {
-        CourseEnrollment enrollment = new CourseEnrollment(student, courseId);
-        repository.save(enrollment);
-    }
+    /**
+     * When OrderPaid event is received, this method is called to enroll the student in the course.
+     * Result:
+     * {@link com.el.enrollment.domain.CourseEnrollment} created with a set of
+     * {@link com.el.enrollment.domain.LessonProgress} for each lesson in the course.
+     * Each LessonProgress is initialized with completed flag = false.
+    * */
+    void enrollment(String student, Long courseId);
+
+    void markLessonAsCompleted(Long enrollmentId, Long lessonId);
+
+    void markLessonAsIncomplete(Long enrollmentId, Long lessonId);
 
 }

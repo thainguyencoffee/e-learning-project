@@ -5,18 +5,18 @@ import com.el.course.application.dto.CourseDTO;
 import com.el.course.application.dto.CourseRequestDTO;
 import com.el.course.application.dto.CourseRequestResolveDTO;
 import com.el.course.application.dto.CourseUpdateDTO;
-import com.el.course.domain.Course;
-import com.el.course.domain.CourseRequest;
-import com.el.course.domain.Language;
-import com.el.course.domain.RequestType;
+import com.el.course.domain.*;
 import com.el.course.web.CourseRequestApproveDTO;
 import com.el.course.web.CourseRequestRejectDTO;
 import com.el.discount.application.dto.DiscountDTO;
 import com.el.discount.domain.Discount;
 import com.el.discount.domain.Type;
+import com.el.enrollment.domain.CourseEnrollment;
+import com.el.enrollment.domain.LessonProgress;
 import com.el.order.domain.Order;
 import com.el.order.domain.OrderItem;
 import org.javamoney.moneta.Money;
+import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -40,6 +40,36 @@ public class TestFactory {
                 Set.of(Language.ENGLISH, Language.SPANISH),
                 teacher
         );
+    }
+
+    public static Course createCourseWithSections() {
+        Course course = new Course("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a accumsan purus, et pellentesque nunc. Ut tempus massa leo, a finibus metus porttitor a. Nulla. ",
+                " Etiam in luctus lacus. Proin luctus iaculis ipsum, vitae pulvinar sapien. Vivamus blandit vestibulum tempor. Aenean id tincidunt purus. Donec egestas, dolor a rutrum gravida, enim nunc rhoncus nulla, in tincidunt nisi dui sed metus. Phasellus ut leo elementum, condimentum quam non, pretium leo. In sed justo vitae purus gravida dapibus quis et justo. Nulla eu dapibus ex, lobortis consequat est. Pellentesque ac porta diam, id faucibus nisl. Nunc volutpat felis eget libero gravida pretium. ",
+                "http://example.com/thumbnail.jpg",
+                Set.of("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere lacus massa, et ullamcorper massa iaculis in. Curabitur vulputate, magna eu aliquam scelerisque, ligula dolor. ",
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis ac diam sed ante bibendum finibus nec ut tortor. Cras sed tincidunt libero. Donec placerat volutpat. "),
+                Language.VIETNAMESE,
+                Set.of("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris commodo ligula elementum urna euismod faucibus. In hac habitasse platea dictumst. Suspendisse ac tincidunt tortor. Mauris. "),
+                Set.of(Language.ENGLISH, Language.SPANISH),
+                teacher);
+        CourseSection section = Mockito.spy(new CourseSection("Section 1..."));
+        Mockito.when(section.getId()).thenReturn(1L);
+        section.addLesson(new Lesson("Lesson 1.1...",
+                Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
+        section.addLesson(new Lesson("Lesson 1.2...",
+                Lesson.Type.VIDEO, "http://example.com/lesson2.mp4", null));
+
+        CourseSection section1 = Mockito.spy(new CourseSection("Section 2..."));
+        Mockito.when(section1.getId()).thenReturn(2L);
+        section1.addLesson(new Lesson("Lesson 2.1...",
+                Lesson.Type.VIDEO, "http://example.com/lesson2.1.mp4", null));
+        section1.addLesson(new Lesson("Lesson 2.2...",
+                Lesson.Type.VIDEO, "http://example.com/lesson2.2.mp4", null));
+        section1.addLesson(new Lesson("Lesson 2.3...",
+                Lesson.Type.VIDEO, "http://example.com/lesson2.3.mp4", null));
+        course.addSection(section);
+        course.addSection(section1);
+        return course;
     }
 
     public static CourseDTO createDefaultCourseDTO() {
@@ -181,6 +211,16 @@ public class TestFactory {
                 new OrderItem(2L, Money.of(2000, Currencies.VND))
         );
         return new Order(items);
+    }
+
+    // Course Enrollment
+    public static CourseEnrollment createDefaultCourseEnrollment() {
+        return new CourseEnrollment(user, 1L, Set.of(
+                new LessonProgress(1L), new LessonProgress(2L)));
+    }
+
+    public static CourseEnrollment createCourseEnrollmentWithEmptyLessonProgress() {
+        return new CourseEnrollment(user, 1L, Set.of());
     }
 
 }

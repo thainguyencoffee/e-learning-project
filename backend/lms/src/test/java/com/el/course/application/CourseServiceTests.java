@@ -43,6 +43,7 @@ class CourseServiceTests {
     private CourseDTO courseDTO;
     private CourseUpdateDTO courseUpdateDTO;
     private Course course;
+    private Course courseWithSections;
     private Course courseForPublish;
 
     @BeforeEach
@@ -51,10 +52,9 @@ class CourseServiceTests {
 
         // Giả lập CourseDTO với dữ liệu mẫu
         courseDTO = TestFactory.createDefaultCourseDTO();
-
         courseUpdateDTO = TestFactory.createDefaultCourseUpdateDTO();
-
         course = TestFactory.createDefaultCourse();
+        courseWithSections = TestFactory.createCourseWithSections();
 
         courseForPublish = new Course(
                 courseDTO.title(),
@@ -66,10 +66,14 @@ class CourseServiceTests {
                 courseDTO.subtitles(),
                 "teacher123"
         );
-        courseForPublish.changePrice(Money.of(100, Currencies.VND));
+
         CourseSection section = new CourseSection("Billie Jean [4K] 30th Anniversary, 2001");
         section.addLesson(new Lesson("Lesson 1", Lesson.Type.TEXT, "https://example.com/lesson1", null));
         courseForPublish.addSection(section);
+
+        // update validate updatePrice, Course.validSections return true
+        courseForPublish.changePrice(Money.of(100, Currencies.VND));
+
     }
 
     @Test
@@ -207,12 +211,12 @@ class CourseServiceTests {
 
     @Test
     void updatePrice_ValidCourseIdAndPrice_UpdatesPrice() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L)).thenReturn(courseWithSections);
 
         MonetaryAmount newPrice = Money.of(100, Currencies.VND);
         courseService.updatePrice(1L, newPrice);
-        verify(courseRepository, times(1)).save(course);
-        assertEquals(newPrice, course.getPrice());
+        verify(courseRepository, times(1)).save(courseWithSections);
+        assertEquals(newPrice, courseWithSections.getPrice());
     }
 
     @Test
@@ -280,74 +284,6 @@ class CourseServiceTests {
         verify(courseRepository, never()).save(any(Course.class));
     }
 
-//    @Test
-//    void publishCourse_ValidCourseIdAndApprovedBy_PublishesCourse() {
-//        when(courseQueryService.findCourseById(1L)).thenReturn(courseForPublish);
-//
-//        courseService.publishCourse(1L, "Admin");
-//
-//        verify(courseRepository, times(1)).save(courseForPublish);
-//    }
-//
-//    @Test
-//    void publishCourse_CourseNotFound_ThrowsException() {
-//        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
-//
-//        assertThrows(ResourceNotFoundException.class, () -> courseService.publishCourse(1L, "Admin"));
-//
-//        verify(courseRepository, never()).save(any(Course.class));
-//    }
-//
-//    @Test
-//    void applyDiscount_ShouldApplyDiscountSuccessfully() {
-//        // Mock và discountService
-//        when(courseQueryService.findCourseById(any())).thenReturn(course);
-//        course.changePrice(Money.of(100, Currencies.VND));
-//
-//        MonetaryAmount discountedPrice = Money.of(80, Currencies.VND);
-//        when(discountService.calculateDiscount(any(), any())).thenReturn(discountedPrice);
-//        when(courseRepository.save(any(Course.class))).thenReturn(course);
-//
-//        // Act
-//        courseService.applyDiscount(1L, "DISCOUNT_10");
-//
-//        // Xác minh rằng courseRepository.findById, discountService.calculateDiscount và courseRepository.save đã được gọi
-//        verify(courseQueryService, times(1)).findCourseById(any());
-//        verify(discountService, times(1)).calculateDiscount(any(), any());
-//        verify(courseRepository, times(1)).save(course);
-//    }
-//
-//    @Test
-//    void applyDiscount_ShouldThrowException_WhenCoursePriceIsNull() {
-//        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-//        String discountCode = "DISCOUNT_10";
-//
-//        // Kiểm tra xem ngoại lệ có được ném ra khi giá của khóa học là null
-//        assertThrows(InputInvalidException.class, () -> {
-//            courseService.applyDiscount(1L, discountCode);
-//        });
-//
-//        // Verify
-//        verify(discountService, never()).calculateDiscount(anyString(), any(MonetaryAmount.class));
-//        verify(courseRepository, never()).save(any(Course.class));
-//    }
-//
-//    @Test
-//    void applyDiscount_ShouldThrowException_WhenDiscountNotFound() {
-//        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-//
-//        course.changePrice(Money.of(100, Currencies.VND));
-//        String discountCode = "DISCOUNT_10";
-//        when(discountService.calculateDiscount(discountCode, course.getPrice())).thenThrow(ResourceNotFoundException.class);
-//
-//        // Kiểm tra xem ngoại lệ có được ném ra khi không tìm thấy mã giảm giá
-//        assertThrows(ResourceNotFoundException.class, () -> {
-//            courseService.applyDiscount(1L, discountCode);
-//        });
-//
-//        // Verify
-//        verify(courseRepository, never()).save(any(Course.class));
-//    }
 
     @Test
     void addCourseSection_ShouldAddCourseSection() {
@@ -359,16 +295,11 @@ class CourseServiceTests {
         CourseSectionDTO courseSectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
 
         // Act
-        Course updatedCourse = courseService.addSection(1L, courseSectionDTO);
+        courseService.addSection(1L, courseSectionDTO);
 
         // Verify
         verify(courseQueryService, times(1)).findCourseById(1L);
         verify(courseRepository, times(1)).save(course);
-
-        // Kiểm tra các giá trị trả về
-        assertNotNull(updatedCourse);
-        assertEquals(1, updatedCourse.getSections().size());
-        assertEquals(courseSectionDTO.title(), updatedCourse.getSections().iterator().next().getTitle());
     }
 
     @Test

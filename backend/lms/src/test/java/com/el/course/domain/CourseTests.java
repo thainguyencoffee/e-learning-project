@@ -164,8 +164,8 @@ class CourseTests {
     @Test
     void changePrice_ValidPrice_ChangesPrice() {
         MonetaryAmount newPrice = Money.of(100, Currencies.VND);
-        courseNoSections.changePrice(newPrice);
-        assertEquals(newPrice, courseNoSections.getPrice());
+        courseWithSections.changePrice(newPrice);
+        assertEquals(newPrice, courseWithSections.getPrice());
     }
 
     @Test
@@ -808,5 +808,37 @@ class CourseTests {
         );
     }
 
+//    @Test
+//    void calculateDoneLessonsPercentage_ShouldCalc() {
+//        Course course = TestFactory.createCourseWithSections();
+//        Double percentage = course.calculateDoneLessonsPercentage(1);
+//        assertNotNull(percentage);
+//
+//        double percentageExpected = (1 / (double) 5) * 100;
+//        assertEquals(percentageExpected, percentage);
+//    }
+//
+//    @Test
+//    void calculateDoneLessonsPercentage_ShouldThrowException_WhenCourseHasNoSection() {
+//        Course course = TestFactory.createDefaultCourse();
+//        assertThrows(InputInvalidException.class, () -> course.calculateDoneLessonsPercentage(1),
+//                "Cannot do calculation on a draft course.");
+//    }
+//
+//    @Test
+//    void calculateDoneLessonsPercentageForSection_ShouldCalc() {
+//        Course course = TestFactory.createCourseWithSections();
+//        Double percentage = course.calculateDoneLessonsPercentageForSection(1L, 1);
+//        assertNotNull(percentage);
+//
+//        double percentageExpected = (1 / (double) 2) * 100;
+//        assertEquals(percentageExpected, percentage);
+//    }
+//
+//    @Test
+//    void calculateDoneLessonsPercentageForSection_ShouldThrowException_WhenCourseHasNoSection() {
+//        Course course = TestFactory.createDefaultCourse();
+//        assertThrows(ResourceNotFoundException.class, () -> course.calculateDoneLessonsPercentageForSection(1L, 1));
+//    }
 
 }
