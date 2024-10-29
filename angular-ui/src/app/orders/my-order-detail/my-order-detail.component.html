@@ -1,30 +1,98 @@
-<div class="d-flex flex-wrap mb-4">
-  <h1 class="flex-grow-1">Order Detail!</h1>
-  <div>
-    <a routerLink="/my-orders" class="btn btn-secondary">Back to list</a>
+<div class="container mt-5">
+  <!-- Header Section -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="text-primary fw-bold">
+      <i class="bi bi-bag-fill me-2"></i> Order Receipt
+    </h1>
+    <a routerLink="/my-orders" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back to list
+    </a>
   </div>
-</div>
 
-<div class="col-md-6" *ngIf="order">
-  <p><strong>ID:</strong> {{ order.id }}</p>
-  <p><strong>Order Date:</strong> {{ order.orderDate | date }}</p>
-  <p><strong>Total price:</strong> {{ order.discountedPrice || order.totalPrice }}</p>
-  <p><strong>Discount:</strong> {{ order.discountCode || 'No discount' }}</p>
-  <p><strong>Created by:</strong> {{ order.createdBy }}</p>
-  <p><strong>Status: </strong>
-    <span *ngIf="order.status === 'PAID'" class="badge bg-success">{{order.status}}</span>
-    <span *ngIf="order.status === 'PENDING'" class="badge bg-warning">{{order.status}}</span>
-    <span *ngIf="order.status === 'CANCELLED'" class="badge bg-secondary">{{order.status}}</span>
-  </p>
-</div>
+  <div class="row g-4">
+    <!-- Order Details Section -->
+    <div class="col-lg-6 d-flex">
+      <div class="card shadow-lg border-0 flex-fill">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0"><i class="bi bi-receipt me-2"></i> Order Details</h5>
+        </div>
+        <div class="card-body">
+          <div class="order-section" *ngIf="order">
+            <div class="d-flex justify-content-between">
+              <p><strong>Order ID:</strong></p>
+              <p>{{ order.id }}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p><strong>Order Date:</strong></p>
+              <p>{{ order.orderDate | date:'mediumDate' }}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p><strong>Discount:</strong></p>
+              <p>{{ order.discountCode || 'No discount' }}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p><strong>Total Price:</strong></p>
+              <p class="text-success fw-bold">{{ order.discountedPrice || order.totalPrice }}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p><strong>Created By:</strong></p>
+              <p>{{ order.createdBy }}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p><strong>Status:</strong></p>
+              <p>
+                <span *ngIf="order.status === 'PAID'" class="badge bg-success">{{order.status}}</span>
+                <span *ngIf="order.status === 'PENDING'" class="badge bg-warning">{{order.status}}</span>
+                <span *ngIf="order.status === 'CANCELLED'" class="badge bg-secondary">{{order.status}}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<h1>Payment</h1>
-<div class="col-md-6" *ngIf="payments && payments.length > 0">
-  @for (payment of payments; track payment.id) {
-    <p><strong>ID:</strong> {{ payment.id }}</p>
-    <p><strong>Payment Date:</strong> {{ payment.paymentDate | date }}</p>
-    <p><strong>Method:</strong> {{ payment.paymentMethod }}</p>
-    <p><strong>Status:</strong> {{ payment.status }}</p>
-    <p><strong>Receipt URL: </strong> <a [href]="payment.receiptUrl" target="_blank">Receipt URL</a></p>
-  }
-</div>
+    <!-- Payment Details Section -->
+    <div class="col-lg-6 d-flex" *ngIf="payments && payments.length > 0">
+      <div class="card shadow-lg border-0 flex-fill">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0"><i class="bi bi-credit-card me-2"></i> Payment Details</h5>
+        </div>
+        <div class="card-body">
+          @for (payment of payments; track payment.id) {
+            <div class="d-flex justify-content-between">
+              <p><strong>Payment ID:</strong></p>
+              <p>{{ payment.id }}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p><strong>Date:</strong></p>
+              <p>{{ payment.paymentDate | date:'mediumDate' }}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p><strong>Method:</strong></p>
+              <p class="text-primary">{{ payment.paymentMethod }}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p><strong>Amount:</strong></p>
+              <p class="fw-bold text-success">{{ payment.amount }}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p><strong>Status:</strong></p>
+              <p>
+                <span *ngIf="payment.status === 'PAID'" class="badge bg-success">{{payment.status}}</span>
+                <span *ngIf="payment.status === 'PENDING'" class="badge bg-warning">{{payment.status}}</span>
+                <span *ngIf="payment.status === 'CANCELLED'" class="badge bg-secondary">{{payment.status}}</span>
+              </p>
+            </div>
+            <div class="text-end mt-2">
+              <a [href]="payment.receiptUrl" target="_blank" class="btn btn-primary">
+                <i class="bi bi-receipt"></i> View Receipt
+              </a>
+            </div>
+          }
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>

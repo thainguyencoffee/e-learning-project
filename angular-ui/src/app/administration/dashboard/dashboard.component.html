@@ -1,17 +1,12 @@
 <div class="mt-3">
   <div class="row">
-    <div class="col-3">
-      <ul class="list-inline">
-        <li>
-          <a routerLink="/administration/courses">Course management</a>
-        </li>
-        <li>
-          <a *ngIf="isAdmin()" routerLink="/administration/discounts">Discount management</a>
-        </li>
-      </ul>
+    <div class="col">
+      <div class="d-flex mb-2">
+        <a routerLink="/administration/courses" class="btn btn-primary me-2">Course management</a>
+        <a *ngIf="isAdmin()" routerLink="/administration/discounts" class="btn btn-primary">Discount management</a>
+      </div>
     </div>
-    <div class="col-8">
-      <router-outlet></router-outlet>
-    </div>
+    <hr class="my"> <!-- Adds vertical spacing around the horizontal line -->
+    <router-outlet></router-outlet>
   </div>
 </div>
