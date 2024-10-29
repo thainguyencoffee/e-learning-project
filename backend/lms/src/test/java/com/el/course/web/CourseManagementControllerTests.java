@@ -2,6 +2,7 @@ package com.el.course.web;
 
 import com.el.TestFactory;
 import com.el.common.Currencies;
+import com.el.common.config.CustomAuthenticationEntryPoint;
 import com.el.common.config.jackson.JacksonCustomizations;
 import com.el.common.config.SecurityConfig;
 import com.el.common.exception.InputInvalidException;
@@ -42,7 +43,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CourseManagementController.class)
-@Import({SecurityConfig.class, JacksonCustomizations.class})
+@Import({SecurityConfig.class, JacksonCustomizations.class, CustomAuthenticationEntryPoint.class})
 class CourseManagementControllerTests {
 
     @Autowired

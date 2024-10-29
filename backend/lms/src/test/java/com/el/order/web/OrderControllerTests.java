@@ -1,5 +1,6 @@
 package com.el.order.web;
 
+import com.el.common.config.CustomAuthenticationEntryPoint;
 import com.el.common.config.jackson.JacksonCustomizations;
 import com.el.common.config.SecurityConfig;
 import com.el.common.exception.InputInvalidException;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(OrderController.class)
-@Import({SecurityConfig.class, JacksonCustomizations.class})
+@Import({SecurityConfig.class, JacksonCustomizations.class, CustomAuthenticationEntryPoint.class})
 class OrderControllerTests {
 
     @Autowired

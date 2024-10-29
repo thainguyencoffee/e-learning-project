@@ -16,7 +16,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint)
+            throws Exception {
         return http
                         // Define authorization rules
                         .authorizeHttpRequests(authorize -> authorize
@@ -48,10 +49,15 @@ public class SecurityConfig {
                         // Require "teacher" role for all other requests
                         .anyRequest().hasAnyRole("teacher", "admin")
                 )
+                // Custom exception handling
+//                .exceptionHandling(exceptionHandling -> exceptionHandling
+//                        .authenticationEntryPoint(customAuthenticationEntryPoint))
                 // Configure OAuth2 resource server to use JWT tokens
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt
                         // Set the JWT authentication converter
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                )
                 // Set session management policy to stateless
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
