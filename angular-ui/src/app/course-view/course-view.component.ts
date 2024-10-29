@@ -53,7 +53,11 @@ export class CourseViewComponent implements OnInit, OnDestroy{
       error: error => this.errorHandler.handleServerError(error.error)
     })
 
-    this.hasPurchase$ = this.orderService.hasPurchase(this.id!);
+    if (this.userService.current.isAuthenticated) {
+      this.hasPurchase$ = this.orderService.hasPurchase(this.id!);
+    } else {
+      this.hasPurchase$ = new Observable<boolean>();
+    }
 
   }
 
