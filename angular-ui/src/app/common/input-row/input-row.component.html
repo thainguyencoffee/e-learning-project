@@ -61,7 +61,7 @@
         }
       } @else if (rowType === 'imageFile') {
         <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}"
-               accept=".jpg, .jpeg, .png"/>
+               accept=".jpg, .jpeg, .png, .webp"/>
         <img [src]="previewUrl" alt="Image preview" class="img-thumbnail mt-2" style="max-height: 200px;"/>
       } @else if (rowType === 'videoFile') {
         <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}"
