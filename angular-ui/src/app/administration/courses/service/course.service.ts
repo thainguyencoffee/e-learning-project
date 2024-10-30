@@ -5,7 +5,7 @@ import {Course} from "../model/view/course";
 import {AddCourseDto} from "../model/add-course.dto";
 import {UploadService} from "../../../common/upload/upload.service";
 import {EditCourseDto} from "../model/edit-course.dto";
-import {PageWrapper} from "../model/view/page-wrapper";
+import {PageWrapper} from "../../../common/dto/page-wrapper";
 import {SectionDto} from "../model/section-dto";
 import {LessonDto} from "../model/lesson-dto";
 import {Section} from "../model/view/section";

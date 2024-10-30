@@ -6,7 +6,7 @@ import {NavigationEnd, Router, RouterLink} from "@angular/router";
 import {Subscription} from "rxjs";
 import {NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
 import {UserService} from "../../../../common/auth/user.service";
-import {PaginationUtils} from "../../model/view/page-wrapper";
+import {PaginationUtils} from "../../../../common/dto/page-wrapper";
 
 @Component({
   selector: 'app-list-course',

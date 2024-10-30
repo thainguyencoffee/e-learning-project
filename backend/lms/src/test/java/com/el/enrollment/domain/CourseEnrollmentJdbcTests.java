@@ -2,6 +2,8 @@ package com.el.enrollment.domain;
 
 import com.el.TestFactory;
 import com.el.common.config.DataAuditConfig;
+import com.el.enrollment.application.dto.CourseEnrollmentDTO;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
@@ -10,6 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,19 +27,15 @@ class CourseEnrollmentJdbcTests {
     @Autowired
     private CourseEnrollmentRepository repository;
 
+    @BeforeEach
+    void setUp() {
+        repository.save(TestFactory.createDefaultCourseEnrollment());
+    }
+
     @Test
     void testSave() {
         CourseEnrollment courseEnrollment = repository.save(TestFactory.createDefaultCourseEnrollment());
         assertNotNull(courseEnrollment.getId());
-
-        Page<CourseEnrollment> allByStudent = repository.findAllByStudent(courseEnrollment.getStudent(), null);
-        assertNotNull(allByStudent);
-        long totalElements = allByStudent.getTotalElements();
-        assertEquals(1, totalElements);
-
-        Optional<CourseEnrollment> byIdAndStudent = repository.findByIdAndStudent(courseEnrollment.getId(), courseEnrollment.getStudent());
-        assertNotNull(byIdAndStudent);
-        assertEquals(courseEnrollment.getId(), byIdAndStudent.get().getId());
     }
 
     @Test

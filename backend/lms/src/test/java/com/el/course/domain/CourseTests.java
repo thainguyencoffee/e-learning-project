@@ -537,6 +537,7 @@ class CourseTests {
         courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
 
         assertTrue(courseWithSections.isPublishedAndNotDeleted());
+        assertFalse(courseWithSections.getUnpublished());
         assertEquals("admin", courseWithSections.getApprovedBy());
     }
 
@@ -693,6 +694,7 @@ class CourseTests {
         courseWithSections.approveUnpublish(courseRequestUnPublish.getId(), "admin", "Looks not good!");
 
         assertTrue(courseWithSections.isNotPublishedAndDeleted());
+        assertTrue(courseWithSections.getUnpublished());
         assertEquals("admin", courseWithSections.getApprovedBy());
     }
 

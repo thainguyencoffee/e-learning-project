@@ -5,7 +5,7 @@ import com.el.course.application.dto.CourseDTO;
 import com.el.course.application.dto.CourseSectionDTO;
 import com.el.course.application.dto.LessonDTO;
 import com.el.course.domain.*;
-import com.el.course.web.CourseRequestApproveDTO;
+import com.el.course.web.dto.CourseRequestApproveDTO;
 import com.el.course.web.dto.AssignTeacherDTO;
 import com.el.course.web.dto.UpdatePriceDTO;
 import com.el.course.web.dto.UpdateSectionDTO;

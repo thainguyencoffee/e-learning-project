@@ -3,11 +3,12 @@ import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router
 import {CourseService} from "../../service/course.service";
 import {Course} from "../../model/view/course";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
-import {NgForOf, NgIf} from "@angular/common";
+import {DatePipe, NgForOf, NgIf} from "@angular/common";
 import {Subscription} from "rxjs";
 import {UserService} from "../../../../common/auth/user.service";
 import {Section} from "../../model/view/section";
 import {Lesson} from "../../model/view/lesson";
+import {EnrolmentsService} from "../../../../enrolments/service/enrolments.service";
 
 @Component({
   selector: 'app-course-detail',
@@ -17,6 +18,7 @@ import {Lesson} from "../../model/view/lesson";
     RouterLink,
     NgForOf,
     NgIf,
+    DatePipe,
   ],
   templateUrl: './course-detail.component.html',
 })
@@ -25,11 +27,13 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
   route = inject(ActivatedRoute)
   router = inject(Router);
   courseService = inject(CourseService);
+  enrolmentService = inject(EnrolmentsService);
   errorHandler = inject(ErrorHandler);
   userService = inject(UserService);
 
   currentId?: number;
   courseDto?: Course
+  participantNumber?: number;
   navigationSubscription?: Subscription;
 
   ngOnInit(): void {
@@ -51,6 +55,12 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
     this.courseService.getCourse(this.currentId)
       .subscribe({
         next: (data) => this.courseDto = data,
+        error: (error) => this.errorHandler.handleServerError(error.error)
+      })
+
+    this.enrolmentService.countEnrolmentsByCourseId(this.currentId)
+      .subscribe({
+        next: (data) => this.participantNumber = data,
         error: (error) => this.errorHandler.handleServerError(error.error)
       })
   }

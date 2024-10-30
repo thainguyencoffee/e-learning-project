@@ -179,6 +179,7 @@ public class Course extends AuditSupportClass {
                 }).orElseThrow(ResourceNotFoundException::new);
         this.approvedBy = approvedBy;
         this.published = true;
+        this.unpublished = false;
     }
 
     public void rejectPublish(Long courseRequestId, String rejectedBy, String rejectReason) {

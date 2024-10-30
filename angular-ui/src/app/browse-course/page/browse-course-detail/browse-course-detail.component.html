@@ -1,0 +1,68 @@
+<div class="container mt-5 p-4 border rounded shadow-sm bg-light">
+  <h1 class="mb-4 text-center text-primary">Title: {{ course?.title }}</h1>
+  <p><strong>Teacher</strong>: {{ course?.teacher }}</p>
+  <p><strong>Price</strong>:{{ course?.price}}</p>
+  <p>{{ course?.description }}</p>
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="p-3 border rounded bg-white">
+        <h5>Subtitles</h5>
+        <ul class="list-group">
+          <li class="list-group-item">
+            {{course?.subtitles?.join(', ') || 'N/A' }}
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="p-3 border rounded bg-white">
+        <h5>Benefits</h5>
+        <ul class="list-group">
+          <li class="list-group-item">
+            {{ course?.benefits?.join(', ') || 'N/A' }}
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="p-3 border rounded bg-white">
+        <h5>Prerequisites</h5>
+        <ul class="list-group">
+          <li class="list-group-item">
+            {{ course?.prerequisites?.join(', ') || 'N/A' }}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="!isAuthenticated; else loggedIn">
+    <div class="alert alert-info mt-4" role="alert">
+      <h4 class="alert-heading">You are not logged in!</h4>
+      <p>Please log in to access the course and other features.</p>
+      <app-login></app-login>
+    </div>
+  </div>
+  <ng-template #loggedIn>
+  <div *ngIf="enrolment" class="alert alert-success" role="alert">
+    <h4 class="alert-heading">Congratulations! You </h4>
+    <p>You can start learning right now. Here is your course information:</p>
+    <ul>
+      <li>Course Name: <strong>{{ course?.title }}</strong></li>
+      <li>Teacher: <strong>{{ course?.teacher }}</strong></li>
+    </ul>
+    <a [routerLink]="['/enrolments', enrolment.id]" class="btn btn-primary">Start Learning</a>
+  </div>
+
+  <div *ngIf="!enrolment" class="alert alert-warning" role="alert">
+    <h4 class="alert-heading">You have not purchased this course!</h4>
+    <p>To start learning, please purchase the course now to gain valuable knowledge.</p>
+    <ul>
+      <li>Course Name: <strong>{{ course?.title }}</strong></li>
+      <li>Teacher: <strong>{{ course?.teacher }}</strong></li>
+      <li>Price: <strong>{{ course?.price }}</strong></li>
+    </ul>
+    <a href="/course/{{ course?.id }}/purchase" class="btn btn-success">Buy Now</a>
+  </div>
+  </ng-template>
+</div>
+

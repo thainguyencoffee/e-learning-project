@@ -23,6 +23,8 @@ https://github.com/thainguyencoffee/e-learning-project.git
 
 ### Compile and test; build all JARs, build image container, start docker compose
 
+> Note: Linux: `sudo chmod -R 777 e-learning-project`
+
 1. Without angular (recommend when you want to develop frontend)
 ```bash
 ./build.sh without-angular

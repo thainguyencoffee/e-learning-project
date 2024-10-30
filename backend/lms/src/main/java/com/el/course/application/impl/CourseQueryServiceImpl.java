@@ -4,11 +4,14 @@ import com.el.common.RolesBaseUtil;
 import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
+import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.domain.Course;
 import com.el.course.domain.CourseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CourseQueryServiceImpl implements CourseQueryService {
@@ -69,10 +72,10 @@ public class CourseQueryServiceImpl implements CourseQueryService {
         throw new AccessDeniedException("Access denied");
     }
 
-
     @Override
-    public Page<Course> findAllPublishedCourses(Pageable pageable) {
-        return courseRepository.findAllByPublishedAndDeleted(true, false, pageable);
+    public Course findCourseDeleted(Long courseId) {
+        return courseRepository.findByIdAndDeleted(courseId, true)
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
@@ -82,8 +85,15 @@ public class CourseQueryServiceImpl implements CourseQueryService {
     }
 
     @Override
-    public Course findCourseDeleted(Long courseId) {
-        return courseRepository.findByIdAndDeleted(courseId, true)
+    public List<CourseWithoutSectionsDTO> findAllCourseWithoutSectionsDTOs(Pageable pageable) {
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+        return courseRepository.findAllByPublishedAndDeleted(true, false, page, size);
+    }
+
+    @Override
+    public CourseWithoutSectionsDTO findCourseWithoutSectionsDTOById(Long courseId) {
+        return courseRepository.findPublishedCourseDTOByIdAndPublishedAndDeleted(courseId, true, false)
                 .orElseThrow(ResourceNotFoundException::new);
     }
 

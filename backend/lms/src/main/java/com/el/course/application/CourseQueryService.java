@@ -1,8 +1,11 @@
 package com.el.course.application;
 
+import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.domain.Course;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface CourseQueryService {
 
@@ -14,10 +17,12 @@ public interface CourseQueryService {
 
     Course findCourseInTrashById(Long courseId);
 
-    Page<Course> findAllPublishedCourses(Pageable pageable);
+    Course findCourseDeleted(Long courseId);
 
     Course findPublishedCourseById(Long courseId);
 
-    Course findCourseDeleted(Long courseId);
+    List<CourseWithoutSectionsDTO> findAllCourseWithoutSectionsDTOs(Pageable pageable);
+
+    CourseWithoutSectionsDTO findCourseWithoutSectionsDTOById(Long courseId);
 
 }
