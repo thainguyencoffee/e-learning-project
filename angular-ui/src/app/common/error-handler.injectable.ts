@@ -83,6 +83,7 @@ export function getGlobalErrorMessage(key: string, details?: any) {
     maxlength: 'Your value too long.',
     minlength: 'Your value too short.',
     validDouble: 'Please provide a valid floating point number.',
+    validJson: 'Please follow the JSON format. Example array format: ["value1", "value2"]',
     REQUIRED_NOT_NULL: 'Please provide a value.',
     REQUIRED_NOT_BLANK: 'Please provide a value.',
   }

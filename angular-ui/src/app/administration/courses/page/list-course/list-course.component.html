@@ -23,7 +23,7 @@
         <th scope="col">Title</th>
         <th scope="col">Language</th>
         <th scope="col">Thumbnail</th>
-        <th scope="col">Published</th>
+        <th scope="col">Status</th>
         <th><!-- --></th>
       </tr>
       </thead>
@@ -48,7 +48,11 @@
                 </a>
               }
             </td>
-            <td>{{ course.published }}</td>
+            <td>
+              <span class="badge {{ course.published ? 'bg-success' : 'bg-primary' }}">
+              {{ course.published ? 'Published' : 'Not published' }}
+            </span>
+            </td>
             <td>
               <div class="float-end text-nowrap d-flex">
                 <a [routerLink]="['/administration/courses/', course.id]" class="btn btn-sm btn-secondary me-2">View</a>
