@@ -29,12 +29,26 @@ import {MyOrdersComponent} from "./orders/my-orders/my-orders.component";
 import {MyOrderDetailComponent} from "./orders/my-order-detail/my-order-detail.component";
 import {MyEnrollmentsComponent} from "./my-courses/my-enrollments.component";
 import {CourseViewComponent} from "./course-view/course-view.component";
+import {UsageComponent} from "./common/usage/usage.component";
+import {AboutUnpublishComponent} from "./common/usage/about-unpublish/about-unpublish.component";
 
 export const routes: Routes = [
   {
     title: 'Welcome to E learning!',
     path: '',
     component: HomeComponent,
+  },
+  {
+    title: 'Usage',
+    path: 'usage',
+    component: UsageComponent,
+    children: [
+      {
+        title: 'Usage about unpublishing course',
+        path: 'about-unpublish',
+        component: AboutUnpublishComponent
+      }
+    ]
   },
   {
     title: 'Course detail',

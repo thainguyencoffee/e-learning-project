@@ -3,6 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {PageWrapper} from "./administration/courses/model/view/page-wrapper";
 import {Course} from "./administration/courses/model/view/course";
+import {CourseEnrollmentDTO} from "./my-courses/model";
 
 
 @Injectable(
@@ -20,6 +21,14 @@ export class BrowseCourseService {
 
   getPublishedCourse(id: number): Observable<Course> {
     return this.http.get<Course>(this.resourcePath + '/' + id);
+  }
+
+  countCourseEnrolmentsByCourseId(courseId: number) {
+    return this.http.get<number>(`${this.resourcePath}/${courseId}/enrolments/count`);
+  }
+
+  getAllCourseEnrolmentsByCourseId(courseId: number): Observable<PageWrapper<CourseEnrollmentDTO>> {
+    return this.http.get<PageWrapper<CourseEnrollmentDTO>>(`${this.resourcePath}/${courseId}/enrolments`);
   }
 
 }

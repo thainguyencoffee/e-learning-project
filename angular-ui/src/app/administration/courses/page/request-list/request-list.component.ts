@@ -44,11 +44,7 @@ export class RequestListComponent implements OnInit {
 
   canRequestUnPublish(course: Course) {
     return this.userService.current.hasAnyRole('ROLE_teacher')
-      && this.isTitleGreen(course) && this.noStudentsInCourse(course) && course.published;
-  }
-
-  private noStudentsInCourse(course: Course) {
-    return course.students.length === 0;
+      && this.isTitleGreen(course) && course.published;
   }
 
   private isTitleGreen(course: Course) {
