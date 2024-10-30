@@ -11,7 +11,6 @@ import {DatePipe, NgIf} from "@angular/common";
 @Component({
   selector: 'app-my-order-detail',
   standalone: true,
-  styleUrls: ['./my-order-detail.component.css'],
   imports: [
     NgIf,
     DatePipe,

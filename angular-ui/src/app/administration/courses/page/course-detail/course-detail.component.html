@@ -19,7 +19,8 @@
         <img
           [src]="courseDto.thumbnailUrl || 'https://placehold.jp/200x200.png'"
           class="img-fluid rounded shadow-sm mb-3"
-          alt="Course Thumbnail">
+          alt="Course Thumbnail"
+          style="width: auto; height: 300px; object-fit: cover;">
       </div>
       <div class="col-lg-8">
         <p><strong>Title:</strong> {{ courseDto.title }}</p>
@@ -37,7 +38,6 @@
       </div>
     </div>
   </section>
-
   <!-- Subtitles, Benefits, and Prerequisites -->
   <div class="row mb-4">
     <div class="col-md-4">
@@ -89,84 +89,68 @@
     </p>
     <p><strong>Last Modified Date:</strong> {{ courseDto.lastModifiedDate }}</p>
   </section>
-
   <!--Section-->
-  <div id="sections">
-    <h5>Sections</h5>
+  <section id="sections" class="p-4 border rounded mb-4 bg-white">
+    <h2 class="mb-4 border-bottom pb-2">Sections</h2>
+    <!--Section-->
+  <div class="accordion mt-4" id="courseSections">
+    <div *ngFor="let section of courseDto.sections; let i = index" class="accordion-item mb-3 border rounded">
+      <!-- Accordion Header -->
+      <h2 class="accordion-header" [attr.id]="'heading' + section.id">
+        <div class="d-flex align-items-center justify-content-between px-3 py-2">
+          <!-- Title và nút collapse -->
+          <span class="badge bg-primary me-2">{{ section.lessons.length }} Lesson</span>
+          <button
+            class="accordion-button collapsed bg-light text-dark fw-bold p-0 me-3"
+            type="button"
+            data-bs-toggle="collapse"
+            [attr.data-bs-target]="'#collapse' + section.id"
+            aria-expanded="false"
+            [attr.aria-controls]="'collapse' + section.id"
+          >
+            <span>{{ section.title }}</span>
+          </button>
 
-    <div *ngIf="courseDto?.sections?.length === 0">
-    <span class="badge bg-dark">
-      No prerequisites available
-    </span>
-    </div>
-
-    <div *ngIf="courseDto?.sections?.length !== 0" class="table-responsive">
-      <table class="table table-striped table-hover align-middle">
-        <thead>
-        <tr>
-          <th scope="col">Id</th>
-          <th scope="col">Title</th>
-          <th><!-- --></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let section of courseDto.sections;">
-          <td>{{ section.id }}</td>
-
-          <td type="button" data-bs-toggle="collapse"
-              [attr.data-bs-target]="'#collapse' + section.id"
-              aria-expanded="false" [attr.aria-controls]="'#collapse' + section.id"
-          >{{ section.title }}
-          </td>
-
-          <td>
-            <div class="float-end text-nowrap d-flex">
+          <!-- Badge và nhóm button -->
+          <div class="d-flex align-items-center">
+            <div class="d-flex gap-2">
               <a [routerLink]="['/administration/courses/', currentId, 'sections', section.id]"
-                 class="btn btn-sm btn-secondary me-2">View section detail</a>
-              <a *ngIf="isEditable()" [routerLink]="['/administration/courses', currentId, 'sections', 'edit', section.id]"
-                 class="btn btn-sm btn-secondary me-2">Edit Section</a>
-              <a *ngIf="isEditable()" [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'add']"
-                 class="btn btn-sm btn-secondary me-2">Add Lesson</a>
-              <button *ngIf="isEditable()" type="button" (click)="confirmDeleteSection(section.id, section)"
-                      class="btn btn-sm btn-secondary me-2">Delete
-              </button>
+                 class="btn btn-secondary btn-sm custom-button">View Detail</a>
+              <a *ngIf="isEditable()"
+                 [routerLink]="['/administration/courses', currentId, 'sections', 'edit', section.id]"
+                 class="btn btn-secondary btn-sm custom-button">Edit</a>
+              <a *ngIf="isEditable()"
+                 [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'add']"
+                 class="btn btn-secondary btn-sm custom-button">Add Lesson</a>
+              <button *ngIf="isEditable()"
+                      type="button"
+                      (click)="confirmDeleteSection(section.id, section)"
+                      class="btn btn-secondary btn-sm custom-button">Delete</button>
             </div>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div *ngFor="let section of courseDto.sections;">
-      <div class="collapse table-responsive" [attr.id]="'collapse' + section.id">
-        <table class="table table-striped table-hover align-middle">
-          <thead>
-          <tr>
-            <th>Id</th>
-            <th>Title</th>
-            <td>Type</td>
-            <th>Preview</th>
-            <th><!-- --></th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr *ngFor="let lesson of section.lessons">
-            <td>{{ lesson.id }}</td>
-            <td>{{ lesson.title }}</td>
-            <td>{{ lesson.type }}</td>
-            <td><a [href]="lesson.link" target="_blank">View content</a></td>
-
-            <td>
-              <a *ngIf="isEditable()" [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'edit', lesson.id]"
-                 class="btn btn-sm btn-secondary me-2">Edit Lesson</a>
-              <button *ngIf="isEditable()" type="button" (click)="confirmDeleteLesson(section.id, lesson.id, lesson)"
-                      class="btn btn-sm btn-secondary me-2">Delete
-              </button>
-            </td>
-          </tr>
-          </tbody>
-        </table>
+          </div>
+        </div>
+      </h2>
+      <!-- Accordion Content -->
+      <div
+        [attr.id]="'collapse' + section.id"
+        class="accordion-collapse collapse"
+        [attr.aria-labelledby]="'heading' + section.id"
+        data-bs-parent="#courseSections"
+      >
+        <div class="accordion-body border-top">
+          <ul class="list-group border-0">
+            <li *ngFor="let lesson of section.lessons; let j = index"
+                class="list-group-item d-flex justify-content-between align-items-center border-0">
+              <span class="fw-bold">{{ j + 1 }}. {{ lesson.title }}</span>
+              <a [href]="lesson.link" target="_blank" class="btn btn-outline-success custom-button">
+                View content
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
+  </section>
 </div>
+

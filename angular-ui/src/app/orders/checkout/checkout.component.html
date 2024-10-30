@@ -1,99 +1,138 @@
-<h1>List courses for checkout</h1>
+<div class="container my-5">
+  <h1 class="text-center mb-4">Courses for Checkout</h1>
 
-<table class="table">
-  <thead>
-  <tr>
-    <th>ID</th>
-    <th>Title</th>
-    <th>Language</th>
-    <th>Price</th>
-    <th>Published</th>
-    <th>Teacher</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr *ngFor="let course of courses" (click)="selectCourse(course)">
-    <td>{{ course.id }}</td>
-    <td>{{ course.title }}</td>
-    <td>{{ course.language }}</td>
-    <td>{{ course.price }}</td>
-    <td>{{ course.published ? 'Yes' : 'No' }}</td>
-    <td>{{ course.teacher }}</td>
-  </tr>
-  </tbody>
-</table>
-
-<div *ngIf="selectedCourse" class="container">
-  <div class="row">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+  <!-- Courses Table -->
+  <table class="table table-hover table-bordered">
+    <thead class="table-primary">
+    <tr>
+      <th>ID</th>
+      <th>Title</th>
+      <th>Language</th>
+      <th>Price</th>
+      <th>Teacher</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let course of courses" (click)="selectCourse(course)" class="table-light">
+      <td>{{ course.id }}</td>
+      <td>{{ course.title }}</td>
+      <td>{{ course.language }}</td>
+      <td>{{ course.price }}</td>
+      <td>{{ course.teacher }}</td>
+    </tr>
+    </tbody>
+  </table>
+  <!-- Selected Course Details -->
+  <div *ngIf="selectedCourse" class="card mt-4 shadow-lg">
+    <!-- Header với nút đóng -->
+    <div class="card-header d-flex justify-content-between align-items-center">
       <h3 class="mb-0">Course Details</h3>
-      <button class="btn btn-danger btn-sm" (click)="clearSelected()" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
+      <button class="btn-close" (click)="clearSelected()" aria-label="Close"></button>
     </div>
-
-    <div class="col-md-6">
-      <p><strong>Title:</strong> {{ selectedCourse.title }}</p>
-      <p><strong>Description:</strong> {{ selectedCourse.description }}</p>
-      <p><strong>Language:</strong> {{ selectedCourse.language }}</p>
-      <p><strong>Subtitles:</strong> {{ selectedCourse.subtitles?.join(', ') }}</p>
-      <p><strong>Benefits:</strong> {{ selectedCourse.benefits?.join(', ') }}</p>
-      <p><strong>Prerequisites:</strong> {{ selectedCourse.prerequisites?.join(', ') }}</p>
-      <p><strong>Price:</strong> {{ selectedCourse.price }}</p>
-      <p><strong>Teacher:</strong> {{ selectedCourse.teacher }}</p>
+    <section id="basic" class="p-4 border rounded mb-4 bg-white">
+    <div class="row">
+      <div class="col-lg-4 text-center">
+        <img
+          [src]="selectedCourse.thumbnailUrl || 'https://placehold.jp/200x200.png'"
+          class="img-fluid rounded shadow-sm mb-3"
+          alt="Course Thumbnail"
+          style="width: auto; height: 300px; object-fit: cover;">
+      </div>
+      <div class="col-lg-8">
+        <p><strong>Title:</strong> {{ selectedCourse.title }}</p>
+        <p>
+          <strong>Teacher:</strong>
+          <span>{{ selectedCourse.teacher }}</span>
+        </p>
+        <p><strong>Description:</strong> {{ selectedCourse.description || 'No description available' }}</p>
+        <p><strong>Language:</strong> <span>{{ selectedCourse.language }}</span></p>
+        <p><strong>Price:</strong> {{ selectedCourse.price || 'Price not available' }}</p>
+      </div>
     </div>
-
-    <div class="col-md-6">
-      <img [src]="selectedCourse.thumbnailUrl" alt="{{ selectedCourse.title }}" class="img-fluid"/>
+    </section>
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <div class="p-3 border rounded bg-white">
+          <h5>Subtitles</h5>
+          <ul class="list-group">
+            <li class="list-group-item">
+              {{ selectedCourse.subtitles?.join(', ') || 'N/A' }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 border rounded bg-white">
+          <h5>Benefits</h5>
+          <ul class="list-group">
+            <li class="list-group-item">
+              {{ selectedCourse.benefits?.join(', ') || 'N/A' }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 border rounded bg-white">
+          <h5>Prerequisites</h5>
+          <ul class="list-group">
+            <li class="list-group-item">
+              {{ selectedCourse.prerequisites?.join(', ') || 'N/A' }}
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+  <!-- Discount Section -->
+  <table class="table mt-4">
+    <thead class="table-primary">
+    <tr>
+      <th>Code</th>
+      <th>Type</th>
+      <th>Value</th>
+      <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngIf="discountSelected" class="table-light">
+      <td>{{ discountSelected.code }}</td>
+      <td>{{ discountSelected.type }}</td>
+      <td>
+        {{ discountSelected.type === 'PERCENTAGE'
+        ? discountSelected.percentage + '%'
+        : discountSelected.fixedPrice  }}
+      </td>
+      <td>
+        <button class="btn btn-danger btn-sm" (click)="clearDiscount()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
 
-<table class="table">
-  <thead>
-  <tr>
-    <th>Code</th>
-    <th>Type</th>
-    <th>Value</th>
-    <th><!----></th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr *ngIf="discountSelected">
-    <td>{{ discountSelected.code }}</td>
-    <td>{{ discountSelected.type }}</td>
-    <td>{{ discountSelected.type === 'PERCENTAGE' ? discountSelected.percentage : discountSelected.fixedPrice }}</td>
-    <td>
-      <button class="btn btn-danger btn-sm" (click)="clearDiscount()" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </td>
-  </tr>
-  </tbody>
-</table>
-
-<h1>Please complete below form</h1>
-@if (!discountSelected) {
-  <h4>Total price: {{ calcTotalPrice() }}</h4>
-} @else {
-
-  @if (discountSelected.type === 'PERCENTAGE' && discountSelected.percentage) {
-    <h4>Total price: {{ calcMultiplier(calcTotalPrice(), discountSelected.percentage) }}</h4>
-  } @else if (discountSelected.type === 'FIXED' && discountSelected.fixedPrice) {
-    <h4>Total price: {{ calcDifference(calcTotalPrice(), discountSelected.fixedPrice) }}</h4>
-  } @else {
+  <!-- Price Calculation -->
+  <h1 class="text-center mb-4">Please complete below form</h1>
+  @if (!discountSelected) {
     <h4>Total price: {{ calcTotalPrice() }}</h4>
+  } @else {
+    @if (discountSelected.type === 'PERCENTAGE' && discountSelected.percentage) {
+      <h4>Total price: {{ calcMultiplier(calcTotalPrice(), discountSelected.percentage) }}</h4>
+    } @else if (discountSelected.type === 'FIXED' && discountSelected.fixedPrice) {
+      <h4>Total price: {{ calcDifference(calcTotalPrice(), discountSelected.fixedPrice) }}</h4>
+    } @else {
+      <h4>Total price: {{ calcTotalPrice() }}</h4>
+    }
   }
-
-}
-
-<form [formGroup]="discountCodeForm" (ngSubmit)="handleSearchForm()">
-  <app-input-row [group]="discountCodeForm" field="discountCode" label="Discount code"/>
-  <input type="submit" value="Search" class="btn btn-primary mt-4"/>
-</form>
-
-
-<div class="d-flex justify-content-center">
-  <button class="btn btn-success btn-lg" (click)="confirmEnrollCourse()">Enroll this course</button>
+  <!-- Discount Code Form -->
+  <form [formGroup]="discountCodeForm" (ngSubmit)="handleSearchForm()" class="mt-4">
+    <div class="row">
+        <app-input-row [group]="discountCodeForm" field="discountCode" label="Discount Code"></app-input-row>
+    </div>
+    <input type="submit" value="Search" class="btn btn-primary"/>
+  </form>
+  <!-- Enroll Button -->
+  <div class="d-flex justify-content-center mt-5">
+    <button class="btn btn-success btn-lg" (click)="confirmEnrollCourse()">Enroll in this Course</button>
+  </div>
 </div>
-

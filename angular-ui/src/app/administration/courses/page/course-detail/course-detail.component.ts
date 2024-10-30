@@ -12,6 +12,7 @@ import {Lesson} from "../../model/view/lesson";
 @Component({
   selector: 'app-course-detail',
   standalone: true,
+  styleUrls:['course-detail.component.css'],
   imports: [
     RouterLink,
     NgForOf,

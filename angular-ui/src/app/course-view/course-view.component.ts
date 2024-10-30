@@ -1,12 +1,13 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
+import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
 import {Course} from "../administration/courses/model/view/course";
 import {BrowseCourseService} from "../browse-course.service";
 import {ErrorHandler} from "../common/error-handler.injectable";
 import {OrdersService} from "../orders/orders.service";
 import {Observable, Subscription} from "rxjs";
-import {AsyncPipe, CurrencyPipe, NgIf} from "@angular/common";
+import {AsyncPipe, CurrencyPipe, NgForOf, NgIf} from "@angular/common";
 import {UserService} from "../common/auth/user.service";
+import {LoginComponent} from "../common/auth/login.component";
 
 @Component({
   selector: 'app-course-view',
@@ -14,7 +15,10 @@ import {UserService} from "../common/auth/user.service";
   imports: [
     NgIf,
     AsyncPipe,
-    CurrencyPipe
+    CurrencyPipe,
+    LoginComponent,
+    NgForOf,
+    RouterLink
   ],
   templateUrl: './course-view.component.html',
 })
