@@ -8,7 +8,7 @@ import {Subscription} from "rxjs";
 import {UserService} from "../../../../common/auth/user.service";
 import {Section} from "../../model/view/section";
 import {Lesson} from "../../model/view/lesson";
-import {BrowseCourseService} from "../../../../browse-course.service";
+import {EnrolmentsService} from "../../../../enrolments/service/enrolments.service";
 
 @Component({
   selector: 'app-course-detail',
@@ -26,7 +26,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
   route = inject(ActivatedRoute)
   router = inject(Router);
   courseService = inject(CourseService);
-  browseCourseService = inject(BrowseCourseService);
+  enrolmentService = inject(EnrolmentsService);
   errorHandler = inject(ErrorHandler);
   userService = inject(UserService);
 
@@ -57,7 +57,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
         error: (error) => this.errorHandler.handleServerError(error.error)
       })
 
-    this.browseCourseService.countCourseEnrolmentsByCourseId(this.currentId)
+    this.enrolmentService.countEnrolmentsByCourseId(this.currentId)
       .subscribe({
         next: (data) => this.participantNumber = data,
         error: (error) => this.errorHandler.handleServerError(error.error)

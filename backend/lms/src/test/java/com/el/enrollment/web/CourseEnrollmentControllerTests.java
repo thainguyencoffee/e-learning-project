@@ -5,9 +5,10 @@ import com.el.common.config.CustomAuthenticationEntryPoint;
 import com.el.common.config.SecurityConfig;
 import com.el.common.config.jackson.JacksonCustomizations;
 import com.el.common.exception.ResourceNotFoundException;
-import com.el.enrollment.application.CourseEnrollmentDTO;
+import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.impl.CourseEnrollmentServiceImpl;
 import com.el.enrollment.domain.CourseEnrollment;
+import com.el.enrollment.domain.CourseEnrollmentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,9 @@ class CourseEnrollmentControllerTests {
 
     @MockBean
     private CourseEnrollmentServiceImpl courseEnrollmentService;
+
+    @MockBean
+    private CourseEnrollmentRepository enrollmentRepository;
 
     @Test
     void getAllEnrollments_ValidRequest_ReturnsAllEnrollments() throws Exception {

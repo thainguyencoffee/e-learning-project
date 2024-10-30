@@ -8,9 +8,9 @@ import {ErrorHandler} from "../../../../common/error-handler.injectable";
 import {InputRowComponent} from "../../../../common/input-row/input-row.component";
 import {Course} from "../../model/view/course";
 import {RejectRequestDto} from "../../model/reject-request.dto";
-import {BrowseCourseService} from "../../../../browse-course.service";
 import {Observable} from "rxjs";
 import {AsyncPipe, NgIf} from "@angular/common";
+import {EnrolmentsService} from "../../../../enrolments/service/enrolments.service";
 
 @Component({
   selector: 'app-resolve-request',
@@ -31,8 +31,8 @@ export class ResolveRequestComponent implements OnInit{
   router = inject(Router);
   userService = inject(UserService);
   courseService = inject(CourseService);
+  enrolmentService = inject(EnrolmentsService);
   errorHandler = inject(ErrorHandler);
-  browseCourseService = inject(BrowseCourseService);
 
   requestType: string = '';
   resolveType: string = '';
@@ -108,7 +108,7 @@ export class ResolveRequestComponent implements OnInit{
     this.courseId = this.route.snapshot.params['courseId'];
     this.requestId = this.route.snapshot.params['requestId'];
 
-    this.enrolmentsCount$ = this.browseCourseService.countCourseEnrolmentsByCourseId(this.courseId!);
+    this.enrolmentsCount$ = this.enrolmentService.countEnrolmentsByCourseId(this.courseId!);
 
     this.courseService.getCourse(this.courseId!).subscribe({
       next: (course) => {

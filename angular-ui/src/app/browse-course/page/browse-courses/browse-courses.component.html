@@ -1,0 +1,32 @@
+@if (!courseWithoutSectionsList || courseWithoutSectionsList.length === 0) {
+  <div>No course could be found.</div>
+} @else {
+
+  @for (course of courseWithoutSectionsList; track course.id) {
+    <div class="card" style="width: 18rem;">
+      <a [routerLink]="['courses', course.id]">
+        <img [src]="course.thumbnailUrl || 'https://placehold.co/600x400/000000/FFF'" class="card-img-top" alt="...">
+      </a>
+      <div class="card-body">
+        <h5 class="card-title">{{course.title}}</h5>
+        <p class="card-text">{{course.description}}</p>
+        <a [routerLink]="['checkout', course.id]" class="btn btn-primary">Buy now</a>
+      </div>
+    </div>
+  }
+
+  <nav aria-label="Page navigation example">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="paginationUtils!.number === 0">
+        <button class="page-link" (click)="onPageChange(paginationUtils!.number - 1)">Previous</button>
+      </li>
+      <li class="page-item" *ngFor="let page of getPageRange()" [class.active]="page === paginationUtils!.number">
+        <button class="page-link" (click)="onPageChange(page)">{{ page + 1 }}</button>
+      </li>
+      <li class="page-item" [class.disabled]="paginationUtils!.number === paginationUtils!.totalPages - 1">
+        <button class="page-link" (click)="onPageChange(paginationUtils!.number + 1)">Next</button>
+      </li>
+    </ul>
+  </nav>
+
+}
