@@ -61,7 +61,7 @@
       <li>Teacher: <strong>{{ course?.teacher }}</strong></li>
       <li>Price: <strong>{{ course?.price }}</strong></li>
     </ul>
-    <a href="/course/{{ course?.id }}/purchase" class="btn btn-success">Buy Now</a>
+    <a [routerLink]="['/checkout', course?.id]" class="btn btn-success">Buy Now</a>
   </div>
   </ng-template>
 </div>
