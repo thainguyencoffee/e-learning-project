@@ -3,6 +3,7 @@ package com.el.enrollment.domain;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
@@ -13,6 +14,7 @@ import java.util.Set;
 
 @Table("course_enrollment")
 @Getter
+@ToString
 public class CourseEnrollment {
     @Id
     private Long id;

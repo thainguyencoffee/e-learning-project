@@ -1,5 +1,7 @@
 package com.el.enrollment.application;
 
+import com.el.enrollment.application.dto.CourseEnrollmentDTO;
+import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import org.springframework.data.domain.Pageable;
 
@@ -10,6 +12,8 @@ public interface CourseEnrollmentService {
     List<CourseEnrollmentDTO> findAllCourseEnrollments(Pageable pageable);
 
     CourseEnrollment findCourseEnrollmentById(Long id);
+
+    EnrolmentWithCourseDTO findEnrolmentWithCourseById(Long id);
 
     /**
      * When OrderPaid event is received, this method is called to enroll the student in the course.

@@ -1,11 +1,10 @@
 import { Routes } from '@angular/router';
-import {HomeComponent} from "./home/home.component";
+import {BrowseCoursesComponent} from "./browse-course/page/browse-courses/browse-courses.component";
 import {DashboardComponent} from "./administration/dashboard/dashboard.component";
 import {ListCourseComponent} from "./administration/courses/page/list-course/list-course.component";
 import {AddCourseComponent} from "./administration/courses/page/add-course/add-course.component";
-import {ErrorComponent} from "./error/error.component";
+import {ErrorComponent} from "./common/error/error.component";
 import {EditCourseComponent} from "./administration/courses/page/edit-course/edit-course.component";
-import {CourseDetailComponent} from "./administration/courses/page/course-detail/course-detail.component";
 import { AddSectionComponent } from './administration/courses/page/add-section/add-section.component';
 import {EditSectionComponent} from "./administration/courses/page/edit-section/edit-section.component";
 import {AddLessonComponent} from "./administration/courses/page/add-lesson/add-lesson.component";
@@ -23,20 +22,22 @@ import {ResolveRequestComponent} from "./administration/courses/page/resolve-req
 import {
   RequestCourseDetailComponent
 } from "./administration/courses/page/request-course-detail/request-course-detail.component";
-import {CheckoutComponent} from "./orders/checkout/checkout.component";
-import {PaymentComponent} from "./orders/payment/payment.component";
-import {MyOrdersComponent} from "./orders/my-orders/my-orders.component";
-import {MyOrderDetailComponent} from "./orders/my-order-detail/my-order-detail.component";
-import {MyEnrollmentsComponent} from "./my-courses/my-enrollments.component";
-import {CourseViewComponent} from "./course-view/course-view.component";
+import {CheckoutComponent} from "./orders/page/checkout/checkout.component";
+import {PaymentComponent} from "./payment/page/payment.component";
+import {MyOrdersComponent} from "./orders/page/my-orders/my-orders.component";
+import {MyOrderDetailComponent} from "./orders/page/my-order-detail/my-order-detail.component";
+import {MyEnrolmentsComponent} from "./enrolments/page/my-enrolments/my-enrolments.component";
+import {BrowseCourseDetailComponent} from "./browse-course/page/browse-course-detail/browse-course-detail.component";
 import {UsageComponent} from "./common/usage/usage.component";
 import {AboutUnpublishComponent} from "./common/usage/about-unpublish/about-unpublish.component";
+import {EnrolmentContentComponent} from "./enrolments/page/enrolment-content/enrolment-content.component";
+import {CourseDetailComponent} from "./administration/courses/page/course-detail/course-detail.component";
 
 export const routes: Routes = [
   {
     title: 'Welcome to E learning!',
     path: '',
-    component: HomeComponent,
+    component: BrowseCoursesComponent,
   },
   {
     title: 'Usage',
@@ -52,8 +53,13 @@ export const routes: Routes = [
   },
   {
     title: 'Course detail',
-    path: 'course-view/:id',
-    component: CourseViewComponent
+    path: 'courses/:id',
+    component: BrowseCourseDetailComponent
+  },
+  {
+    title: 'Course content',
+    path: 'enrolments/:id',
+    component: EnrolmentContentComponent
   },
   {
     title: 'Checkout course',
@@ -77,8 +83,8 @@ export const routes: Routes = [
   },
   {
     title: 'Welcome to my courses!',
-    path: 'my-enrollments',
-    component: MyEnrollmentsComponent
+    path: 'my-enrolments',
+    component: MyEnrolmentsComponent
   },
   {
     title: 'Welcome to dashboard!',

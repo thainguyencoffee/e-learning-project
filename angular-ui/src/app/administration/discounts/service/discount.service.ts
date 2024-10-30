@@ -1,7 +1,7 @@
 import {inject, Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {PageWrapper} from "../../courses/model/view/page-wrapper";
+import {PageWrapper} from "../../../common/dto/page-wrapper";
 import {DiscountDto} from "../model/discount-dto";
 import {Discount} from "../model/view/discount";
 

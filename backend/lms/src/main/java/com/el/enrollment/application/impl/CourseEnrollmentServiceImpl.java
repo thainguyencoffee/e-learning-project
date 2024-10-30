@@ -5,8 +5,9 @@ import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
 import com.el.course.domain.Course;
-import com.el.enrollment.application.CourseEnrollmentDTO;
+import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
+import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
 import com.el.enrollment.domain.LessonProgress;
@@ -57,6 +58,15 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
                     .orElseThrow(ResourceNotFoundException::new);
         }
         throw new AccessDeniedException("Access denied");
+    }
+
+    @Override
+    public EnrolmentWithCourseDTO findEnrolmentWithCourseById(Long id) {
+        String student = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+        CourseEnrollment enrolment = repository.findByIdAndStudent(id, student)
+                .orElseThrow(ResourceNotFoundException::new);
+        Course course = courseQueryService.findPublishedCourseById(id);
+        return EnrolmentWithCourseDTO.of(enrolment, course);
     }
 
     public void enrollment(String student, Long courseId) {
