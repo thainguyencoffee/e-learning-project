@@ -24,13 +24,15 @@
       <div class="col-lg-8">
         <p><strong>Title:</strong> {{ courseDto.title }}</p>
         <p>
-          <strong>Teacher:</strong>
-          <span *ngIf="isCreateByYou(courseDto.teacher)" class="badge bg-secondary">This account</span>
+          <strong>Teacher: </strong>
+          <span *ngIf="isCreateByYou(courseDto.teacher)">{{ courseDto.teacher }}
+            <span class="badge bg-secondary">this account</span>
+          </span>
           <span *ngIf="!isCreateByYou(courseDto.teacher)">{{ courseDto.teacher }}</span>
         </p>
-        <p><strong>Description:</strong> {{ courseDto.description || 'No description available' }}</p>
-        <p><strong>Language:</strong> <span class="fw-bold">{{ courseDto.language }}</span></p>
-        <p><strong>Price:</strong> {{ courseDto.price || 'Price not available' }}</p>
+        <p><strong>Description: </strong> {{ courseDto.description || 'No description available' }}</p>
+        <p><strong>Language: </strong> <span class="fw-bold">{{ courseDto.language }}</span></p>
+        <p><strong>Price: </strong> {{ courseDto.price || 'Price not available' }}</p>
         <p class="badge {{ courseDto.published ? 'bg-success' : 'bg-primary' }}">
           Status: {{ courseDto.published ? 'Published' : 'Not published' }}
         </p>
@@ -78,16 +80,20 @@
   <!-- Accessibility Section -->
   <section id="accessibility" class="p-4 border rounded mb-4 bg-white">
     <h2 class="mb-4 border-bottom pb-2">Accessibility</h2>
-    <p><strong>Created By:</strong>
-      <span *ngIf="isCreateByYou(courseDto.createdBy)" class="badge bg-secondary">This account</span>
+    <p><strong>Created By: </strong>
+      <span *ngIf="isCreateByYou(courseDto.createdBy)">{{ courseDto.createdBy }}
+        <span class="badge bg-secondary">this account</span>
+      </span>
       <span *ngIf="!isCreateByYou(courseDto.createdBy)">{{ courseDto.createdBy }}</span>
     </p>
-    <p><strong>Created Date:</strong> {{ courseDto.createdDate }}</p>
-    <p><strong>Last Modified By:</strong>
-      <span *ngIf="isCreateByYou(courseDto.lastModifiedBy)" class="badge bg-secondary">This account</span>
+    <p><strong>Created Date: </strong> {{ courseDto.createdDate | date }}</p>
+    <p><strong>Last Modified By: </strong>
+      <span *ngIf="isCreateByYou(courseDto.lastModifiedBy)">{{ courseDto.lastModifiedBy }}
+        <span class="badge bg-secondary">this account</span>
+      </span>
       <span *ngIf="!isCreateByYou(courseDto.lastModifiedBy)">{{ courseDto.lastModifiedBy }}</span>
     </p>
-    <p><strong>Last Modified Date:</strong> {{ courseDto.lastModifiedDate }}</p>
+    <p><strong>Last Modified Date:</strong> {{ courseDto.lastModifiedDate | date }}</p>
   </section>
 
   <!--Section-->
@@ -96,7 +102,7 @@
 
     <div *ngIf="courseDto?.sections?.length === 0">
     <span class="badge bg-dark">
-      No prerequisites available
+      No sections available
     </span>
     </div>
 

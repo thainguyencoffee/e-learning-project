@@ -3,7 +3,7 @@ import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router
 import {CourseService} from "../../service/course.service";
 import {Course} from "../../model/view/course";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
-import {NgForOf, NgIf} from "@angular/common";
+import {DatePipe, NgForOf, NgIf} from "@angular/common";
 import {Subscription} from "rxjs";
 import {UserService} from "../../../../common/auth/user.service";
 import {Section} from "../../model/view/section";
@@ -16,6 +16,7 @@ import {Lesson} from "../../model/view/lesson";
     RouterLink,
     NgForOf,
     NgIf,
+    DatePipe,
   ],
   templateUrl: './course-detail.component.html',
 })
