@@ -4,9 +4,9 @@ export interface CourseWithoutSections {
   thumbnailUrl: string,
   description: string,
   language: string,
-  subtitles: string[],
-  benefits: string[],
-  prerequisites: string[],
+  subtitles?: string[],
+  benefits?: string[],
+  prerequisites?: string[],
   price: string,
   teacher: string
 }
