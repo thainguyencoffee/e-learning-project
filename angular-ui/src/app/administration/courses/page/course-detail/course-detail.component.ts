@@ -13,6 +13,7 @@ import {EnrolmentsService} from "../../../../enrolments/service/enrolments.servi
 @Component({
   selector: 'app-course-detail',
   standalone: true,
+  styleUrls:['course-detail.component.css'],
   imports: [
     RouterLink,
     NgForOf,

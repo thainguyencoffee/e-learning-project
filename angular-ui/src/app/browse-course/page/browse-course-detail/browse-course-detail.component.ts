@@ -8,6 +8,7 @@ import {UserService} from "../../../common/auth/user.service";
 import {EnrolmentsService} from "../../../enrolments/service/enrolments.service";
 import {Enrolment} from "../../../enrolments/model/enrolment";
 import {CourseWithoutSections} from "../../model/course-without-sections";
+import {LoginComponent} from "../../../common/auth/login.component";
 
 @Component({
   selector: 'app-browse-course-detail',
@@ -16,7 +17,8 @@ import {CourseWithoutSections} from "../../model/course-without-sections";
     NgIf,
     AsyncPipe,
     CurrencyPipe,
-    RouterLink
+    RouterLink,
+    LoginComponent
   ],
   templateUrl: './browse-course-detail.component.html',
 })
@@ -33,6 +35,7 @@ export class BrowseCourseDetailComponent implements OnInit, OnDestroy{
   courseId?: number;
   course?: CourseWithoutSections;
   enrolment?: Enrolment;
+  isAuthenticated= false;
 
   ngOnInit(): void {
     this.loadData()
@@ -58,7 +61,10 @@ export class BrowseCourseDetailComponent implements OnInit, OnDestroy{
     this.userService.valueChanges.subscribe({
       next: user => {
         if (user.isAuthenticated) {
+          this.isAuthenticated = true;
           this.getEnrolmentByCourseId()
+        } else {
+          this.isAuthenticated = false;
         }
       }
     })
