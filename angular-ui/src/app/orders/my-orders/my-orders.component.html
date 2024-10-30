@@ -24,7 +24,7 @@
         @for (order of orders; track order.id) {
           <tr>
             <td>{{ order.id }}</td>
-            <td>{{ order.orderDate | date }}</td>
+            <td>{{ order.orderDate | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
             <td>{{ order.totalPrice }}</td>
             <td>
               <span *ngIf="order.status === 'PAID'" class="badge bg-success">{{order.status}}</span>
