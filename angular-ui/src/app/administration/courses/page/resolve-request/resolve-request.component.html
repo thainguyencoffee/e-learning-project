@@ -26,7 +26,14 @@
       </form>
     }
   } @else if (requestType === 'UNPUBLISH') {
-    <form [formGroup]="approveRequestAddForm" (ngSubmit)="handleSubmit()">
+    <div *ngIf="enrolmentsCount$ | async as count">
+      <div class="alert alert-warning">This course has {{count}} enrolments. Are you sure you want to unpublish this course?
+      Please read the <a routerLink="/usage/about-unpublish">documentation</a> before unpublishing.</div>
+      <div *ngIf="!isReadDocumentationForUnpublishedCourse">
+        <button class="btn btn-primary" (click)="isReadDocumentationForUnpublishedCourse = true">I have read the documentation</button>
+      </div>
+    </div>
+    <form *ngIf="isReadDocumentationForUnpublishedCourse" [formGroup]="approveRequestAddForm" (ngSubmit)="handleSubmit()">
       <app-input-row [group]="approveRequestAddForm" field="approveType" label="Approve type" />
       <app-input-row [group]="approveRequestAddForm" field="approveMessage" label="Approve Message" rowType="textarea"/>
       <input type="submit" value="Submit Approve" class="btn btn-primary mt-4" />

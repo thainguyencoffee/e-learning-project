@@ -8,6 +8,9 @@ import {ErrorHandler} from "../../../../common/error-handler.injectable";
 import {InputRowComponent} from "../../../../common/input-row/input-row.component";
 import {Course} from "../../model/view/course";
 import {RejectRequestDto} from "../../model/reject-request.dto";
+import {BrowseCourseService} from "../../../../browse-course.service";
+import {Observable} from "rxjs";
+import {AsyncPipe, NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-resolve-request',
@@ -16,7 +19,9 @@ import {RejectRequestDto} from "../../model/reject-request.dto";
     FormsModule,
     InputRowComponent,
     ReactiveFormsModule,
-    RouterLink
+    RouterLink,
+    NgIf,
+    AsyncPipe
   ],
   templateUrl: './resolve-request.component.html',
 })
@@ -27,12 +32,16 @@ export class ResolveRequestComponent implements OnInit{
   userService = inject(UserService);
   courseService = inject(CourseService);
   errorHandler = inject(ErrorHandler);
+  browseCourseService = inject(BrowseCourseService);
 
   requestType: string = '';
   resolveType: string = '';
   courseId?: number;
   requestId?: number;
   course?: Course
+  enrolmentsCount$!: Observable<number>;
+
+  isReadDocumentationForUnpublishedCourse = false;
 
   getMessage(key: string, details?: any) {
     const messages: Record<string, string> = {
@@ -98,6 +107,8 @@ export class ResolveRequestComponent implements OnInit{
     this.resolveType = this.route.snapshot.data['resolveType']
     this.courseId = this.route.snapshot.params['courseId'];
     this.requestId = this.route.snapshot.params['requestId'];
+
+    this.enrolmentsCount$ = this.browseCourseService.countCourseEnrolmentsByCourseId(this.courseId!);
 
     this.courseService.getCourse(this.courseId!).subscribe({
       next: (course) => {

@@ -11,6 +11,10 @@ import java.util.Optional;
 
 public interface CourseEnrollmentRepository extends CrudRepository<CourseEnrollment, Long> {
 
+    Page<CourseEnrollment> findAllByCourseId(Long courseId, Pageable pageable);
+
+    Integer countAllByCourseId(Long courseId);
+
     Page<CourseEnrollment> findAll(Pageable pageable);
 
     @Query("select ce.id, ce.student, ce.course_id, c.title, c.thumbnail_url, c.teacher, ce.enrollment_date, ce.completed " +
