@@ -1,5 +1,10 @@
-import {SectionDto} from "../../administration/courses/model/section-dto";
 import {LessonProgress} from "./lesson-progress";
+import {Section} from "../../administration/courses/model/view/section";
+
+export interface Progress {
+  totalLessons: number,
+  completedLessons: number,
+}
 
 export interface EnrolmentWithCourseDto {
   courseId: number,
@@ -10,10 +15,11 @@ export interface EnrolmentWithCourseDto {
   subtitles: string[],
   benefits: string[],
   prerequisites: string[],
-  sections: SectionDto[],
+  sections: Section[],
   teacher: string,
   enrollmentId: number,
   student: string,
   lessonProgresses: LessonProgress[],
-  completed: boolean
+  completed: boolean,
+  progress: Progress
 }

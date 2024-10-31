@@ -1,14 +1,23 @@
-import {Component, inject, OnInit} from '@angular/core';
-import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {ActivatedRoute, NavigationEnd, Router, RouterLink, RouterOutlet} from "@angular/router";
 import {ErrorHandler} from "../../../common/error-handler.injectable";
-import {Subscription} from "rxjs";
+import {Observable, Subscription} from "rxjs";
 import {EnrolmentsService} from "../../service/enrolments.service";
 import {EnrolmentWithCourseDto} from "../../model/enrolment-with-course-dto";
+import {AsyncPipe, NgClass, NgForOf, NgIf} from "@angular/common";
+import {EnrolmentWithCourseDataService} from "./enrolment-with-course-data.service";
 
 @Component({
   selector: 'app-enrolment-content',
   standalone: true,
-  imports: [],
+  imports: [
+    NgForOf,
+    NgClass,
+    RouterLink,
+    RouterOutlet,
+    NgIf,
+    AsyncPipe
+  ],
   templateUrl: './enrolment-content.component.html',
 })
 export class EnrolmentContentComponent implements OnInit {
@@ -16,19 +25,13 @@ export class EnrolmentContentComponent implements OnInit {
   router = inject(Router);
   enrolmentService = inject(EnrolmentsService);
   errorHandler = inject(ErrorHandler);
+  EnrolmentWithCourseDataService = inject(EnrolmentWithCourseDataService);
 
   enrolmentId?: number;
-  enrolmentWithCourse?: EnrolmentWithCourseDto;
-  navigationSubscription?: Subscription;
+  enrolmentWithCourse$!: Observable<EnrolmentWithCourseDto | null>;
 
   ngOnInit(): void {
     this.loadData();
-
-    this.navigationSubscription = this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        this.loadData();
-      }
-    })
   }
 
   loadData(): void {
@@ -36,10 +39,15 @@ export class EnrolmentContentComponent implements OnInit {
 
     this.enrolmentService.getEnrolmentWithCourseByEnrollmentId(this.enrolmentId)
       .subscribe({
-        next: (data) => this.enrolmentWithCourse = data,
+        next: (data) => this.EnrolmentWithCourseDataService.setEnrolmentWithCourse(data),
         error: (error) => this.errorHandler.handleServerError(error.error)
       })
+
+    this.enrolmentWithCourse$ = this.EnrolmentWithCourseDataService.enrolmentWithCourse$;
   }
 
-  protected readonly JSON = JSON;
+  isActive(route: string): boolean {
+    return this.router.url === route;
+  }
+
 }
