@@ -112,7 +112,7 @@ public class Order extends AbstractAggregateRoot<Order> {
             throw new InputInvalidException("You can't pay for a completed order.");
         }
         this.status = Status.PAID;
-        registerEvent(new OrderPaidEvent(id, items.stream().map(OrderItem::getId).toList(), createdBy));
+        registerEvent(new OrderPaidEvent(id, items.stream().map(OrderItem::getCourse).toList(), createdBy));
     }
 
     private boolean isPaid() {

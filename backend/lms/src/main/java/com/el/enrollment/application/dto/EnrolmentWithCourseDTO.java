@@ -5,6 +5,7 @@ import com.el.course.domain.CourseSection;
 import com.el.course.domain.Language;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.LessonProgress;
+import com.el.enrollment.domain.Progress;
 
 import java.util.Set;
 
@@ -22,7 +23,8 @@ public record EnrolmentWithCourseDTO(
         Long enrollmentId,
         String student,
         Set<LessonProgress> lessonProgresses,
-        Boolean completed
+        Boolean completed,
+        Progress progress
 ) {
     public static EnrolmentWithCourseDTO of(CourseEnrollment enrolment, Course course) {
         return new EnrolmentWithCourseDTO(
@@ -39,7 +41,8 @@ public record EnrolmentWithCourseDTO(
                 enrolment.getId(),
                 enrolment.getStudent(),
                 enrolment.getLessonProgresses(),
-                enrolment.getCompleted()
+                enrolment.getCompleted(),
+                enrolment.getProgress()
         );
     }
 }
