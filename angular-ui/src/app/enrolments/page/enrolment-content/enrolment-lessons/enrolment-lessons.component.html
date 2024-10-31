@@ -1,1 +1,15 @@
-<p>enrolment-lessons works!</p>
+<div *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse">
+  <h1>Course content</h1>
+  <div *ngIf="setupLessonsMap(enrolmentWithCourse.sections)">
+
+    <div *ngFor="let lessonProgress of enrolmentWithCourse.lessonProgresses; let i = index">
+      <a class="btn btn-primary"
+         [attr.aria-disabled]="!lessonEnabled(i, enrolmentWithCourse.progress.completedLessons)"
+         [ngClass]="{'disabled': !lessonEnabled(i, enrolmentWithCourse.progress.completedLessons)}">
+        {{lessonMap[lessonProgress.lessonId].title}}
+      </a>
+    </div>
+
+  </div>
+
+</div>

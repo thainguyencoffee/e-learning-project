@@ -9,7 +9,7 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Table("course_enrollment")
@@ -22,7 +22,7 @@ public class CourseEnrollment {
     private Long courseId;
     private Instant enrollmentDate;
     @MappedCollection(idColumn = "course_enrollment")
-    private Set<LessonProgress> lessonProgresses = new HashSet<>();
+    private Set<LessonProgress> lessonProgresses = new LinkedHashSet<>();
     private Boolean completed;
     @CreatedBy
     private String createdBy;
