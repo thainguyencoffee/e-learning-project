@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Import;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -33,7 +33,7 @@ class OrderJsonTests {
     @Test
     void serialize() throws IOException {
         // Arrange
-        Set<OrderItem> items = new HashSet<>();
+        Set<OrderItem> items = new LinkedHashSet<>();
         items.add(new OrderItem(111L, Money.of(1000, Currencies.VND)));
         items.add(new OrderItem(222L, Money.of(2000, Currencies.VND)));
         Order order = new Order(items);

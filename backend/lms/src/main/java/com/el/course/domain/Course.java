@@ -14,7 +14,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
@@ -32,13 +32,13 @@ public class Course extends AuditSupportClass {
     private Set<String> prerequisites;
 
     @MappedCollection(idColumn = "course")
-    private Set<CourseSection> sections = new HashSet<>();
+    private Set<CourseSection> sections = new LinkedHashSet<>();
     private MonetaryAmount price;
     private Boolean published;
     private Boolean unpublished;
     private String teacher;
     private String approvedBy;
-    private Set<CourseRequest> courseRequests = new HashSet<>();
+    private Set<CourseRequest> courseRequests = new LinkedHashSet<>();
     @JsonIgnore
     private boolean deleted;
     @Version
@@ -374,7 +374,7 @@ public class Course extends AuditSupportClass {
     }
 
     public Set<Long> getLessonIds() {
-        Set<Long> lessonIds = new HashSet<>();
+        Set<Long> lessonIds = new LinkedHashSet<>();
         for (CourseSection section : sections) {
             for (Lesson lesson : section.getLessons()) {
                 lessonIds.add(lesson.getId());
