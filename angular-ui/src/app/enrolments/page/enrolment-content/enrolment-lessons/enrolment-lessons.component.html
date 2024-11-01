@@ -1,17 +1,15 @@
 <div *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse">
   <h1>Course content</h1>
+  <div *ngIf="setupLessonsMap(enrolmentWithCourse.sections)">
 
-  <div class="container mt-4">
-    <div *ngFor="let section of enrolmentWithCourse.sections" class="mb-4">
-      <h3 class="text-primary">{{section.title}}</h3>
-      <div class="list-group">
-        <div *ngFor="let lesson of section.lessons" class="list-group-item d-flex justify-content-between align-items-center">
-          <span class="text-decoration-underline">{{lesson.title}}</span>
-          <a [routerLink]="['/enrolments', enrolmentId, 'lessons', lesson.id]" class="btn btn-primary" *ngIf="!isCompleted(lesson.id, enrolmentWithCourse.lessonProgresses)">Learn</a>
-        </div>
-      </div>
+    <div *ngFor="let lessonProgress of enrolmentWithCourse.lessonProgresses; let i = index">
+      <a class="btn btn-primary"
+         [attr.aria-disabled]="!lessonEnabled(i, enrolmentWithCourse.progress.completedLessons)"
+         [ngClass]="{'disabled': !lessonEnabled(i, enrolmentWithCourse.progress.completedLessons)}">
+        {{lessonMap[lessonProgress.lessonId].title}}
+      </a>
     </div>
+
   </div>
 
 </div>
-

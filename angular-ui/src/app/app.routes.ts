@@ -37,7 +37,6 @@ import {
   EnrolmentLessonsComponent
 } from "./enrolments/page/enrolment-content/enrolment-lessons/enrolment-lessons.component";
 import {EnrolmentPostsComponent} from "./enrolments/page/enrolment-content/enrolment-posts/enrolment-posts.component";
-import {LessonDetailComponent} from "./enrolments/page/enrolment-content/lesson-detail/lesson-detail.component";
 
 export const routes: Routes = [
   {
@@ -83,11 +82,6 @@ export const routes: Routes = [
         component: EnrolmentPostsComponent
       }
     ]
-  },
-  {
-    title: 'Lesson detail',
-    path: 'enrolments/:enrolmentId/lessons/:lessonId',
-    component: LessonDetailComponent
   },
   {
     title: 'Checkout course',
