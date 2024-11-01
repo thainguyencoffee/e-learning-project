@@ -8,6 +8,7 @@ import {ErrorHandler} from "../../../../common/error-handler.injectable";
 @Component({
   selector: 'app-enrolment-posts',
   standalone: true,
+  styleUrls:['enrolment-posts.component.css'],
   imports: [
     NgForOf,
     NgClass,
@@ -83,23 +84,19 @@ export class EnrolmentPostsComponent implements OnInit{
   };
   ngOnInit(): void {
     this.loadData();
-
     this.navigationSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.loadData();
       }
     })
   }
-
   loadData(): void {
     this.enrolmentId = +this.route.snapshot.params['id'];
-
     this.enrolmentService.getEnrolmentWithCourseByEnrollmentId(this.enrolmentId)
       .subscribe({
         next: (data) => this.enrolmentWithCourse = data,
         error: (error) => this.errorHandler.handleServerError(error.error)
       })
   }
-
   protected readonly JSON = JSON;
 }
