@@ -34,11 +34,8 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public Discount findByCode(String code) {
-        Discount discount = discountRepository.findByCodeAndDeleted(code, false)
+        return discountRepository.findByCodeAndDeleted(code, false)
                 .orElseThrow(ResourceNotFoundException::new);
-        if (!discount.isActive())
-            throw new ResourceNotFoundException();
-        return discount;
     }
 
     @Override

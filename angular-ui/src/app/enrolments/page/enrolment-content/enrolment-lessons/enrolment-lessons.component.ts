@@ -1,10 +1,11 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {ActivatedRoute, RouterLink} from "@angular/router";
+import {ActivatedRoute} from "@angular/router";
 import {EnrolmentWithCourseDataService} from "../enrolment-with-course-data.service";
-import {Observable} from "rxjs";
+import {from, mergeMap, Observable, toArray} from "rxjs";
 import {EnrolmentWithCourseDto} from "../../../model/enrolment-with-course-dto";
 import {AsyncPipe, NgClass, NgForOf, NgIf} from "@angular/common";
-import {LessonProgress} from "../../../model/lesson-progress";
+import {Section} from "../../../../administration/courses/model/view/section";
+import {Lesson} from "../../../../administration/courses/model/view/lesson";
 
 @Component({
   selector: 'app-enrolment-lessons',
@@ -13,8 +14,7 @@ import {LessonProgress} from "../../../model/lesson-progress";
     AsyncPipe,
     NgIf,
     NgForOf,
-    NgClass,
-    RouterLink
+    NgClass
   ],
   templateUrl: './enrolment-lessons.component.html',
   styleUrl: './enrolment-lessons.component.css'
@@ -26,17 +26,34 @@ export class EnrolmentLessonsComponent implements OnInit {
 
   enrolmentId?: number;
   enrolmentWithCourse$!: Observable<EnrolmentWithCourseDto | null>;
+  lessons: Lesson[] = [];
+  lessonMap: { [id: string]: Lesson } = {};
 
   ngOnInit(): void {
-    this.route.parent?.params.subscribe(params => {
-      this.enrolmentId = params['id'];
-    });
+    this.enrolmentId = +this.route.snapshot.params['id'];
 
     this.enrolmentWithCourse$ = this.enrolmentWithCourseDataService.enrolmentWithCourse$;
   }
 
-  isCompleted(lessonId: number, lessonProgresses: LessonProgress[]) {
-    return lessonProgresses.find(lp => lp.lessonId === lessonId)?.completed;
+  lessonEnabled(index: number, completedLesson: number) {
+    return index <= completedLesson;
+  }
+
+  setupLessonsMap(sections: Section[]) {
+    from(sections).pipe(
+      mergeMap(section => section.lessons),
+      toArray()
+    ).subscribe({
+      next: lessons => {
+        this.lessons = lessons;
+        this.lessonMap = lessons.reduce((map: { [id: string]: Lesson }, lesson) => {
+          map[lesson.id] = lesson;
+          return map;
+        }, {});
+      },
+      error: _ => false
+    });
+    return true;
   }
 
 }
