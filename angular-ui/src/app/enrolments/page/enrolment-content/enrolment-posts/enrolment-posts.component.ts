@@ -18,7 +18,6 @@ import {ErrorHandler} from "../../../../common/error-handler.injectable";
     AsyncPipe
   ],
   templateUrl: './enrolment-posts.component.html',
-  styleUrl: './enrolment-posts.component.css'
 })
 export class EnrolmentPostsComponent implements OnInit{
    route = inject(ActivatedRoute);
