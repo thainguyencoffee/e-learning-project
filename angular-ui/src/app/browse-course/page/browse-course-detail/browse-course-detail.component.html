@@ -50,7 +50,7 @@
       <li>Course Name: <strong>{{ course?.title }}</strong></li>
       <li>Teacher: <strong>{{ course?.teacher }}</strong></li>
     </ul>
-    <a [routerLink]="['/enrolments', enrolment.id]" class="btn btn-primary">Start Learning</a>
+    <a [routerLink]="['/enrolments', enrolment.id, 'overview']" class="btn btn-primary">Start Learning</a>
   </div>
 
   <div *ngIf="!enrolment" class="alert alert-warning" role="alert">
@@ -61,7 +61,7 @@
       <li>Teacher: <strong>{{ course?.teacher }}</strong></li>
       <li>Price: <strong>{{ course?.price }}</strong></li>
     </ul>
-    <a href="/course/{{ course?.id }}/purchase" class="btn btn-success">Buy Now</a>
+    <a [routerLink]="['/checkout', course?.id]" class="btn btn-success">Buy Now</a>
   </div>
   </ng-template>
 </div>

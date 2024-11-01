@@ -1,123 +1,24 @@
-<!-- src/app/enrolment-post/enrolment-post.component.html -->
+<div class="row">
+  <div class="col-4" *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse">
+    <img [src]="enrolmentWithCourse?.thumbnailUrl" class="img-thumbnail" alt="">
+    <h2>{{enrolmentWithCourse?.title}}</h2>
+    <p>{{enrolmentWithCourse?.description}}</p>
 
-<div class="card mb-4">
-  <img [src]="enrolment.thumbnailUrl" class="card-img-top" alt="Course Thumbnail">
-  <div class="card-body">
-    <h2 class="card-title">
-      <i class="bi bi-book"></i> {{ enrolment.title }}
-    </h2>
-    <p class="text-muted">
-      <i class="bi bi-person-fill"></i> Giảng viên: {{ enrolment.teacher }}
-    </p>
-    <p class="card-text">
-      <i class="bi bi-info-circle-fill"></i> {{ enrolment.description }}
-    </p>
-
-    <hr>
-
-    <h4>
-      <i class="bi bi-star-fill text-warning"></i> Lợi ích khi tham gia khóa học:
-    </h4>
-    <ul>
-      <li *ngFor="let benefit of enrolment.benefits">
-        <i class="bi bi-check-circle-fill text-success"></i> {{ benefit }}
-      </li>
-    </ul>
-
-    <h5>
-      <i class="bi bi-exclamation-triangle-fill text-danger"></i> Yêu cầu đầu vào:
-    </h5>
-    <p *ngFor="let prerequisite of enrolment.prerequisites">
-      <i class="bi bi-dot"></i> {{ prerequisite }}
-    </p>
-
-    <hr>
-
-    <h4>
-      <i class="bi bi-book-half"></i> Chương trình học
-    </h4>
-      <div class="accordion mt-4" id="courseSections">
-        <div *ngFor="let section of enrolment.sections; let i = index" class="accordion-item mb-3 border rounded">
-          <!-- Accordion Header -->
-          <h2 class="accordion-header" [attr.id]="'heading' + section.id">
-            <div class="d-flex align-items-center justify-content-between px-3 py-2">
-              <!-- Title và nút collapse -->
-              <span class="badge bg-primary me-2">{{ section.lessons.length }} Lesson</span>
-              <button
-                class="accordion-button collapsed bg-light text-dark fw-bold p-0 me-3"
-                type="button"
-                data-bs-toggle="collapse"
-                [attr.data-bs-target]="'#collapse' + section.id"
-                aria-expanded="false"
-                [attr.aria-controls]="'collapse' + section.id"
-              >
-                <span>{{ section.title }}</span>
-              </button>
-
-            </div>
-          </h2>
-          <div
-            [attr.id]="'collapse' + section.id"
-            class="accordion-collapse collapse"
-            [attr.aria-labelledby]="'heading' + section.id"
-            data-bs-parent="#courseSections"
-          >
-            <div class="accordion-body border-top">
-              <ul class="list-group border-0">
-                <li *ngFor="let lesson of section.lessons" class="list-group-item d-flex align-items-center border-0">
-                  <i class="bi bi-bookmark"></i>
-                  <span class="fw-bold ms-2">{{ lesson.title }}</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    <hr>
-    <h4>
-      <i class="bi bi-person-lines-fill"></i> Thông Tin Học Viên
-    </h4>
-    <p>
-      <i class="bi bi-person"></i> Học viên đăng ký: {{ enrolment.student }}
-    </p>
-    <p>
-      <i class="bi bi-check-square"></i> Trạng thái hoàn thành:
-      <span [class.text-success]="enrolment.completed" [class.text-danger]="!enrolment.completed">
-        {{ enrolment.completed ? 'Đã hoàn thành' : 'Chưa hoàn thành' }}
-      </span>
-    </p>
-    <hr>
-    <h4>
-      <i class="bi bi-graph-up-arrow"></i> Tiến độ học tập
-    </h4>
-    <div *ngFor="let lessonProgress of enrolment.lessonProgresses" class="mb-2">
-      <strong>
-        <i class="bi bi-bookmark-check-fill"></i> {{ lessonProgress.title }}:
-      </strong>
-      <div class="progress">
-        <div
-          class="progress-bar"
-          role="progressbar"
-          [style.width]="lessonProgress.progress + '%'"
-          [attr.aria-valuenow]="lessonProgress.progress"
-          aria-valuemin="0"
-          aria-valuemax="100"
-        >
-          {{ lessonProgress.progress }}%
-        </div>
-      </div>
+    <div class="list-group">
+      <a [routerLink]="['/enrolments', enrolmentId, 'overview']" class="list-group-item list-group-item-action"
+              [ngClass]="{'active': isActive('/enrolments/' + enrolmentId + '/overview')}"
+              [attr.aria-current]="isActive('/enrolments/' + enrolmentId + '/overview')">Overview</a>
+      <a [routerLink]="['/enrolments', enrolmentId, 'lessons']" class="list-group-item list-group-item-action"
+              [ngClass]="{'active': isActive('/enrolments/' + enrolmentId + '/lessons')}"
+              [attr.aria-current]="isActive('/enrolments/' + enrolmentId + '/lessons')">Lessons</a>
+      <a [routerLink]="['/enrolments', enrolmentId, 'posts']" class="list-group-item list-group-item-action"
+              [ngClass]="{'active': isActive('/enrolments/' + enrolmentId + '/posts')}"
+              [attr.aria-current]="isActive('/enrolments/' + enrolmentId + '/posts')">Posts</a>
     </div>
+  </div>
 
-    <hr>
-
-    <h5>
-      <i class="bi bi-pencil-square"></i> Cách thức đăng ký
-    </h5>
-    <p>
-      <i class="bi bi-hash"></i> Mã đăng ký: {{ enrolment.enrollmentId }}
-    </p>
-    <button class="btn btn-primary">
-      <i class="bi bi-play-circle"></i> Học ngay
-    </button>
+  <div class="col-8">
+    <router-outlet></router-outlet>
   </div>
 </div>
+

@@ -1,0 +1,79 @@
+/* src/app/enrolment-post/enrolment-post.component.css */
+
+.card {
+  max-width: 700px;
+  margin: auto;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif;
+  color: #333;
+}
+
+.card-img-top {
+  height: 300px;
+  object-fit: cover;
+}
+
+.card-title {
+  color: #2c3e50;
+  font-weight: bold;
+  font-size: 1.8rem;
+}
+
+.text-muted {
+  color: #7f8c8d;
+}
+
+.card-text {
+  color: #555;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+h4, h5 {
+  color: #2980b9;
+  font-weight: bold;
+  margin-top: 1.2rem;
+}
+
+ul {
+  padding-left: 1.5rem;
+  list-style-type: none;
+}
+
+ul li::before {
+  content: "\2022";
+  color: #27ae60;
+  font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}
+
+.progress {
+  background-color: #e0e0e0;
+  border-radius: 0.5rem;
+}
+
+.progress-bar {
+  background-color: #3498db;
+  color: white;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background-color: #3498db;
+  border-color: #2980b9;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+  border-color: #1f618d;
+}
+
+hr {
+  border: 1px solid #ddd;
+}
+

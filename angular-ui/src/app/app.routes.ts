@@ -32,6 +32,11 @@ import {UsageComponent} from "./common/usage/usage.component";
 import {AboutUnpublishComponent} from "./common/usage/about-unpublish/about-unpublish.component";
 import {EnrolmentContentComponent} from "./enrolments/page/enrolment-content/enrolment-content.component";
 import {CourseDetailComponent} from "./administration/courses/page/course-detail/course-detail.component";
+import {EnrolmentOverviewComponent} from "./enrolments/page/enrolment-content/enrolment-overview/enrolment-overview.component";
+import {
+  EnrolmentLessonsComponent
+} from "./enrolments/page/enrolment-content/enrolment-lessons/enrolment-lessons.component";
+import {EnrolmentPostsComponent} from "./enrolments/page/enrolment-content/enrolment-posts/enrolment-posts.component";
 
 export const routes: Routes = [
   {
@@ -59,7 +64,24 @@ export const routes: Routes = [
   {
     title: 'Course content',
     path: 'enrolments/:id',
-    component: EnrolmentContentComponent
+    component: EnrolmentContentComponent,
+    children: [
+      {
+        title: 'Enrolment overview',
+        path: 'overview',
+        component: EnrolmentOverviewComponent
+      },
+      {
+        title: 'Enrolment lessons',
+        path: 'lessons',
+        component: EnrolmentLessonsComponent
+      },
+      {
+        title: 'Enrolment posts',
+        path: 'posts',
+        component: EnrolmentPostsComponent
+      }
+    ]
   },
   {
     title: 'Checkout course',
