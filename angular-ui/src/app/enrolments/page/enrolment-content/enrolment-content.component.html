@@ -1,23 +1,23 @@
 <div class="row">
-  <div class="col-4" *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse">
+  <div class="col-md-4 col-12" *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse">
     <img [src]="enrolmentWithCourse?.thumbnailUrl" class="img-thumbnail" alt="">
-    <h2>{{enrolmentWithCourse?.title}}</h2>
-    <p>{{enrolmentWithCourse?.description}}</p>
+    <h2>{{ enrolmentWithCourse?.title }}</h2>
+    <p>{{ enrolmentWithCourse?.description }}</p>
 
     <div class="list-group">
       <a [routerLink]="['/enrolments', enrolmentId, 'overview']" class="list-group-item list-group-item-action"
-              [ngClass]="{'active': isActive('/enrolments/' + enrolmentId + '/overview')}"
-              [attr.aria-current]="isActive('/enrolments/' + enrolmentId + '/overview')">Overview</a>
+         [ngClass]="{'active': isActive('/enrolments/' + enrolmentId + '/overview')}"
+         [attr.aria-current]="isActive('/enrolments/' + enrolmentId + '/overview')">Overview</a>
       <a [routerLink]="['/enrolments', enrolmentId, 'lessons']" class="list-group-item list-group-item-action"
-              [ngClass]="{'active': isActive('/enrolments/' + enrolmentId + '/lessons')}"
-              [attr.aria-current]="isActive('/enrolments/' + enrolmentId + '/lessons')">Lessons</a>
+         [ngClass]="{'active': isActive('/enrolments/' + enrolmentId + '/lessons')}"
+         [attr.aria-current]="isActive('/enrolments/' + enrolmentId + '/lessons')">Lessons</a>
       <a [routerLink]="['/enrolments', enrolmentId, 'posts']" class="list-group-item list-group-item-action"
-              [ngClass]="{'active': isActive('/enrolments/' + enrolmentId + '/posts')}"
-              [attr.aria-current]="isActive('/enrolments/' + enrolmentId + '/posts')">Posts</a>
+         [ngClass]="{'active': isActive('/enrolments/' + enrolmentId + '/posts')}"
+         [attr.aria-current]="isActive('/enrolments/' + enrolmentId + '/posts')">Posts</a>
     </div>
   </div>
 
-  <div class="col-8">
+  <div class="col-md-8 col-12">
     <router-outlet></router-outlet>
   </div>
 </div>
