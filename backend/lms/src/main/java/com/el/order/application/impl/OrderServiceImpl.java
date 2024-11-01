@@ -12,15 +12,11 @@ import com.el.order.application.dto.OrderRequestDTO;
 import com.el.order.domain.Order;
 import com.el.order.domain.OrderItem;
 import com.el.order.domain.OrderRepository;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.money.MonetaryAmount;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -87,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order createOrder(String currentUsername, OrderRequestDTO orderRequestDTO) {
 
-        Set<OrderItem> items = new HashSet<>();
+        Set<OrderItem> items = new LinkedHashSet<>();
 
         for (OrderItemDTO itemDto : orderRequestDTO.items()) {
             if (orderRepository.hasPurchasedCourse(itemDto.id(), currentUsername)) {

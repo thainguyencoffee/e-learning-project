@@ -298,6 +298,18 @@ class LmsApplicationTests {
                         ))
                         .exchange()
                         .expectStatus().isOk();
+
+                webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", courseId, sectionId)
+                        .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(new LessonDTO(
+                                "Donec facilisis vel tortor eget efficitur. Sed congue ante mi, sed tristique purus feugiat a",
+                                Lesson.Type.VIDEO,
+                                "https://www.youtube.com/watch?v=2",
+                                null)
+                        ))
+                        .exchange()
+                        .expectStatus().isOk();
             }
         }
 
@@ -1512,49 +1524,53 @@ class LmsApplicationTests {
 
 
     // Enrollment bounded context
-
-//    private Long performCreateEnrollment(KeycloakToken actor) {
-//        var courseDTO = TestFactory.createDefaultCourseDTO();
-//        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-//        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO));
-//        var courseId = course.getId();
-//
-//        approvePublishByCourseId(course.getId());
-//
-//        webTestClient.get()
-//                .uri("/published-courses/{courseId}", courseId)
-//                .exchange()
-//                .expectStatus().isOk();
-//
-//        Set<OrderItemDTO> orderItemsDto = new HashSet<>();
-//        orderItemsDto.add(new OrderItemDTO(courseId));
-//        var orderRequestDto = new OrderRequestDTO(orderItemsDto, null);
-//
-//        // Gửi request POST để tạo order
-//        String location = webTestClient.post().uri("/orders")
-//                .headers(header -> header.setBearerAuth(actor.getAccessToken()))
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .body(BodyInserters.fromValue(orderRequestDto))
-//                .exchange()
-//                .expectStatus().isCreated()
-//                .expectBody()
-//                .returnResult().getResponseHeaders().getLocation().toString();
-//
-//        String orderId = location.substring(location.lastIndexOf("/") + 1);
-//
-//        // Act: Pay order
-//        var paymentRequestDto = new PaymentRequest(
-//                UUID.fromString(orderId),
-//                Money.of(50000, Currencies.VND),
-//                PaymentMethod.STRIPE, "tok_visa");
-//        webTestClient.post().uri("/payments")
-//                .headers(header -> header.setBearerAuth(actor.getAccessToken()))
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .body(BodyInserters.fromValue(paymentRequestDto))
-//                .exchange()
-//                .expectStatus().isCreated();
-//        return courseId;
+//    @Test
+//    void test() {
+//        performCreateEnrollment(userToken);
 //    }
+
+    private Long performCreateEnrollment(KeycloakToken actor) {
+        var courseDTO = TestFactory.createDefaultCourseDTO();
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO));
+        var courseId = course.getId();
+
+        approvePublishByCourseId(course.getId());
+
+        webTestClient.get()
+                .uri("/published-courses/{courseId}", courseId)
+                .exchange()
+                .expectStatus().isOk();
+
+        Set<OrderItemDTO> orderItemsDto = new HashSet<>();
+        orderItemsDto.add(new OrderItemDTO(courseId));
+        var orderRequestDto = new OrderRequestDTO(orderItemsDto, null);
+
+        // Gửi request POST để tạo order
+        String location = webTestClient.post().uri("/orders")
+                .headers(header -> header.setBearerAuth(actor.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(orderRequestDto))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody()
+                .returnResult().getResponseHeaders().getLocation().toString();
+
+        String orderId = location.substring(location.lastIndexOf("/") + 1);
+
+        // Act: Pay order
+        var paymentRequestDto = new PaymentRequest(
+                UUID.fromString(orderId),
+                Money.of(50000, Currencies.VND),
+                PaymentMethod.STRIPE, "tok_visa");
+        webTestClient.post().uri("/payments")
+                .headers(header -> header.setBearerAuth(actor.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(paymentRequestDto))
+                .exchange()
+                .expectStatus().isCreated();
+        return courseId;
+    }
 
     protected static class KeycloakToken {
         private final String accessToken;

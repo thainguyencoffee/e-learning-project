@@ -9,7 +9,7 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.util.Assert;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
@@ -20,7 +20,7 @@ public class CourseSection {
     private Long id;
     private String title;
     @MappedCollection(idColumn = "course_section")
-    private Set<Lesson> lessons = new HashSet<>();
+    private Set<Lesson> lessons = new LinkedHashSet<>();
 
     public CourseSection(String title) {
         Assert.hasText(title, "Title must not be empty.");
