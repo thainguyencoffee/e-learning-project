@@ -34,12 +34,12 @@ export class EnrolmentsService {
     return this.http.get<number>(`${this.resourcePath}/count`, {params: {courseId: courseId.toString()}});
   }
 
-  markLessonAsCompleted(enrollmentId: string, lessonId: string) {
-    return this.http.put(`${this.resourcePath}/${enrollmentId}/lessons/${lessonId}mark?completed`, null);
+  markLessonAsCompleted(enrollmentId: number, lessonId: number) {
+    return this.http.put(`${this.resourcePath}/${enrollmentId}/lessons/${lessonId}?mark=completed`, null);
   }
 
-  markLessonAsIncomplete(enrollmentId: string, lessonId: string) {
-    return this.http.put(`${this.resourcePath}/${enrollmentId}/lessons/${lessonId}mark?incomplete`, null);
+  markLessonAsIncomplete(enrollmentId: number, lessonId: number) {
+    return this.http.put(`${this.resourcePath}/${enrollmentId}/lessons/${lessonId}?mark=incomplete`, null);
   }
 
 }

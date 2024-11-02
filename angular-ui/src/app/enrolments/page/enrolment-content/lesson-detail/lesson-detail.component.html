@@ -1,5 +1,6 @@
 <div *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse">
   <div *ngIf="getLessonById(lessonId!, enrolmentWithCourse.sections) as lessonDetail">
+
     <!--Header-->
     <div class="d-flex flex-wrap mb-4">
       <h1 class="flex-grow-1">{{lessonDetail.title}}</h1>
@@ -16,5 +17,29 @@
       </div>
     </div>
 
+    <!--Action Buttons-->
+    <div class="d-flex justify-content-between mb-4">
+      <div>
+        <button *ngIf="!lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)" (click)="markLessonAsCompleted(lessonDetail.id, lessonDetail.title)"
+                class="btn btn-success me-2">Mark as Completed</button>
+
+        <button *ngIf="lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)" (click)="markLessonAsIncomplete(lessonDetail.id, lessonDetail.title)"
+                class="btn btn-warning">Unmark as Incomplete</button>
+      </div>
+      <div>
+        <a *ngIf="lessonPrev" [routerLink]="['/enrolments', enrolmentId, 'lessons', lessonPrev]"
+           [queryParams]="{
+              lessonPrev: enrolmentWithCourseDataService.getPrevLesson(lessonPrev!),
+              lessonNext: enrolmentWithCourseDataService.getNextLesson(lessonPrev!),
+           }"
+           class="btn btn-primary me-2">Previous Course</a>
+        <a *ngIf="lessonNext" [routerLink]="['/enrolments', enrolmentId, 'lessons', lessonNext]"
+           [queryParams]="{
+              lessonPrev: enrolmentWithCourseDataService.getPrevLesson(lessonNext!),
+              lessonNext: enrolmentWithCourseDataService.getNextLesson(lessonNext!),
+           }"
+           class="btn btn-primary">Next Course</a>
+      </div>
+    </div>
   </div>
 </div>

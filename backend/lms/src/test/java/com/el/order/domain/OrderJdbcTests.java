@@ -17,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -38,7 +37,7 @@ class OrderJdbcTests {
     void setUp() {
         // Arrange
         OrderItem item = new OrderItem(1L, Money.of(100, Currencies.VND));
-        Set<OrderItem> items = new LinkedHashSet<>();
+        Set<OrderItem> items = new HashSet<>();
         items.add(item);
         order = new Order(items);
     }

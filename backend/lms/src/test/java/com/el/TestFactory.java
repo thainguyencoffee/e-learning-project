@@ -52,23 +52,37 @@ public class TestFactory {
                 Set.of("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris commodo ligula elementum urna euismod faucibus. In hac habitasse platea dictumst. Suspendisse ac tincidunt tortor. Mauris. "),
                 Set.of(Language.ENGLISH, Language.SPANISH),
                 teacher);
-        CourseSection section = Mockito.spy(new CourseSection("Section 1..."));
-        Mockito.when(section.getId()).thenReturn(1L);
-        section.addLesson(new Lesson("Lesson 1.1...",
-                Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null));
-        section.addLesson(new Lesson("Lesson 1.2...",
-                Lesson.Type.VIDEO, "http://example.com/lesson2.mp4", null));
-
-        CourseSection section1 = Mockito.spy(new CourseSection("Section 2..."));
-        Mockito.when(section1.getId()).thenReturn(2L);
-        section1.addLesson(new Lesson("Lesson 2.1...",
-                Lesson.Type.VIDEO, "http://example.com/lesson2.1.mp4", null));
-        section1.addLesson(new Lesson("Lesson 2.2...",
-                Lesson.Type.VIDEO, "http://example.com/lesson2.2.mp4", null));
-        section1.addLesson(new Lesson("Lesson 2.3...",
-                Lesson.Type.VIDEO, "http://example.com/lesson2.3.mp4", null));
-        course.addSection(section);
+        // add section 1
+        CourseSection section1 = Mockito.spy(new CourseSection("Section 1..."));
+        Mockito.when(section1.getId()).thenReturn(1L);
         course.addSection(section1);
+        // add lessons to section 1
+
+        Lesson lesson1 = new Lesson("Lesson 1.1...",
+                Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null);
+        Lesson lesson2 = new Lesson("Lesson 1.2...",
+                Lesson.Type.VIDEO, "http://example.com/lesson2.mp4", null);
+
+        course.addLessonToSection(1L, lesson1);
+        course.addLessonToSection(1L, lesson2);
+
+        CourseSection section2 = Mockito.spy(new CourseSection("Section 2..."));
+        Mockito.when(section2.getId()).thenReturn(2L);
+        // add section 2
+        course.addSection(section2);
+
+        // add lessons to section 2
+        Lesson lesson3 = new Lesson("Lesson 2.1...",
+                Lesson.Type.VIDEO, "http://example.com/lesson2.1.mp4", null);
+        Lesson lesson4 = new Lesson("Lesson 2.2...",
+                Lesson.Type.VIDEO, "http://example.com/lesson2.2.mp4", null);
+        Lesson lesson5 = new Lesson("Lesson 2.3...",
+                Lesson.Type.VIDEO, "http://example.com/lesson2.3.mp4", null);
+
+        course.addLessonToSection(2L, lesson3);
+        course.addLessonToSection(2L, lesson4);
+        course.addLessonToSection(2L, lesson5);
+
         return course;
     }
 
