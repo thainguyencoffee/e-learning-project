@@ -1,79 +1,48 @@
-/* src/app/enrolment-post/enrolment-post.component.css */
 
-.card {
-  max-width: 700px;
-  margin: auto;
-  border: 1px solid #ddd;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  font-family: 'Arial', sans-serif;
-  color: #333;
+/* Ảnh đại diện giảng viên */
+.card-header img {
+  border-width: 2px;
 }
 
-.card-img-top {
-  height: 300px;
-  object-fit: cover;
-}
-
+/* Tiêu đề và nội dung */
 .card-title {
-  color: #2c3e50;
   font-weight: bold;
-  font-size: 1.8rem;
-}
-
-.text-muted {
-  color: #7f8c8d;
 }
 
 .card-text {
-  color: #555;
-  line-height: 1.6;
   font-size: 1.1rem;
 }
 
-h4, h5 {
-  color: #2980b9;
-  font-weight: bold;
-  margin-top: 1.2rem;
+/* Badge số lượt thích */
+.btn-outline-primary .badge {
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
-ul {
-  padding-left: 1.5rem;
-  list-style-type: none;
+/* Khu vực bình luận */
+.comments-section {
+  background-color: #f9f9f9;
+  border-radius: 0 0 10px 10px;
 }
 
-ul li::before {
-  content: "\2022";
-  color: #27ae60;
-  font-weight: bold;
-  display: inline-block;
-  width: 1em;
-  margin-left: -1em;
+.input-group .form-control {
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
 }
 
-.progress {
-  background-color: #e0e0e0;
-  border-radius: 0.5rem;
+.input-group .btn {
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
 
-.progress-bar {
-  background-color: #3498db;
-  color: white;
-  font-weight: bold;
+.comment {
+  background-color: #f1f1f1;
+  border-radius: 10px;
 }
-
-.btn-primary {
-  background-color: #3498db;
-  border-color: #2980b9;
-  font-weight: bold;
-  font-size: 1.1rem;
+.post-image {
+  width: 100%;
+  height: 500px; /* Chiều cao cố định */
+  object-fit: cover; /* Đảm bảo hình ảnh lấp đầy khung nhưng không méo */
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
-
-.btn-primary:hover {
-  background-color: #2980b9;
-  border-color: #1f618d;
-}
-
-hr {
-  border: 1px solid #ddd;
-}
-

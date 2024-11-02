@@ -1,121 +1,75 @@
-<!-- src/app/enrolment-post/enrolment-post.component.html -->
+<div class="card my-3 shadow-sm border-0">
+  <!-- Thông tin giảng viên -->
+  <div class="card-header bg-primary text-white d-flex align-items-center">
+    <img
+      src="{{ teacher.avatarUrl }}"
+      alt="Avatar"
+      class="rounded-circle me-3 border border-light"
+      width="50"
+      height="50"
+    />
+    <div>
+      <h5 class="m-0">{{ teacher.name }}</h5>
+      <small class="text-light">{{ teacher.department }}</small>
+    </div>
+  </div>
 
-<div class="card mb-4">
-  <img [src]="enrolment.thumbnailUrl" class="card-img-top" alt="Course Thumbnail">
-  <div class="card-body">
-    <h2 class="card-title">
-      <i class="bi bi-book"></i> {{ enrolment.title }}
-    </h2>
-    <p class="text-muted">
-      <i class="bi bi-person-fill"></i> Giảng viên: {{ enrolment.teacher }}
-    </p>
-    <p class="card-text">
-      <i class="bi bi-info-circle-fill"></i> {{ enrolment.description }}
-    </p>
-    <hr>
-    <h4>
-      <i class="bi bi-star-fill text-warning"></i> Lợi ích khi tham gia khóa học:
-    </h4>
-    <ul>
-      <li *ngFor="let benefit of enrolment.benefits">
-        <i class="bi bi-check-circle-fill text-success"></i> {{ benefit }}
-      </li>
-    </ul>
+  <!-- Nội dung bài đăng -->
+  <div *ngFor="let post of postsList" class="post">
+    <div class="card-body">
+      <h5 class="card-title text-primary">{{ post.title }}</h5>
+      <p class="card-text text-secondary">{{ post.content }}</p>
+      <img
+        *ngIf="post.imageUrl"
+        [src]="post.imageUrl"
+        alt="Post Image"
+        class="post-image mb-3 img-fluid rounded"
+      />
+      <small class="text-muted d-block mb-2">Ngày đăng: {{ post.date | date: 'short' }}</small>
+    </div>
 
-    <h5>
-      <i class="bi bi-exclamation-triangle-fill text-danger"></i> Yêu cầu đầu vào:
-    </h5>
-    <p *ngFor="let prerequisite of enrolment.prerequisites">
-      <i class="bi bi-dot"></i> {{ prerequisite }}
-    </p>
+    <!-- Các hành động -->
+    <div class="card-footer d-flex justify-content-between">
+      <button class="btn btn-outline-primary" (click)="toggleLike()">
+        <i class="bi bi-hand-thumbs-up"></i> Like {{ likes }}
+      </button>
+      <button class="btn btn-outline-secondary" (click)="toggleComments()">
+        <i class="bi bi-chat-left-text me-1"></i> Comment
+      </button>
+    </div>
 
-    <hr>
+    <!-- Phần bình luận -->
+    <div *ngIf="showComments" class="comments-section p-3 border-top">
+      <!-- Form thêm bình luận mới -->
+      <div class="input-group mb-3">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Thêm bình luận..."
+          [(ngModel)]="newComment"
+        />
+        <button class="btn btn-primary" (click)="addComment()">Đăng</button>
+      </div>
 
-    <h4>
-      <i class="bi bi-book-half"></i> Chương trình học
-    </h4>
-    <div class="accordion mt-4" id="courseSections">
-      <div *ngFor="let section of enrolment.sections; let i = index" class="accordion-item mb-3 border rounded">
-        <!-- Accordion Header -->
-        <h2 class="accordion-header" [attr.id]="'heading' + section.id">
-          <div class="d-flex align-items-center justify-content-between px-3 py-2">
-            <!-- Title và nút collapse -->
-            <span class="badge bg-primary me-2">{{ section.lessons.length }} Lesson</span>
-            <button
-              class="accordion-button collapsed bg-light text-dark fw-bold p-0 me-3"
-              type="button"
-              data-bs-toggle="collapse"
-              [attr.data-bs-target]="'#collapse' + section.id"
-              aria-expanded="false"
-              [attr.aria-controls]="'collapse' + section.id"
-            >
-              <span>{{ section.title }}</span>
-            </button>
+      <!-- Danh sách bình luận -->
+      <div *ngFor="let comment of comments" class="comment p-2 border rounded mb-2 bg-light">
+        <strong class="text-primary">{{ comment.user }}</strong>: {{ comment.text }}
 
-          </div>
-        </h2>
-        <div
-          [attr.id]="'collapse' + section.id"
-          class="accordion-collapse collapse"
-          [attr.aria-labelledby]="'heading' + section.id"
-          data-bs-parent="#courseSections"
-        >
-          <div class="accordion-body border-top">
-            <ul class="list-group border-0">
-              <li *ngFor="let lesson of section.lessons" class="list-group-item d-flex align-items-center border-0">
-                <i class="bi bi-bookmark"></i>
-                <span class="fw-bold ms-2">{{ lesson.title }}</span>
-              </li>
-            </ul>
-          </div>
+        <!-- Replies Section -->
+        <div *ngFor="let reply of comment.replies" class="reply p-2 mt-1 ms-3 border-start border-secondary">
+          <strong>{{ reply.user }}:</strong> {{ reply.text }}
+        </div>
+
+        <!-- New Reply Input -->
+        <div class="mt-2">
+          <input
+            [(ngModel)]="newComment"
+            placeholder="Reply..."
+            class="form-control form-control-sm"
+          />
+          <button class="btn btn-outline-primary btn-sm mt-1" (click)="addReply(comment)">Reply</button>
         </div>
       </div>
     </div>
-    <hr>
-    <h4>
-      <i class="bi bi-person-lines-fill"></i> Thông Tin Học Viên
-    </h4>
-    <p>
-      <i class="bi bi-person"></i> Học viên đăng ký: {{ enrolment.student }}
-    </p>
-    <p>
-      <i class="bi bi-check-square"></i> Trạng thái hoàn thành:
-      <span [class.text-success]="enrolment.completed" [class.text-danger]="!enrolment.completed">
-        {{ enrolment.completed ? 'Đã hoàn thành' : 'Chưa hoàn thành' }}
-      </span>
-    </p>
-    <hr>
-    <h4>
-      <i class="bi bi-graph-up-arrow"></i> Tiến độ học tập
-    </h4>
-    <div *ngFor="let lessonProgress of enrolment.lessonProgresses" class="mb-2">
-      <strong>
-        <i class="bi bi-bookmark-check-fill"></i> {{ lessonProgress.title }}:
-      </strong>
-      <div class="progress">
-        <div
-          class="progress-bar"
-          role="progressbar"
-          [style.width]="lessonProgress.progress + '%'"
-          [attr.aria-valuenow]="lessonProgress.progress"
-          aria-valuemin="0"
-          aria-valuemax="100"
-        >
-          {{ lessonProgress.progress }}%
-        </div>
-      </div>
-    </div>
-
-    <hr>
-
-    <h5>
-      <i class="bi bi-pencil-square"></i> Cách thức đăng ký
-    </h5>
-    <p>
-      <i class="bi bi-hash"></i> Mã đăng ký: {{ enrolment.enrollmentId }}
-    </p>
-    <button class="btn btn-primary">
-      <i class="bi bi-play-circle"></i> Học ngay
-    </button>
   </div>
 </div>
