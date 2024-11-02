@@ -72,6 +72,7 @@ $SED "s/LOCALHOST_NAME/${host}/g" "compose-${host}.yml"
 rm -f "compose-${host}.yml''"
 
 rm -f "keycloak/import/keycloak101-realm.json"
+mkdir -p keycloak/import
 cp keycloak101-realm.json keycloak/import/keycloak101-realm.json
 $SED "s/LOCALHOST_NAME/${host}/g" keycloak/import/keycloak101-realm.json
 rm -f "keycloak/import/keycloak101-realm.json''"
