@@ -312,7 +312,9 @@ class CourseTests {
     @Test
     void removeSectionAndAddSection_NoNeedUpdateOrderIndex() {
         CourseSection section1 = spy(new CourseSection("SectionTitle1"));
-        CourseSection section2 = new CourseSection("SectionTitle2");
+        CourseSection section2 = spy(new CourseSection("SectionTitle2"));
+        when(section1.getId()).thenReturn(1L);
+        when(section2.getId()).thenReturn(2L);
 
         courseNoSections.addSection(section1);
         courseNoSections.addSection(section2);
@@ -321,7 +323,6 @@ class CourseTests {
         assertEquals(2, section2.getOrderIndex());
 
         // Remove section 1
-        when(section1.getId()).thenReturn(1L);
         courseNoSections.removeSection(1L);
 
         // Add new section
