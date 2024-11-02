@@ -4,4 +4,5 @@ export interface Lesson {
   type: string;
   link: string;
   quiz: number;
+  orderIndex : number;
 }

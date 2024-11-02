@@ -70,7 +70,11 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
 
     this.enrolmentService.getEnrolmentWithCourseByEnrollmentId(this.enrolmentId)
       .subscribe({
-        next: (data) => this.enrolmentWithCourseDataService.setEnrolmentWithCourse(data),
+        next: (data) => {
+          this.enrolmentWithCourseDataService.setEnrolmentWithCourse(
+            this.enrolmentWithCourseDataService.sortSectionAndLessons(data)
+          );
+        },
         error: (error) => this.errorHandler.handleServerError(error.error)
       })
 

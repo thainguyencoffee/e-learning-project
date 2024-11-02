@@ -1,8 +1,6 @@
 <div *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse">
   <div *ngIf="getLessonById(lessonId!, enrolmentWithCourse.sections) as lessonDetail">
 
-    lessonPrev {{lessonPrev}}
-    lessonNext {{lessonNext}}
     <!--Header-->
     <div class="d-flex flex-wrap mb-4">
       <h1 class="flex-grow-1">{{lessonDetail.title}}</h1>
@@ -31,14 +29,14 @@
       <div>
         <a *ngIf="lessonPrev" [routerLink]="['/enrolments', enrolmentId, 'lessons', lessonPrev]"
            [queryParams]="{
-              lessonPrev: enrolmentWithCourseDataService.getLessonIdPrev(lessonPrev!, enrolmentWithCourse.lessonProgresses),
-              lessonNext: enrolmentWithCourseDataService.getLessonIdNext(lessonPrev!, enrolmentWithCourse.lessonProgresses),
+              lessonPrev: enrolmentWithCourseDataService.getPrevLesson(lessonPrev!),
+              lessonNext: enrolmentWithCourseDataService.getNextLesson(lessonPrev!),
            }"
            class="btn btn-primary me-2">Previous Course</a>
         <a *ngIf="lessonNext" [routerLink]="['/enrolments', enrolmentId, 'lessons', lessonNext]"
            [queryParams]="{
-              lessonPrev: enrolmentWithCourseDataService.getLessonIdPrev(lessonNext!, enrolmentWithCourse.lessonProgresses),
-              lessonNext: enrolmentWithCourseDataService.getLessonIdNext(lessonNext!, enrolmentWithCourse.lessonProgresses),
+              lessonPrev: enrolmentWithCourseDataService.getPrevLesson(lessonNext!),
+              lessonNext: enrolmentWithCourseDataService.getNextLesson(lessonNext!),
            }"
            class="btn btn-primary">Next Course</a>
       </div>
