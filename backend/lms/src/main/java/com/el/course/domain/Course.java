@@ -14,7 +14,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -32,13 +32,13 @@ public class Course extends AuditSupportClass {
     private Set<String> prerequisites;
 
     @MappedCollection(idColumn = "course")
-    private Set<CourseSection> sections = new LinkedHashSet<>();
+    private Set<CourseSection> sections = new HashSet<>();
     private MonetaryAmount price;
     private Boolean published;
     private Boolean unpublished;
     private String teacher;
     private String approvedBy;
-    private Set<CourseRequest> courseRequests = new LinkedHashSet<>();
+    private Set<CourseRequest> courseRequests = new HashSet<>();
     @JsonIgnore
     private boolean deleted;
     @Version
@@ -277,10 +277,21 @@ public class Course extends AuditSupportClass {
             throw new InputInvalidException("Section must not be null.");
         }
 
+        // Check valid section
+        // Now when addSection is called, that section only has title
+        // Don't support add section that has whole attributes
+        if (section.hasLessons())
+            throw new InputInvalidException("Cannot add a section that has lessons.");
+
         if (this.sections.stream().anyMatch(existingSection -> existingSection.getTitle().equals(section.getTitle()))) {
             throw new InputInvalidException("A section with the same title already exists.");
         }
 
+        int orderIndexLast = 1;
+        if (!this.sections.isEmpty()) {
+            orderIndexLast = this.sections.stream().mapToInt(CourseSection::getOrderIndex).max().getAsInt() + 1;
+        }
+        section.setOrderIndex(orderIndexLast);
         this.sections.add(section);
     }
 
@@ -374,7 +385,7 @@ public class Course extends AuditSupportClass {
     }
 
     public Set<Long> getLessonIds() {
-        Set<Long> lessonIds = new LinkedHashSet<>();
+        Set<Long> lessonIds = new HashSet<>();
         for (CourseSection section : sections) {
             for (Lesson lesson : section.getLessons()) {
                 lessonIds.add(lesson.getId());
@@ -383,24 +394,5 @@ public class Course extends AuditSupportClass {
         return lessonIds;
     }
 
-//    public double calculateDoneLessonsPercentage(int completedLessons) {
-//        int totalLessons = this.sections.stream()
-//                .mapToInt(section -> section.getLessons().size())
-//                .sum();
-//        if (totalLessons == 0) throw new InputInvalidException("Cannot do calculation on a draft course.");
-//        if (totalLessons < completedLessons) throw new InputInvalidException("Completed lessons must not exceed total lessons.");
-//
-//        return (completedLessons / (double) totalLessons) * 100;
-//    }
-//
-//    public double calculateDoneLessonsPercentageForSection(Long sectionId, int completedLessons) {
-//        CourseSection section = findSectionById(sectionId);
-//        int totalLessons = section.getLessons().size();
-//
-//        if (totalLessons == 0) throw new InputInvalidException("Cannot do calculation on a draft course.");
-//        if (totalLessons < completedLessons) throw new InputInvalidException("Completed lessons must not exceed total lessons.");
-//
-//        return (completedLessons / (double) totalLessons) * 100;
-//    }
 
 }

@@ -28,11 +28,16 @@ class CourseTests {
         courseNoSections = TestFactory.createDefaultCourse();
 
         // Tạo một course có sections
-        CourseSection courseSection = new CourseSection("SectionTitle");
-        courseSection.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
+        CourseSection courseSection = spy(new CourseSection("SectionTitle"));
+        when(courseSection.getId()).thenReturn(1000L);
+        // Update for Course.java line 282
+//        courseSection.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
 
         courseWithSections = TestFactory.createDefaultCourse();
+        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null);
         courseWithSections.addSection(courseSection);
+        courseWithSections.addLessonToSection(courseSection.getId(), lesson);
+
         courseWithSections.changePrice(Money.of(100, Currencies.VND));
     }
 
@@ -202,11 +207,28 @@ class CourseTests {
 
 
     @Test
-    void addSection_ValidSection_AddsSection() {
+    void addSection_FirstSection_ShouldSetOrderIndexToOne() {
+        // Khi add section, thì index của section đó được set là index của section cuối + 1
+        // Ví dụ mảng index [1, 2, 3, 4] khi add section thì index của section mới là 5 => mảng index mới [1, 2, 3, 4, 5]
+        // Tiếp theo, khi xóa section, không cần phải cập nhật lại index của các section còn lại
+        // Ví dụ mảng index [1, 2, 3, 4, 5] khi xóa section có index 3 thì mảng index mới là [1, 2, 4, 5]
         CourseSection section = new CourseSection("SectionTitle");
-        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
         courseNoSections.addSection(section);
+        assertEquals(1, section.getOrderIndex());
         assertTrue(courseNoSections.getSections().contains(section));
+    }
+
+    @Test
+    void addSection_SecondSection_ShouldSetOrderIndexToTwo() {
+        CourseSection section1 = new CourseSection("SectionTitle1");
+        CourseSection section2 = new CourseSection("SectionTitle2");
+
+        courseNoSections.addSection(section1);
+        courseNoSections.addSection(section2);
+
+        assertEquals(1, section1.getOrderIndex());
+        assertEquals(2, section2.getOrderIndex());
+        assertTrue(courseNoSections.getSections().contains(section2));
     }
 
     @Test
@@ -235,7 +257,6 @@ class CourseTests {
         CourseSection section = spy(new CourseSection("SectionTitle"));
         // Mock id của section
         when(section.getId()).thenReturn(1L);
-        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
         courseNoSections.addSection(section);
         assertTrue(courseNoSections.getSections().contains(section));
 
@@ -252,7 +273,6 @@ class CourseTests {
         CourseSection section = spy(new CourseSection("SectionTitle"));
         // Mock id của section
         when(section.getId()).thenReturn(1L);
-        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
         courseNoSections.addSection(section);
         assertTrue(courseNoSections.getSections().contains(section));
 
@@ -279,12 +299,38 @@ class CourseTests {
     void removeSection_ValidSectionId_RemovesSection() {
         CourseSection section = spy(new CourseSection("SectionTitle"));
         when(section.getId()).thenReturn(1L);
-        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
         courseNoSections.addSection(section);
+
+        assertEquals(1, courseNoSections.getSections().size());
+        assertEquals(1, section.getOrderIndex());
 
         courseNoSections.removeSection(1L);
 
         assertFalse(courseNoSections.getSections().contains(section));
+    }
+
+    @Test
+    void removeSectionAndAddSection_NoNeedUpdateOrderIndex() {
+        CourseSection section1 = spy(new CourseSection("SectionTitle1"));
+        CourseSection section2 = new CourseSection("SectionTitle2");
+
+        courseNoSections.addSection(section1);
+        courseNoSections.addSection(section2);
+
+        assertEquals(1, section1.getOrderIndex());
+        assertEquals(2, section2.getOrderIndex());
+
+        // Remove section 1
+        when(section1.getId()).thenReturn(1L);
+        courseNoSections.removeSection(1L);
+
+        // Add new section
+        CourseSection section3 = new CourseSection("SectionTitle3");
+        courseNoSections.addSection(section3);
+
+        // Verify order index of section 2 and section 3
+        assertEquals(2, section2.getOrderIndex());
+        assertEquals(3, section3.getOrderIndex());
     }
 
     @Test
@@ -301,25 +347,109 @@ class CourseTests {
     }
 
     @Test
-    void addLessonToSection_ValidSectionIdAndLesson_AddsLesson() {
+    void addLessonToSection_FirstLesson_ShouldSetOrderIndexIsOne() {
         CourseSection section = spy(new CourseSection("SectionTitle"));
         when(section.getId()).thenReturn(1L);
-        // Khi thêm một lesson mới vào section, không có lesson nào trùng title
-        section.addLesson(new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1", null));
         courseNoSections.addSection(section);
 
-        courseNoSections.addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/2", null));
+        // Add lesson to section
+        // Khi thêm một lesson mới vào section, không có lesson nào trùng title
+        Lesson lesson = new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1", null);
+        courseNoSections.addLessonToSection(section.getId(), lesson);
+
+        assertEquals(1, lesson.getOrderIndex());
+
+        assertEquals(1, section.getLessons().size());
+    }
+
+    @Test
+    void addLessonToSection_SecondLesson_ShouldSetOrderIndexIsTwo() {
+        CourseSection section = spy(new CourseSection("SectionTitle"));
+        when(section.getId()).thenReturn(1L);
+        courseNoSections.addSection(section);
+
+        // Add lesson to section
+        // Khi thêm một lesson mới vào section, không có lesson nào trùng title
+        Lesson lesson1 = new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1", null);
+        Lesson lesson2 = new Lesson("LessonTitle 2", Lesson.Type.TEXT, "https://www.example.com/2", null);
+        courseNoSections.addLessonToSection(section.getId(), lesson1);
+        courseNoSections.addLessonToSection(section.getId(), lesson2);
+
+        assertEquals(1, lesson1.getOrderIndex());
+        assertEquals(2, lesson2.getOrderIndex());
+
         assertEquals(2, section.getLessons().size());
     }
 
     @Test
-    void addLessonToSection_ValidSectionIdButLessonDuplicateTitle_ThrowException() {
+    void removeLessonAndAddLesson_NoNeedUpdateOrderIndex() {
         CourseSection section = spy(new CourseSection("SectionTitle"));
         when(section.getId()).thenReturn(1L);
-        // Khi thêm một lesson mới vào section, không có lesson nào trùng title
-        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1", null));
+        courseNoSections.addSection(section);
+
+        // Add lesson to section
+        Lesson lesson1 = spy(new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1", null));
+        when(lesson1.getId()).thenReturn(1L);
+        Lesson lesson2 = spy(new Lesson("LessonTitle 2", Lesson.Type.TEXT, "https://www.example.com/2", null));
+        when(lesson2.getId()).thenReturn(2L);
+        courseNoSections.addLessonToSection(section.getId(), lesson1);
+        courseNoSections.addLessonToSection(section.getId(), lesson2);
+
+        assertEquals(1, lesson1.getOrderIndex());
+        assertEquals(2, lesson2.getOrderIndex());
+
+        // Remove lesson 1
+        courseNoSections.removeLessonFromSection(1L, 1L);
+
+        // Add new lesson
+        Lesson lesson3 = new Lesson("LessonTitle 3", Lesson.Type.TEXT, "https://www.example.com/3", null);
+        courseNoSections.addLessonToSection(section.getId(), lesson3);
+
+        // Verify order index of lesson 2 and lesson 3
+        assertEquals(2, lesson2.getOrderIndex());
+        assertEquals(3, lesson3.getOrderIndex());
+    }
+
+    @Test
+    void removeLessonAtTailAndAddLesson_NoNeedUpdateOrderIndex() {
+        CourseSection section = spy(new CourseSection("SectionTitle"));
+        when(section.getId()).thenReturn(1L);
+        courseNoSections.addSection(section);
+
+        // Add lesson to section
+        Lesson lesson1 = spy(new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1", null));
+        when(lesson1.getId()).thenReturn(1L);
+        Lesson lesson2 = spy(new Lesson("LessonTitle 2", Lesson.Type.TEXT, "https://www.example.com/2", null));
+        when(lesson2.getId()).thenReturn(2L);
+
+        courseNoSections.addLessonToSection(section.getId(), lesson1);
+        courseNoSections.addLessonToSection(section.getId(), lesson2);
+
+        assertEquals(1, lesson1.getOrderIndex());
+        assertEquals(2, lesson2.getOrderIndex());
+
+        // Remove lesson 1
+        courseNoSections.removeLessonFromSection(1L, 2L);
+
+        // Add new lesson
+        Lesson lesson3 = new Lesson("LessonTitle 3", Lesson.Type.TEXT, "https://www.example.com/3", null);
+        courseNoSections.addLessonToSection(section.getId(), lesson3);
+
+        // Verify order index of lesson 2 and lesson 3
+        assertEquals(1, lesson1.getOrderIndex());
+        assertEquals(2, lesson3.getOrderIndex());
+    }
+
+    @Test
+    void addLessonToSection_ValidSectionIdButLessonDuplicateTitle_ThrowException() {
+        // Issue #90
+        CourseSection section = spy(new CourseSection("SectionTitle"));
+        when(section.getId()).thenReturn(1L);
 
         courseNoSections.addSection(section);
+
+        // add lesson to section
+        courseNoSections.addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1", null));
 
         assertThrows(InputInvalidException.class, () -> courseNoSections
                 .addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/2", null)));
@@ -329,10 +459,11 @@ class CourseTests {
     void addLessonToSection_ValidSectionIdButLessonDuplicateLink_ThrowException() {
         CourseSection section = spy(new CourseSection("SectionTitle"));
         when(section.getId()).thenReturn(1L);
-        // Khi thêm một lesson mới vào section, không có lesson nào trùng title
-        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1", null));
 
         courseNoSections.addSection(section);
+
+        // Add lesson to section
+        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1", null));
 
         assertThrows(InputInvalidException.class, () -> courseNoSections
                 .addLessonToSection(1L, new Lesson("LessonTitle 2", Lesson.Type.TEXT, "https://www.example.com/1", null)));
@@ -355,10 +486,12 @@ class CourseTests {
     void updateLessonInSection_ValidSectionIdLessonIdAndLesson_UpdatesLesson() {
         CourseSection section = spy(new CourseSection("SectionTitle"));
         when(section.getId()).thenReturn(1L);
+        courseNoSections.addSection(section);
+
+        // Add lesson to section
         Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1", null));
         when(lesson.getId()).thenReturn(1L);
-        section.addLesson(lesson);
-        courseNoSections.addSection(section);
+        courseNoSections.addLessonToSection(1L, lesson);
 
         courseNoSections.updateLessonInSection(1L, 1L, new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/2", null));
         assertEquals("UpdatedLessonTitle", section.findLessonById(1L).getTitle());
@@ -366,30 +499,48 @@ class CourseTests {
 
     @Test
     void updateLessonInSection_ValidSectionIdLessonIdButLessonDuplicateTitle_ThrowException() {
+        // Tạo CourseSection và thêm vào courseNoSections
         CourseSection section = spy(new CourseSection("SectionTitle"));
         when(section.getId()).thenReturn(1L);
-        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1", null));
-        when(lesson.getId()).thenReturn(1L);
-        section.addLesson(lesson);
         courseNoSections.addSection(section);
-//
-//        section.addLesson(new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/2", null));
-//        assertThrows(InputInvalidException.class, () -> courseNoSections
-//                .updateLessonInSection(1L, 1L, new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/3", null)));
+
+        // Tạo và thêm một Lesson đầu tiên với title và link cố định
+        Lesson lesson1 = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1", null));
+        when(lesson1.getId()).thenReturn(1L);
+        courseNoSections.addLessonToSection(1L, lesson1);
+
+        // Tạo và thêm một Lesson khác với title hoặc link trùng
+        Lesson lesson2 = spy(new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/2", null));
+        when(lesson2.getId()).thenReturn(2L);
+        courseNoSections.addLessonToSection(1L, lesson2);
+
+        // Thử cập nhật lesson1 với title trùng với lesson2
+        Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/3", null);
+
+        assertThrows(InputInvalidException.class, () ->
+                courseNoSections.updateLessonInSection(1L, 1L, updatedLesson)
+        );
     }
+
 
     @Test
     void updateLessonInSection_ValidSectionIdLessonIdButLessonDuplicateLink_ThrowException() {
         CourseSection section = spy(new CourseSection("SectionTitle"));
         when(section.getId()).thenReturn(1L);
-        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1", null));
-        when(lesson.getId()).thenReturn(2L);
-        section.addLesson(lesson);
         courseNoSections.addSection(section);
-//
-//        section.addLesson(new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/2", null));
-//        assertThrows(InputInvalidException.class, () -> courseNoSections
-//                .updateLessonInSection(1L, 2L, new Lesson("UpdatedLessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/2", null)));
+
+        Lesson lesson1 = spy(new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1", null));
+        when(lesson1.getId()).thenReturn(1L);
+        courseNoSections.addLessonToSection(1L, lesson1);
+
+        Lesson lesson2 = spy(new Lesson("LessonTitle 2", Lesson.Type.TEXT, "https://www.example.com/2", null));
+        when(lesson2.getId()).thenReturn(2L);
+        courseNoSections.addLessonToSection(1L, lesson2);
+
+        Lesson updatedLesson = new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/2", null);
+
+        assertThrows(InputInvalidException.class, () -> courseNoSections
+                .updateLessonInSection(1L, 1L, updatedLesson));
     }
 
 
@@ -410,22 +561,25 @@ class CourseTests {
     void updateLessonInSection_LessonNotFound_ThrowsException() {
         CourseSection section = spy(new CourseSection("SectionTitle"));
         when(section.getId()).thenReturn(1L);
-        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1", null));
-        when(lesson.getId()).thenReturn(1L);
-        section.addLesson(lesson);
         courseNoSections.addSection(section);
 
-        assertThrows(ResourceNotFoundException.class, () -> courseNoSections.updateLessonInSection(1L, 2L, new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/2", null)));
+        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1", null));
+        when(lesson.getId()).thenReturn(1L);
+        courseNoSections.addLessonToSection(1L, lesson);
+
+        assertThrows(ResourceNotFoundException.class, () -> courseNoSections.updateLessonInSection(1L, 2L,
+                new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/2", null)));
     }
 
     @Test
     void removeLessonFromSection_ValidSectionIdAndLessonId_RemovesLesson() {
         CourseSection section = spy(new CourseSection("SectionTitle"));
         when(section.getId()).thenReturn(1L);
+        courseNoSections.addSection(section);
+
         Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
         when(lesson.getId()).thenReturn(1L);
-        section.addLesson(lesson);
-        courseNoSections.addSection(section);
+        courseNoSections.addLessonToSection(1L, lesson);
 
         courseNoSections.removeLessonFromSection(1L, 1L);
 
@@ -441,10 +595,11 @@ class CourseTests {
     void removeLessonFromSection_LessonNotFound_ThrowsException() {
         CourseSection section = spy(new CourseSection("SectionTitle"));
         when(section.getId()).thenReturn(1L);
+        courseNoSections.addSection(section);
+
         Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
         when(lesson.getId()).thenReturn(1L);
-        section.addLesson(lesson);
-        courseNoSections.addSection(section);
+        courseNoSections.addLessonToSection(1L, lesson);
 
         assertThrows(ResourceNotFoundException.class, () -> courseNoSections.removeLessonFromSection(1L, 999L));
     }
@@ -810,37 +965,5 @@ class CourseTests {
         );
     }
 
-//    @Test
-//    void calculateDoneLessonsPercentage_ShouldCalc() {
-//        Course course = TestFactory.createCourseWithSections();
-//        Double percentage = course.calculateDoneLessonsPercentage(1);
-//        assertNotNull(percentage);
-//
-//        double percentageExpected = (1 / (double) 5) * 100;
-//        assertEquals(percentageExpected, percentage);
-//    }
-//
-//    @Test
-//    void calculateDoneLessonsPercentage_ShouldThrowException_WhenCourseHasNoSection() {
-//        Course course = TestFactory.createDefaultCourse();
-//        assertThrows(InputInvalidException.class, () -> course.calculateDoneLessonsPercentage(1),
-//                "Cannot do calculation on a draft course.");
-//    }
-//
-//    @Test
-//    void calculateDoneLessonsPercentageForSection_ShouldCalc() {
-//        Course course = TestFactory.createCourseWithSections();
-//        Double percentage = course.calculateDoneLessonsPercentageForSection(1L, 1);
-//        assertNotNull(percentage);
-//
-//        double percentageExpected = (1 / (double) 2) * 100;
-//        assertEquals(percentageExpected, percentage);
-//    }
-//
-//    @Test
-//    void calculateDoneLessonsPercentageForSection_ShouldThrowException_WhenCourseHasNoSection() {
-//        Course course = TestFactory.createDefaultCourse();
-//        assertThrows(ResourceNotFoundException.class, () -> course.calculateDoneLessonsPercentageForSection(1L, 1));
-//    }
 
 }
