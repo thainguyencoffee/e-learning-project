@@ -54,7 +54,11 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
     this.currentId = +this.route.snapshot.params['id']
     this.courseService.getCourse(this.currentId)
       .subscribe({
-        next: (data) => this.courseDto = data,
+        next: (data) => {
+          this.courseDto = data;
+          this.courseDto.sections?.sort((a, b) => a.orderIndex - b.orderIndex);
+          this.courseDto.sections?.forEach(section => section.lessons.sort((a, b) => a.orderIndex - b.orderIndex));
+        },
         error: (error) => this.errorHandler.handleServerError(error.error)
       })
 

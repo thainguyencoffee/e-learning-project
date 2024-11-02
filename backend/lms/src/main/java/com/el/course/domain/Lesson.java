@@ -17,6 +17,7 @@ public class Lesson {
     private Type type;
     private String link;
     private Long quiz;
+    private Integer orderIndex;
 
     public enum Type {
         VIDEO, TEXT, QUIZ, ASSIGNMENT
@@ -64,6 +65,10 @@ public class Lesson {
             default:
                 throw new InputInvalidException("Unsupported lesson type.");
         }
+    }
+
+    protected void setOrderIndex(Integer i) {
+        this.orderIndex = i;
     }
 
 }

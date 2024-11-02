@@ -47,9 +47,10 @@ create table course_request
 
 create table course_section
 (
-    id     bigserial    not null,
-    title  varchar(255) not null,
-    course bigint       not null references course (id) on DELETE cascade,
+    id          bigserial    not null,
+    title       varchar(255) not null,
+    order_index int          not null,
+    course      bigint       not null references course (id) on DELETE cascade,
     constraint fk_course_section primary key (id)
 );
 
@@ -61,6 +62,7 @@ create table lesson
     type           varchar(255) not null,
     link           varchar(255),
     quiz           bigint,
+    order_index    int          not null,
     course_section bigint       not null references course_section (id) on DELETE cascade,
     constraint fk_lesson primary key (id)
 );
@@ -74,11 +76,11 @@ create table quiz
 
 create table question
 (
-    id      bigserial      not null,
-    prompt  varchar(255)   not null,
+    id      bigserial    not null,
+    prompt  varchar(255) not null,
     options varchar(255)[] not null,
-    correct int            not null,
-    quiz    bigint         not null references quiz (id) on DELETE cascade,
+    correct int          not null,
+    quiz    bigint       not null references quiz (id) on DELETE cascade,
     constraint fk_question primary key (id)
 );
 

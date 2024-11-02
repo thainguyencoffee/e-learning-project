@@ -67,9 +67,10 @@ class CourseServiceTests {
                 "teacher123"
         );
 
-        CourseSection section = new CourseSection("Billie Jean [4K] 30th Anniversary, 2001");
-        section.addLesson(new Lesson("Lesson 1", Lesson.Type.TEXT, "https://example.com/lesson1", null));
+        CourseSection section = spy(new CourseSection("Billie Jean [4K] 30th Anniversary, 2001"));
+        when(section.getId()).thenReturn(1L);
         courseForPublish.addSection(section);
+        courseForPublish.addLessonToSection(1L, new Lesson("Lesson 1", Lesson.Type.TEXT, "https://example.com/lesson1", null));
 
         // update validate updatePrice, Course.validSections return true
         courseForPublish.changePrice(Money.of(100, Currencies.VND));

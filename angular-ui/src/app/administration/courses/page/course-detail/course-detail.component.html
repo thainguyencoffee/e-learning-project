@@ -115,7 +115,7 @@
             aria-expanded="false"
             [attr.aria-controls]="'collapse' + section.id"
           >
-            <span>{{ section.title }}</span>
+            <span>{{ section.orderIndex + '-' + section.title }}</span>
           </button>
 
           <!-- Badge và nhóm button -->
@@ -148,10 +148,17 @@
           <ul class="list-group border-0">
             <li *ngFor="let lesson of section.lessons; let j = index"
                 class="list-group-item d-flex justify-content-between align-items-center border-0">
-              <span class="fw-bold">{{ j + 1 }}. {{ lesson.title }}</span>
+              <span class="fw-bold">{{ lesson.orderIndex }}. {{ lesson.title }}</span>
               <a [href]="lesson.link" target="_blank" class="btn btn-outline-success custom-button">
                 View content
               </a>
+              <a *ngIf="isEditable()"
+                 [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'edit', lesson.id]"
+                 class="btn btn-secondary btn-sm custom-button">Edit</a>
+              <button *ngIf="isEditable()"
+                      type="button"
+                      (click)="confirmDeleteLesson(section.id, lesson.id, lesson)"
+                      class="btn btn-secondary btn-sm custom-button">Delete</button>
             </li>
           </ul>
         </div>

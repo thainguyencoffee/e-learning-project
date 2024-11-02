@@ -19,7 +19,7 @@ public class Order extends AbstractAggregateRoot<Order> {
     @Id
     private UUID id;
     @MappedCollection(idColumn = "orders")
-    private Set<OrderItem> items = new LinkedHashSet<>();
+    private Set<OrderItem> items = new HashSet<>();
     private Instant orderDate;
     private MonetaryAmount totalPrice;
     private MonetaryAmount discountedPrice;

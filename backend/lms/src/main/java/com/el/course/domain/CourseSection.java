@@ -9,7 +9,7 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.util.Assert;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -20,7 +20,8 @@ public class CourseSection {
     private Long id;
     private String title;
     @MappedCollection(idColumn = "course_section")
-    private Set<Lesson> lessons = new LinkedHashSet<>();
+    private Set<Lesson> lessons = new HashSet<>();
+    private Integer orderIndex;
 
     public CourseSection(String title) {
         Assert.hasText(title, "Title must not be empty.");
@@ -42,6 +43,11 @@ public class CourseSection {
             throw new InputInvalidException("Duplicate lesson title or link.");
         }
 
+        int orderIndexLast = 1;
+        if (!this.lessons.isEmpty()) {
+            orderIndexLast = this.lessons.stream().mapToInt(Lesson::getOrderIndex).max().getAsInt() + 1;
+        }
+        lesson.setOrderIndex(orderIndexLast);
         this.lessons.add(lesson);
     }
 
@@ -71,6 +77,10 @@ public class CourseSection {
 
     public boolean hasLessons() {
         return !this.lessons.isEmpty();
+    }
+
+    protected void setOrderIndex(int i) {
+        this.orderIndex = i;
     }
 
 }
