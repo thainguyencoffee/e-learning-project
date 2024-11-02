@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
 import {BehaviorSubject} from "rxjs";
 import {EnrolmentWithCourseDto} from "../../model/enrolment-with-course-dto";
+import {LessonProgress} from "../../model/lesson-progress";
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,22 @@ export class EnrolmentWithCourseDataService {
 
   clearEnrolmentWithCourse(): void {
     this.enrolmentWithCourseSubject.next(null);
+  }
+
+  getLessonIdPrev(lessonId: number, lessonProgresses: LessonProgress[]) {
+    const index = lessonProgresses.findIndex(lp => lp.lessonId === lessonId);
+    if (index === 0) {
+      return null;
+    }
+    return lessonProgresses[index - 1]?.lessonId;
+  }
+
+  getLessonIdNext(lessonId: number, lessonProgresses: LessonProgress[]) {
+    const index = lessonProgresses.findIndex(lp => lp.lessonId === lessonId);
+    if (index === lessonProgresses.length - 1) {
+      return null;
+    }
+    return lessonProgresses[index + 1]?.lessonId;
   }
 
 }
