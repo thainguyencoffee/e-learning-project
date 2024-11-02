@@ -1,1 +1,75 @@
-<p>enrolment-posts works!</p>
+<div class="card my-3 shadow-sm border-0">
+  <!-- Thông tin giảng viên -->
+  <div class="card-header bg-primary text-white d-flex align-items-center">
+    <img
+      src="{{ teacher.avatarUrl }}"
+      alt="Avatar"
+      class="rounded-circle me-3 border border-light"
+      width="50"
+      height="50"
+    />
+    <div>
+      <h5 class="m-0">{{ teacher.name }}</h5>
+      <small class="text-light">{{ teacher.department }}</small>
+    </div>
+  </div>
+
+  <!-- Nội dung bài đăng -->
+  <div *ngFor="let post of postsList" class="post">
+    <div class="card-body">
+      <h5 class="card-title text-primary">{{ post.title }}</h5>
+      <p class="card-text text-secondary">{{ post.content }}</p>
+      <img
+        *ngIf="post.imageUrl"
+        [src]="post.imageUrl"
+        alt="Post Image"
+        class="post-image mb-3 img-fluid rounded"
+      />
+      <small class="text-muted d-block mb-2">Ngày đăng: {{ post.date | date: 'short' }}</small>
+    </div>
+
+    <!-- Các hành động -->
+    <div class="card-footer d-flex justify-content-between">
+      <button class="btn btn-outline-primary" (click)="toggleLike()">
+        <i class="bi bi-hand-thumbs-up"></i> Like {{ likes }}
+      </button>
+      <button class="btn btn-outline-secondary" (click)="toggleComments()">
+        <i class="bi bi-chat-left-text me-1"></i> Comment
+      </button>
+    </div>
+
+    <!-- Phần bình luận -->
+    <div *ngIf="showComments" class="comments-section p-3 border-top">
+      <!-- Form thêm bình luận mới -->
+      <div class="input-group mb-3">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Thêm bình luận..."
+          [(ngModel)]="newComment"
+        />
+        <button class="btn btn-primary" (click)="addComment()">Đăng</button>
+      </div>
+
+      <!-- Danh sách bình luận -->
+      <div *ngFor="let comment of comments" class="comment p-2 border rounded mb-2 bg-light">
+        <strong class="text-primary">{{ comment.user }}</strong>: {{ comment.text }}
+
+        <!-- Replies Section -->
+        <div *ngFor="let reply of comment.replies" class="reply p-2 mt-1 ms-3 border-start border-secondary">
+          <strong>{{ reply.user }}:</strong> {{ reply.text }}
+        </div>
+
+        <!-- New Reply Input -->
+        <div class="mt-2">
+          <input
+            [(ngModel)]="newComment"
+            placeholder="Reply..."
+            class="form-control form-control-sm"
+          />
+          <button class="btn btn-outline-primary btn-sm mt-1" (click)="addReply(comment)">Reply</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

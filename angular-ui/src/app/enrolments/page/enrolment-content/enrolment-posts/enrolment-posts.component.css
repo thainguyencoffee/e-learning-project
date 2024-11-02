@@ -1,0 +1,48 @@
+
+/* Ảnh đại diện giảng viên */
+.card-header img {
+  border-width: 2px;
+}
+
+/* Tiêu đề và nội dung */
+.card-title {
+  font-weight: bold;
+}
+
+.card-text {
+  font-size: 1.1rem;
+}
+
+/* Badge số lượt thích */
+.btn-outline-primary .badge {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Khu vực bình luận */
+.comments-section {
+  background-color: #f9f9f9;
+  border-radius: 0 0 10px 10px;
+}
+
+.input-group .form-control {
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
+.input-group .btn {
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.comment {
+  background-color: #f1f1f1;
+  border-radius: 10px;
+}
+.post-image {
+  width: 100%;
+  height: 500px; /* Chiều cao cố định */
+  object-fit: cover; /* Đảm bảo hình ảnh lấp đầy khung nhưng không méo */
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
