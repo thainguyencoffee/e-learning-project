@@ -39,6 +39,10 @@ public class Course extends AuditSupportClass {
     private String teacher;
     private String approvedBy;
     private Set<CourseRequest> courseRequests = new HashSet<>();
+
+    @MappedCollection(idColumn = "course")
+    private Set<Post> posts = new HashSet<>();
+
     @JsonIgnore
     private boolean deleted;
     @Version
@@ -362,6 +366,56 @@ public class Course extends AuditSupportClass {
             throw new InputInvalidException("Course is not deleted.");
         }
         this.deleted = false;
+    }
+
+    public void addPost(Post post) {
+        if (isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot add a post to an unpublished course.");
+        }
+
+        this.posts.add(post);
+    }
+
+    public void updatePost(Long postId, String newContent, Set<String> newPhotoUrls) {
+        if (isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot update a post in an unpublished course.");
+        }
+
+        Post post = findPostById(postId);
+        post.updateInfo(newContent, newPhotoUrls);
+    }
+
+    public void deletePost(Long postId) {
+        if (isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot remove a post from an unpublished course.");
+        }
+        Post post = findPostById(postId);
+        post.delete();
+    }
+
+    public void restorePost(Long postId) {
+        if (isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot restore a post in an unpublished course.");
+        }
+        Post post = findPostById(postId);
+        post.restore();
+    }
+
+    public void forceDeletePost(Long postId) {
+        if (isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot force delete a post in an unpublished course.");
+        }
+        Post post = findPostById(postId);
+        if (!post.isDeleted())
+            throw new InputInvalidException("Post is not deleted.");
+        this.posts.remove(post);
+    }
+
+    private Post findPostById(Long postId) {
+        return this.posts.stream()
+                .filter(post -> post.getId().equals(postId))
+                .findFirst()
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
     private CourseSection findSectionById(Long sectionId) {

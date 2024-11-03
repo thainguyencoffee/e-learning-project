@@ -967,4 +967,124 @@ class CourseTests {
     }
 
 
+    @Test
+    void addPost_ValidPost_AddsPost() {
+        Course coursePublished = spy(TestFactory.createDefaultCourse());
+        when(coursePublished.isNotPublishedAndDeleted()).thenReturn(false);
+        Post postTemplate = TestFactory.createDefaultPost();
+
+        UserInfo info = postTemplate.getInfo();
+        assertEquals("thai", info.firstName());
+        assertEquals("nguyen", info.lastName());
+        assertTrue(postTemplate.getContent() != null && !postTemplate.getContent().isBlank());
+
+        coursePublished.addPost(postTemplate);
+        assertEquals(1, coursePublished.getPosts().size());
+        assertEquals(postTemplate, coursePublished.getPosts().iterator().next());
+    }
+
+    @Test
+    void addPost_UnpublishedCourse_ThrowsException() {
+        Post defaultPost = TestFactory.createDefaultPost();
+
+        String message = assertThrows(InputInvalidException.class, () -> courseNoSections.addPost(defaultPost)).getMessage();
+        assertEquals("Cannot add a post to an unpublished course.", message);
+    }
+
+    @Test
+    void updatePost_ValidPost_UpdatesPost() {
+        Course coursePublished = spy(TestFactory.createDefaultCourse());
+        when(coursePublished.isNotPublishedAndDeleted()).thenReturn(false);
+        Post postTemplate = spy(TestFactory.createDefaultPost());
+        when(postTemplate.getId()).thenReturn(1L);
+
+        UserInfo info = postTemplate.getInfo();
+        assertEquals("thai", info.firstName());
+        assertEquals("nguyen", info.lastName());
+        assertTrue(postTemplate.getContent() != null && !postTemplate.getContent().isBlank());
+
+        coursePublished.addPost(postTemplate);
+        assertEquals(1, coursePublished.getPosts().size());
+
+
+        coursePublished.updatePost(1L, "Updated content", Set.of("http://example.com/1111", "http://example.com/2/update"));
+        assertEquals("Updated content", postTemplate.getContent());
+        assertEquals(2, postTemplate.getPhotoUrls().size());
+        assertTrue(postTemplate.getPhotoUrls().containsAll(Set.of("http://example.com/1111", "http://example.com/2/update")));
+
+        coursePublished.updatePost(1L, "Updated content", null);
+        assertEquals("Updated content", postTemplate.getContent());
+        assertNull(postTemplate.getPhotoUrls());
+    }
+
+    @Test
+    void updatePost_UnpublishedCourse_ThrowsException() {
+        String message = assertThrows(InputInvalidException.class, () -> courseNoSections.updatePost(1L,
+                "Updated content", Set.of("http://example.com/1", "http://example.com/2"))).getMessage();
+        assertEquals("Cannot update a post in an unpublished course.", message);
+    }
+
+
+    @Test
+    void updatePost_PostNotFound_ThrowsException() {
+        Course coursePublished = spy(TestFactory.createDefaultCourse());
+        when(coursePublished.isNotPublishedAndDeleted()).thenReturn(false);
+
+        assertThrows(ResourceNotFoundException.class, () -> coursePublished.updatePost(1L,
+                "Updated content", Set.of("http://example.com/1", "http://example.com/2")));
+    }
+
+    @Test
+    void deletePost_ValidPost_DeletesPost() {
+        Course coursePublished = spy(TestFactory.createDefaultCourse());
+        when(coursePublished.isNotPublishedAndDeleted()).thenReturn(false);
+        Post postTemplate = spy(TestFactory.createDefaultPost());
+        when(postTemplate.getId()).thenReturn(1L);
+
+        coursePublished.addPost(postTemplate);
+        assertEquals(1, coursePublished.getPosts().size());
+
+        coursePublished.deletePost(1L);
+        assertTrue(postTemplate.isDeleted());
+    }
+
+    @Test
+    void deletePost_UnpublishedCourse_ThrowsException() {
+        assertThrows(InputInvalidException.class, () -> courseNoSections.deletePost(1L));
+    }
+
+    @Test
+    void restorePost_DeletedPost_RestoresPost() {
+        Course coursePublished = spy(TestFactory.createDefaultCourse());
+        when(coursePublished.isNotPublishedAndDeleted()).thenReturn(false);
+        Post postTemplate = spy(TestFactory.createDefaultPost());
+        when(postTemplate.getId()).thenReturn(1L);
+
+        coursePublished.addPost(postTemplate);
+        assertEquals(1, coursePublished.getPosts().size());
+
+        coursePublished.deletePost(1L);
+        assertTrue(postTemplate.isDeleted());
+
+        coursePublished.restorePost(1L);
+        assertFalse(postTemplate.isDeleted());
+    }
+
+    @Test
+    void forceDeletePost_DeletedPost_ForceDeletesPost() {
+        Course coursePublished = spy(TestFactory.createDefaultCourse());
+        when(coursePublished.isNotPublishedAndDeleted()).thenReturn(false);
+        Post postTemplate = spy(TestFactory.createDefaultPost());
+        when(postTemplate.getId()).thenReturn(1L);
+
+        coursePublished.addPost(postTemplate);
+        assertEquals(1, coursePublished.getPosts().size());
+
+        coursePublished.deletePost(1L);
+        assertTrue(postTemplate.isDeleted());
+
+        coursePublished.forceDeletePost(1L);
+        assertFalse(coursePublished.getPosts().contains(postTemplate));
+    }
+
 }

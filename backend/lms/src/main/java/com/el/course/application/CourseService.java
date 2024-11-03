@@ -46,4 +46,14 @@ public interface CourseService {
 
     void rejectUnpublish(Long courseId, Long courseRequestId, CourseRequestResolveDTO resolveDTO);
 
+    Long addPost(Long courseId, CoursePostDTO coursePostDTO);
+
+    void updatePost(Long courseId, Long postId, CoursePostDTO coursePostDTO);
+
+    void deletePost(Long courseId, Long postId);
+
+    void restorePost(Long courseId, Long postId);
+
+    void deleteForcePost(Long courseId, Long postId);
+
 }

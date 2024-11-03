@@ -2,6 +2,7 @@ package com.el;
 
 import com.el.common.Currencies;
 import com.el.course.application.dto.CourseDTO;
+import com.el.course.application.dto.CoursePostDTO;
 import com.el.course.application.dto.CourseSectionDTO;
 import com.el.course.application.dto.LessonDTO;
 import com.el.course.domain.*;
@@ -958,7 +959,8 @@ class LmsApplicationTests {
                 .expectBody(Long.class).returnResult().getResponseBody();
 
         // Assert
-        assertThat(lessonId).isNotNull();;
+        assertThat(lessonId).isNotNull();
+        ;
 
         LessonDTO updateLessonDTO = new LessonDTO("New title", Lesson.Type.TEXT, "http://example.com/lesson1.txt", null);
 
@@ -1063,7 +1065,8 @@ class LmsApplicationTests {
                 .expectBody(Long.class).returnResult().getResponseBody();
 
         // Assert
-        assertThat(lessonId).isNotNull();;
+        assertThat(lessonId).isNotNull();
+        ;
 
         // Act: Delete lesson
         var section = course.getSections().iterator().next();
@@ -1097,6 +1100,232 @@ class LmsApplicationTests {
                 .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
                 .exchange()
                 .expectStatus().isForbidden();
+    }
+
+    // Post
+
+    private Long performCreatePost(CoursePostDTO postDTO, Long courseId) {
+        // Act: Add post
+        var postId = webTestClient.post().uri("/courses/{courseId}/posts", courseId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(postDTO))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Long.class).returnResult().getResponseBody();
+
+        // Assert
+        assertThat(postId).isNotNull();
+        return postId;
+    }
+
+    @Test
+    void testAddPostToCourse_Successful() {
+        // Arrange
+        var courseDTO = TestFactory.createDefaultCourseDTO();
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        approvePublishByCourseId(course.getId());
+
+        CoursePostDTO postDTO = TestFactory.createDefaultCoursePostDTO();
+
+        // Act
+        var postId = performCreatePost(postDTO, course.getId());
+
+        // Act: Get post
+        webTestClient.get().uri("/courses/{courseId}/posts/{postId}", course.getId(), postId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(postId)
+                .jsonPath("$.info.firstName").isEqualTo(extractClaimFromToken(teacherToken.accessToken, "given_name"))
+                .jsonPath("$.info.lastName").isEqualTo(extractClaimFromToken(teacherToken.accessToken, "family_name"))
+                .jsonPath("$.content").isEqualTo(postDTO.content())
+                .jsonPath("$.photoUrls").isArray()
+                .jsonPath("$.delete").doesNotExist();
+
+        webTestClient.get().uri("/courses/{courseId}/posts/{postId}", course.getId(), postId)
+                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Test
+    void testUpdatePost_Successful() {
+        // Arrange
+        var courseDTO = TestFactory.createDefaultCourseDTO();
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        approvePublishByCourseId(course.getId());
+
+        CoursePostDTO postDTO = TestFactory.createDefaultCoursePostDTO();
+
+        // Act: Add post
+        var postId = performCreatePost(postDTO, course.getId());
+
+        // Assert
+        assertThat(postId).isNotNull();
+
+        // Act: Update post
+        CoursePostDTO updatePostDTO = new CoursePostDTO("New content (Update)", null);
+        webTestClient.put().uri("/courses/{courseId}/posts/{postId}", course.getId(), postId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(updatePostDTO))
+                .exchange()
+                .expectStatus().isOk();
+
+        // Act: Get post
+        webTestClient.get().uri("/courses/{courseId}/posts/{postId}", course.getId(), postId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(postId)
+                .jsonPath("$.info.firstName").isEqualTo(extractClaimFromToken(teacherToken.accessToken, "given_name"))
+                .jsonPath("$.info.lastName").isEqualTo(extractClaimFromToken(teacherToken.accessToken, "family_name"))
+                .jsonPath("$.content").isEqualTo(updatePostDTO.content())
+                .jsonPath("$.photoUrls").isEmpty()
+                .jsonPath("$.delete").doesNotExist();
+    }
+
+    @Test
+    void testCreateAndUpdatePost_UserIsNotTeacherOrAdmin_Forbidden() {
+        // Arrange
+        CoursePostDTO postDTO = TestFactory.createDefaultCoursePostDTO();
+
+        // Act: Create post
+        webTestClient.post().uri("/courses/{courseId}/posts", 100L)
+                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(postDTO))
+                .exchange()
+                .expectStatus().isForbidden();
+
+        // Act: Update post
+        webTestClient.put().uri("/courses/{courseId}/posts/{postId}", 100L, 200L)
+                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(postDTO))
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Test
+    void testDeletePost_Successful() {
+        // Arrange
+        var courseDTO = TestFactory.createDefaultCourseDTO();
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        approvePublishByCourseId(course.getId());
+
+        CoursePostDTO postDTO = TestFactory.createDefaultCoursePostDTO();
+
+        // Act: Add post
+        var postId = performCreatePost(postDTO, course.getId());
+
+        // Assert
+        assertThat(postId).isNotNull();
+
+        // Act: Delete post
+        webTestClient.delete().uri("/courses/{courseId}/posts/{postId}", course.getId(), postId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isNoContent();
+
+        // Act: Get post in trash
+        webTestClient.get().uri("/courses/{courseId}/posts/trash", course.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.content.length()").isEqualTo(1);
+
+        // Act: Get post
+        webTestClient.get().uri("/courses/{courseId}/posts/{postId}", course.getId(), postId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void testRestorePost_Successful() {
+        // Arrange
+        var courseDTO = TestFactory.createDefaultCourseDTO();
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        approvePublishByCourseId(course.getId());
+
+        CoursePostDTO postDTO = TestFactory.createDefaultCoursePostDTO();
+
+        // Act: Add post
+        var postId = performCreatePost(postDTO, course.getId());
+
+        // Assert
+        assertThat(postId).isNotNull();
+
+        // Act: Delete post
+        webTestClient.delete().uri("/courses/{courseId}/posts/{postId}", course.getId(), postId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isNoContent();
+
+        // Act: Restore post
+        webTestClient.post().uri("/courses/{courseId}/posts/{postId}/restore", course.getId(), postId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk();
+
+        // Act: Get post
+        webTestClient.get().uri("/courses/{courseId}/posts/{postId}", course.getId(), postId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    @Test
+    void testDeleteForcePost_Successful() {
+        // Arrange
+        var courseDTO = TestFactory.createDefaultCourseDTO();
+        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
+        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        approvePublishByCourseId(course.getId());
+
+        CoursePostDTO postDTO = TestFactory.createDefaultCoursePostDTO();
+
+        // Act: Add post
+        var postId = performCreatePost(postDTO, course.getId());
+
+        // Assert
+        assertThat(postId).isNotNull();
+
+        // Act: Delete post
+        webTestClient.delete().uri("/courses/{courseId}/posts/{postId}", course.getId(), postId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isNoContent();
+
+        // Act: Delete force
+        webTestClient.delete().uri("/courses/{courseId}/posts/{postId}?force=true", course.getId(), postId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isNoContent();
+
+        webTestClient.get().uri("/courses/{courseId}", course.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.posts.length()").isEqualTo(0);
+
+        // Act: Get post in trash
+        webTestClient.get().uri("/courses/{courseId}/posts/trash", course.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.content.length()").isEqualTo(0);
     }
 
     @Test

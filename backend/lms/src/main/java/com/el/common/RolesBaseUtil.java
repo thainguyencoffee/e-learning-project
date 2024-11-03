@@ -1,5 +1,6 @@
 package com.el.common;
 
+import com.el.common.auth.web.dto.UserInfo;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
@@ -13,6 +14,17 @@ public class RolesBaseUtil {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) authentication.getPrincipal();
         return jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME);
+    }
+
+    public UserInfo getCurrentUserInfoFromJwt() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        return new UserInfo(
+                jwt.getSubject(),
+                jwt.getClaim(StandardClaimNames.GIVEN_NAME),
+                jwt.getClaim(StandardClaimNames.FAMILY_NAME),
+                jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME),
+                jwt.getClaimAsString("roles"));
     }
 
     public boolean isAdmin() {

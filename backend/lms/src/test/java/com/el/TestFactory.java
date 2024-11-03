@@ -1,10 +1,7 @@
 package com.el;
 
 import com.el.common.Currencies;
-import com.el.course.application.dto.CourseDTO;
-import com.el.course.application.dto.CourseRequestDTO;
-import com.el.course.application.dto.CourseRequestResolveDTO;
-import com.el.course.application.dto.CourseUpdateDTO;
+import com.el.course.application.dto.*;
 import com.el.course.domain.*;
 import com.el.course.web.dto.CourseRequestApproveDTO;
 import com.el.course.web.dto.CourseRequestRejectDTO;
@@ -237,4 +234,47 @@ public class TestFactory {
         return new CourseEnrollment(user, 1L, Set.of());
     }
 
+    public static Post createDefaultPost() {
+        return new Post(
+                """
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam feugiat suscipit ultricies. Sed suscipit massa quis lorem fermentum, et rutrum augue pretium. Phasellus placerat tortor sapien, vel tristique diam accumsan ultrices. Proin facilisis pharetra orci, non eleifend lorem varius at. Proin malesuada augue eu mi consequat varius. Curabitur cursus lobortis neque, eu posuere dui. Etiam consectetur, orci quis dapibus luctus, ipsum arcu sagittis lectus, eget consectetur quam nulla ut leo. Pellentesque eu ligula sagittis, aliquam quam ac, fermentum neque. Suspendisse scelerisque augue eu gravida faucibus. Mauris tristique convallis erat at iaculis. Integer sit amet ultrices massa. Vestibulum quam turpis, vestibulum id tincidunt vitae, sollicitudin nec nunc. Praesent varius et magna scelerisque volutpat. Aenean rhoncus libero id commodo finibus. Pellentesque orci neque, vulputate et commodo non, placerat eu libero.
+                        
+                        Morbi risus quam, placerat non sem a, ullamcorper pharetra lorem. Quisque pharetra nisl in efficitur viverra. Vestibulum dictum nisl sit amet pharetra viverra. Sed eros mauris, mollis eget iaculis in, vulputate sit amet velit. Aliquam quis dictum enim. Duis vestibulum vulputate sapien id dictum. Suspendisse vitae leo et eros cursus sagittis. Mauris quis nisi eu mauris tristique ullamcorper ut id lacus.
+                        
+                        Aenean eros sapien, sagittis cursus enim ut, luctus mollis ex. Aliquam eleifend bibendum quam, nec condimentum augue accumsan id. Suspendisse congue commodo nulla, ac faucibus est hendrerit ac. Donec a commodo ipsum. Ut imperdiet augue non ultrices venenatis. Morbi ornare urna nec nibh maximus eleifend finibus eu lacus. Praesent a maximus ex. Sed pretium, neque eget fringilla tempor, lorem tortor convallis dolor, eu sollicitudin ante metus vitae arcu. Donec rutrum magna eros, at consequat purus congue a.
+                        
+                        Duis non elit diam. Cras eleifend rhoncus erat, a consectetur ex. Phasellus vehicula massa eget nunc lacinia maximus. Cras interdum neque sodales dui ullamcorper, id viverra sapien tempus. Nullam consectetur dui vitae imperdiet porta. Sed consectetur leo non tortor imperdiet, eget ullamcorper erat gravida. Sed at dui eget sem suscipit congue pretium nec magna.
+                        
+                        Donec eleifend dignissim enim, et rutrum eros eleifend vel. Mauris interdum non leo at tincidunt. Aliquam tincidunt ac elit id ornare. Etiam felis magna, lobortis sed luctus hendrerit, semper non velit. Nunc vel odio vel justo gravida mattis at sed felis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Phasellus sed nisl euismod urna laoreet ullamcorper. Proin feugiat sem at libero ultricies semper. Morbi rutrum magna ac mauris cursus sollicitudin. Cras commodo neque sapien, imperdiet rhoncus sapien pretium ac. Integer sed enim non nisi aliquet placerat. Vivamus scelerisque feugiat diam, non blandit mauris aliquet ac. Vivamus ullamcorper diam dui, sit amet rhoncus velit pellentesque non. Nam luctus urna in purus porttitor eleifend.\s
+                        """,
+                new UserInfo("thai", "nguyen"),
+                Set.of("http://example.com/photo1.jpg", "http://example.com/photo2.jpg")
+        );
+    }
+
+    public static com.el.common.auth.web.dto.UserInfo createDefaultUserInfo() {
+        return new com.el.common.auth.web.dto.UserInfo(
+                UUID.randomUUID().toString(),
+                "nguyen",
+                "thai",
+                user,
+                "nguyennt11032004@gmail.com");
+    }
+
+    public static CoursePostDTO createDefaultCoursePostDTO() {
+        return new CoursePostDTO(
+                """
+                         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus auctor, turpis eu gravida lobortis, dolor ipsum dignissim elit, quis fringilla velit arcu sed mi. Curabitur bibendum efficitur libero in facilisis. Fusce egestas non neque at pharetra. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed porttitor ut enim id luctus. Nunc quis mauris id dolor sollicitudin vestibulum. Phasellus pharetra lectus et dui porta, sit amet sagittis orci convallis. Praesent libero turpis, tincidunt non dapibus non, condimentum vel mauris.
+                        
+                        Suspendisse fermentum ultrices orci ut porttitor. Pellentesque ut dignissim elit. Fusce faucibus elit sit amet metus ultricies, at fringilla sem lobortis. Donec ornare convallis est, sit amet porta odio accumsan et. Integer posuere mi arcu, at sodales orci consequat eu. Phasellus pharetra posuere facilisis. Nunc accumsan nulla sit amet neque euismod, nec sodales turpis lacinia. Curabitur lobortis neque in lectus condimentum efficitur. Vivamus purus ligula, sagittis malesuada congue ac, scelerisque non dui. Sed ut tincidunt ex.\s""",
+                Set.of("http://example.com/photo1.jpg", "http://example.com/photo2.jpg")
+        );
+    }
+
+    public static CoursePostDTO createCoursePostDTOBadRequest() {
+        return new CoursePostDTO(
+                "",
+                Set.of("http://example.com/photo1.jpg", "http://example.com/photo2.jpg")
+        );
+    }
 }

@@ -19,6 +19,8 @@ import org.mockito.MockitoAnnotations;
 
 import javax.money.MonetaryAmount;
 
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -874,6 +876,123 @@ class CourseServiceTests {
         assertThrows(InputInvalidException.class, () -> courseService.rejectUnpublish(1L, 2L, resolveDTO));
 
         verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    // Post
+    @Test
+    void addPost_ValidCourseId_AddsPost() {
+        Course spy = spy(course);
+        doNothing().when(spy).addPost(any());
+        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
+        when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
+
+        CoursePostDTO coursePostDTO = new CoursePostDTO("Post content", Set.of("http://example.com/1", "http://example.com/2"));
+        courseService.addPost(1L, coursePostDTO);
+
+        verify(courseRepository, times(1)).save(spy);
+    }
+
+    @Test
+    void addPost_CourseNotFound_ThrowsException() {
+        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
+        when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
+
+        CoursePostDTO coursePostDTO = new CoursePostDTO("Post content", Set.of("http://example.com/1", "http://example.com/2"));
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.addPost(1L, coursePostDTO));
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+
+    @Test
+    void updatePost_ValidCourseIdAndPostId_UpdatesPost() {
+        Course spy = spy(course);
+        doNothing().when(spy).updatePost(any(), any(), any());
+
+        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
+        when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
+
+        CoursePostDTO coursePostDTO = new CoursePostDTO("Updated content", Set.of("http://example.com/3"));
+        courseService.updatePost(1L, 1L, coursePostDTO);
+
+        verify(courseRepository, times(1)).save(spy);
+    }
+
+    @Test
+    void updatePost_CourseNotFound_ThrowsException() {
+        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
+        when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
+
+        CoursePostDTO coursePostDTO = new CoursePostDTO("Updated content", Set.of("http://example.com/3"));
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.updatePost(1L, 1L, coursePostDTO));
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void deletePost_ValidCourseIdAndPostId_DeletesPost() {
+        Course spy = spy(course);
+        doNothing().when(spy).deletePost(any());
+
+        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
+        when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
+
+        courseService.deletePost(1L, 1L);
+
+        verify(courseRepository, times(1)).save(spy);
+    }
+
+    @Test
+    void deletePost_CourseNotFound_ThrowsException() {
+        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
+        when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.deletePost(1L, 1L));
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void restorePost_ValidCourseIdAndPostId_RestoresPost() {
+        Course spy = spy(course);
+        doNothing().when(spy).restorePost(any());
+
+        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
+        when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
+
+        courseService.restorePost(1L, 1L);
+
+        verify(courseRepository, times(1)).save(spy);
+    }
+
+    @Test
+    void restorePost_CourseNotFound_ThrowsException() {
+        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
+        when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
+
+        assertThrows(ResourceNotFoundException.class, () -> courseService.restorePost(1L, 1L));
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void deleteForcePost_ValidCourseIdAndPostId_ForceDeletesPost() {
+        Course spy = spy(course);
+        doNothing().when(spy).forceDeletePost(any());
+
+        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
+        when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
+
+        courseService.deleteForcePost(1L, 1L);
+
+        verify(courseRepository, times(1)).save(spy);
     }
 
 }

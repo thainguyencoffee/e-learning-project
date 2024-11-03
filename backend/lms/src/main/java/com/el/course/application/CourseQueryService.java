@@ -2,6 +2,7 @@ package com.el.course.application;
 
 import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.domain.Course;
+import com.el.course.domain.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -24,5 +25,11 @@ public interface CourseQueryService {
     List<CourseWithoutSectionsDTO> findAllCourseWithoutSectionsDTOs(Pageable pageable);
 
     CourseWithoutSectionsDTO findCourseWithoutSectionsDTOById(Long courseId);
+
+    List<Post> findAllPostsByCourseId(Long courseId, Pageable pageable);
+
+    Post findPostByCourseIdAndPostId(Long courseId, Long postId);
+
+    List<Post> findTrashedPosts(Long courseId, Pageable pageable);
 
 }
