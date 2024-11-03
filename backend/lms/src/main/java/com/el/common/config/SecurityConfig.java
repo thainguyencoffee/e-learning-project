@@ -21,6 +21,12 @@ public class SecurityConfig {
         return http
                         // Define authorization rules
                         .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.GET,
+                                "/courses/{courseId}/posts",
+                                "/courses/{courseId}/posts/{postId}").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/courses/{courseId}/posts/trash").hasAnyRole("teacher", "admin")
+                        .requestMatchers("/courses/{courseId}/posts/**").hasAnyRole("teacher", "admin")
+
                         .requestMatchers("/courses/{courseId}/requests/{requestId}/approve").hasRole("admin")
                         .requestMatchers("/courses/{courseId}/requests/{requestId}/reject").hasRole("admin")
                         .requestMatchers("/courses/{courseId}/requests",

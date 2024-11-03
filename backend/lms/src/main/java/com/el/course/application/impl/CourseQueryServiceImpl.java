@@ -7,6 +7,8 @@ import com.el.course.application.CourseQueryService;
 import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.domain.Course;
 import com.el.course.domain.CourseRepository;
+import com.el.course.domain.Post;
+import com.el.enrollment.domain.CourseEnrollmentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,10 +19,12 @@ import java.util.List;
 public class CourseQueryServiceImpl implements CourseQueryService {
 
     private final CourseRepository courseRepository;
+    private final CourseEnrollmentRepository courseEnrollmentRepository;
     private final RolesBaseUtil rolesBaseUtil;
 
-    public CourseQueryServiceImpl(CourseRepository courseRepository, RolesBaseUtil rolesBaseUtil) {
+    public CourseQueryServiceImpl(CourseRepository courseRepository, CourseEnrollmentRepository courseEnrollmentRepository, RolesBaseUtil rolesBaseUtil) {
         this.courseRepository = courseRepository;
+        this.courseEnrollmentRepository = courseEnrollmentRepository;
         this.rolesBaseUtil = rolesBaseUtil;
     }
 
@@ -94,6 +98,76 @@ public class CourseQueryServiceImpl implements CourseQueryService {
     @Override
     public CourseWithoutSectionsDTO findCourseWithoutSectionsDTOById(Long courseId) {
         return courseRepository.findPublishedCourseDTOByIdAndPublishedAndDeleted(courseId, true, false)
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Override
+    public List<Post> findAllPostsByCourseId(Long courseId, Pageable pageable) {
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+        String currentUser = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+
+        if (rolesBaseUtil.isAdmin()) {
+            return courseRepository.findAllPostsByCourseIdAndDeleted(courseId, false, page, size);
+        }
+
+        if(rolesBaseUtil.isTeacher()) {
+            return courseRepository.findAllPostsByCourseIdAndTeacherAndDeleted(courseId, currentUser, false, page, size);
+        }
+
+        if (rolesBaseUtil.isUser() && isUserEnrolled(courseId, currentUser)) {
+            return courseRepository.findAllPostsByCourseIdAndDeleted(courseId, false, page, size);
+        }
+        return List.of();
+    }
+
+    @Override
+    public Post findPostByCourseIdAndPostId(Long courseId, Long postId) {
+        String currentUser = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+
+        if (rolesBaseUtil.isAdmin()) {
+            return findPost(courseId, postId);
+        }
+
+        if(rolesBaseUtil.isTeacher()) {
+            return findPostForTeacher(courseId, postId, currentUser);
+        }
+
+        if (rolesBaseUtil.isUser() && isUserEnrolled(courseId, currentUser)) {
+            return findPost(courseId, postId);
+        }
+
+        throw new AccessDeniedException("Access denied");
+    }
+
+    @Override
+    public List<Post> findTrashedPosts(Long courseId, Pageable pageable) {
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+        String currentUser = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+
+        if (rolesBaseUtil.isAdmin()) {
+            return courseRepository.findAllPostsByCourseIdAndDeleted(courseId, true, page, size);
+        }
+
+        if(rolesBaseUtil.isTeacher()) {
+            return courseRepository.findAllPostsByCourseIdAndTeacherAndDeleted(courseId, currentUser, true, page, size);
+        }
+
+        throw new AccessDeniedException("Access denied");
+    }
+
+    private boolean isUserEnrolled(Long courseId, String username) {
+        return courseEnrollmentRepository.findByCourseIdAndStudent(courseId, username).isPresent();
+    }
+
+    private Post findPost(Long courseId, Long postId) {
+        return courseRepository.findPostByCourseIdAndPostIdAndDeleted(courseId, postId, false)
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    private Post findPostForTeacher(Long courseId, Long postId, String teacher) {
+        return courseRepository.findPostByCourseIdAndPostIdAndTeacherAndDeleted(courseId, postId, teacher, false)
                 .orElseThrow(ResourceNotFoundException::new);
     }
 

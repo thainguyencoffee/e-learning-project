@@ -5,10 +5,7 @@ import com.el.common.exception.AccessDeniedException;
 import com.el.course.application.CourseQueryService;
 import com.el.course.application.CourseService;
 import com.el.course.application.dto.*;
-import com.el.course.domain.Course;
-import com.el.course.domain.CourseRepository;
-import com.el.course.domain.CourseSection;
-import com.el.course.domain.Lesson;
+import com.el.course.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -231,6 +228,45 @@ public class CourseServiceImpl implements CourseService {
     public void rejectUnpublish(Long courseId, Long courseRequestId, CourseRequestResolveDTO resolveDTO) {
         Course course = courseQueryService.findCourseById(courseId);
         course.rejectUnpublish(courseRequestId, resolveDTO.resolvedBy(), resolveDTO.message());
+        courseRepository.save(course);
+    }
+
+    @Override
+    public Long addPost(Long courseId, CoursePostDTO coursePostDTO) {
+        com.el.common.auth.web.dto.UserInfo userInfo = rolesBaseUtil.getCurrentUserInfoFromJwt();
+
+        Post post = coursePostDTO.toPost(new UserInfo(userInfo.firstName(), userInfo.lastName()));
+        Course course = courseQueryService.findCourseById(courseId);
+        course.addPost(post);
+        courseRepository.save(course);
+        return post.getId();
+    }
+
+    @Override
+    public void updatePost(Long courseId, Long postId, CoursePostDTO coursePostDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.updatePost(postId, coursePostDTO.content(), coursePostDTO.photoUrls());
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void deletePost(Long courseId, Long postId) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.deletePost(postId);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void restorePost(Long courseId, Long postId) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.restorePost(postId);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void deleteForcePost(Long courseId, Long postId) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.forceDeletePost(postId);
         courseRepository.save(course);
     }
 
