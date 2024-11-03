@@ -14,7 +14,6 @@ import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
     NgForOf
   ],
   templateUrl: './enrolment-overview.component.html',
-  styleUrl: './enrolment-overview.component.css'
 })
 export class EnrolmentOverviewComponent implements OnInit{
 

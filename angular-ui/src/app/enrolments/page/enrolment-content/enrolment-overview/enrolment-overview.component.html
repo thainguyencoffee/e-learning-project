@@ -1,33 +1,70 @@
 <div *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse">
-  <h1>Overview</h1>
+  <!-- Overview Section with Border and Shadow -->
+  <div class="card mb-4 shadow">
+    <div class="card-body">
+      <h1 class="text-primary">Overview</h1>
 
-  <h3>Your Progress</h3>
-  <div class="progress" role="progressbar" aria-label="Example with label"
-       [attr.aria-valuenow]="calcProgress(enrolmentWithCourse.progress)" aria-valuemin="0" aria-valuemax="100">
-    <div class="progress-bar" [style.width]="calcProgress(enrolmentWithCourse.progress) + '%'">
-      {{calcProgress(enrolmentWithCourse.progress)}}%
+      <h3>Your Progress</h3>
+      <div class="progress" role="progressbar" aria-label="Example with label"
+           [attr.aria-valuenow]="calcProgress(enrolmentWithCourse.progress)" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" [style.width]="calcProgress(enrolmentWithCourse.progress) + '%'">
+          {{calcProgress(enrolmentWithCourse.progress)}}%
+        </div>
+      </div>
     </div>
   </div>
 
-  <h3>Teacher</h3>
-  <p>{{enrolmentWithCourse.teacher}}</p>
+  <!-- Teacher, Language, Subtitles as Table without Border and Shadow -->
+  <div class="card mb-4 shadow">
+    <div class="card-body">
+      <h3 class="text-primary">Course Details</h3>
+      <table class="table">
+        <tbody>
+        <tr>
+          <th>Teacher</th>
+          <td>{{enrolmentWithCourse.teacher}}</td>
+        </tr>
+        <tr>
+          <th>Language</th>
+          <td>{{enrolmentWithCourse.language}}</td>
+        </tr>
+        <tr>
+          <th>Subtitles</th>
+          <td>
+            <ul class="list-unstyled mb-0">
+              <li *ngFor="let subtitle of enrolmentWithCourse.subtitles">{{subtitle}}</li>
+            </ul>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-  <h3>Language</h3>
-  <p>{{enrolmentWithCourse.language}}</p>
+  <!-- Benefits and Prerequisites in One Row -->
+  <div class="row">
+    <!-- Benefits Section without Border and Shadow -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h3>Benefits</h3>
+          <ul>
+            <li *ngFor="let benefit of enrolmentWithCourse.benefits">{{benefit}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
-  <h3>Subtitles</h3>
-  <ul>
-    <li *ngFor="let subtitle of enrolmentWithCourse.subtitles">{{subtitle}}</li>
-  </ul>
-
-  <h3>benefits</h3>
-  <ul>
-    <li *ngFor="let benefit of enrolmentWithCourse.benefits">{{benefit}}</li>
-  </ul>
-
-  <h3>prerequisites</h3>
-  <ul>
-    <li *ngFor="let prerequisite of enrolmentWithCourse.prerequisites">{{prerequisite}}</li>
-  </ul>
-
+    <!-- Prerequisites Section without Border and Shadow -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h3>Prerequisites</h3>
+          <ul>
+            <li *ngFor="let prerequisite of enrolmentWithCourse.prerequisites">{{prerequisite}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
