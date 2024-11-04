@@ -1,6 +1,7 @@
 package com.el.course.application;
 
 import com.el.course.application.dto.CourseWithoutSectionsDTO;
+import com.el.course.domain.Comment;
 import com.el.course.domain.Course;
 import com.el.course.domain.Post;
 import org.springframework.data.domain.Page;
@@ -32,4 +33,5 @@ public interface CourseQueryService {
 
     List<Post> findTrashedPosts(Long courseId, Pageable pageable);
 
+    List<Comment> findCommentsByPostId(Long courseId, Long postId, Pageable pageable);
 }

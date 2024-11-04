@@ -2,7 +2,9 @@ package com.el.course.web;
 
 import com.el.course.application.CourseQueryService;
 import com.el.course.application.CourseService;
+import com.el.course.application.dto.CommentDTO;
 import com.el.course.application.dto.CoursePostDTO;
+import com.el.course.domain.Comment;
 import com.el.course.domain.Post;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -67,6 +69,44 @@ public class CoursePostController {
     public ResponseEntity<Page<Post>> getTrashedPost(@PathVariable Long courseId, Pageable pageable) {
         List<Post> result = courseQueryService.findTrashedPosts(courseId, pageable);
         return ResponseEntity.ok(new PageImpl<>(result, pageable, result.size()));
+    }
+
+    @GetMapping("{postId}/comments")
+    public ResponseEntity<Page<Comment>> getComments(@PathVariable Long courseId, @PathVariable Long postId, Pageable pageable) {
+        List<Comment> result = courseQueryService.findCommentsByPostId(courseId, postId, pageable);
+        return ResponseEntity.ok(new PageImpl<>(result, pageable, result.size()));
+    }
+
+    @PostMapping("{postId}/comments")
+    public ResponseEntity<Long> addComment(@PathVariable Long courseId, @PathVariable Long postId, @Valid @RequestBody CommentDTO commentDTO) {
+        return ResponseEntity.ok(courseService.addComment(courseId, postId, commentDTO));
+    }
+
+    @PutMapping("{postId}/comments/{commentId}")
+    public ResponseEntity<Void> updateComment(@PathVariable Long courseId,
+                                              @PathVariable Long postId,
+                                              @PathVariable Long commentId,
+                                              @Valid @RequestBody CommentDTO commentDTO) {
+        courseService.updateComment(courseId, postId, commentId, commentDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("{postId}/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Long courseId, @PathVariable Long postId, @PathVariable Long commentId) {
+        courseService.deleteComment(courseId, postId, commentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("{postId}/emotions")
+    public ResponseEntity<Void> addEmotion(@PathVariable Long courseId, @PathVariable Long postId) {
+        courseService.addEmotion(courseId, postId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("{postId}/emotions/{emotionId}")
+    public ResponseEntity<Void> deleteEmotion(@PathVariable Long courseId, @PathVariable Long postId, @PathVariable Long emotionId) {
+        courseService.deleteEmotion(courseId, postId, emotionId);
+        return ResponseEntity.noContent().build();
     }
 
 }

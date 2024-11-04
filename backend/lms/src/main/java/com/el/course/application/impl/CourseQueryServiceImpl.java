@@ -5,6 +5,7 @@ import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
 import com.el.course.application.dto.CourseWithoutSectionsDTO;
+import com.el.course.domain.Comment;
 import com.el.course.domain.Course;
 import com.el.course.domain.CourseRepository;
 import com.el.course.domain.Post;
@@ -118,7 +119,8 @@ public class CourseQueryServiceImpl implements CourseQueryService {
         if (rolesBaseUtil.isUser() && isUserEnrolled(courseId, currentUser)) {
             return courseRepository.findAllPostsByCourseIdAndDeleted(courseId, false, page, size);
         }
-        return List.of();
+
+        throw new AccessDeniedException("Access denied");
     }
 
     @Override
@@ -152,6 +154,27 @@ public class CourseQueryServiceImpl implements CourseQueryService {
 
         if(rolesBaseUtil.isTeacher()) {
             return courseRepository.findAllPostsByCourseIdAndTeacherAndDeleted(courseId, currentUser, true, page, size);
+        }
+
+        throw new AccessDeniedException("Access denied");
+    }
+
+    @Override
+    public List<Comment> findCommentsByPostId(Long courseId, Long postId, Pageable pageable) {
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+        String currentUser = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+
+        if (rolesBaseUtil.isAdmin()) {
+            return courseRepository.findAllCommentsByCourseIdAndPostId(courseId, postId, page, size);
+        }
+
+        if(rolesBaseUtil.isTeacher()) {
+            return courseRepository.findAllCommentsByCourseIdAndPostIdAndTeacher(courseId, postId, currentUser, page, size);
+        }
+
+        if (rolesBaseUtil.isUser() && isUserEnrolled(courseId, currentUser)) {
+            return courseRepository.findAllCommentsByCourseIdAndPostId(courseId, postId, page, size);
         }
 
         throw new AccessDeniedException("Access denied");

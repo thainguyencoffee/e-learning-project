@@ -3,6 +3,7 @@ package com.el.course.application;
 import com.el.course.application.dto.*;
 import com.el.course.domain.Course;
 import com.el.course.domain.Lesson;
+import jakarta.validation.Valid;
 
 import javax.money.MonetaryAmount;
 
@@ -56,4 +57,13 @@ public interface CourseService {
 
     void deleteForcePost(Long courseId, Long postId);
 
+    Long addComment(Long courseId, Long postId, CommentDTO commentDTO);
+
+    void deleteComment(Long courseId, Long postId, Long commentId);
+
+    void addEmotion(Long courseId, Long postId);
+
+    void deleteEmotion(Long courseId, Long postId, Long emotionId);
+
+    void updateComment(Long courseId, Long postId, Long commentId, CommentDTO commentDTO);
 }

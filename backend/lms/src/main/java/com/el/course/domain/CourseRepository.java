@@ -47,4 +47,14 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
             "where c.id = :courseId and p.id = :postId and c.teacher = :teacher and p.deleted = :deleted")
     Optional<Post> findPostByCourseIdAndPostIdAndTeacherAndDeleted(Long courseId, Long postId, String teacher, Boolean deleted);
 
+    @Query("select co.* from course c join post p on c.id = p.course " +
+            "join comment co on co.post = p.id  " +
+            "where c.id = :courseId and p.id = :postId and p.deleted = false LIMIT :size OFFSET :page * :size")
+    List<Comment> findAllCommentsByCourseIdAndPostId(Long courseId, Long postId, int page, int size);
+
+    @Query("select co.* from course c join post p on c.id = p.course " +
+            "join comment co on co.post = p.id  " +
+            "where c.id = :courseId and p.id = :postId and c.teacher = :teacher and p.deleted = false LIMIT :size OFFSET :page * :size")
+    List<Comment> findAllCommentsByCourseIdAndPostIdAndTeacher(Long courseId, Long postId, String teacher, int page, int size);
+
 }
