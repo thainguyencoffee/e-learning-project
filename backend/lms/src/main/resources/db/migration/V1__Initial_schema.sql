@@ -54,6 +54,37 @@ create table course_section
     constraint fk_course_section primary key (id)
 );
 
+create table quiz
+(
+    id                    bigserial    not null,
+    course_section        bigint       not null references course_section (id) on DELETE cascade,
+    title                 varchar(255) not null,
+    description           varchar(2000),
+    after_lesson_id       bigint       not null,
+    total_score           int          not null,
+    pass_score_percentage int          not null,
+    deleted               boolean      not null,
+    constraint fk_quiz primary key (id)
+);
+
+create table question
+(
+    id      bigserial     not null,
+    quiz    bigint        not null references quiz (id) on DELETE cascade,
+    content varchar(1000) not null,
+    type    varchar(50)   not null,
+    score   int           not null,
+    constraint fk_question primary key (id)
+);
+
+create table answer_option
+(
+    id       bigserial     not null,
+    question bigint        not null references question (id) on DELETE cascade,
+    content  varchar(1000) not null,
+    correct  boolean       not null,
+    constraint fk_answer_option primary key (id)
+);
 
 create table lesson
 (
@@ -67,22 +98,6 @@ create table lesson
     constraint fk_lesson primary key (id)
 );
 
-create table quiz
-(
-    id    bigserial    not null,
-    title varchar(255) not null,
-    constraint fk_quiz primary key (id)
-);
-
-create table question
-(
-    id      bigserial    not null,
-    prompt  varchar(255) not null,
-    options varchar(255)[] not null,
-    correct int          not null,
-    quiz    bigint       not null references quiz (id) on DELETE cascade,
-    constraint fk_question primary key (id)
-);
 
 create table course_student
 (
@@ -181,7 +196,7 @@ create table post
     content            varchar(10000) not null,
     first_name         varchar(255)   not null,
     last_name          varchar(255)   not null,
-    attachment_urls         varchar(255)[],
+    attachment_urls    varchar(255)[],
     created_date       timestamp      not null,
     last_modified_date timestamp      not null,
     deleted            boolean        not null,
@@ -195,7 +210,7 @@ create table comment
     content            varchar(10000) not null,
     first_name         varchar(255)   not null,
     last_name          varchar(255)   not null,
-    attachment_urls         varchar(255)[],
+    attachment_urls    varchar(255)[],
     created_date       timestamp      not null,
     last_modified_date timestamp      not null,
     constraint fk_comment primary key (id)
