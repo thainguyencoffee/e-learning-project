@@ -13,11 +13,11 @@ public record CoursePostDTO(
         @Size(min = 10, message = ValidateMessages.MIN_LENGTH)
         @Size(max = 10000, message = ValidateMessages.MAX_LENGTH)
         String content,
-        Set<String> photoUrls
+        Set<String> attachmentUrls
 ) {
 
         public Post toPost(UserInfo info) {
-                return new Post(content, info, photoUrls);
+                return new Post(content, info, attachmentUrls);
         }
 
 }

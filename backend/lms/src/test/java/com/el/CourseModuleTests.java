@@ -903,7 +903,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
                 .jsonPath("$.info.firstName").isEqualTo(extractClaimFromToken(teacherToken.accessToken, "given_name"))
                 .jsonPath("$.info.lastName").isEqualTo(extractClaimFromToken(teacherToken.accessToken, "family_name"))
                 .jsonPath("$.content").isEqualTo(postDTO.content())
-                .jsonPath("$.photoUrls").isArray()
+                .jsonPath("$.attachmentUrls").isArray()
                 .jsonPath("$.delete").doesNotExist();
 
         webTestClient.get().uri("/courses/{courseId}/posts/{postId}", course.getId(), postId)
@@ -947,7 +947,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
                 .jsonPath("$.info.firstName").isEqualTo(extractClaimFromToken(teacherToken.accessToken, "given_name"))
                 .jsonPath("$.info.lastName").isEqualTo(extractClaimFromToken(teacherToken.accessToken, "family_name"))
                 .jsonPath("$.content").isEqualTo(updatePostDTO.content())
-                .jsonPath("$.photoUrls").isEmpty()
+                .jsonPath("$.attachmentUrls").isEmpty()
                 .jsonPath("$.delete").doesNotExist();
     }
 

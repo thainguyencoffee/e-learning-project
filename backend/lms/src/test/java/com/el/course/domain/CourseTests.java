@@ -1009,12 +1009,12 @@ class CourseTests {
 
         coursePublished.updatePost(1L, "Updated content", Set.of("http://example.com/1111", "http://example.com/2/update"));
         assertEquals("Updated content", postTemplate.getContent());
-        assertEquals(2, postTemplate.getPhotoUrls().size());
-        assertTrue(postTemplate.getPhotoUrls().containsAll(Set.of("http://example.com/1111", "http://example.com/2/update")));
+        assertEquals(2, postTemplate.getAttachmentUrls().size());
+        assertTrue(postTemplate.getAttachmentUrls().containsAll(Set.of("http://example.com/1111", "http://example.com/2/update")));
 
         coursePublished.updatePost(1L, "Updated content", null);
         assertEquals("Updated content", postTemplate.getContent());
-        assertNull(postTemplate.getPhotoUrls());
+        assertNull(postTemplate.getAttachmentUrls());
     }
 
     @Test
