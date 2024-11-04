@@ -5,6 +5,8 @@ import com.el.common.Currencies;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.common.exception.InputInvalidException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.ToString;
 import org.javamoney.moneta.Money;
@@ -411,6 +413,38 @@ public class Course extends AuditSupportClass {
         this.posts.remove(post);
     }
 
+    public void addCommentToPost(Long postId, Comment comment) {
+        if (isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot add a comment to an unpublished course.");
+        }
+        Post post = findPostById(postId);
+        post.addComment(comment);
+    }
+
+    public void deleteCommentFromPost(Long postId, Long commentId) {
+        if (isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot delete a comment from an unpublished course.");
+        }
+        Post post = findPostById(postId);
+        post.deleteComment(commentId);
+    }
+
+    public void addEmotionToPost(Long postId, Emotion emotion) {
+        if (isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot add an emotion to an unpublished course.");
+        }
+        Post post = findPostById(postId);
+        post.addEmotion(emotion);
+    }
+
+    public void deleteEmotionFromPost(Long postId, Long emotionId) {
+        if (isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot delete an emotion from an unpublished course.");
+        }
+        Post post = findPostById(postId);
+        post.deleteEmotion(emotionId);
+    }
+
     private Post findPostById(Long postId) {
         return this.posts.stream()
                 .filter(post -> post.getId().equals(postId))
@@ -449,4 +483,11 @@ public class Course extends AuditSupportClass {
     }
 
 
+    public void updateComment(Long postId, Long commentId, String content, Set<String> strings) {
+        if (isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot update a comment in an unpublished course.");
+        }
+        Post post = findPostById(postId);
+        post.updateComment(commentId, content, strings);
+    }
 }

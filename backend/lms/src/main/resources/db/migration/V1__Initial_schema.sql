@@ -174,15 +174,38 @@ create table lesson_progress
     constraint fk_lesson_progress primary key (id)
 );
 
-create table post (
-    id bigserial not null,
-    course bigint not null references course (id) on DELETE cascade,
-    content varchar(10000) not null,
-    first_name varchar(255) not null,
-    last_name varchar(255) not null,
-    photo_urls varchar(255)[],
-    created_date timestamp not null,
-    last_modified_date timestamp not null,
-    deleted boolean not null,
+create table post
+(
+    id                 bigserial      not null,
+    course             bigint         not null references course (id) on DELETE cascade,
+    content            varchar(10000) not null,
+    first_name         varchar(255)   not null,
+    last_name          varchar(255)   not null,
+    photo_urls         varchar(255)[],
+    created_date       timestamp      not null,
+    last_modified_date timestamp      not null,
+    deleted            boolean        not null,
     constraint fk_post primary key (id)
+);
+
+create table comment
+(
+    id                 bigserial      not null,
+    post               bigint         not null references post (id) on DELETE cascade,
+    content            varchar(10000) not null,
+    first_name         varchar(255)   not null,
+    last_name          varchar(255)   not null,
+    photo_urls         varchar(255)[],
+    created_date       timestamp      not null,
+    last_modified_date timestamp      not null,
+    constraint fk_comment primary key (id)
+);
+
+create table emotion
+(
+    id           bigserial   not null,
+    post         bigint      not null references post (id) on DELETE cascade,
+    username     varchar(50) not null,
+    created_date timestamp   not null,
+    constraint fk_emotion primary key (id)
 );

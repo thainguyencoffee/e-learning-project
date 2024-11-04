@@ -1,14 +1,17 @@
 package com.el.course.domain;
 
 import com.el.common.exception.InputInvalidException;
+import com.el.common.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Embedded;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Table("post")
@@ -20,6 +23,10 @@ public class Post {
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     private UserInfo info;
     private Set<String> photoUrls;
+    @MappedCollection(idColumn = "post")
+    private Set<Comment> comments = new HashSet<>();
+    @MappedCollection(idColumn = "post")
+    private Set<Emotion> emotions = new HashSet<>();
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;
     @JsonIgnore
@@ -78,6 +85,49 @@ public class Post {
             throw new InputInvalidException("Post is not deleted");
         }
         this.deleted = false;
+    }
+
+    public void addComment(Comment comment) {
+        if (isDeleted()) {
+            throw new InputInvalidException("Post is deleted");
+        }
+        comments.add(comment);
+    }
+
+    public void addEmotion(Emotion emotion) {
+        if (isDeleted()) {
+            throw new InputInvalidException("Post is deleted");
+        }
+        emotions.add(emotion);
+    }
+
+    public void deleteComment(Long commentId) {
+        if (isDeleted()) {
+            throw new InputInvalidException("Post is deleted");
+        }
+        comments.removeIf(comment -> comment.getId().equals(commentId));
+    }
+
+    public void deleteEmotion(Long emotionId) {
+        if (isDeleted()) {
+            throw new InputInvalidException("Post is deleted");
+        }
+        emotions.removeIf(emotion -> emotion.getId().equals(emotionId));
+    }
+
+    public void updateComment(Long commentId, String newContent, Set<String> newPhotoUrls) {
+        if (isDeleted()) {
+            throw new InputInvalidException("Post is deleted");
+        }
+        Comment comment = findCommentById(commentId);
+        comment.updateInfo(newContent, newPhotoUrls);
+    }
+
+    private Comment findCommentById(Long commentId) {
+        return comments.stream()
+                .filter(comment -> comment.getId().equals(commentId))
+                .findFirst()
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
 }

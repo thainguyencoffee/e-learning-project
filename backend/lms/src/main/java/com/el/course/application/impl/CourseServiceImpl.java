@@ -270,4 +270,46 @@ public class CourseServiceImpl implements CourseService {
         courseRepository.save(course);
     }
 
+    @Override
+    public Long addComment(Long courseId, Long postId, CommentDTO commentDTO) {
+        com.el.common.auth.web.dto.UserInfo userInfo = rolesBaseUtil.getCurrentUserInfoFromJwt();
+
+        Comment comment = commentDTO.toComment(new UserInfo(userInfo.firstName(), userInfo.lastName()));
+        Course course = courseQueryService.findCourseById(courseId);
+        course.addCommentToPost(postId, comment);
+        courseRepository.save(course);
+        return comment.getId();
+    }
+
+    @Override
+    public void deleteComment(Long courseId, Long postId, Long commentId) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.deleteCommentFromPost(postId, commentId);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void addEmotion(Long courseId, Long postId) {
+        String username = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+
+        Emotion emotion = new Emotion(username);
+        Course course = courseQueryService.findCourseById(courseId);
+        course.addEmotionToPost(postId, emotion);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void deleteEmotion(Long courseId, Long postId, Long emotionId) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.deleteEmotionFromPost(postId, emotionId);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void updateComment(Long courseId, Long postId, Long commentId, CommentDTO commentDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.updateComment(postId, commentId, commentDTO.content(), commentDTO.photoUrls());
+        courseRepository.save(course);
+    }
+
 }
