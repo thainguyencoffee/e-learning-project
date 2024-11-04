@@ -6,7 +6,6 @@ import com.el.common.config.DataAuditConfig;
 import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -137,7 +136,7 @@ class CourseJdbcTests {
         assertEquals(1, commentsByTeacher.size());
         assertEquals(0, commentsByAnotherTeacher.size());
         assertEquals(comment.getContent(), comments.get(0).getContent());
-        assertEquals(comment.getPhotoUrls(), comments.get(0).getPhotoUrls());
+        assertEquals(comment.getAttachmentUrls(), comments.get(0).getAttachmentUrls());
     }
 
     @Test

@@ -181,7 +181,7 @@ create table post
     content            varchar(10000) not null,
     first_name         varchar(255)   not null,
     last_name          varchar(255)   not null,
-    photo_urls         varchar(255)[],
+    attachment_urls         varchar(255)[],
     created_date       timestamp      not null,
     last_modified_date timestamp      not null,
     deleted            boolean        not null,
@@ -195,7 +195,7 @@ create table comment
     content            varchar(10000) not null,
     first_name         varchar(255)   not null,
     last_name          varchar(255)   not null,
-    photo_urls         varchar(255)[],
+    attachment_urls         varchar(255)[],
     created_date       timestamp      not null,
     last_modified_date timestamp      not null,
     constraint fk_comment primary key (id)

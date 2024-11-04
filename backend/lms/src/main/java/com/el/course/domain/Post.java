@@ -22,7 +22,7 @@ public class Post {
     private String content;
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     private UserInfo info;
-    private Set<String> photoUrls;
+    private Set<String> attachmentUrls;
     @MappedCollection(idColumn = "post")
     private Set<Comment> comments = new HashSet<>();
     @MappedCollection(idColumn = "post")
@@ -32,7 +32,7 @@ public class Post {
     @JsonIgnore
     private boolean deleted = false;
 
-    public Post(String content, UserInfo info, Set<String> photoUrls) {
+    public Post(String content, UserInfo info, Set<String> attachmentUrls) {
         final UrlValidator URL_VALIDATOR = new UrlValidator();
 
         if (content == null || content.isBlank()) {
@@ -42,13 +42,13 @@ public class Post {
             throw new InputInvalidException("User info is required");
         }
 
-        if (!photoUrls.stream().allMatch(URL_VALIDATOR::isValid)) {
+        if (!attachmentUrls.stream().allMatch(URL_VALIDATOR::isValid)) {
             throw new InputInvalidException("Invalid photo URL");
         }
 
         this.content = content;
         this.info = info;
-        this.photoUrls = photoUrls;
+        this.attachmentUrls = attachmentUrls;
 
         this.createdDate = LocalDateTime.now();
         this.lastModifiedDate = LocalDateTime.now();
@@ -57,19 +57,19 @@ public class Post {
     public Post() {
     }
 
-    protected void updateInfo(String newContent, Set<String> newPhotoUrls) {
+    protected void updateInfo(String newContent, Set<String> newAttachmentUrls) {
         final UrlValidator URL_VALIDATOR = new UrlValidator();
 
         if (newContent == null || newContent.isBlank()) {
             throw new InputInvalidException("Content of the post is required");
         }
 
-        if (newPhotoUrls != null && !newPhotoUrls.stream().allMatch(URL_VALIDATOR::isValid)) {
-            throw new InputInvalidException("Invalid photo URL");
+        if (newAttachmentUrls != null && !newAttachmentUrls.stream().allMatch(URL_VALIDATOR::isValid)) {
+            throw new InputInvalidException("Invalid attachment urls");
         }
 
         this.content = newContent;
-        this.photoUrls = newPhotoUrls;
+        this.attachmentUrls = newAttachmentUrls;
         this.lastModifiedDate = LocalDateTime.now();
     }
 
@@ -115,12 +115,12 @@ public class Post {
         emotions.removeIf(emotion -> emotion.getId().equals(emotionId));
     }
 
-    public void updateComment(Long commentId, String newContent, Set<String> newPhotoUrls) {
+    public void updateComment(Long commentId, String newContent, Set<String> newAttachmentUrls) {
         if (isDeleted()) {
             throw new InputInvalidException("Post is deleted");
         }
         Comment comment = findCommentById(commentId);
-        comment.updateInfo(newContent, newPhotoUrls);
+        comment.updateInfo(newContent, newAttachmentUrls);
     }
 
     private Comment findCommentById(Long commentId) {

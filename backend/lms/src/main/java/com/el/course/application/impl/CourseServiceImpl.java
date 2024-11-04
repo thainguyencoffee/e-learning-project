@@ -245,7 +245,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public void updatePost(Long courseId, Long postId, CoursePostDTO coursePostDTO) {
         Course course = courseQueryService.findCourseById(courseId);
-        course.updatePost(postId, coursePostDTO.content(), coursePostDTO.photoUrls());
+        course.updatePost(postId, coursePostDTO.content(), coursePostDTO.attachmentUrls());
         courseRepository.save(course);
     }
 
@@ -308,7 +308,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public void updateComment(Long courseId, Long postId, Long commentId, CommentDTO commentDTO) {
         Course course = courseQueryService.findCourseById(courseId);
-        course.updateComment(postId, commentId, commentDTO.content(), commentDTO.photoUrls());
+        course.updateComment(postId, commentId, commentDTO.content(), commentDTO.attachmentUrls());
         courseRepository.save(course);
     }
 

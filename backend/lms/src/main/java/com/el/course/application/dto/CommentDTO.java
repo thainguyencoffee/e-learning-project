@@ -13,9 +13,9 @@ public record CommentDTO(
         @Size(min = 10, message = ValidateMessages.MIN_LENGTH)
         @Size(max = 5000, message = ValidateMessages.MAX_LENGTH)
         String content,
-        Set<String> photoUrls
+        Set<String> attachmentUrls
 ) {
     public Comment toComment(UserInfo info) {
-        return new Comment(content, info, photoUrls);
+        return new Comment(content, info, attachmentUrls);
     }
 }

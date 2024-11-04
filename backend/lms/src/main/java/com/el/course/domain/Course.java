@@ -378,13 +378,13 @@ public class Course extends AuditSupportClass {
         this.posts.add(post);
     }
 
-    public void updatePost(Long postId, String newContent, Set<String> newPhotoUrls) {
+    public void updatePost(Long postId, String newContent, Set<String> newAttachmentUrls) {
         if (isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot update a post in an unpublished course.");
         }
 
         Post post = findPostById(postId);
-        post.updateInfo(newContent, newPhotoUrls);
+        post.updateInfo(newContent, newAttachmentUrls);
     }
 
     public void deletePost(Long postId) {
