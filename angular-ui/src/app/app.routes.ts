@@ -38,6 +38,12 @@ import {
 } from "./enrolments/page/enrolment-content/enrolment-lessons/enrolment-lessons.component";
 import {EnrolmentPostsComponent} from "./enrolments/page/enrolment-content/enrolment-posts/enrolment-posts.component";
 import {LessonDetailComponent} from "./enrolments/page/enrolment-content/lesson-detail/lesson-detail.component";
+import {ManageQuizComponent} from "./administration/courses/page/manage-quiz/manage-quiz.component";
+import {AddQuizComponent} from "./administration/courses/page/manage-quiz/add-quiz/add-quiz.component";
+import {EditQuizComponent} from "./administration/courses/page/manage-quiz/edit-quiz/edit-quiz.component";
+import {AddQuestionComponent} from "./administration/courses/page/manage-quiz/add-question/add-question.component";
+import {EditQuestionComponent} from "./administration/courses/page/manage-quiz/edit-question/edit-question.component";
+import {QuizTrashComponent} from "./administration/courses/page/manage-quiz/quiz-trash/quiz-trash.component";
 
 export const routes: Routes = [
   {
@@ -174,6 +180,37 @@ export const routes: Routes = [
         title: "Edit Lesson",
         path: 'courses/:courseId/sections/:sectionId/lessons/edit/:lessonId',
         component: EditLessonComponent
+      },
+      // Manage Quiz
+      {
+        title: "Manage Quiz",
+        path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes',
+        component: ManageQuizComponent
+      },
+      {
+        title: "Quiz Trash",
+        path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes/trash',
+        component: QuizTrashComponent
+      },
+      {
+        title: 'Add Quiz',
+        path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes/add',
+        component: AddQuizComponent
+      },
+      {
+        title: 'Edit Quiz',
+        path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes/edit/:quizId',
+        component: EditQuizComponent
+      },
+      {
+        title: 'Add Question',
+        path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes/add-question/:quizId',
+        component: AddQuestionComponent
+      },
+      {
+        title: 'Edit Question',
+        path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes/:quizId/edit-question/:questionId',
+        component: EditQuestionComponent
       },
       {
         title: 'Request course list',

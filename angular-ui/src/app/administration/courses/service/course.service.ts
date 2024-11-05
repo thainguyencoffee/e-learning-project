@@ -13,6 +13,9 @@ import {Lesson} from "../model/view/lesson";
 import {CourseRequestDto} from "../model/course-request.dto";
 import {ApproveRequestDto} from "../model/approve-request.dto";
 import {RejectRequestDto} from "../model/reject-request.dto";
+import {EditQuizDto} from "../model/edit-quiz.dto";
+import {QuestionDto} from "../model/question.dto";
+import {Quiz} from "../model/view/quiz";
 
 @Injectable(
   {providedIn: 'root'}
@@ -146,6 +149,49 @@ export class CourseService {
 
   rejectRequest(courseId: number, requestId: number, data: RejectRequestDto) {
     return this.http.put<void>(`${this.resourcePath}/${courseId}/requests/${requestId}/reject`, data);
+  }
+
+  getQuiz(courseId: number, sectionId: number) {
+    return this.http.get<PageWrapper<Quiz>>(`${this.resourcePath}/${courseId}/sections/${sectionId}/quizzes`);
+  }
+
+  addQuizToSection(courseId: number, sectionId: number, data: AddCourseDto) {
+    return this.http.post(`${this.resourcePath}/${courseId}/sections/${sectionId}/quizzes`, data);
+  }
+
+  updateQuizInSection(courseId: number, sectionId: number, quizId: number, data: EditQuizDto) {
+    return this.http.put(`${this.resourcePath}/${courseId}/sections/${sectionId}/quizzes/${quizId}`, data);
+  }
+
+  addQuestionToQuiz(courseId: number, sectionId: number, quizId: number, data: QuestionDto) {
+    return this.http.post(`${this.resourcePath}/${courseId}/sections/${sectionId}/quizzes/${quizId}/questions`, data);
+  }
+
+  updateQuestionToQuiz(courseId: number, sectionId: number, quizId: number, questionId: number, data: QuestionDto) {
+    return this.http.put(`${this.resourcePath}/${courseId}/sections/${sectionId}/quizzes/${quizId}/questions/${questionId}`, data);
+  }
+
+  deleteQuestion(courseId: number, sectionId: number, quizId: number, questionId: number) {
+    return this.http.delete<void>(`${this.resourcePath}/${courseId}/sections/${sectionId}/quizzes/${quizId}/questions/${questionId}`);
+  }
+
+
+  deleteQuiz(courseId: number, sectionId: number, quizId: number) {
+    return this.http.delete<void>(`${this.resourcePath}/${courseId}/sections/${sectionId}/quizzes/${quizId}`);
+  }
+
+  getQuizInTrash(courseId: number, sectionId: number) {
+    return this.http.get<PageWrapper<Quiz>>(`${this.resourcePath}/${courseId}/sections/${sectionId}/quizzes/trash`);
+  }
+
+  restoreQuiz(courseId: number, sectionId: number, quizId: number) {
+    return this.http.post<void>(`${this.resourcePath}/${courseId}/sections/${sectionId}/quizzes/${quizId}/restore`, {});
+  }
+
+  deleteQuizForce(courseId: number, sectionId: number, quizId: number) {
+    return this.http.delete<void>(`${this.resourcePath}/${courseId}/sections/${sectionId}/quizzes/${quizId}`, {
+      params: { force: 'true' }
+    });
   }
 
 }
