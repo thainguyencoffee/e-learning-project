@@ -89,7 +89,7 @@ public class CourseSection {
         if (this.quizzes.stream().anyMatch(q -> q.getTitle().equals(quiz.getTitle())))
             throw new InputInvalidException("Duplicate quiz title.");
 
-        if (this.quizzes.stream().anyMatch(q -> q.getAfterLessonId().equals(quiz.getAfterLessonId()))) {
+        if (this.quizzes.stream().anyMatch(q -> /*!q.isDeleted() &&*/ q.getAfterLessonId().equals(quiz.getAfterLessonId()))) {
             throw new InputInvalidException("There is already a quiz after the lesson.");
         }
 
