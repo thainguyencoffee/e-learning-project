@@ -66,4 +66,21 @@ public interface CourseService {
     void deleteEmotion(Long courseId, Long postId, Long emotionId);
 
     void updateComment(Long courseId, Long postId, Long commentId, CommentDTO commentDTO);
+
+    Long addQuizToSection(Long courseId, Long sectionId, QuizDTO quizDTO);
+
+    void updateQuiz(Long courseId, Long sectionId, Long quizId, QuizUpdateDTO quizUpdateDTO);
+
+    void deleteQuiz(Long courseId, Long sectionId, Long quizId);
+
+    void restoreQuiz(Long courseId, Long sectionId, Long quizId);
+
+    void deleteForceQuiz(Long courseId, Long sectionId, Long quizId);
+
+    Long addQuestionToQuiz(Long courseId, Long sectionId, Long quizId, QuestionDTO questionDTO);
+
+    void updateQuestion(Long courseId, Long sectionId, Long quizId, Long questionId, QuestionDTO questionUpdateDTO);
+
+    void deleteQuestion(Long courseId, Long sectionId, Long quizId, Long questionId);
+
 }

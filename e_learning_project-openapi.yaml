@@ -1285,6 +1285,328 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Post"
+  /courses/{courseId}/sections/{sectionId}/quizzes/{quizId}:
+    put:
+      summary: "PUT courses/{courseId}/sections/{sectionId}/quizzes/{quizId}"
+      operationId: "updateQuiz"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "sectionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "quizId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuizUpdateDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+    delete:
+      summary: "DELETE courses/{courseId}/sections/{sectionId}/quizzes/{quizId}"
+      operationId: "deleteQuiz"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "sectionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "quizId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "force"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+            default: "false"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+    get:
+      summary: "GET courses/{courseId}/sections/{sectionId}/quizzes/{quizId}"
+      operationId: "getQuiz"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "sectionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "quizId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Quiz"
+  /courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/questions/{questionId}:
+    put:
+      summary: "PUT courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/questions/{questionId}"
+      operationId: "updateQuestion"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "sectionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "quizId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "questionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuestionDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+    delete:
+      summary: "DELETE courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/questions/{questionId}"
+      operationId: "deleteQuestion"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "sectionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "quizId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "questionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+  /courses/{courseId}/sections/{sectionId}/quizzes:
+    post:
+      summary: "POST courses/{courseId}/sections/{sectionId}/quizzes"
+      operationId: "addQuiz"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "sectionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuizDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "integer"
+                format: "int64"
+    get:
+      summary: "GET courses/{courseId}/sections/{sectionId}/quizzes"
+      operationId: "getAllQuizzes"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "sectionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Quiz"
+  /courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/restore:
+    post:
+      summary: "POST courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/restore"
+      operationId: "restoreQuiz"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "sectionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "quizId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+  /courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/questions:
+    post:
+      summary: "POST courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/questions"
+      operationId: "addQuestion"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "sectionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "quizId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuestionDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "integer"
+                format: "int64"
+  /courses/{courseId}/sections/{sectionId}/quizzes/trash:
+    get:
+      summary: "GET courses/{courseId}/sections/{sectionId}/quizzes/trash"
+      operationId: "getDeletedQuizzes"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "sectionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Quiz"
 components:
   schemas:
     OrderItemDTO:
@@ -1485,6 +1807,62 @@ components:
         orderIndex:
           type: "integer"
           format: "int32"
+    AnswerOption:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        content:
+          type: "string"
+        correct:
+          type: "boolean"
+    Question:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        content:
+          type: "string"
+        type:
+          type: "string"
+          enum:
+            - "MULTIPLE_CHOICE"
+            - "SINGLE_CHOICE"
+            - "TRUE_FALSE"
+        options:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/AnswerOption"
+        score:
+          type: "integer"
+          format: "int32"
+    Quiz:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        title:
+          type: "string"
+        description:
+          type: "string"
+        afterLessonId:
+          type: "integer"
+          format: "int64"
+        questions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Question"
+        totalScore:
+          type: "integer"
+          format: "int32"
+        passScorePercentage:
+          type: "integer"
+          format: "int32"
+        deleted:
+          type: "boolean"
     CourseSection:
       type: "object"
       properties:
@@ -1497,6 +1875,10 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Lesson"
+        quizzes:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Quiz"
         orderIndex:
           type: "integer"
           format: "int32"
@@ -2046,3 +2428,51 @@ components:
           type: "array"
           items:
             type: "string"
+    QuizUpdateDTO:
+      type: "object"
+      properties:
+        title:
+          type: "string"
+        description:
+          type: "string"
+        passScorePercentage:
+          type: "integer"
+          format: "int32"
+    AnswerOptionDTO:
+      type: "object"
+      properties:
+        content:
+          type: "string"
+        correct:
+          type: "boolean"
+    QuestionDTO:
+      type: "object"
+      properties:
+        content:
+          type: "string"
+        type:
+          type: "string"
+          enum:
+            - "MULTIPLE_CHOICE"
+            - "SINGLE_CHOICE"
+            - "TRUE_FALSE"
+        options:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/AnswerOptionDTO"
+        score:
+          type: "integer"
+          format: "int32"
+    QuizDTO:
+      type: "object"
+      properties:
+        title:
+          type: "string"
+        description:
+          type: "string"
+        afterLessonId:
+          type: "integer"
+          format: "int64"
+        passScorePercentage:
+          type: "integer"
+          format: "int32"
