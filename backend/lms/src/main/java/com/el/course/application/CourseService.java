@@ -3,6 +3,7 @@ package com.el.course.application;
 import com.el.course.application.dto.*;
 import com.el.course.domain.Course;
 import com.el.course.domain.Lesson;
+import jakarta.validation.Valid;
 
 import javax.money.MonetaryAmount;
 
@@ -55,5 +56,31 @@ public interface CourseService {
     void restorePost(Long courseId, Long postId);
 
     void deleteForcePost(Long courseId, Long postId);
+
+    Long addComment(Long courseId, Long postId, CommentDTO commentDTO);
+
+    void deleteComment(Long courseId, Long postId, Long commentId);
+
+    void addEmotion(Long courseId, Long postId);
+
+    void deleteEmotion(Long courseId, Long postId, Long emotionId);
+
+    void updateComment(Long courseId, Long postId, Long commentId, CommentDTO commentDTO);
+
+    Long addQuizToSection(Long courseId, Long sectionId, QuizDTO quizDTO);
+
+    void updateQuiz(Long courseId, Long sectionId, Long quizId, QuizUpdateDTO quizUpdateDTO);
+
+    void deleteQuiz(Long courseId, Long sectionId, Long quizId);
+
+    void restoreQuiz(Long courseId, Long sectionId, Long quizId);
+
+    void deleteForceQuiz(Long courseId, Long sectionId, Long quizId);
+
+    Long addQuestionToQuiz(Long courseId, Long sectionId, Long quizId, QuestionDTO questionDTO);
+
+    void updateQuestion(Long courseId, Long sectionId, Long quizId, Long questionId, QuestionDTO questionUpdateDTO);
+
+    void deleteQuestion(Long courseId, Long sectionId, Long quizId, Long questionId);
 
 }

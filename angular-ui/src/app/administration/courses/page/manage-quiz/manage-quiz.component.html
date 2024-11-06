@@ -1,0 +1,72 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Quiz Detail</h1>
+  <div>
+    <a [routerLink]="['/administration/courses', courseId]" class="btn btn-secondary">Back to course detail</a>
+  </div>
+</div>
+
+<a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', 'trash']"
+   class="btn btn-secondary btn-sm custom-button">Go to trash</a>
+
+<ng-container *ngIf="quizDto as quizDetail; else quizNo">
+  <a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', 'edit', quizDetail.id]"
+     class="btn btn-secondary btn-sm custom-button">Edit Quiz</a>
+  <a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', 'add-question', quizDetail.id]"
+     class="btn btn-secondary btn-sm custom-button">Add Question</a>
+  <button type="button" (click)="confirmDeleteQuiz(quizDetail.id)" class="btn btn-sm btn-secondary me-2">
+    Delete
+  </button>
+
+  <h3>Title: {{quizDetail.title}}</h3>
+  <p>Description: {{quizDetail.description}}</p>
+  <p>This quiz will display after lessonID: {{quizDetail.afterLessonId}}</p>
+  <p>Total score: {{quizDetail.totalScore}}</p>
+  <p>Min {{quizDetail.passScorePercentage}} % to passed</p>
+
+  <ng-container *ngIf="quizDetail.questions.length > 0; else noQuestions">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover align-middle">
+        <thead>
+        <tr>
+          <th scope="col">Id</th>
+          <th scope="col">Content</th>
+          <th scope="col">Type</th>
+          <th scope="col">Options</th>
+          <th scope="col">Score</th>
+          <th><!-- --></th>
+        </tr>
+        </thead>
+        <tbody>
+          @for (question of quizDetail.questions; track question.id) {
+            <tr>
+              <td>{{question.id}}</td>
+              <td>{{question.content}}</td>
+              <td>{{question.type}}</td>
+              <td>{{question.options | json}}</td>
+              <td>{{question.score}}</td>
+              <td>
+                <a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', quizDetail.id, 'edit-question', question.id]"
+                   class="btn btn-secondary btn-sm custom-button">Edit</a>
+                <button type="button" (click)="confirmDeleteQuestion(quizDetail.id, question.id)" class="btn btn-sm btn-secondary me-2">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+
+  <ng-template #noQuestions>
+    <h1>No question could be found.</h1>
+  </ng-template>
+
+</ng-container>
+
+<ng-template #quizNo>
+  <div>No Quiz could be found.</div>
+  <a
+     [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', 'add']"
+     class="btn btn-secondary btn-sm custom-button">Create Quiz</a>
+</ng-template>

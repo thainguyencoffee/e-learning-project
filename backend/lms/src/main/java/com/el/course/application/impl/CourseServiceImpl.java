@@ -245,7 +245,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public void updatePost(Long courseId, Long postId, CoursePostDTO coursePostDTO) {
         Course course = courseQueryService.findCourseById(courseId);
-        course.updatePost(postId, coursePostDTO.content(), coursePostDTO.photoUrls());
+        course.updatePost(postId, coursePostDTO.content(), coursePostDTO.attachmentUrls());
         courseRepository.save(course);
     }
 
@@ -267,6 +267,111 @@ public class CourseServiceImpl implements CourseService {
     public void deleteForcePost(Long courseId, Long postId) {
         Course course = courseQueryService.findCourseById(courseId);
         course.forceDeletePost(postId);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public Long addComment(Long courseId, Long postId, CommentDTO commentDTO) {
+        com.el.common.auth.web.dto.UserInfo userInfo = rolesBaseUtil.getCurrentUserInfoFromJwt();
+
+        Comment comment = commentDTO.toComment(new UserInfo(userInfo.firstName(), userInfo.lastName()));
+        Course course = courseQueryService.findCourseById(courseId);
+        course.addCommentToPost(postId, comment);
+        courseRepository.save(course);
+        return comment.getId();
+    }
+
+    @Override
+    public void deleteComment(Long courseId, Long postId, Long commentId) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.deleteCommentFromPost(postId, commentId);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void addEmotion(Long courseId, Long postId) {
+        String username = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+
+        Emotion emotion = new Emotion(username);
+        Course course = courseQueryService.findCourseById(courseId);
+        course.addEmotionToPost(postId, emotion);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void deleteEmotion(Long courseId, Long postId, Long emotionId) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.deleteEmotionFromPost(postId, emotionId);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void updateComment(Long courseId, Long postId, Long commentId, CommentDTO commentDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.updateComment(postId, commentId, commentDTO.content(), commentDTO.attachmentUrls());
+        courseRepository.save(course);
+    }
+
+    @Override
+    public Long addQuizToSection(Long courseId, Long sectionId, QuizDTO quizDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        Quiz quiz = quizDTO.toQuiz();
+        course.addQuizToSection(sectionId, quiz);
+        courseRepository.save(course);
+        return quiz.getId();
+    }
+
+    @Override
+    public void updateQuiz(Long courseId, Long sectionId, Long quizId, QuizUpdateDTO quizUpdateDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.updateQuizInSection(sectionId, quizId,
+                quizUpdateDTO.title(),
+                quizUpdateDTO.description(),
+                quizUpdateDTO.passScorePercentage());
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void deleteQuiz(Long courseId, Long sectionId, Long quizId) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.deleteQuizFromSection(sectionId, quizId);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void restoreQuiz(Long courseId, Long sectionId, Long quizId) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.restoreQuizInSection(sectionId, quizId);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void deleteForceQuiz(Long courseId, Long sectionId, Long quizId) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.forceDeleteQuizFromSection(sectionId, quizId);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public Long addQuestionToQuiz(Long courseId, Long sectionId, Long quizId, QuestionDTO questionDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        Question question = questionDTO.toQuestion();
+        course.addQuestionToQuizInSection(sectionId, quizId, question);
+        courseRepository.save(course);
+        return question.getId();
+    }
+
+    @Override
+    public void updateQuestion(Long courseId, Long sectionId, Long quizId, Long questionId, QuestionDTO questionUpdateDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.updateQuestionInQuizInSection(sectionId, quizId, questionId, questionUpdateDTO.toQuestion());
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void deleteQuestion(Long courseId, Long sectionId, Long quizId, Long questionId) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.deleteQuestionFromQuizInSection(sectionId, quizId, questionId);
         courseRepository.save(course);
     }
 

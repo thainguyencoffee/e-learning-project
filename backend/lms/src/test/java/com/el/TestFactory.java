@@ -2,6 +2,7 @@ package com.el;
 
 import com.el.common.Currencies;
 import com.el.course.application.dto.*;
+import com.el.course.application.dto.QuestionDTO.AnswerOptionDTO;
 import com.el.course.domain.*;
 import com.el.course.web.dto.CourseRequestApproveDTO;
 import com.el.course.web.dto.CourseRequestRejectDTO;
@@ -214,8 +215,8 @@ public class TestFactory {
         return new CourseRequestRejectDTO(RequestType.PUBLISH, " Quisque orci metus, dignissim et ultrices vitae, condimentum at augue. Etiam euismod commodo accumsan. Suspendisse at tellus lectus. Vivamus est velit, hendrerit a erat sed, tempor sollicitudin turpis. Mauris porttitor sagittis sem, aliquet tempor mauris consectetur in. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Etiam accumsan leo eget risus hendrerit, eu euismod ligula pulvinar. Donec ut turpis quis metus lacinia sollicitudin. Proin ut tellus dolor. Nam quis tincidunt tellus. Mauris ultricies dolor quam, eu feugiat mauris condimentum vitae. Maecenas non aliquam nisi, et efficitur dui. ",
                 admin);
     }
-
     // Orders
+
     public static Order createDefaultOrder() {
         Set<OrderItem> items = Set.of(
                 new OrderItem(1L, Money.of(1000, Currencies.VND)),
@@ -223,8 +224,8 @@ public class TestFactory {
         );
         return new Order(items);
     }
-
     // Course Enrollment
+
     public static CourseEnrollment createDefaultCourseEnrollment() {
         return new CourseEnrollment(user, 1L, Set.of(
                 new LessonProgress(1L), new LessonProgress(2L)));
@@ -277,4 +278,45 @@ public class TestFactory {
                 Set.of("http://example.com/photo1.jpg", "http://example.com/photo2.jpg")
         );
     }
+
+    public static Quiz createDefaultQuiz() {
+        return new Quiz("Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+                "Donec congue elementum feugiat. Morbi egestas elit nec sodales rutrum. Nullam ut ullamcorper risus. Phasellus eget dignissim ante, sed varius odio. Duis aliquet arcu sed congue bibendum",
+                1L, 50);
+    }
+
+    public static Question createDefaultQuestion() {
+        return new Question("Question " + UUID.randomUUID(),
+                QuestionType.SINGLE_CHOICE,
+                2,
+                Set.of(new AnswerOption("Answer 1", true),
+                new AnswerOption("Answer 2", false),
+                new AnswerOption("Answer 3", false))
+        );
+    }
+
+    public static QuizDTO createDefaultQuizDTO(Long lessonId) {
+        return new QuizDTO("Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+                "Donec congue elementum feugiat. Morbi egestas elit nec sodales rutrum. Nullam ut ullamcorper risus. Phasellus eget dignissim ante, sed varius odio. Duis aliquet arcu sed congue bibendum",
+                lessonId, 50);
+    }
+
+    public static QuizUpdateDTO createDefaultQuizUpdateDTO() {
+        return new QuizUpdateDTO("Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+                "Donec congue elementum feugiat. Morbi egestas elit nec sodales rutrum. Nullam ut ullamcorper risus. Phasellus eget dignissim ante, sed varius odio. Duis aliquet arcu sed congue bibendum",
+                50);
+    }
+
+
+    public static QuestionDTO createDefaultQuestionDTO() {
+        return new QuestionDTO("Donec pharetra in lacus a pulvinar. Fusce eget nulla odio. Sed nec varius massa.",
+                QuestionType.SINGLE_CHOICE,
+                Set.of(new AnswerOptionDTO("Answer 1", true),
+                        new AnswerOptionDTO("Answer 2", false),
+                        new AnswerOptionDTO("Answer 3", false),
+                        new AnswerOptionDTO("Answer 4", false)),
+                2
+        );
+    }
+
 }
