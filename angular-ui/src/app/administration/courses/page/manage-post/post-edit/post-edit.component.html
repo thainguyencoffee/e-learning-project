@@ -15,7 +15,6 @@
         <app-input-row [group]="editForm" field="content" rowType="textarea" label="Content"/>
       </div>
       <div class="col-md-12 mb-3">
-        <app-input-row [group]="editForm" field="photoUrls" rowType="imageFile" label="Photo"/>
         <app-input-object-row [group]="editForm" field="attachmentUrls" label="Attachment"
                               [addItem]="addAttachment.bind(this)" [removeItem]="removeAttachment.bind(this)"
                               [fieldConfiguration]="attachmentUrlFieldConfiguration"

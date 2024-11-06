@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd, RouterLink } from "@angular/router";
-import { PostDto } from "../../../model/post-dto"; // Import Post DTO
+import { PostDto } from "../../../model/post-dto";
 import { ErrorHandler } from "../../../../../common/error-handler.injectable";
 import { DatePipe, NgForOf, NgIf } from "@angular/common";
 import { Subscription } from "rxjs";
