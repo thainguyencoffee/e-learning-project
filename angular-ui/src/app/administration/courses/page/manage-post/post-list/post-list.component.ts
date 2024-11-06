@@ -6,7 +6,6 @@ import { UserService } from "../../../../../common/auth/user.service";
 import { CourseService } from "../../../service/course.service";
 import { ErrorHandler } from "../../../../../common/error-handler.injectable";
 import {PaginationUtils} from "../../../../../common/dto/page-wrapper";
-import {Course} from "../../../model/view/course";
 import {Subscription} from "rxjs";
 
 @Component({

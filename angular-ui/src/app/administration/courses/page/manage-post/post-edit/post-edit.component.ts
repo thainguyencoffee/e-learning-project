@@ -1,13 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
-import { CourseService } from "../../service/course.service";
-import { ErrorHandler } from "../../../../common/error-handler.injectable";
+import { CourseService } from "../../../service/course.service";
+import { ErrorHandler } from "../../../../../common/error-handler.injectable";
 import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
-import { InputRowComponent } from "../../../../common/input-row/input-row.component";
-import { PostDto } from "../../model/post-dto";
-import {updateForm} from "../../../../common/utils";
-import {FieldConfiguration} from "../../../../common/input-object-row/field-configuration";
-import {InputObjectRowComponent} from "../../../../common/input-object-row/input-object-row.component";
+import { InputRowComponent } from "../../../../../common/input-row/input-row.component";
+import { PostDto } from "../../../model/post-dto";
+import {updateFormAdvanced} from "../../../../../common/utils";
+import {FieldConfiguration} from "../../../../../common/input-object-row/field-configuration";
+import {InputObjectRowComponent} from "../../../../../common/input-object-row/input-object-row.component";
 
 @Component({
   selector: 'app-edit-post',
@@ -72,7 +72,9 @@ export class EditPostComponent implements OnInit {
     // Tải dữ liệu bài viết để chỉnh sửa
     this.courseService.getPost(this.courseId!, this.postId!)
       .subscribe({
-       next: (data) => updateForm(this.editForm, data),
+       next: (data) => {
+         updateFormAdvanced(this.editForm, data, this.createAttachmentUrl)
+       },
       error: (error) => this.errorHandler.handleServerError(error.error)
       })
   }

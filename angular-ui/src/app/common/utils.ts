@@ -1,4 +1,4 @@
-import {AbstractControl, FormArray, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
+import {AbstractControl, FormArray, FormControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
 
 
 /**
@@ -13,7 +13,7 @@ export function updateForm(group: FormGroup, data: any) {
   }
 }
 
-export function updateFormAdvanced(group: FormGroup, data: any, createAnswerOption: () => FormGroup) {
+export function updateFormAdvanced(group: FormGroup, data: any, createAnswerOption: () => AbstractControl) {
   for (const field in group.controls) {
     const control = group.get(field)!;
     const value = data && data[field] !== undefined ? data[field] : null;
@@ -24,10 +24,15 @@ export function updateFormAdvanced(group: FormGroup, data: any, createAnswerOpti
       // Xóa và cập nhật lại FormArray
       control.clear();
       value.forEach((item) => {
-        const itemGroup = createAnswerOption();
+        const itemControl = createAnswerOption();
 
-        updateFormAdvanced(itemGroup, item, createAnswerOption);
-        control.push(itemGroup);
+        // Kiểm tra nếu itemControl là FormGroup, gọi đệ quy. Nếu là FormControl, đặt giá trị trực tiếp.
+        if (itemControl instanceof FormGroup) {
+          updateFormAdvanced(itemControl, item, createAnswerOption);
+        } else if (itemControl instanceof FormControl) {
+          itemControl.setValue(item);
+        }
+        control.push(itemControl);
       });
     } else {
       control.setValue(value);

@@ -1,13 +1,13 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import { PostDto } from "../../model/post-dto"; // Adjust import according to your structure
+import { PostDto } from "../../../model/post-dto";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
-import { ErrorHandler } from "../../../../common/error-handler.injectable";
-import { InputRowComponent } from "../../../../common/input-row/input-row.component";
-import { CourseService } from "../../service/course.service";
+import { ErrorHandler } from "../../../../../common/error-handler.injectable";
+import { InputRowComponent } from "../../../../../common/input-row/input-row.component";
+import { CourseService } from "../../../service/course.service";
 import { NgIf } from "@angular/common";
-import {FieldConfiguration} from "../../../../common/input-object-row/field-configuration";
-import {InputObjectRowComponent} from "../../../../common/input-object-row/input-object-row.component";
+import {FieldConfiguration} from "../../../../../common/input-object-row/field-configuration";
+import {InputObjectRowComponent} from "../../../../../common/input-object-row/input-object-row.component";
 
 @Component({
   selector: 'app-post-add',
