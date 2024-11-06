@@ -1,11 +1,11 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {DatePipe, NgForOf, NgIf, SlicePipe} from "@angular/common";
 import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
-import {CourseService} from "../../service/course.service";
-import {UserService} from "../../../../common/auth/user.service";
-import {ErrorHandler} from "../../../../common/error-handler.injectable";
+import {CourseService} from "../../../service/course.service";
+import {UserService} from "../../../../../common/auth/user.service";
+import {ErrorHandler} from "../../../../../common/error-handler.injectable";
 import {Subscription} from "rxjs";
-import {Post} from "../../model/view/post";
+import {Post} from "../../../model/view/post";
 
 @Component({
   selector: 'app-course-trash',

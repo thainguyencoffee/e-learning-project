@@ -169,8 +169,8 @@ export class CourseService {
   }
 
   deletePost(courseId: number, postId: number, post: Post): Observable<void> {
-    if (post.photoUrls && post.photoUrls.length > 0) {
-      return this.uploadService.deleteAll(post.photoUrls)
+    if (post.attachmentUrls && post.attachmentUrls.length > 0) {
+      return this.uploadService.deleteAll(post.attachmentUrls)
         .pipe(switchMap(() => this.http.delete<void>(`${this.resourcePath}/${courseId}/posts/${postId}`)));
     } else {
       return this.http.delete<void>(`${this.resourcePath}/${courseId}/posts/${postId}`);

@@ -1,12 +1,12 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
-import { Post } from "../../model/view/post";
+import { Post } from "../../../model/view/post";
 import { DatePipe, NgForOf, NgIf, SlicePipe } from "@angular/common";
-import { UserService } from "../../../../common/auth/user.service";
-import { CourseService } from "../../service/course.service";
-import { ErrorHandler } from "../../../../common/error-handler.injectable";
-import {PaginationUtils} from "../../../../common/dto/page-wrapper";
-import {Course} from "../../model/view/course";
+import { UserService } from "../../../../../common/auth/user.service";
+import { CourseService } from "../../../service/course.service";
+import { ErrorHandler } from "../../../../../common/error-handler.injectable";
+import {PaginationUtils} from "../../../../../common/dto/page-wrapper";
+import {Course} from "../../../model/view/course";
 import {Subscription} from "rxjs";
 
 @Component({
@@ -86,6 +86,7 @@ export class PostListComponent implements OnInit,OnDestroy {
     }
 
   }
+
   getMessage(key: string, details?: any) {
     const messages: Record<string, string> = {
       confirmDelete: 'Do you really want to delete this post?',

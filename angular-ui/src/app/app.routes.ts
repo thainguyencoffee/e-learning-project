@@ -38,11 +38,11 @@ import {
 } from "./enrolments/page/enrolment-content/enrolment-lessons/enrolment-lessons.component";
 import {EnrolmentPostsComponent} from "./enrolments/page/enrolment-content/enrolment-posts/enrolment-posts.component";
 import {LessonDetailComponent} from "./enrolments/page/enrolment-content/lesson-detail/lesson-detail.component";
-import {PostListComponent} from "./administration/courses/page/post-list/post-list.component";
-import {PostAddComponent} from "./administration/courses/page/post-add/post-add.component";
-import {PostDetailComponent} from "./administration/courses/page/post-detail/post-detail.component";
-import {EditPostComponent} from "./administration/courses/page/post-edit/post-edit.component";
-import {PostTrashComponent} from "./administration/courses/page/post-trash/post-trash.component";
+import {PostListComponent} from "./administration/courses/page/manage-post/post-list/post-list.component";
+import {PostAddComponent} from "./administration/courses/page/manage-post/post-add/post-add.component";
+import {PostDetailComponent} from "./administration/courses/page/manage-post/post-detail/post-detail.component";
+import {EditPostComponent} from "./administration/courses/page/manage-post/post-edit/post-edit.component";
+import {PostTrashComponent} from "./administration/courses/page/manage-post/post-trash/post-trash.component";
 import {ManageQuizComponent} from "./administration/courses/page/manage-quiz/manage-quiz.component";
 import {AddQuizComponent} from "./administration/courses/page/manage-quiz/add-quiz/add-quiz.component";
 import {EditQuizComponent} from "./administration/courses/page/manage-quiz/edit-quiz/edit-quiz.component";

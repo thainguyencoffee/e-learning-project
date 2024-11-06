@@ -1,11 +1,12 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd, RouterLink } from "@angular/router";
-import { PostDto } from "../../model/post-dto"; // Import Post DTO
-import { ErrorHandler } from "../../../../common/error-handler.injectable";
+import { PostDto } from "../../../model/post-dto"; // Import Post DTO
+import { ErrorHandler } from "../../../../../common/error-handler.injectable";
 import { DatePipe, NgForOf, NgIf } from "@angular/common";
 import { Subscription } from "rxjs";
-import { UserService } from "../../../../common/auth/user.service";
-import { CourseService } from "../../service/course.service";
+import { UserService } from "../../../../../common/auth/user.service";
+import { CourseService } from "../../../service/course.service";
+import {Post} from "../../../model/view/post";
 
 @Component({
   selector: 'app-post-detail',
@@ -26,6 +27,7 @@ export class PostDetailComponent implements OnInit, OnDestroy {
   userService = inject(UserService);
   courseId?:number;
   postId?: number;
+  post?: Post;
   postDto?: PostDto;
   navigationSubscription?: Subscription;
 
