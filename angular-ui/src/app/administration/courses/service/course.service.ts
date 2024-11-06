@@ -1,6 +1,6 @@
 import {inject, Injectable} from "@angular/core";
-import {HttpClient} from "@angular/common/http";
-import {Observable, switchMap} from "rxjs";
+import {HttpClient, HttpParams} from "@angular/common/http";
+import {catchError, Observable, switchMap, throwError} from "rxjs";
 import {Course} from "../model/view/course";
 import {AddCourseDto} from "../model/add-course.dto";
 import {UploadService} from "../../../common/upload/upload.service";
@@ -13,6 +13,8 @@ import {Lesson} from "../model/view/lesson";
 import {CourseRequestDto} from "../model/course-request.dto";
 import {ApproveRequestDto} from "../model/approve-request.dto";
 import {RejectRequestDto} from "../model/reject-request.dto";
+import {Post} from "../model/view/post";
+import {PostDto} from "../model/post-dto";
 import {EditQuizDto} from "../model/edit-quiz.dto";
 import {QuestionDto} from "../model/question.dto";
 import {Quiz} from "../model/view/quiz";
@@ -110,14 +112,14 @@ export class CourseService {
     return this.http.post(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons`, data);
   }
 
-  deleteLesson(courseId: number, sectionId: number, lessonId: number, lesson: Lesson) {
-    if (lesson.link) {
-      return this.uploadService.deleteAll([lesson.link])
-        .pipe(switchMap(() => this.http.delete<void>(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons/${lessonId}`)))
-    } else {
-      return this.http.delete<void>(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons/${lessonId}`);
+    deleteLesson(courseId: number, sectionId: number, lessonId: number, lesson: Lesson) {
+      if (lesson.link) {
+        return this.uploadService.deleteAll([lesson.link])
+          .pipe(switchMap(() => this.http.delete<void>(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons/${lessonId}`)))
+      } else {
+        return this.http.delete<void>(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons/${lessonId}`);
+      }
     }
-  }
 
   updateLesson(courseId: number, sectionId: number, lessonId: number, data: LessonDto) {
     return this.http.put<Course>(`${this.resourcePath}/${courseId}/sections/${sectionId}/lessons/${lessonId}`, data);
@@ -150,6 +152,49 @@ export class CourseService {
   rejectRequest(courseId: number, requestId: number, data: RejectRequestDto) {
     return this.http.put<void>(`${this.resourcePath}/${courseId}/requests/${requestId}/reject`, data);
   }
+  getAllPosts(pageNumber: number = 0,courseId: number, pageSize: number = 10): Observable<PageWrapper<Post>> {
+    const url = `${this.resourcePath}/${courseId}/posts?page=${pageNumber}&size=${pageSize}`;
+    return this.http.get<PageWrapper<Post>>(url);
+  }
+  getPost(courseId: number, postId: number): Observable<PostDto> {
+
+    return this.http.get<PostDto>(`${this.resourcePath}/${courseId}/posts/${postId}`);
+  }
+
+  createPost(data: PostDto, courseId: number): Observable<void> {
+    return this.http.post<void>(`${this.resourcePath}/${courseId}/posts`, data);
+  }
+  updatePost(courseId: number, postId: number, postData: PostDto): Observable<void> {
+    return this.http.put<void>(`${this.resourcePath}/${courseId}/posts/${postId}`, postData);
+  }
+
+  deletePost(courseId: number, postId: number, post: Post): Observable<void> {
+    if (post.photoUrls && post.photoUrls.length > 0) {
+      return this.uploadService.deleteAll(post.photoUrls)
+        .pipe(switchMap(() => this.http.delete<void>(`${this.resourcePath}/${courseId}/posts/${postId}`)));
+    } else {
+      return this.http.delete<void>(`${this.resourcePath}/${courseId}/posts/${postId}`);
+    }
+  }
+  restorePost(courseId: number, postId: number){
+    return this.http.post<void>(`${this.resourcePath}/${courseId}/posts/${postId}/restore`, {});
+  }
+  getTrashedPosts(pageNumber: number = 0,courseId: number,pageSize: number = 10): Observable<PageWrapper<Post>> {
+    const url = `${this.resourcePath}/${courseId}/posts/trash?page=${pageNumber}&size=${pageSize}`;
+    return this.http.get<PageWrapper<Post>>(url);
+  }
+  deletePostForce(post: Post,courseId:number): Observable<void> {
+    const url = `${this.resourcePath}/${courseId}/posts/${post.id}`;
+    const params = new HttpParams().set('force', 'true');
+
+    return this.http.delete<void>(url, { params }).pipe(
+      catchError((error) => {
+        console.error("Error deleting post forcefully:", error);
+        return throwError(() => new Error("Failed to delete post forcefully"));
+      })
+    );
+  }
+
 
   getQuiz(courseId: number, sectionId: number) {
     return this.http.get<PageWrapper<Quiz>>(`${this.resourcePath}/${courseId}/sections/${sectionId}/quizzes`);

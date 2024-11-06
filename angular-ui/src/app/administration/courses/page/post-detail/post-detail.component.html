@@ -1,0 +1,36 @@
+<div *ngIf="postDto" class="container-fluid bg-light p-4 rounded shadow-sm">
+  <!-- Header Section -->
+  <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+    <h1 class="text-primary fw-bold">Post Detail Center</h1>
+    <a [routerLink]="['/administration/courses', courseId, 'posts']" class="btn btn-secondary">Back to list</a>
+
+  </div>
+
+  <!-- Basic Info Section -->
+  <section id="basic" class="p-4 border rounded mb-4 bg-white">
+    <h2 class="mb-4 border-bottom pb-2">Basic Information</h2>
+    <div class="row">
+      <div class="col-lg-8">
+        <p><strong>Created Date:</strong> {{ postDto.createdDate | date: 'yyyy-MM-dd HH:mm:ss' }}</p>
+        <p><strong>Last Modified Date:</strong> {{ postDto.lastModifiedDate | date: 'yyyy-MM-dd HH:mm:ss' }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Post Content Section -->
+  <section id="content" class="p-4 border rounded mb-4 bg-white">
+    <h2 class="mb-4 border-bottom pb-2">Content</h2>
+    <p>{{ postDto.content || 'No content available' }}</p>
+  </section>
+
+  <!-- Photo Gallery Section -->
+  <section id="photos" class="p-4 border rounded mb-4 bg-white">
+    <h2 class="mb-4 border-bottom pb-2">Photos</h2>
+    <div class="row">
+      <div *ngFor="let photoUrl of postDto.photoUrls" class="col-lg-4 col-md-6 mb-3">
+        <img [src]="photoUrl" class="img-fluid rounded shadow-sm" alt="Photo" style="object-fit: cover; height: 200px; width: 100%;">
+      </div>
+      <div *ngIf="!postDto.photoUrls?.length" class="text-muted">No photos available</div>
+    </div>
+  </section>
+</div>
