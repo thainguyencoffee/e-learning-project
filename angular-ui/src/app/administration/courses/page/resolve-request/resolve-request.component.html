@@ -9,13 +9,13 @@
   @if (requestType === 'PUBLISH') {
     @if(!course?.price) {
       <div class="alert alert-warning">This course has no price. Please
-        <a [routerLink]="['/administration/courses/set-price', courseId]">
+        <a [routerLink]="['/administration/courses/set-price', courseId]" [queryParams]="{requestId}">
           Set price
         </a>
         the price before approving the request.</div>
     } @else {
       <div class="alert alert-warning">Are you sure about it's price is {{course!.price}}? You can
-        <a [routerLink]="['/administration/courses/set-price', courseId]">
+        <a [routerLink]="['/administration/courses/set-price', courseId]" [queryParams]="{requestId}">
           change price
         </a>.</div>
 

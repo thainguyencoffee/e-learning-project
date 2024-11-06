@@ -1,0 +1,51 @@
+<div [formGroup]="group!">
+  <div *ngIf="formArray" class="row mb-3">
+    <label class="col-md-2 col-form-label d-flex align-items-center">
+      {{ label }}
+    </label>
+
+    <!-- Phần Form Array -->
+    <div class="col-md-10" [formArrayName]="field">
+      <ng-container *ngFor="let control of formArray.controls; let i = index">
+        <div class="d-flex align-items-center mb-3 p-3 border rounded">
+          <!-- Form Group nếu có -->
+          <div *ngIf="isFormGroup(control); else formArrayBasic" [formGroupName]="i" class="flex-grow-1">
+            <ng-container *ngFor="let fieldConfig of groupConfiguration">
+              <div *ngIf="formArray.at(i).get(fieldConfig.name!)">
+                <app-input-row
+                  [group]="getFormGroup(formArray.at(i))"
+                  [field]="fieldConfig.name!"
+                  [label]="fieldConfig.label!"
+                  [rowType]="fieldConfig.type"
+                  [options]="fieldConfig.options"
+                />
+              </div>
+            </ng-container>
+          </div>
+
+          <!-- Ng-template fallback cho trường hợp không phải FormGroup -->
+          <ng-template #formArrayBasic>
+            <div *ngIf="fieldConfiguration" class="flex-grow-1">
+              <app-input-row-form-array
+                [control]="getFormControl(control)"
+                [rowType]="fieldConfiguration.type"
+                [options]="fieldConfiguration.options"
+                [placeholder]="fieldConfiguration.placeholder"
+              />
+            </div>
+          </ng-template>
+
+          <!-- Button Remove nhỏ gọn -->
+          <button type="button" class="btn btn-danger btn-sm m-2" (click)="removeItem(i)">
+            <i class="bi bi-x-circle"></i>
+          </button>
+        </div>
+      </ng-container>
+
+      <!-- Nút Add Item gọn gàng hơn -->
+      <button type="button" class="btn btn-primary btn-sm mt-3" (click)="addItem()">
+        <i class="bi bi-plus-circle"></i> Add Item
+      </button>
+    </div>
+  </div>
+</div>

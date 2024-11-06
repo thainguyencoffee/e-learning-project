@@ -9,7 +9,11 @@
 <form [formGroup]="addForm" (ngSubmit)="handleSubmit()">
   <app-input-row [group]="addForm" field="content" label="Content" rowType="textarea" />
   <app-input-row [group]="addForm" field="type" label="Type" rowType="select" [options]="questionTypesMap" />
-  <app-input-row [group]="addForm" field="options" label="Answer Options" rowType="textarea" />
+  <app-input-object-row [group]="addForm" field="options" label="Answer Options"
+                        [groupConfiguration]="optionGroupConfiguration"
+                        [addItem]="addAnswerOption.bind(this)"
+                        [removeItem]="removeAnswerOption.bind(this)">
+  </app-input-object-row>
   <app-input-row [group]="addForm" field="score" label="Score" rowType="number" />
   <input type="submit" value="Add Question" class="btn btn-primary mt-4" />
 </form>

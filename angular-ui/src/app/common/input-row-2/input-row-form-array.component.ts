@@ -13,48 +13,40 @@ import {
   ViewChild
 } from '@angular/core';
 import {
-  FormArray, FormControl,
-  FormGroup,
+  FormControl,
   FormsModule,
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
-import {InputErrorsComponent} from "./input-errors.component";
 import {UploadService} from "../upload/upload.service";
 import {ErrorHandler} from "../error-handler.injectable";
 import {Router} from "@angular/router";
 import flatpickr from 'flatpickr';
+import {InputErrorsComponent} from "../input-row/input-errors.component";
 
 
 @Component({
-  selector: 'app-input-row',
+  selector: 'app-input-row-form-array',
   standalone: true,
-  templateUrl: './input-row.component.html',
+  templateUrl: './input-row-form-array.component.html',
   imports: [ReactiveFormsModule, InputErrorsComponent, KeyValuePipe /**/, FormsModule, NgForOf, NgIf]
 })
-export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
+export class InputRowFormArrayComponent implements AfterViewInit, OnChanges, OnInit {
 
   uploadService = inject(UploadService)
   errorHandler = inject(ErrorHandler);
   router = inject(Router);
 
-  @Input() group?: FormGroup;
-  @Input() field = '';
+  @Input({required: true}) control?: FormControl;
 
-  @Input() formArray?: FormArray;
+  @Input() rowType = 'text';
+
   @Input() index?: number;
-  @Input() controlFromArray?: FormControl;
 
-  @Input()
-  rowType = 'text';
+  @Input() inputClass = '';
 
-  @Input()
-  inputClass = '';
+  @Input() options?: Record<string, string> | Map<number, string>;
 
-  @Input()
-  options?: Record<string, string> | Map<number, string>;
-
-  @Input() label = '';
   @Input() placeholder?: string = '';
 
   @Input()
@@ -70,27 +62,15 @@ export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
 
   @Output() optionsChange = new EventEmitter<string>();
 
-  get dynamicControl(): FormControl | null  {
-    if (this.group && this.field) {
-      return this.group.get(this.field) as FormControl;
-    }
-    if (this.formArray && this.controlFromArray) {
-      return this.controlFromArray as FormControl;
-    }
-    return null;
-  }
-
-  randomId = Math.random().toString(36).substring(7);
-
   ngOnInit() {
     if (this.rowType === 'imageFile') {
-      this.previewUrl = this.dynamicControl!.value || 'https://placehold.co/400'
+      this.previewUrl = this.control!.value || 'https://placehold.co/400'
     } else {
-      this.previewUrl = this.dynamicControl!.value || ''
+      this.previewUrl = this.control!.value || ''
     }
 
-    this.previousUrl = this.dynamicControl!.value || '' // bất kể rowType là gì thì vẫn đảm bảo previousUrl để clear data khi cần
-    this.dynamicControl!.valueChanges.subscribe(value => {
+    this.previousUrl = this.control!.value || '' // bất kể rowType là gì thì vẫn đảm bảo previousUrl để clear data khi cần
+    this.control!.valueChanges.subscribe(value => {
       if (value) {
         this.previewUrl = value
         this.previousUrl = value
@@ -118,12 +98,12 @@ export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
   @HostListener('input', ['$event.target'])
   onEvent(target: HTMLInputElement) {
     if (target.value === '') {
-      this.dynamicControl!.setValue(null);
+      this.control!.setValue(null);
     }
   }
 
   isRequired() {
-    return this.dynamicControl?.hasValidator(Validators.required);
+    return this.control?.hasValidator(Validators.required);
   }
 
   getInputClasses() {
@@ -131,7 +111,7 @@ export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
   }
 
   hasErrors() {
-    return this.dynamicControl?.invalid && (this.dynamicControl?.dirty || this.dynamicControl?.touched);
+    return this.control?.invalid && (this.control?.dirty || this.control?.touched);
   }
 
   initDatepicker() {
@@ -163,7 +143,7 @@ export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
     }
     const input = this.elRef.nativeElement.querySelector('input');
     const flatpicker = flatpickr(input, flatpickrConfig);
-    this.dynamicControl!.valueChanges.subscribe(val => {
+    this.control!.valueChanges.subscribe(val => {
       // update in case value changes after initialization
       flatpicker.setDate(val);
     });
@@ -179,13 +159,13 @@ export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
 
     this.uploadService.upload(file).subscribe({
       next: response => {
-        this.dynamicControl?.setValue(response.url);
+        this.control?.setValue(response.url);
         this.previewUrl = response.url;
         this.previousUrl = response.url;
         // reload native element
         this.videoPlayer?.nativeElement.load();
       },
-      error: (error) => this.errorHandler.handleServerError(error.error, this.group)
+      error: (error) => this.errorHandler.handleServerError(error.error)
     })
 
   }
@@ -196,7 +176,7 @@ export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
         next: () => {
           this.previousUrl = null;
         },
-        error: error => this.errorHandler.handleServerError(error, this.group)
+        error: error => this.errorHandler.handleServerError(error.error)
       })
     }
 

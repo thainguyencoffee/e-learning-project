@@ -1,4 +1,4 @@
-import {AbstractControl, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
+import {AbstractControl, FormArray, FormGroup, ValidationErrors, ValidatorFn} from '@angular/forms';
 
 
 /**
@@ -8,24 +8,32 @@ import {AbstractControl, FormGroup, ValidationErrors, ValidatorFn} from '@angula
 export function updateForm(group: FormGroup, data: any) {
   for (const field in group.controls) {
     const control = group.get(field)!;
-
-    // Lấy giá trị từ data, nếu không có thì gán null
     let value = data[field] === undefined ? null : data[field];
-
-    // Kiểm tra các điều kiện để xác định xem có cần chuyển đổi giá trị hay không
-    const controlIsEmptyOrNotArray = !control.value || !Array.isArray(control.value);
-    const valueIsObjectOrArray = typeof value === 'object' && value !== null;
-
-    if (value && controlIsEmptyOrNotArray && valueIsObjectOrArray) {
-      // Chuyển đổi giá trị thành chuỗi JSON nếu cần
-      value = JSON.stringify(value, undefined, 2);
-    }
-
-    // Cập nhật giá trị cho điều khiển
     control.setValue(value);
   }
 }
 
+export function updateFormAdvanced(group: FormGroup, data: any, createAnswerOption: () => FormGroup) {
+  for (const field in group.controls) {
+    const control = group.get(field)!;
+    const value = data && data[field] !== undefined ? data[field] : null;
+
+    if (control instanceof FormGroup && value && typeof value === 'object' && !Array.isArray(value)) {
+      updateFormAdvanced(control, value, createAnswerOption);
+    } else if (control instanceof FormArray && Array.isArray(value)) {
+      // Xóa và cập nhật lại FormArray
+      control.clear();
+      value.forEach((item) => {
+        const itemGroup = createAnswerOption();
+
+        updateFormAdvanced(itemGroup, item, createAnswerOption);
+        control.push(itemGroup);
+      });
+    } else {
+      control.setValue(value);
+    }
+  }
+}
 
 export const validJson: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   if (control.value === null) {
