@@ -6,6 +6,8 @@ import { ErrorHandler } from "../../../../common/error-handler.injectable";
 import { InputRowComponent } from "../../../../common/input-row/input-row.component";
 import { CourseService } from "../../service/course.service";
 import { NgIf } from "@angular/common";
+import {FieldConfiguration} from "../../../../common/input-object-row/field-configuration";
+import {InputObjectRowComponent} from "../../../../common/input-object-row/input-object-row.component";
 
 @Component({
   selector: 'app-post-add',
@@ -14,37 +16,70 @@ import { NgIf } from "@angular/common";
     RouterLink,
     ReactiveFormsModule,
     InputRowComponent,
-    NgIf
+    NgIf,
+    InputObjectRowComponent
   ],
   templateUrl: './post-add.component.html',
 })
 export class PostAddComponent implements OnInit{
+
   router = inject(Router);
   courseId?: number;
   route = inject(ActivatedRoute);
   courseService = inject(CourseService);
   errorHandler = inject(ErrorHandler);
 
+  getMessage(key: string, details?: any) {
+    const messages: Record<string, string> = {
+      created: `Post was created successfully.`
+    };
+    return messages[key];
+  }
+
+  attachmentUrlFieldConfiguration: FieldConfiguration = {
+    type: 'imageFile',
+    placeholder: 'Attachment URL'
+  }
+
   addForm = new FormGroup({
-    content: new FormControl(null, [Validators.required]),
-    photoUrls: new FormControl(null)// Change to photoUrls for multiple images
+    content: new FormControl(null, [Validators.required, Validators.minLength(10), Validators.maxLength(10000)]),
+    attachmentUrls: new FormArray([], [Validators.required])
   });
+
+  get attachmentUrls() {
+    return this.addForm.get('attachmentUrls') as FormArray;
+  }
+
+  createAttachmentUrl() {
+    return new FormControl(null, [Validators.required]);
+  }
+
+  addAttachment() {
+    this.attachmentUrls.push(this.createAttachmentUrl());
+  }
+
+  removeAttachment(index: number) {
+    this.attachmentUrls.removeAt(index);
+  }
+
   ngOnInit(): void {
     // Lấy courseId từ tham số URL khi component được khởi tạo
     this.courseId = +this.route.snapshot.params['courseId'];
     console.log('Course ID:', this.courseId); // Kiểm tra courseId có được gán đúng không
   }
+
   handleSubmit() {
     window.scrollTo(0, 0);
     this.addForm.markAllAsTouched();
     if (!this.addForm.valid) {
       return;
     }
+
     const data = new PostDto(this.addForm.value);
-    const courseId = this.route.snapshot.params['courseId'];
-    console.log(data)
-    this.courseService.createPost(data, courseId).subscribe({
-      next: () => this.router.navigate(['/administration/courses', courseId, 'posts'], {
+
+    this.courseService.createPost(data, this.courseId!).subscribe({
+      next: () => this.router.navigate(['../'], {
+        relativeTo: this.route,
         state: {
           msgSuccess: this.getMessage('created')
         }
@@ -53,10 +88,5 @@ export class PostAddComponent implements OnInit{
     });
   }
 
-  getMessage(key: string, details?: any) {
-    const messages: Record<string, string> = {
-      created: `Post was created successfully.`
-    };
-    return messages[key];
-  }
+
 }

@@ -7,6 +7,11 @@
 
 <form [formGroup]="addForm" (ngSubmit)="handleSubmit()">
   <app-input-row [group]="addForm" rowType="textarea" field="content" label="Content" />
-  <app-input-row [group]="addForm" rowType="imageFile" field="photoUrls" label="Photos" />
+<!--  <app-input-row [group]="addForm" rowType="imageFile" field="photoUrls" label="Photos" />-->
+  <app-input-object-row [group]="addForm"
+                        [fieldConfiguration]="attachmentUrlFieldConfiguration"
+                        [addItem]="addAttachment.bind(this)"
+                        [removeItem]="removeAttachment.bind(this)"
+                        field="attachmentUrls" label="Attachments" />
   <input type="submit" value="Add Post" class="btn btn-primary mt-4" />
 </form>
