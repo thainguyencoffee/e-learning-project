@@ -1,0 +1,25 @@
+<div class="container">
+  <!-- Header -->
+  <div class="d-flex flex-wrap align-items-center mb-4">
+    <h1 class="flex-grow-1">Edit Post</h1>
+    <a [routerLink]="['/administration/courses', courseId, 'posts']" class="btn btn-secondary">Back to list</a>
+  </div>
+
+  <!-- Form -->
+  <form [formGroup]="editForm" (ngSubmit)="handleSubmit()" class="bg-light p-4 rounded shadow-sm">
+    <div class="row">
+      <div class="col-md-12 mb-3">
+        <app-input-row [group]="editForm" field="id" rowType="number" label="Id"/>
+      </div>
+      <div class="col-md-12 mb-3">
+        <app-input-row [group]="editForm" field="content" rowType="textarea" label="Content" />
+      </div>
+      <div class="col-md-12 mb-3">
+        <app-input-row [group]="editForm" field="photoUrls" rowType="imageFile" label="Photo"/>
+      </div>
+    </div>
+    <div class="text-end">
+      <input type="submit" value="Edit Post" class="btn btn-primary mt-4" />
+    </div>
+  </form>
+</div>

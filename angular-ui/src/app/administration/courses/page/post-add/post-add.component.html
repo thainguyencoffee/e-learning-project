@@ -1,0 +1,12 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Add Post</h1>
+  <div>
+    <a [routerLink]="['/administration/courses', courseId, 'posts']" class="btn btn-secondary">Back to list</a>
+  </div>
+</div>
+
+<form [formGroup]="addForm" (ngSubmit)="handleSubmit()">
+  <app-input-row [group]="addForm" rowType="textarea" field="content" label="Content" />
+  <app-input-row [group]="addForm" rowType="imageFile" field="photoUrls" label="Photos" />
+  <input type="submit" value="Add Post" class="btn btn-primary mt-4" />
+</form>

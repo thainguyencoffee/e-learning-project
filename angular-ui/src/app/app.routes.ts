@@ -38,7 +38,11 @@ import {
 } from "./enrolments/page/enrolment-content/enrolment-lessons/enrolment-lessons.component";
 import {EnrolmentPostsComponent} from "./enrolments/page/enrolment-content/enrolment-posts/enrolment-posts.component";
 import {LessonDetailComponent} from "./enrolments/page/enrolment-content/lesson-detail/lesson-detail.component";
-
+import {PostListComponent} from "./administration/courses/page/post-list/post-list.component";
+import {PostAddComponent} from "./administration/courses/page/post-add/post-add.component";
+import {PostDetailComponent} from "./administration/courses/page/post-detail/post-detail.component";
+import {EditPostComponent} from "./administration/courses/page/post-edit/post-edit.component";
+import {PostTrashComponent} from "./administration/courses/page/post-trash/post-trash.component";
 export const routes: Routes = [
   {
     title: 'Welcome to E learning!',
@@ -179,6 +183,31 @@ export const routes: Routes = [
         title: 'Request course list',
         path: 'courses/:courseId/requests',
         component: RequestListComponent
+      },
+      {
+        title:'Post list',
+        path:'courses/:courseId/posts',
+        component: PostListComponent
+      },
+      {
+        title:'Post trash',
+        path: 'courses/:courseId/posts/trash',
+        component: PostTrashComponent
+      },
+      {
+        title:'Post add',
+        path:'courses/:courseId/posts/add',
+        component: PostAddComponent
+      },
+      {
+        title:'Post detail',
+        path:'courses/:courseId/posts/:postId',
+        component: PostDetailComponent
+      },
+      {
+        title:'Post edit',
+        path:'courses/:courseId/posts/:postId/edit',
+        component: EditPostComponent
       },
       {
         title: 'Request course detail',

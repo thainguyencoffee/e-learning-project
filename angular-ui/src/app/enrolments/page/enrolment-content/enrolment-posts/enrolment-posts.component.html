@@ -19,12 +19,9 @@
     <div class="card-body">
       <h5 class="card-title text-primary">{{ post.title }}</h5>
       <p class="card-text text-secondary">{{ post.content }}</p>
-      <img
-        *ngIf="post.imageUrl"
-        [src]="post.imageUrl"
-        alt="Post Image"
-        class="post-image mb-3 img-fluid rounded"
-      />
+      <div *ngFor="let imageUrl of post.imageUrls"  class="post-image mb-3 img-fluid rounded">
+        <img [src]="imageUrl" alt="Post Image" />
+      </div>
       <small class="text-muted d-block mb-2">Ngày đăng: {{ post.date | date: 'short' }}</small>
     </div>
 
