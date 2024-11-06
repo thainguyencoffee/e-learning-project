@@ -20,6 +20,7 @@
       <tr>
         <th scope="col">Id</th>
         <th scope="col">Content</th>
+        <th scope="col">Author</th>
         <th scope="col">Created Date</th>
         <th scope="col">Actions</th>
       </tr>
@@ -28,7 +29,8 @@
         @for (post of posts; track post.id) {
           <tr>
             <td>{{ post.id }}</td>
-            <td>{{ post.content | slice:0:50 }}...</td> <!-- Giới hạn nội dung để hiển thị ngắn gọn -->
+            <td>{{ post.content | slice:0:50 }}...</td>
+            <td>{{ post.info.firstName === userService.current.name ? 'This account': post.info.firstName}}</td>
             <td>{{ post.createdDate | date:'short' }}</td>
             <td>
                 <a [routerLink]="['/administration/courses/', courseId,'posts',post.id]" class="btn btn-sm btn-secondary me-2">View</a>

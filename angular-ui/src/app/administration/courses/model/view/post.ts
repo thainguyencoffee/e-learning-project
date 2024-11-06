@@ -4,8 +4,10 @@ export interface Post {
   id: number;
   content: string;
   info: UserInfo;
-  photoUrls?: string[];
+  attachmentUrls?: string[];
+  comments?:string;
+  emotions?:string;
   createdDate: Date;
   lastModifiedDate: Date;
-  deleted: boolean;// Array for multiple image URLs
+  deleted: boolean;
 }
