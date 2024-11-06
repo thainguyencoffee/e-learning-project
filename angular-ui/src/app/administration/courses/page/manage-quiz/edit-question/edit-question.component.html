@@ -10,7 +10,11 @@
   <app-input-row [group]="editForm" field="id" label="Id" rowType="number" />
   <app-input-row [group]="editForm" field="content" label="Content" rowType="textarea" />
   <app-input-row [group]="editForm" field="type" label="Type" rowType="select" [options]="questionTypesMap" />
-  <app-input-row [group]="editForm" field="options" label="Answer Options" rowType="textarea" />
+  <app-input-object-row [group]="editForm" field="options" label="Answer Options"
+                        [groupConfiguration]="optionGroupConfiguration"
+                        [addItem]="addAnswerOption.bind(this)"
+                        [removeItem]="removeAnswerOption.bind(this)">
+  </app-input-object-row>
   <app-input-row [group]="editForm" field="score" label="Score" rowType="number" />
   <input type="submit" value="Update Question" class="btn btn-primary mt-4" />
 </form>

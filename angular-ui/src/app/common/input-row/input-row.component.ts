@@ -13,7 +13,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {
-  AbstractControl,
+  FormArray, FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
@@ -38,11 +38,12 @@ export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
   errorHandler = inject(ErrorHandler);
   router = inject(Router);
 
-  @Input({ required: true })
-  group?: FormGroup;
+  @Input() group?: FormGroup;
+  @Input() field = '';
 
-  @Input({ required: true })
-  field = '';
+  @Input() formArray?: FormArray;
+  @Input() index?: number;
+  @Input() controlFromArray?: FormControl;
 
   @Input()
   rowType = 'text';
@@ -53,13 +54,12 @@ export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
   @Input()
   options?: Record<string, string> | Map<number, string>;
 
-  @Input({ required: true })
-  label = '';
+  @Input() label = '';
+  @Input() placeholder?: string = '';
 
   @Input()
   datepicker?: 'datepicker'|'timepicker'|'datetimepicker';
 
-  control?: AbstractControl;
   optionsMap?: Map<string | number, string>;
 
   elRef = inject(ElementRef);
@@ -70,17 +70,27 @@ export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
 
   @Output() optionsChange = new EventEmitter<string>();
 
-  ngOnInit() {
-    this.control = this.group!.get(this.field)!;
+  get dynamicControl(): FormControl | null  {
+    if (this.group && this.field) {
+      return this.group.get(this.field) as FormControl;
+    }
+    if (this.formArray && this.controlFromArray) {
+      return this.controlFromArray as FormControl;
+    }
+    return null;
+  }
 
+  randomId = Math.random().toString(36).substring(7);
+
+  ngOnInit() {
     if (this.rowType === 'imageFile') {
-      this.previewUrl = this.control.value || 'https://placehold.co/400'
+      this.previewUrl = this.dynamicControl!.value || 'https://placehold.co/400'
     } else {
-      this.previewUrl = this.control.value || ''
+      this.previewUrl = this.dynamicControl!.value || ''
     }
 
-    this.previousUrl = this.control.value || '' // bất kể rowType là gì thì vẫn đảm bảo previousUrl để clear data khi cần
-    this.control.valueChanges.subscribe(value => {
+    this.previousUrl = this.dynamicControl!.value || '' // bất kể rowType là gì thì vẫn đảm bảo previousUrl để clear data khi cần
+    this.dynamicControl!.valueChanges.subscribe(value => {
       if (value) {
         this.previewUrl = value
         this.previousUrl = value
@@ -108,12 +118,12 @@ export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
   @HostListener('input', ['$event.target'])
   onEvent(target: HTMLInputElement) {
     if (target.value === '') {
-      this.control!.setValue(null);
+      this.dynamicControl!.setValue(null);
     }
   }
 
   isRequired() {
-    return this.control?.hasValidator(Validators.required);
+    return this.dynamicControl?.hasValidator(Validators.required);
   }
 
   getInputClasses() {
@@ -121,7 +131,7 @@ export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
   }
 
   hasErrors() {
-    return this.control?.invalid && (this.control?.dirty || this.control?.touched);
+    return this.dynamicControl?.invalid && (this.dynamicControl?.dirty || this.dynamicControl?.touched);
   }
 
   initDatepicker() {
@@ -153,7 +163,7 @@ export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
     }
     const input = this.elRef.nativeElement.querySelector('input');
     const flatpicker = flatpickr(input, flatpickrConfig);
-    this.control!.valueChanges.subscribe(val => {
+    this.dynamicControl!.valueChanges.subscribe(val => {
       // update in case value changes after initialization
       flatpicker.setDate(val);
     });
@@ -169,7 +179,7 @@ export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
 
     this.uploadService.upload(file).subscribe({
       next: response => {
-        this.control?.setValue(response.url);
+        this.dynamicControl?.setValue(response.url);
         this.previewUrl = response.url;
         this.previousUrl = response.url;
         // reload native element

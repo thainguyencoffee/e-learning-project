@@ -2,13 +2,13 @@
   @if (rowType === 'checkbox') {
     <div class="col-md-10 offset-md-2">
       <div class="form-check">
-        <input [id]="field" [formControlName]="field" type="checkbox"
+        <input [id]="field" [formControl]="dynamicControl!" type="checkbox"
                class="form-check-input {{ getInputClasses() }}"/>
         <label [for]="field" class="form-check-label">
           {{ label }} <span class='text-danger' *ngIf="isRequired()">*</span>
         </label>
       </div>
-      <app-input-errors [control]="control"/>
+      <app-input-errors [control]="dynamicControl!"/>
     </div>
   } @else {
     <label [for]="rowType === 'radio' ? '' : field" class="col-md-2 col-form-label">
@@ -16,65 +16,80 @@
     </label>
     <div class="col-md-10">
       @if (rowType === 'text' || rowType === 'password' || rowType === 'email' || rowType === 'tel') {
-        <input [id]="field" [type]="rowType" [formControlName]="field"
+        <input [id]="field" [type]="rowType" [formControl]="dynamicControl!" [placeholder]="placeholder"
                class="form-control {{ getInputClasses() }}"/>
-      } @else if (rowType === 'number') {
-        <input [id]="field" type="number" [formControlName]="field"
+      }
+
+      @else if (rowType === 'number') {
+        <input [id]="field" type="number" [formControl]="dynamicControl!" [placeholder]="placeholder"
                class="form-control {{ getInputClasses() }}"/>
-      } @else if (rowType === 'textarea') {
-        <textarea [id]="field" [formControlName]="field"
+      }
+
+      @else if (rowType === 'textarea') {
+        <textarea [id]="field" [formControl]="dynamicControl!" [placeholder]="placeholder"
                   class="form-control {{ getInputClasses() }}"></textarea>
-      } @else if (rowType === 'select') {
-        <select [id]="field" [formControlName]="field"
+      }
+
+      @else if (rowType === 'select') {
+        <select [id]="field" [formControl]="dynamicControl!"
                 class="form-select {{ getInputClasses() }}">
           <option [ngValue]="null">Please select</option>
           @for (option of optionsMap | keyvalue; track option.key) {
             <option [ngValue]="option.key">{{ option.value }}</option>
           }
         </select>
-      } @else if (rowType === 'multiselect') {
-        <select [id]="field" [formControlName]="field" multiple="true"
+      }
+
+      @else if (rowType === 'multiselect') {
+        <select [id]="field" [formControl]="dynamicControl!" multiple="true"
                 class="form-select {{ getInputClasses() }}">
           @for (option of optionsMap | keyvalue; track option.key) {
             <option [ngValue]="option.key">{{ option.value }}</option>
           }
         </select>
-      } @else if (rowType === 'radio') {
+      }
+
+      @else if (rowType === 'radio') {
         @if (!isRequired()) {
           <div class="form-check form-check-inline pt-2">
-            <input [id]="field" [formControlName]="field" [value]="null" type="radio"
+            <input [id]="field" [formControl]="dynamicControl!" [value]="null" type="radio"
                    class="form-check-input {{ inputClass }}"/>
             <label [for]="field" class="form-check-label">Please select</label>
           </div>
         }
-        @for (option of optionsMap | keyvalue; track option.key) {
-          <div class="form-check form-check-inline pt-2">
-            <input
-              [id]="field + '_' + option.key"
-              [formControlName]="field"
-              [value]="option.key"
-              type="radio"
-              class="form-check-input {{ getInputClasses() }}"
-              (click)="onRadioOptionsSelected(option.key)"/>
-            <label [for]="field + '_' + option.key" class="form-check-label">{{ option.value }}</label>
-          </div>
-        }
-      } @else if (rowType === 'imageFile') {
+        <div *ngFor="let option of optionsMap! | keyvalue" class="form-check form-check-inline pt-2">
+          <input
+            [id]="field + '_' + option.key"
+            [formControl]="dynamicControl!"
+            [value]="option.key"
+            type="radio"
+            class="form-check-input {{ getInputClasses() }}"
+            (click)="onRadioOptionsSelected(option.key)"/>
+          <label [for]="field + '_' + option.key" class="form-check-label">{{ option.value }}</label>
+        </div>
+      }
+
+      @else if (rowType === 'imageFile') {
         <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}"
                accept=".jpg, .jpeg, .png, .webp"/>
         <img [src]="previewUrl" alt="Image preview" class="img-thumbnail mt-2" style="max-height: 200px;"/>
-      } @else if (rowType === 'videoFile') {
+      }
+
+      @else if (rowType === 'videoFile') {
         <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}"
                accept=".mp4"/>
         <video *ngIf="previewUrl" #videoPlayer id="myVideo" controls width="100%">
           <source [src]="previewUrl" type="video/mp4">
         </video>
-      } @else if (rowType == 'docFile') {
+      }
+
+      @else if (rowType == 'docFile') {
         <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}"
                accept=".pdf, .doc, .docx"/>
         <p *ngIf="previewUrl">Your document was uploaded: {{ previewUrl }}</p>
       }
-      <app-input-errors [control]="control"/>
+
+      <app-input-errors [control]="dynamicControl!"/>
     </div>
   }
 </div>

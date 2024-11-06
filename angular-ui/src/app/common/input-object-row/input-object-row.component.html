@@ -1,0 +1,49 @@
+<div [formGroup]="group!" class="row mb-3">
+  <div *ngIf="formArray" class="row mb-3">
+    <label class="col-md-2 col-form-label d-flex align-items-center">
+      {{ label }}
+      <button type="button" class="btn btn-primary btn-sm ms-2" (click)="addItem()">Add Item</button>
+    </label>
+
+    <!-- Phần Form Array -->
+    <div class="col-md-10" [formArrayName]="field">
+      <ng-container *ngFor="let control of formArray.controls; let i = index">
+        <div class="d-flex align-items-center mb-2 p-2 border rounded">
+
+          <!-- Form Group nếu có -->
+          <div *ngIf="isFormGroup(control); else formArrayBasic" [formGroupName]="i" class="flex-grow-1">
+            <ng-container *ngFor="let fieldConfig of groupConfiguration">
+              <div *ngIf="formArray.at(i).get(fieldConfig.name!)">
+                <app-input-row
+                  [group]="getFormGroup(formArray.at(i))"
+                  [field]="fieldConfig.name!"
+                  [label]="fieldConfig.label!"
+                  [rowType]="fieldConfig.type"
+                  [options]="fieldConfig.options"
+                  [index]="i"
+                />
+              </div>
+            </ng-container>
+          </div>
+
+          <!-- Ng-template fallback cho trường hợp không phải FormGroup -->
+          <ng-template #formArrayBasic>
+            <div *ngIf="fieldConfiguration" class="flex-grow-1">
+              <app-input-row
+                [group]="group"
+                [formArray]="formArray"
+                [controlFromArray]="getFormControl(control)"
+                [placeholder]="fieldConfiguration.placeholder"
+                [rowType]="fieldConfiguration.type"
+                [options]="fieldConfiguration.options"
+              />
+            </div>
+          </ng-template>
+
+          <button type="button" class="btn btn-danger btn-sm ms-2" (click)="removeItem(i)">Remove</button>
+        </div>
+      </ng-container>
+    </div>
+
+  </div>
+</div>

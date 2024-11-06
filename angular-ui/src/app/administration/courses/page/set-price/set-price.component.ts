@@ -1,12 +1,9 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from "@angular/router";
-import {UsersService} from "../../../../common/auth/users.service";
-import {UserService} from "../../../../common/auth/user.service";
 import {CourseService} from "../../service/course.service";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
 import {Course} from "../../model/view/course";
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {SectionDto} from "../../model/section-dto";
 import {InputRowComponent} from "../../../../common/input-row/input-row.component";
 
 @Component({
@@ -19,7 +16,7 @@ import {InputRowComponent} from "../../../../common/input-row/input-row.componen
   ],
   templateUrl: './set-price.component.html',
 })
-export class SetPriceComponent implements OnInit{
+export class SetPriceComponent implements OnInit {
 
   route = inject(ActivatedRoute);
   router = inject(Router);
@@ -27,10 +24,13 @@ export class SetPriceComponent implements OnInit{
   errorHandler = inject(ErrorHandler)
 
   courseId?: number;
+  requestId?: number;
   course?: Course;
 
   ngOnInit(): void {
     this.courseId = this.route.snapshot.params['courseId'];
+    const requestIdParam = this.route.snapshot.queryParamMap.get('requestId')
+    this.requestId = requestIdParam ? +requestIdParam : undefined;
     this.courseService.getCourse(this.courseId!).subscribe({
       next: data => this.course = data,
       error: error => this.errorHandler.handleServerError(error.error)
@@ -64,14 +64,17 @@ export class SetPriceComponent implements OnInit{
     const number = this.setForm.get('price')?.value;
     const currency = this.setForm.get('currency')?.value;
     const price = currency + '' + number;
-    this.courseService.updatePrice(this.courseId!, price).subscribe({
-      next:() => this.router.navigate(['/administration/courses'], {
-        state: {
-          msgSuccess: this.getMessage('updated')
-        }
-      }),
-      error: (error) => this.errorHandler.handleServerError(error.error, this.setForm, this.getMessage)
-    })
+
+    if (this.courseId !== undefined && this.requestId !== undefined) {
+      this.courseService.updatePrice(this.courseId!, price).subscribe({
+        next: () => this.router.navigate(['/administration/courses', this.courseId, 'requests', 'approve', this.requestId], {
+          state: {
+            msgSuccess: this.getMessage('updated')
+          }
+        }),
+        error: (error) => this.errorHandler.handleServerError(error.error, this.setForm, this.getMessage)
+      })
+    }
 
   }
 

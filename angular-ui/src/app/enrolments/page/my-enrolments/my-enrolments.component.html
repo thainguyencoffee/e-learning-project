@@ -14,7 +14,7 @@
             <span class="card-text badge bg-success" *ngIf="enrollment.completed">Completed</span>
             <span class="card-text badge bg-warning" *ngIf="!enrollment.completed">Incomplete</span>
           </p>
-          <a [routerLink]="['/courses', enrollment.courseId]" class="btn btn-primary">Study</a>
+          <a [routerLink]="['/enrolments', enrollment.id, 'overview']" class="btn btn-primary">Study</a>
         </div>
       </div>
     }
