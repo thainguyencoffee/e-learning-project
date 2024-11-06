@@ -28,8 +28,8 @@ export class EditDiscountComponent implements OnInit {
   currentId?: number;
 
   typesMap: Record<string, string> = {
-    PERCENTAGE: 'Theo phần trăm',
-    FIXED: 'Giảm cố định',
+    PERCENTAGE: 'Percentage',
+    FIXED: 'Fixed',
   }
 
   currenciesMap: Record<string, string> = {

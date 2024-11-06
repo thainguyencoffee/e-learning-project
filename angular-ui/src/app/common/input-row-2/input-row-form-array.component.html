@@ -1,37 +1,31 @@
-<div [formGroup]="group!" class="row mb-3">
+<div class="row mb-3">
   @if (rowType === 'checkbox') {
     <div class="col-md-10 offset-md-2">
       <div class="form-check">
-        <input [id]="field + randomId" [formControlName]="field" type="checkbox"
+        <input [id]="index" formControlName="" type="checkbox"
                class="form-check-input {{ getInputClasses() }}"/>
-        <label [for]="field + randomId" class="form-check-label">
-          {{ label }} <span class='text-danger' *ngIf="isRequired()">*</span>
-        </label>
       </div>
-      <app-input-errors [control]="dynamicControl!"/>
+      <app-input-errors [control]="control!"/>
     </div>
   } @else {
-    <label [for]="rowType === 'radio' ? '' : field + randomId" class="col-md-2 col-form-label">
-      {{ label }} <span class='text-danger' *ngIf="isRequired()">*</span>
-    </label>
     <div class="col-md-10">
       @if (rowType === 'text' || rowType === 'password' || rowType === 'email' || rowType === 'tel') {
-        <input [id]="field + randomId" [type]="rowType" [formControlName]="field" [placeholder]="placeholder"
+        <input [id]="index" [type]="rowType" formControlName="" [placeholder]="placeholder"
                class="form-control {{ getInputClasses() }}"/>
       }
 
       @else if (rowType === 'number') {
-        <input [id]="field + randomId" type="number" [formControlName]="field" [placeholder]="placeholder"
+        <input [id]="index" type="number" formControlName="" [placeholder]="placeholder"
                class="form-control {{ getInputClasses() }}"/>
       }
 
       @else if (rowType === 'textarea') {
-        <textarea [id]="field + randomId" [formControlName]="field" [placeholder]="placeholder"
+        <textarea [id]="index" formControlName="" [placeholder]="placeholder"
                   class="form-control {{ getInputClasses() }}"></textarea>
       }
 
       @else if (rowType === 'select') {
-        <select [id]="field + randomId" [formControlName]="field"
+        <select [id]="index" formControlName=""
                 class="form-select {{ getInputClasses() }}">
           <option [ngValue]="null">Please select</option>
           @for (option of optionsMap! | keyvalue; track option.key) {
@@ -41,7 +35,7 @@
       }
 
       @else if (rowType === 'multiselect') {
-        <select [id]="field + randomId" [formControlName]="field" multiple="true"
+        <select [id]="index" formControlName="" multiple="true"
                 class="form-select {{ getInputClasses() }}">
           @for (option of optionsMap! | keyvalue; track option.key) {
             <option [ngValue]="option.key">{{ option.value }}</option>
@@ -52,20 +46,20 @@
       @else if (rowType === 'radio') {
         @if (!isRequired()) {
           <div class="form-check form-check-inline pt-2">
-            <input [id]="field + randomId" [formControlName]="field" [value]="null" type="radio"
+            <input [id]="index" formControlName="" [value]="null" type="radio"
                    class="form-check-input {{ inputClass }}"/>
-            <label [for]="field + randomId" class="form-check-label">Please select</label>
+            <label [for]="index" class="form-check-label">Please select</label>
           </div>
         }
         <div *ngFor="let option of optionsMap! | keyvalue" class="form-check form-check-inline pt-2">
           <input
-            [id]="field + randomId + '_' + option.key"
-            [formControlName]="field"
+            [id]="index + '_' + option.key"
+            formControlName=""
             [value]="option.key"
             type="radio"
             class="form-check-input {{ getInputClasses() }}"
             (click)="onRadioOptionsSelected(option.key)"/>
-          <label [for]="field + randomId + '_' + option.key" class="form-check-label">{{ option.value }}</label>
+          <label [for]="index + '_' + option.key" class="form-check-label">{{ option.value }}</label>
         </div>
       }
 
@@ -89,7 +83,7 @@
         <p *ngIf="previewUrl">Your document was uploaded: {{ previewUrl }}</p>
       }
 
-      <app-input-errors [control]="dynamicControl!"/>
+      <app-input-errors [control]="control!"/>
     </div>
   }
 </div>

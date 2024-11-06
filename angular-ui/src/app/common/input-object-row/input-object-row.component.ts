@@ -3,6 +3,7 @@ import {AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule}
 import {NgForOf, NgIf} from "@angular/common";
 import {FieldConfiguration} from "./field-configuration";
 import {InputRowComponent} from "../input-row/input-row.component";
+import {InputRowFormArrayComponent} from "../input-row-2/input-row-form-array.component";
 
 @Component({
   selector: 'app-input-object-row',
@@ -11,7 +12,8 @@ import {InputRowComponent} from "../input-row/input-row.component";
     ReactiveFormsModule,
     NgIf,
     NgForOf,
-    InputRowComponent
+    InputRowComponent,
+    InputRowFormArrayComponent
   ],
   templateUrl: './input-object-row.component.html',
 })

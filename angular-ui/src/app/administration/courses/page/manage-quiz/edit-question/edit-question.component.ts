@@ -41,9 +41,9 @@ export class EditQuestionComponent implements OnInit {
   }
 
   questionTypesMap: Record<string, string> = {
-    'MULTIPLE_CHOICE': 'Multiple Choice',
-    'SINGLE_CHOICE': 'Single Choice',
-    'TRUE_FALSE': 'True/False',
+    MULTIPLE_CHOICE: 'Multiple Choice',
+    SINGLE_CHOICE: 'Single Choice',
+    TRUE_FALSE: 'True/False',
   }
 
   optionGroupConfiguration: FieldConfiguration[] = [
@@ -57,8 +57,8 @@ export class EditQuestionComponent implements OnInit {
       type: 'radio',
       label: 'Correct',
       options: {
-        'true': 'true',
-        'false': 'false'
+        true: 'true',
+        false: 'false'
       }
     }
   ]
