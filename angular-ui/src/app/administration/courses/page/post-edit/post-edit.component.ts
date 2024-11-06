@@ -6,6 +6,8 @@ import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Va
 import { InputRowComponent } from "../../../../common/input-row/input-row.component";
 import { PostDto } from "../../model/post-dto";
 import {updateForm} from "../../../../common/utils";
+import {FieldConfiguration} from "../../../../common/input-object-row/field-configuration";
+import {InputObjectRowComponent} from "../../../../common/input-object-row/input-object-row.component";
 
 @Component({
   selector: 'app-edit-post',
@@ -14,7 +16,8 @@ import {updateForm} from "../../../../common/utils";
     RouterLink,
     FormsModule,
     InputRowComponent,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    InputObjectRowComponent
   ],
   templateUrl: './post-edit.component.html',
 })
@@ -28,12 +31,32 @@ export class EditPostComponent implements OnInit {
   courseId?: number;
   postId?: number;
 
+  attachmentUrlFieldConfiguration: FieldConfiguration = {
+    type: 'imageFile',
+    placeholder: 'Attachment URL'
+  }
+
   editForm = new FormGroup({
     id: new FormControl({value: null, disabled: true}),
-    content: new FormControl(null, [Validators.required, Validators.maxLength(2000)]),
-    photoUrls: new FormControl(null) // Change to photoUrls for multiple images
+    content: new FormControl(null, [Validators.required, Validators.minLength(10), Validators.maxLength(10000)]),
+    attachmentUrls: new FormArray([], [Validators.required])
   });
 
+  get attachmentUrls() {
+    return this.editForm.get('attachmentUrls') as FormArray;
+  }
+
+  createAttachmentUrl() {
+    return new FormControl(null, [Validators.required]);
+  }
+
+  addAttachment() {
+    this.attachmentUrls.push(this.createAttachmentUrl());
+  }
+
+  removeAttachment(index: number) {
+    this.attachmentUrls.removeAt(index);
+  }
 
   getMessage(key: string) {
     const messages: Record<string, string> = {
@@ -53,6 +76,7 @@ export class EditPostComponent implements OnInit {
       error: (error) => this.errorHandler.handleServerError(error.error)
       })
   }
+
   handleSubmit() {
     window.scrollTo(0, 0);
     this.editForm.markAllAsTouched();
@@ -60,11 +84,12 @@ export class EditPostComponent implements OnInit {
       return;
     }
 
-    const data = new PostDto(this.editForm.getRawValue());
+    const data = new PostDto(this.editForm.value);
 
     this.courseService.updatePost(this.courseId!, this.postId!, data)
       .subscribe({
-        next: () => this.router.navigate(['/administration/courses', this.courseId, 'posts'], {
+        next: () => this.router.navigate(['../'], {
+          relativeTo: this.route,
           state: {
             msgSuccess: this.getMessage('updated')
           }

@@ -12,14 +12,18 @@
         <app-input-row [group]="editForm" field="id" rowType="number" label="Id"/>
       </div>
       <div class="col-md-12 mb-3">
-        <app-input-row [group]="editForm" field="content" rowType="textarea" label="Content" />
+        <app-input-row [group]="editForm" field="content" rowType="textarea" label="Content"/>
       </div>
       <div class="col-md-12 mb-3">
         <app-input-row [group]="editForm" field="photoUrls" rowType="imageFile" label="Photo"/>
+        <app-input-object-row [group]="editForm" field="attachmentUrls" label="Attachment"
+                              [addItem]="addAttachment.bind(this)" [removeItem]="removeAttachment.bind(this)"
+                              [fieldConfiguration]="attachmentUrlFieldConfiguration"
+        />
       </div>
     </div>
     <div class="text-end">
-      <input type="submit" value="Edit Post" class="btn btn-primary mt-4" />
+      <input type="submit" value="Edit Post" class="btn btn-primary mt-4"/>
     </div>
   </form>
 </div>
