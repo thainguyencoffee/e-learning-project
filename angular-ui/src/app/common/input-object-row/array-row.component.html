@@ -26,7 +26,7 @@
           <!-- Ng-template fallback cho trường hợp không phải FormGroup -->
           <ng-template #formArrayBasic>
             <div *ngIf="fieldConfiguration" class="flex-grow-1">
-              <app-input-row-form-array
+              <app-input-row-standalone
                 [control]="getFormControl(control)"
                 [rowType]="fieldConfiguration.type"
                 [options]="fieldConfiguration.options"

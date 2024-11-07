@@ -7,7 +7,7 @@ import { InputRowComponent } from "../../../../../common/input-row/input-row.com
 import { CourseService } from "../../../service/course.service";
 import { NgIf } from "@angular/common";
 import {FieldConfiguration} from "../../../../../common/input-object-row/field-configuration";
-import {InputObjectRowComponent} from "../../../../../common/input-object-row/input-object-row.component";
+import {ArrayRowComponent} from "../../../../../common/input-object-row/array-row.component";
 
 @Component({
   selector: 'app-post-add',
@@ -17,7 +17,7 @@ import {InputObjectRowComponent} from "../../../../../common/input-object-row/in
     ReactiveFormsModule,
     InputRowComponent,
     NgIf,
-    InputObjectRowComponent
+    ArrayRowComponent
   ],
   templateUrl: './post-add.component.html',
 })
