@@ -7,7 +7,7 @@ import { InputRowComponent } from "../../../../../common/input-row/input-row.com
 import { PostDto } from "../../../model/post-dto";
 import {updateFormAdvanced} from "../../../../../common/utils";
 import {FieldConfiguration} from "../../../../../common/input-object-row/field-configuration";
-import {InputObjectRowComponent} from "../../../../../common/input-object-row/input-object-row.component";
+import {ArrayRowComponent} from "../../../../../common/input-object-row/array-row.component";
 
 @Component({
   selector: 'app-edit-post',
@@ -17,7 +17,7 @@ import {InputObjectRowComponent} from "../../../../../common/input-object-row/in
     FormsModule,
     InputRowComponent,
     ReactiveFormsModule,
-    InputObjectRowComponent
+    ArrayRowComponent
   ],
   templateUrl: './post-edit.component.html',
 })

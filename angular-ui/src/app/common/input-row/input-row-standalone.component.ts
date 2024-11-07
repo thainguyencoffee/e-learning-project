@@ -1,4 +1,4 @@
-import { KeyValuePipe, NgForOf, NgIf } from '@angular/common';
+import {KeyValuePipe, NgForOf, NgIf} from '@angular/common';
 import {
   AfterViewInit,
   Component,
@@ -11,49 +11,56 @@ import {
   Output,
 } from '@angular/core';
 import {
-  FormArray,
   FormControl,
-  FormGroup,
   FormsModule,
   ReactiveFormsModule,
-  Validators,
+  Validators
 } from '@angular/forms';
-import { InputErrorsComponent } from "./input-errors.component";
+import {ErrorHandler} from "../error-handler.injectable";
+import {Router} from "@angular/router";
 import flatpickr from 'flatpickr';
+import {InputErrorsComponent} from "./input-errors.component";
 import {FileRowComponent} from "./file-row/file-row.component";
 
+
 @Component({
-  selector: 'app-input-row',
+  selector: 'app-input-row-standalone',
   standalone: true,
-  templateUrl: './input-row.component.html',
-  imports: [ReactiveFormsModule, InputErrorsComponent, KeyValuePipe, FormsModule, NgForOf, NgIf, FileRowComponent],
+  templateUrl: './input-row-standalone.component.html',
+  imports: [ReactiveFormsModule, InputErrorsComponent, KeyValuePipe /**/, FormsModule, NgForOf, NgIf, FileRowComponent]
 })
-export class InputRowComponent implements AfterViewInit, OnChanges {
+export class InputRowStandaloneComponent implements AfterViewInit, OnChanges {
 
-  private elRef = inject(ElementRef);
+  errorHandler = inject(ErrorHandler);
+  router = inject(Router);
 
-  @Input() group?: FormGroup;
-  @Input() field = '';
-  @Input() formArray?: FormArray;
-  @Input() index?: number;
-  @Input() controlFromArray?: FormControl;
+  @Input({required: true}) control?: FormControl;
+
   @Input() rowType = 'text';
+
+  @Input() index?: number;
+
   @Input() inputClass = '';
+
   @Input() options?: Record<string, string> | Map<number, string>;
-  @Input() label = '';
+
   @Input() placeholder?: string = '';
-  @Input() datepicker?: 'datepicker' | 'timepicker' | 'datetimepicker';
-  @Output() optionsChange = new EventEmitter<string>();
+
+  @Input()
+  datepicker?: 'datepicker'|'timepicker'|'datetimepicker';
 
   optionsMap?: Map<string | number, string>;
-  randomId = Math.random().toString(36).substring(7);
 
-  get dynamicControl(): FormControl | null {
-    return this.group?.get(this.field) as FormControl || this.controlFromArray || null;
-  }
+  elRef = inject(ElementRef);
+
+  @Output() optionsChange = new EventEmitter<string>();
 
   ngOnChanges() {
-    this.optionsMap = this.options instanceof Map ? this.options : new Map(Object.entries(this.options || {}));
+    if (!this.options || this.options instanceof Map) {
+      this.optionsMap = this.options;
+    } else {
+      this.optionsMap = new Map(Object.entries(this.options));
+    }
   }
 
   ngAfterViewInit() {
@@ -65,22 +72,22 @@ export class InputRowComponent implements AfterViewInit, OnChanges {
   }
 
   @HostListener('input', ['$event.target'])
-  onInputEvent(target: HTMLInputElement) {
-    if (!target.value) {
-      this.dynamicControl?.setValue(null);
+  onEvent(target: HTMLInputElement) {
+    if (target.value === '') {
+      this.control!.setValue(null);
     }
   }
 
   isRequired() {
-    return this.dynamicControl?.hasValidator(Validators.required);
+    return this.control?.hasValidator(Validators.required);
   }
 
   getInputClasses() {
-    return `${this.hasErrors() ? 'is-invalid ' : ''}${this.inputClass}`;
+    return (this.hasErrors() ? 'is-invalid ' : '') + this.inputClass;
   }
 
   hasErrors() {
-    return this.dynamicControl?.invalid && (this.dynamicControl?.dirty || this.dynamicControl?.touched);
+    return this.control?.invalid && (this.control?.dirty || this.control?.touched);
   }
 
   private initDatepicker() {
@@ -98,7 +105,7 @@ export class InputRowComponent implements AfterViewInit, OnChanges {
     const input = this.elRef.nativeElement.querySelector('input');
     const picker = flatpickr(input, config);
 
-    this.dynamicControl?.valueChanges.subscribe((val) => {
+    this.control?.valueChanges.subscribe((val) => {
       picker.setDate(val);
     });
   }

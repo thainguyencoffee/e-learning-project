@@ -7,7 +7,7 @@ import { updateFormAdvanced} from "../../../../../common/utils";
 import {QuestionDto} from "../../../model/question.dto";
 import {InputRowComponent} from "../../../../../common/input-row/input-row.component";
 import {FieldConfiguration} from "../../../../../common/input-object-row/field-configuration";
-import {InputObjectRowComponent} from "../../../../../common/input-object-row/input-object-row.component";
+import {ArrayRowComponent} from "../../../../../common/input-object-row/array-row.component";
 
 @Component({
   selector: 'app-edit-question',
@@ -16,7 +16,7 @@ import {InputObjectRowComponent} from "../../../../../common/input-object-row/in
     InputRowComponent,
     ReactiveFormsModule,
     RouterLink,
-    InputObjectRowComponent
+    ArrayRowComponent
   ],
   templateUrl: './edit-question.component.html',
 })

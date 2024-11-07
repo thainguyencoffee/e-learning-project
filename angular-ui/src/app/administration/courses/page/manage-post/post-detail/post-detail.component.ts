@@ -34,8 +34,7 @@ export class PostDetailComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadPost();
     this.courseId = +this.route.snapshot.params['courseId'];
-    console.log('Course ID:', this.courseId);
-    // Reload the data if the route changes to the same component
+
     this.navigationSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.loadPost();
