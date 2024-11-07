@@ -63,9 +63,7 @@ export class PostAddComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    // Lấy courseId từ tham số URL khi component được khởi tạo
     this.courseId = +this.route.snapshot.params['courseId'];
-    console.log('Course ID:', this.courseId); // Kiểm tra courseId có được gán đúng không
   }
 
   handleSubmit() {

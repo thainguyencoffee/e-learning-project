@@ -47,7 +47,8 @@ export class PostTrashComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.courseId = +this.route.snapshot.paramMap.get('courseId')!;
+    this.courseId = +this.route.snapshot.params['courseId'];
+
     this.loadData(0);
     this.navigationSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
@@ -76,7 +77,7 @@ export class PostTrashComponent implements OnInit, OnDestroy {
   }
 
   loadData(pageNumber: number): void {
-    console.log("courseId in loadData:", this.courseId);  // Kiểm tra giá trị courseId
+
     this.courseService.getTrashedPosts(pageNumber, this.courseId!)
       .subscribe({
         next: (pageWrapper) => {
