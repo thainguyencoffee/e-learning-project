@@ -3,6 +3,7 @@ package com.el.enrollment.application.dto;
 import com.el.course.domain.Course;
 import com.el.course.domain.CourseSection;
 import com.el.course.domain.Language;
+import com.el.course.domain.Post;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.LessonProgress;
 import com.el.enrollment.domain.Progress;
@@ -19,6 +20,7 @@ public record EnrolmentWithCourseDTO(
         Set<String> benefits,
         Set<String> prerequisites,
         Set<CourseSection> sections,
+        Set<Post> posts,
         String teacher,
         Long enrollmentId,
         String student,
@@ -37,6 +39,7 @@ public record EnrolmentWithCourseDTO(
                 course.getBenefits(),
                 course.getPrerequisites(),
                 course.getSections(),
+                course.getPosts(),
                 course.getTeacher(),
                 enrolment.getId(),
                 enrolment.getStudent(),

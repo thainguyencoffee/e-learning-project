@@ -1,4 +1,13 @@
+/* enrolment-posts.component.css */
+/* enrolment-posts.component.css */
 
+.carousel-image {
+  width: 100%; /* Keep the width of the image responsive */
+  max-width: 400px; /* Adjust this to your preferred width */
+  max-height: 700px; /* Adjust this to your preferred height */
+  object-fit: cover; /* Ensures the entire image is displayed without cropping */
+  margin: auto; /* Centers the image within the carousel */
+}
 /* Ảnh đại diện giảng viên */
 .card-header img {
   border-width: 2px;
@@ -18,6 +27,27 @@
   font-size: 0.85rem;
   font-weight: 600;
 }
+.carousel-image {
+  object-fit: cover;  /* Ensures the image covers the area without distortion */
+  height: 400px;       /* Fixed height for the images */
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgba(0, 0, 0, 0.5); /* Add a background color to make the buttons stand out */
+  border-radius: 50%;  /* Optional: makes the buttons round */
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  width: 5%;  /* Increase the width of the buttons for better visibility */
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  height: 40px;  /* Increase the size of the icons */
+  width: 40px;
+}
 
 /* Khu vực bình luận */
 .comments-section {
@@ -36,7 +66,6 @@
 }
 
 .comment {
-  background-color: #f1f1f1;
   border-radius: 10px;
 }
 .post-image {
