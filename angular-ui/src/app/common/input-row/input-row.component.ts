@@ -18,9 +18,9 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { InputErrorsComponent } from "./input-errors.component";
+import { InputErrorsComponent } from "./error/input-errors.component";
 import flatpickr from 'flatpickr';
-import {FileRowComponent} from "./file-row/file-row.component";
+import {FileRowComponent} from "./shared/file-row.component";
 
 @Component({
   selector: 'app-input-row',
