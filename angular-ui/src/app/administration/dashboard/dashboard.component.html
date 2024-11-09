@@ -3,7 +3,8 @@
     <div class="col">
       <div class="d-flex mb-2">
         <a routerLink="/administration/courses" class="btn btn-primary me-2">Course management</a>
-        <a *ngIf="isAdmin()" routerLink="/administration/discounts" class="btn btn-primary">Discount management</a>
+        <a *ngIf="isAdmin()" routerLink="/administration/discounts" class="btn btn-primary me-2">Discount management</a>
+        <a routerLink="/administration/enrolment-statistics" class="btn btn-primary">Enrolment Statistics</a>
       </div>
     </div>
     <hr class="my"> <!-- Adds vertical spacing around the horizontal line -->

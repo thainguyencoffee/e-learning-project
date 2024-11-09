@@ -122,6 +122,10 @@ export class ListCourseComponent implements OnInit, OnDestroy {
     return !course.published || course.unpublished;
   }
 
+  isPublished(course: Course) {
+    return course.published;
+  }
+
   unassignCurrentTeacher(courseId: number) {
     if (confirm(this.getMessage('confirmUnassignCurrentTeacher'))) {
       const currentAdminName = this.userService.current.name;

@@ -14,13 +14,15 @@ public class LessonProgress {
     @Id
     private Long id;
     private Long lessonId;
+    private String lessonTitle;
     private boolean completed;
     private Instant completedDate;
 
-    public LessonProgress(Long lessonId) {
+    public LessonProgress(String lessonTitle, Long lessonId) {
         if (lessonId == null) throw new InputInvalidException("LessonId must not be null.");
 
         this.lessonId = lessonId;
+        this.lessonTitle = lessonTitle;
         this.completed = false;
         completedDate = null;
     }

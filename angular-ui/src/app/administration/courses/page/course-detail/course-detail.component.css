@@ -1,20 +1,18 @@
-/* Căn chỉnh và khoảng cách giữa các nút */
 .d-flex.gap-2 > * {
   margin-left: 8px;
 }
 
-
-/* Giữ khoảng cách và không để tràn viền */
 .accordion-header {
   overflow: hidden;
   white-space: nowrap;
 }
+
 .custom-button {
-  font-size: 0.875rem;  /* Nhỏ hơn mặc định */
-  padding: 0.25rem 0.5rem; /* Giảm padding */
-  border-radius: 10px; /* Bo tròn nhẹ */
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 10px;
 }
-/* Khắc phục lỗi margin hoặc padding bất thường */
+
 .accordion-button {
   margin: 0 !important;
   padding: 0.5rem !important;

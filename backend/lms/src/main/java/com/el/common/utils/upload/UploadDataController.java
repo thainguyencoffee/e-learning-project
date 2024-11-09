@@ -10,6 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.model.CompletedPart;
+
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -31,6 +35,21 @@ public class UploadDataController {
         log.info("Deleting files: {}", uploadDTO.urls());
         awsS3UploadService.deleteFiles(uploadDTO.urls());
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/start")
+    public ResponseEntity<Map<String, String>> startMultipartUpload(@RequestParam String fileName) {
+        log.info("Starting multipart upload for file: {}", fileName);
+        return ResponseEntity.ok(awsS3UploadService.startMultipartUpload(fileName));
+    }
+
+    @PostMapping("/complete")
+    public ResponseEntity<Void> completeMultipartUpload(@RequestParam String key,
+                                                        @RequestParam String uploadId,
+                                                        @RequestBody List<CompletedPart> parts) {
+        log.info("Completing multipart upload for key: {}, uploadId: {}", key, uploadId);
+        awsS3UploadService.completeMultipartUpload(key, uploadId, parts);
+        return ResponseEntity.ok().build();
     }
 
 }

@@ -184,6 +184,7 @@ create table lesson_progress
     id                bigserial not null,
     course_enrollment bigint    not null references course_enrollment (id) on DELETE cascade,
     lesson_id         bigint    not null,
+    lesson_title      varchar(255),
     completed         boolean   not null,
     completed_date    timestamp,
     constraint fk_lesson_progress primary key (id)

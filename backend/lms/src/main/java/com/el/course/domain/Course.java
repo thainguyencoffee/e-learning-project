@@ -14,7 +14,9 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Getter
@@ -535,14 +537,10 @@ public class Course extends AuditSupportClass {
         return validCurrencies.contains(inputCurrency);
     }
 
-    public Set<Long> getLessonIds() {
-        Set<Long> lessonIds = new HashSet<>();
-        for (CourseSection section : sections) {
-            for (Lesson lesson : section.getLessons()) {
-                lessonIds.add(lesson.getId());
-            }
-        }
-        return lessonIds;
+    public Map<Long, String> getLessonIds() {
+        return this.sections.stream()
+                .flatMap(section -> section.getLessons().stream())
+                .collect(HashMap::new, (map, lesson) -> map.put(lesson.getId(), lesson.getTitle()), Map::putAll);
     }
 
 

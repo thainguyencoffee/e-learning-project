@@ -71,9 +71,9 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
     public void enrollment(String student, Long courseId) {
         Course course = courseQueryService.findPublishedCourseById(courseId);
-        Set<LessonProgress> lessonProgresses = course.getLessonIds()
+        Set<LessonProgress> lessonProgresses = course.getLessonIds().entrySet()
                 .stream()
-                .map(LessonProgress::new)
+                .map(entry -> new LessonProgress(entry.getValue(), entry.getKey()))
                 .collect(Collectors.toSet());
 
         CourseEnrollment enrollment = new CourseEnrollment(student, courseId, lessonProgresses);

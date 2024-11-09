@@ -10,6 +10,7 @@ import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -65,6 +66,33 @@ public class AwsS3UploadService implements UploadService {
             throw new AmazonServiceS3Exception("Delete media failed. " + e.getMessage());
         }
     }
+
+    @Override
+    public Map<String, String> startMultipartUpload(String fileName) {
+        CreateMultipartUploadRequest request = CreateMultipartUploadRequest.builder()
+                .bucket(awsS3Properties.bucketName())
+                .key(fileName)
+                .build();
+        CreateMultipartUploadResponse multipartUpload = s3Client.createMultipartUpload(request);
+        return Map.of(
+                "uploadId", multipartUpload.uploadId(),
+                "key", fileName
+        );
+    }
+
+    public void completeMultipartUpload(String key, String uploadId, List<CompletedPart> parts) {
+        CompletedMultipartUpload completedMultipartUpload = CompletedMultipartUpload.builder()
+                .parts(parts)
+                .build();
+        CompleteMultipartUploadRequest request = CompleteMultipartUploadRequest.builder()
+                .bucket(awsS3Properties.bucketName())
+                .key(key)
+                .uploadId(uploadId)
+                .multipartUpload(completedMultipartUpload)
+                .build();
+        s3Client.completeMultipartUpload(request);
+    }
+
 
     private String cutURL(String url) {
         return url.substring(url.lastIndexOf("/") + 1);
