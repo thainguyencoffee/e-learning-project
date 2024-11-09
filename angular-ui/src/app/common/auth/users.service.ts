@@ -20,4 +20,15 @@ export class UsersService {
     });
   }
 
+  searchByUsernameAndRole(username: string, role: string, exact?: boolean): Observable<UserInfo[]> {
+    const isExact = exact || false;
+    return this.http.get<UserInfo[]>(`${this.resourcePath}/search`, {
+      params: {
+        username: username,
+        exact: isExact.toString(),
+        role: role
+      }
+    });
+  }
+
 }

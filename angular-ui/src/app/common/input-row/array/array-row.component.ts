@@ -1,23 +1,23 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {NgForOf, NgIf} from "@angular/common";
-import {FieldConfiguration} from "./field-configuration";
-import {InputRowComponent} from "../input-row/input-row.component";
-import {InputRowFormArrayComponent} from "../input-row-2/input-row-form-array.component";
+import {FieldConfiguration} from "../field-configuration";
+import {InputRowComponent} from "../input-row.component";
+import {InputRowStandaloneComponent} from "../standalone/input-row-standalone.component";
 
 @Component({
-  selector: 'app-input-object-row',
+  selector: 'app-array-row',
   standalone: true,
   imports: [
     ReactiveFormsModule,
     NgIf,
     NgForOf,
     InputRowComponent,
-    InputRowFormArrayComponent
+    InputRowStandaloneComponent
   ],
-  templateUrl: './input-object-row.component.html',
+  templateUrl: './array-row.component.html',
 })
-export class InputObjectRowComponent implements OnInit {
+export class ArrayRowComponent implements OnInit {
 
   @Input({ required: true })
   group?: FormGroup;

@@ -6,12 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
-import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -44,18 +42,14 @@ public class AwsS3UploadService implements UploadService {
             log.info("Upload media for {} successfully.", key);
         } catch (IOException e) {
             log.error("Upload media for {} failed: {}", key, e.getMessage());
-            throw new RuntimeException("Upload media failed.");
+            throw new AmazonServiceS3Exception("Upload media failed. " + e.getMessage());
         }
         return awsS3Properties.endpoint() + "/" + key;
     }
 
-    @Override
-    public void deleteFile(String url) {
-
-    }
 
     @Override
-    public void deleteFiles(Set<String> urls) {
+    public void deleteFiles(List<String> urls) {
         DeleteObjectsRequest deleteObjects = DeleteObjectsRequest.builder()
                 .bucket(awsS3Properties.bucketName())
                 .delete(builder -> builder
@@ -64,7 +58,12 @@ public class AwsS3UploadService implements UploadService {
                                 .map(key -> ObjectIdentifier.builder().key(key).build())
                                 .toList())
                 ).build();
-        s3Client.deleteObjects(deleteObjects);
+        try {
+            s3Client.deleteObjects(deleteObjects);
+        } catch (Exception e) {
+            log.error("Delete media failed: {}", e.getMessage());
+            throw new AmazonServiceS3Exception("Delete media failed. " + e.getMessage());
+        }
     }
 
     private String cutURL(String url) {

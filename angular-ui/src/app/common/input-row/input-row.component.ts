@@ -1,4 +1,4 @@
-import {KeyValuePipe, NgForOf, NgIf} from '@angular/common';
+import { KeyValuePipe, NgForOf, NgIf } from '@angular/common';
 import {
   AfterViewInit,
   Component,
@@ -8,103 +8,52 @@ import {
   inject,
   Input,
   OnChanges,
-  OnInit,
   Output,
-  ViewChild
 } from '@angular/core';
 import {
-  FormArray, FormControl,
+  FormArray,
+  FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
-  Validators
+  Validators,
 } from '@angular/forms';
-import {InputErrorsComponent} from "./input-errors.component";
-import {UploadService} from "../upload/upload.service";
-import {ErrorHandler} from "../error-handler.injectable";
-import {Router} from "@angular/router";
+import { InputErrorsComponent } from "./error/input-errors.component";
 import flatpickr from 'flatpickr';
-
+import {FileRowComponent} from "./shared/file-row.component";
 
 @Component({
   selector: 'app-input-row',
   standalone: true,
   templateUrl: './input-row.component.html',
-  imports: [ReactiveFormsModule, InputErrorsComponent, KeyValuePipe /**/, FormsModule, NgForOf, NgIf]
+  imports: [ReactiveFormsModule, InputErrorsComponent, KeyValuePipe, FormsModule, NgForOf, NgIf, FileRowComponent],
 })
-export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
+export class InputRowComponent implements AfterViewInit, OnChanges {
 
-  uploadService = inject(UploadService)
-  errorHandler = inject(ErrorHandler);
-  router = inject(Router);
+  private elRef = inject(ElementRef);
 
   @Input() group?: FormGroup;
   @Input() field = '';
-
   @Input() formArray?: FormArray;
   @Input() index?: number;
   @Input() controlFromArray?: FormControl;
-
-  @Input()
-  rowType = 'text';
-
-  @Input()
-  inputClass = '';
-
-  @Input()
-  options?: Record<string, string> | Map<number, string>;
-
+  @Input() rowType = 'text';
+  @Input() inputClass = '';
+  @Input() options?: Record<string, string> | Map<number, string>;
   @Input() label = '';
   @Input() placeholder?: string = '';
-
-  @Input()
-  datepicker?: 'datepicker'|'timepicker'|'datetimepicker';
-
-  optionsMap?: Map<string | number, string>;
-
-  elRef = inject(ElementRef);
-
-  previewUrl: string | null = null;
-  previousUrl: string | null = null;
-  @ViewChild('videoPlayer') videoPlayer: ElementRef | undefined;
-
+  @Input() datepicker?: 'datepicker' | 'timepicker' | 'datetimepicker';
   @Output() optionsChange = new EventEmitter<string>();
 
-  get dynamicControl(): FormControl | null  {
-    if (this.group && this.field) {
-      return this.group.get(this.field) as FormControl;
-    }
-    if (this.formArray && this.controlFromArray) {
-      return this.controlFromArray as FormControl;
-    }
-    return null;
-  }
-
+  optionsMap?: Map<string | number, string>;
   randomId = Math.random().toString(36).substring(7);
 
-  ngOnInit() {
-    if (this.rowType === 'imageFile') {
-      this.previewUrl = this.dynamicControl!.value || 'https://placehold.co/400'
-    } else {
-      this.previewUrl = this.dynamicControl!.value || ''
-    }
-
-    this.previousUrl = this.dynamicControl!.value || '' // bất kể rowType là gì thì vẫn đảm bảo previousUrl để clear data khi cần
-    this.dynamicControl!.valueChanges.subscribe(value => {
-      if (value) {
-        this.previewUrl = value
-        this.previousUrl = value
-      }
-    })
-
+  get dynamicControl(): FormControl | null {
+    return this.group?.get(this.field) as FormControl || this.controlFromArray || null;
   }
 
   ngOnChanges() {
-    if (!this.options || this.options instanceof Map) {
-      this.optionsMap = this.options;
-    } else {
-      this.optionsMap = new Map(Object.entries(this.options));
-    }
+    this.optionsMap = this.options instanceof Map ? this.options : new Map(Object.entries(this.options || {}));
   }
 
   ngAfterViewInit() {
@@ -116,9 +65,9 @@ export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
   }
 
   @HostListener('input', ['$event.target'])
-  onEvent(target: HTMLInputElement) {
-    if (target.value === '') {
-      this.dynamicControl!.setValue(null);
+  onInputEvent(target: HTMLInputElement) {
+    if (!target.value) {
+      this.dynamicControl?.setValue(null);
     }
   }
 
@@ -127,79 +76,39 @@ export class InputRowComponent implements AfterViewInit, OnChanges, OnInit {
   }
 
   getInputClasses() {
-    return (this.hasErrors() ? 'is-invalid ' : '') + this.inputClass;
+    return `${this.hasErrors() ? 'is-invalid ' : ''}${this.inputClass}`;
   }
 
   hasErrors() {
     return this.dynamicControl?.invalid && (this.dynamicControl?.dirty || this.dynamicControl?.touched);
   }
 
-  initDatepicker() {
-    if (!this.datepicker) {
-      return;
-    }
-    const flatpickrConfig:any = {
+  private initDatepicker() {
+    if (!this.datepicker) return;
+
+    const config = {
       allowInput: true,
       time_24hr: true,
-      enableSeconds: true
+      enableSeconds: true,
+      dateFormat: this.getDateFormat(),
+      enableTime: this.datepicker !== 'datepicker',
+      noCalendar: this.datepicker === 'timepicker',
     };
-    if (this.datepicker === 'datepicker') {
-      flatpickrConfig.dateFormat = 'Y-m-d';
-    } else if (this.datepicker === 'timepicker') {
-      flatpickrConfig.enableTime = true;
-      flatpickrConfig.noCalendar = true;
-      flatpickrConfig.dateFormat = 'H:i:S';
-    } else { // datetimepicker
-      flatpickrConfig.enableTime = true;
-      flatpickrConfig.altInput = true;
-      flatpickrConfig.altFormat = 'Y-m-d H:i:S';
-      flatpickrConfig.dateFormat = 'Y-m-dTH:i:S';
-      // workaround label issue
-      flatpickrConfig.onReady = function() {
-        const id = this.input.id;
-        this.input.id = null;
-        this.altInput.id = id;
-      };
-    }
+
     const input = this.elRef.nativeElement.querySelector('input');
-    const flatpicker = flatpickr(input, flatpickrConfig);
-    this.dynamicControl!.valueChanges.subscribe(val => {
-      // update in case value changes after initialization
-      flatpicker.setDate(val);
+    const picker = flatpickr(input, config);
+
+    this.dynamicControl?.valueChanges.subscribe((val) => {
+      picker.setDate(val);
     });
   }
 
-  onFileSelected(event: Event) {
-    const fileInput = event.target as HTMLInputElement;
-    const file = fileInput.files![0];
-
-    if (this.previousUrl) {
-      this.deletePreviousFile();
-    }
-
-    this.uploadService.upload(file).subscribe({
-      next: response => {
-        this.dynamicControl?.setValue(response.url);
-        this.previewUrl = response.url;
-        this.previousUrl = response.url;
-        // reload native element
-        this.videoPlayer?.nativeElement.load();
-      },
-      error: (error) => this.errorHandler.handleServerError(error.error, this.group)
-    })
-
-  }
-
-  deletePreviousFile() {
-    if (this.previousUrl) {
-      this.uploadService.deleteAll([this.previousUrl]).subscribe({
-        next: () => {
-          this.previousUrl = null;
-        },
-        error: error => this.errorHandler.handleServerError(error, this.group)
-      })
-    }
-
+  private getDateFormat() {
+    return this.datepicker === 'datepicker'
+      ? 'Y-m-d'
+      : this.datepicker === 'timepicker'
+        ? 'H:i:S'
+        : 'Y-m-dTH:i:S';
   }
 
 }

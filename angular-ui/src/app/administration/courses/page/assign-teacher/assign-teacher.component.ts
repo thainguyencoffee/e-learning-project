@@ -43,7 +43,7 @@ export class AssignTeacherComponent implements OnInit{
 
   search() {
     if (this.username && this.username.trim()) {
-      this.usersService.searchByUsername(this.username).subscribe({
+      this.usersService.searchByUsernameAndRole(this.username, 'teacher').subscribe({
         next: data => this.teachers = data,
         error: error => this.errorHandler.handleServerError(error.error)
       })

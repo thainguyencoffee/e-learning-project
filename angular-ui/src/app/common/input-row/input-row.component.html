@@ -69,24 +69,8 @@
         </div>
       }
 
-      @else if (rowType === 'imageFile') {
-        <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}"
-               accept=".jpg, .jpeg, .png, .webp"/>
-        <img [src]="previewUrl" alt="Image preview" class="img-thumbnail mt-2" style="max-height: 200px;"/>
-      }
-
-      @else if (rowType === 'videoFile') {
-        <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}"
-               accept=".mp4"/>
-        <video *ngIf="previewUrl" #videoPlayer id="myVideo" controls width="100%">
-          <source [src]="previewUrl" type="video/mp4">
-        </video>
-      }
-
-      @else if (rowType == 'docFile') {
-        <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}"
-               accept=".pdf, .doc, .docx"/>
-        <p *ngIf="previewUrl">Your document was uploaded: {{ previewUrl }}</p>
+      @else if (rowType === 'imageFile' || rowType === 'videoFile' || rowType === 'docFile') {
+        <app-file-row [rowType]="rowType" [control]="dynamicControl!"></app-file-row>
       }
 
       <app-input-errors [control]="dynamicControl!"/>

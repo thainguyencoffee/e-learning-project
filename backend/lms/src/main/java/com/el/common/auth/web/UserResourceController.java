@@ -47,8 +47,15 @@ public class UserResourceController {
     @GetMapping("/search")
     public List<UserInfo> searchUsersWithSearch(
             @RequestParam("username") String username,
-            @RequestParam(value = "exact", required = false, defaultValue = "false") Boolean exact) {
+            @RequestParam(value = "exact", required = false, defaultValue = "false") Boolean exact,
+            @RequestParam(value = "role", required = false) String roleName) {
 
+        if (roleName != null && !roleName.isBlank()) {
+            return keycloakUsersManagement.search(username, exact, roleName)
+                    .stream().map(UserInfo::fromUserRepresentation)
+                    .collect(Collectors.toList());
+
+        }
         return keycloakUsersManagement.search(username, exact)
                 .stream().map(UserInfo::fromUserRepresentation)
                 .collect(Collectors.toList());
