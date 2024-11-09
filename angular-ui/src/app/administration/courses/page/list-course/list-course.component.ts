@@ -2,7 +2,7 @@ import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {CourseService} from "../../service/course.service";
 import {Course} from "../../model/view/course";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
-import {NavigationEnd, Router, RouterLink} from "@angular/router";
+import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
 import {Subscription} from "rxjs";
 import {NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
 import {UserService} from "../../../../common/auth/user.service";
@@ -25,6 +25,7 @@ export class ListCourseComponent implements OnInit, OnDestroy {
   userService = inject(UserService);
   errorHandler = inject(ErrorHandler);
   router = inject(Router);
+  route = inject(ActivatedRoute);
 
   courses?: Course[];
   paginationUtils?: PaginationUtils;
@@ -38,6 +39,8 @@ export class ListCourseComponent implements OnInit, OnDestroy {
         'Before publishing a course, you need to agree to the system requirements in the terms and conditions. ' +
         'Are you sure you want to publish this course?',
       published: 'Course was published successfully.',
+      confirmUnassignCurrentTeacher: 'Do you really want to unassign the current teacher?',
+      unassigned: 'Teacher was unassigned successfully.'
     }
     return messages[key];
   }
@@ -93,8 +96,13 @@ export class ListCourseComponent implements OnInit, OnDestroy {
 
   }
 
-  isAdminCourse(teacher: string) {
-    return this.userService.current.hasAnyRole('ROLE_admin') && this.userService.current.name === teacher;
+  isAdminCourseOwner(teacher: string) {
+    const current = this.userService.current;
+    return current.hasAnyRole('ROLE_admin') && teacher === current.name;
+  }
+
+  isAdmin() {
+    return this.userService.current.hasAnyRole('ROLE_admin');
   }
 
   isTitleBlue(course: Course) {
@@ -112,6 +120,22 @@ export class ListCourseComponent implements OnInit, OnDestroy {
 
   isEditable(course: Course) {
     return !course.published || course.unpublished;
+  }
+
+  unassignCurrentTeacher(courseId: number) {
+    if (confirm(this.getMessage('confirmUnassignCurrentTeacher'))) {
+      const currentAdminName = this.userService.current.name;
+      this.courseService.assignTeacher(courseId, currentAdminName)
+        .subscribe({
+          next: () => this.router.navigate(['.'], {
+            relativeTo: this.route,
+            state: {
+              msgSuccess: this.getMessage('unassigned')
+            }
+          }),
+          error: (error) => this.errorHandler.handleServerError(error.error)
+        })
+    }
   }
 
 }

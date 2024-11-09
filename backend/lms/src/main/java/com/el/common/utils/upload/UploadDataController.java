@@ -26,15 +26,6 @@ public class UploadDataController {
         return ResponseEntity.ok(UploadResponse.success(url));
     }
 
-//    @PostMapping(value = "/multiple", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<UploadDTO> uploadMultiple(@RequestPart
-//                                                            @NotNull(message = "Files to upload are required.")
-//                                                            List<MultipartFile> fileRequest) {
-//        log.info("Uploading multiple files: {}", fileRequest.size());
-//        List<String> keys = awsS3UploadService.uploadFiles(fileRequest);
-//        return ResponseEntity.ok(new UploadDTO(keys));
-//    }
-
     @DeleteMapping(path = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteAll(@RequestBody UploadDTO uploadDTO) {
         log.info("Deleting files: {}", uploadDTO.urls());

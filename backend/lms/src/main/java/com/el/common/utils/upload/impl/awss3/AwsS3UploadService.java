@@ -6,9 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
-import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -49,28 +47,6 @@ public class AwsS3UploadService implements UploadService {
         return awsS3Properties.endpoint() + "/" + key;
     }
 
-//    @Override
-//    public List<String> uploadFiles(List<MultipartFile> files) {
-//        ExecutorService ex = Executors.newFixedThreadPool(Math.min(files.size(), 10));
-//        List<CompletableFuture<String>> futures = new ArrayList<>();
-//
-//        for (MultipartFile file : files) {
-//            CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-//                try {
-//                    return uploadFile(file);
-//                } catch (Exception e) {
-//                    throw new AmazonServiceS3Exception("Task upload file failed.");
-//                }
-//            }, ex);
-//            futures.add(future);
-//        }
-//
-//        List<String> urls = futures.stream()
-//                .map(CompletableFuture::join)
-//                .toList();
-//        ex.shutdown();
-//        return urls;
-//    }
 
     @Override
     public void deleteFiles(List<String> urls) {

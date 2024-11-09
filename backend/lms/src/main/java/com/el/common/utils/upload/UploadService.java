@@ -8,8 +8,6 @@ public interface UploadService {
 
     String uploadFile(MultipartFile file) ;
 
-//    List<String> uploadFiles(List<MultipartFile> files);
-
     void deleteFiles(List<String> urls);
 
 }
