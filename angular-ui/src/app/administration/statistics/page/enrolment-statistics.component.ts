@@ -4,7 +4,7 @@ import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router
 import {PaginationUtils} from "../../../common/dto/page-wrapper";
 import {EnrolmentStatisticService} from "../service/enrolment-statistic.service";
 import {Subscription} from "rxjs";
-import {CourseMinInfoWithEnrolmentStatisticDTO} from "../model/course-min-info-with-enrolment-statistic.dto";
+import {CourseInfoWithEnrolmentStatisticDto} from "../model/course-info-with-enrolment-statistic.dto";
 import {NgForOf, NgIf} from "@angular/common";
 
 @Component({
@@ -24,7 +24,7 @@ export class EnrolmentStatisticsComponent implements OnInit, OnDestroy{
   router = inject(Router);
   route = inject(ActivatedRoute);
 
-  courseMinInfoWithEnrolmentStatistics?: CourseMinInfoWithEnrolmentStatisticDTO[];
+  courseInfoWithEnrolmentStatistics?: CourseInfoWithEnrolmentStatisticDto[];
   paginationUtils?: PaginationUtils;
   navigationSubscription?: Subscription;
 
@@ -52,11 +52,11 @@ export class EnrolmentStatisticsComponent implements OnInit, OnDestroy{
   }
 
   loadData(pageNumber: number): void {
-    this.enrolmentStatisticService.getCourseMinInfoWithEnrolmentStatisticDTO(pageNumber)
+    this.enrolmentStatisticService.getCourseInfoWithEnrolmentStatisticDTO(pageNumber)
       .subscribe({
         next: (pageWrapper) => {
           this.paginationUtils = new PaginationUtils(pageWrapper.page);
-          this.courseMinInfoWithEnrolmentStatistics = pageWrapper.content as CourseMinInfoWithEnrolmentStatisticDTO[];
+          this.courseInfoWithEnrolmentStatistics = pageWrapper.content as CourseInfoWithEnrolmentStatisticDto[];
         },
         error: (error) => this.errorHandler.handleServerError(error.error)
       });

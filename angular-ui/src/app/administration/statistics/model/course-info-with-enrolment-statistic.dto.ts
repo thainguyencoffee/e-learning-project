@@ -1,4 +1,4 @@
-export interface CourseMinInfoWithEnrolmentStatisticDTO {
+export interface CourseInfoWithEnrolmentStatisticDto {
   courseId: number,
   title: string,
   thumbnailUrl: string,

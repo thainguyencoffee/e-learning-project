@@ -5,7 +5,7 @@
   </div>
 </div>
 
-@if (!courseMinInfoWithEnrolmentStatistics || courseMinInfoWithEnrolmentStatistics.length === 0) {
+@if (!courseInfoWithEnrolmentStatistics || courseInfoWithEnrolmentStatistics.length === 0) {
   <div>No Enrolment could be found.</div>
 } @else {
   <div class="table-responsive">
@@ -22,7 +22,7 @@
       </tr>
       </thead>
       <tbody>
-        @for (item of courseMinInfoWithEnrolmentStatistics; track item.courseId) {
+        @for (item of courseInfoWithEnrolmentStatistics; track item.courseId) {
           <tr>
             <td>{{ item.courseId }}</td>
             <td>{{ item.title }}</td>

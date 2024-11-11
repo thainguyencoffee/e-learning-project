@@ -46,85 +46,61 @@ export class FileRowComponent implements OnInit {
 
   @ViewChild('videoPlayer') videoPlayer: ElementRef | undefined;
   previewUrl: string | null = null;
+  previousUrl: string | null = null;
 
   ngOnInit(): void {
-    this.loadFilePreview();
     this.initializeControlValueChanges()
+  }
+
+
+  private initializeControlValueChanges() {
+    if (this.control) {
+      if (this.rowType === 'imageFile') {
+        this.previewUrl = this.control.value || 'https://placehold.co/400'
+      } else {
+        this.previewUrl = this.control.value || ''
+      }
+
+      this.previousUrl = this.control.value || '' // bất kể rowType là gì thì vẫn đảm bảo previousUrl để clear data khi cần
+      this.control.valueChanges.subscribe(value => {
+        if (value) {
+          this.previewUrl = value
+          this.previousUrl = value
+        }
+      })
+    }
   }
 
   onFileSelected(event: Event) {
     const fileInput = event.target as HTMLInputElement;
     const file = fileInput.files![0];
 
-    this.deletePreviousFile().then(() => {
-      this.uploadService.upload(file).subscribe({
-        next: (response) => {
-          this.control?.setValue(response.url);
-          this.previewUrl = response.url;
-          this.saveToLocalStorage(response.url);
-          this.videoPlayer?.nativeElement.load();
+    if (this.previousUrl) {
+      this.deletePreviousFile();
+    }
+
+    this.uploadService.upload(file).subscribe({
+      next: response => {
+        this.control?.setValue(response.url);
+        this.previewUrl = response.url;
+        this.previousUrl = response.url;
+        // reload native element
+        this.videoPlayer?.nativeElement.load();
+      },
+      error: (error) => this.errorHandler.handleServerError(error.error, this.group)
+    })
+
+  }
+
+  deletePreviousFile() {
+    if (this.previousUrl) {
+      this.uploadService.deleteAll([this.previousUrl]).subscribe({
+        next: () => {
+          this.previousUrl = null;
         },
-        error: (error) => this.errorHandler.handleServerError(error.error, this.group),
-      });
-    });
-  }
-
-  private loadFilePreview() {
-    const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
-    const currentFieldUrl = uploadedFiles.find((file: any) => file.field === 'nguyennt101')?.url || null;
-    this.previewUrl = currentFieldUrl || (this.rowType === 'imageFile' ? 'https://placehold.co/400' : '');
-  }
-
-  private initializeControlValueChanges() {
-    this.control?.valueChanges.subscribe((value) => {
-      if (value) {
-        this.previewUrl = value;
-        this.saveToLocalStorage(value);
-      }
-    });
-  }
-
-  private async deletePreviousFile() {
-    const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
-    const currentFieldUrl = uploadedFiles.find((file: any) => file.field === 'nguyennt101')?.url || null;
-
-    if (currentFieldUrl) {
-      return new Promise<void>((resolve, reject) => {
-        this.uploadService.deleteAll([currentFieldUrl]).subscribe({
-          next: () => {
-            this.removeFromLocalStorage();
-            resolve();
-          },
-          error: (error) => {
-            this.errorHandler.handleServerError(error, this.group);
-            reject();
-          },
-        });
-      });
-    } else {
-      return Promise.resolve();
+        error: error => this.errorHandler.handleServerError(error, this.group)
+      })
     }
-  }
-
-  private saveToLocalStorage(url: string) {
-    if (!/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(url)) return;
-
-    const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
-    const existingFileIndex = uploadedFiles.findIndex((file: any) => file.field === 'nguyennt101');
-
-    if (existingFileIndex > -1) {
-      uploadedFiles[existingFileIndex].url = url;
-    } else {
-      uploadedFiles.push({ field: 'nguyennt101', url });
-    }
-
-    localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
-  }
-
-  private removeFromLocalStorage() {
-    const uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles') || '[]');
-    const updatedFiles = uploadedFiles.filter((file: any) => file.field !== 'nguyennt101');
-    localStorage.setItem('uploadedFiles', JSON.stringify(updatedFiles));
   }
 
 }
