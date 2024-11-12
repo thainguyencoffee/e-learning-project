@@ -98,9 +98,11 @@
       <td>{{ discountSelected.code }}</td>
       <td>{{ discountSelected.type }}</td>
       <td>
-        {{ discountSelected.type === 'PERCENTAGE'
-        ? discountSelected.percentage + '%'
-        : discountSelected.fixedPrice  }}
+        @if (discountSelected.type === 'PERCENTAGE') {
+          {{ discountSelected.percentage + '%' + ' upto' + ' ' + discountSelected.maxValue }}
+        } @else {
+          {{ discountSelected.fixedPrice }}
+        }
       </td>
       <td>
         <button class="btn btn-danger btn-sm" (click)="clearDiscount()" aria-label="Close">
@@ -116,13 +118,8 @@
   @if (!discountSelected) {
     <h4>Total price: {{ calcTotalPrice() }}</h4>
   } @else {
-    @if (discountSelected.type === 'PERCENTAGE' && discountSelected.percentage) {
-      <h4>Total price: {{ calcMultiplier(calcTotalPrice(), discountSelected.percentage) }}</h4>
-    } @else if (discountSelected.type === 'FIXED' && discountSelected.fixedPrice) {
-      <h4>Total price: {{ calcDifference(calcTotalPrice(), discountSelected.fixedPrice) }}</h4>
-    } @else {
-      <h4>Total price: {{ calcTotalPrice() }}</h4>
-    }
+    <h4>Total price: {{ calcDifference(calcTotalPrice(), discountSelected.discountPrice) }}</h4>
+    <h4>You save {{discountSelected.discountPrice}} </h4>
   }
   <!-- Discount Code Form -->
   <form [formGroup]="discountCodeForm" (ngSubmit)="handleSearchForm()" class="mt-4">

@@ -38,8 +38,8 @@ export class AddDiscountComponent {
   }
 
   typesMap: Record<string, string> = {
-    PERCENTAGE: 'Theo phần trăm',
-    FIXED: 'Giảm cố định',
+    PERCENTAGE: 'Percentage',
+    FIXED: 'Fixed',
   }
 
   currenciesMap: Record<string, string> = {
@@ -49,10 +49,14 @@ export class AddDiscountComponent {
   discountTypeChange(key: string) {
     if (key === 'PERCENTAGE') {
       this.addForm.get('percentage')?.setValidators([Validators.required, Validators.min(1), Validators.max(100)]);
+      this.addForm.get('maxValue')?.setValidators([Validators.required]);
+      this.addForm.get('currency')?.setValidators([Validators.required]);
+
       this.addForm.get('fixedPrice')?.setValidators([]);
-      this.addForm.get('currency')?.setValidators([]);
     } else {
       this.addForm.get('percentage')?.setValidators([]);
+      this.addForm.get('maxValue')?.setValidators([]);
+
       this.addForm.get('fixedPrice')?.setValidators([Validators.required]);
       this.addForm.get('currency')?.setValidators([Validators.required]);
     }
@@ -65,8 +69,9 @@ export class AddDiscountComponent {
   addForm = new FormGroup({
     code: new FormControl(null, [Validators.required, Validators.maxLength(50), Validators.minLength(10), Validators.pattern(/^\S*$/)]),
     type: new FormControl(null, [Validators.required]),
-    currency: new FormControl(null, []),
+    currency: new FormControl(null, [Validators.required]),
     percentage: new FormControl(null, []),
+    maxValue: new FormControl(null, []),
     fixedPrice: new FormControl(null, []),
     startDate: new FormControl(null, [Validators.required]),
     endDate: new FormControl(null, [Validators.required]),
@@ -81,6 +86,7 @@ export class AddDiscountComponent {
     }
 
     const data = new DiscountDto(this.addForm.value);
+    console.log(data)
 
     this.discountService.createDiscount(data).subscribe({
       next:() => this.router.navigate(['/administration/discounts'], {

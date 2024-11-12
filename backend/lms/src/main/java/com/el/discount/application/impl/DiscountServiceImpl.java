@@ -4,6 +4,7 @@ import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.discount.application.DiscountService;
 import com.el.discount.application.dto.DiscountDTO;
+import com.el.discount.application.dto.DiscountSearchDTO;
 import com.el.discount.domain.Discount;
 import com.el.discount.domain.DiscountRepository;
 import org.springframework.data.domain.Page;
@@ -102,6 +103,20 @@ public class DiscountServiceImpl implements DiscountService {
     public void forceDeleteDiscount(Long id) {
         var discount = findDeletedDiscountById(id);
         discountRepository.delete(discount);
+    }
+
+    @Override
+    public DiscountSearchDTO searchDiscountByCode(String code, MonetaryAmount originalPrice) {
+        var discount = findByCode(code);
+        MonetaryAmount discountedPrice = discount.calculateDiscount(originalPrice);
+        return new DiscountSearchDTO(discount.getCode(),
+                discount.getType(),
+                discount.getPercentage(),
+                discount.getMaxValue(),
+                discount.getFixedPrice(),
+                discount.getStartDate(),
+                discount.getEndDate(),
+                discountedPrice);
     }
 
 

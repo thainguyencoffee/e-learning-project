@@ -20,6 +20,7 @@ public record DiscountDTO(
         @NotNull(message = ValidateMessages.NOT_NULL)
         Type type,
         Double percentage,
+        MonetaryAmount maxValue,
         MonetaryAmount fixedPrice,
         @NotNull(message = ValidateMessages.NOT_NULL)
         LocalDateTime startDate,
@@ -34,6 +35,7 @@ public record DiscountDTO(
                 code,
                 type,
                 percentage,
+                maxValue,
                 fixedPrice,
                 startDate,
                 endDate,

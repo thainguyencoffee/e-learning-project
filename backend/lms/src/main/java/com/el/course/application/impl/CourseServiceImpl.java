@@ -289,13 +289,14 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void addEmotion(Long courseId, Long postId) {
+    public Long addEmotion(Long courseId, Long postId) {
         String username = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
 
         Emotion emotion = new Emotion(username);
         Course course = courseQueryService.findCourseById(courseId);
         course.addEmotionToPost(postId, emotion);
         courseRepository.save(course);
+        return emotion.getId();
     }
 
     @Override

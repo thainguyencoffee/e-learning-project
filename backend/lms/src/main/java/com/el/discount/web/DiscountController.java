@@ -3,6 +3,7 @@ package com.el.discount.web;
 import com.el.common.ValidateMessages;
 import com.el.discount.application.DiscountService;
 import com.el.discount.application.dto.DiscountDTO;
+import com.el.discount.application.dto.DiscountSearchDTO;
 import com.el.discount.domain.Discount;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -36,8 +37,8 @@ public class DiscountController {
     }
 
     @GetMapping("/code/{code}")
-    public ResponseEntity<Discount> getDiscountByCode(@PathVariable String code) {
-        return ResponseEntity.ok(discountService.findByCode(code));
+    public ResponseEntity<DiscountSearchDTO> searchDiscountByCode(@PathVariable String code, @RequestParam MonetaryAmount originalPrice) {
+        return ResponseEntity.ok(discountService.searchDiscountByCode(code, originalPrice));
     }
 
     @PostMapping("/calculate")
