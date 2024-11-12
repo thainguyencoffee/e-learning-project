@@ -4,6 +4,7 @@ import com.el.order.application.OrderService;
 import com.el.order.application.dto.OrderRequestDTO;
 import com.el.order.domain.Order;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/orders", produces = MediaType.APPLICATION_JSON_VALUE)
 public class OrderController {
@@ -44,14 +46,10 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<Order> createOrder(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody OrderRequestDTO orderRequestDTO) {
         String currentUsername = jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME);
+        log.info("Create order OrderRequest: {}, created by: {}", orderRequestDTO, currentUsername);
         Order orderCreated = orderService.createOrder(currentUsername, orderRequestDTO);
         return ResponseEntity.created(URI.create("/orders/" + orderCreated.getId())).body(orderCreated);
     }
-
-//    @GetMapping("/has-purchase/{courseId}")
-//    public ResponseEntity<Boolean> hasPurchase(@PathVariable Long courseId, @AuthenticationPrincipal Jwt jwt) {
-//        return ResponseEntity.ok(orderService.hasPurchase(jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME), courseId));
-//    }
 
     @GetMapping("/purchased-courses")
     public ResponseEntity<List<Long>> purchasedCourses(@AuthenticationPrincipal Jwt jwt) {

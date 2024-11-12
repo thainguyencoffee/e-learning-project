@@ -2,6 +2,8 @@ package com.el.order.application;
 
 import com.el.TestFactory;
 import com.el.common.Currencies;
+import com.el.common.RolesBaseUtil;
+import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
@@ -42,6 +44,9 @@ class OrderServiceTests {
     @Mock
     private DiscountService discountService;
 
+    @Mock
+    private RolesBaseUtil rolesBaseUtil;
+
     @InjectMocks
     private OrderServiceImpl orderService;
 
@@ -77,6 +82,7 @@ class OrderServiceTests {
         OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
                 Set.of(new OrderItemDTO(1L)), null);
         Course course = Mockito.mock(Course.class);
+        // Mock role
         when(courseQueryService.findPublishedCourseById(any(Long.class))).thenReturn(course);
         // Just mock the behavior of the course object called in the createOrder method
         when(course.getPrice()).thenReturn(Money.of(100, Currencies.VND));
@@ -96,11 +102,20 @@ class OrderServiceTests {
     }
 
     @Test
+    void createOrder_RoleAdminOrTeacher_ThrowsException() {
+        OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
+                Set.of(new OrderItemDTO(1L)), "DISCOUNT10");
+        // Mock role
+        when(rolesBaseUtil.isAdmin()).thenReturn(true);
+
+        assertThrows(AccessDeniedException.class, () -> orderService.createOrder(TestFactory.user, orderRequestDTO));
+    }
+
+    @Test
     void createOrder_CourseNotFound_ThrowsException() {
         OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
                 Set.of(new OrderItemDTO(1L)), "DISCOUNT10");
         when(courseQueryService.findPublishedCourseById(any(Long.class))).thenThrow(new ResourceNotFoundException());
-
         assertThrows(ResourceNotFoundException.class, () -> orderService.createOrder(TestFactory.user, orderRequestDTO));
     }
 
@@ -110,6 +125,7 @@ class OrderServiceTests {
                 Set.of(new OrderItemDTO(1L)), "INVALID_DISCOUNT");
         Course course = Mockito.mock(Course.class);
         when(course.getPrice()).thenReturn(Money.of(100, Currencies.VND));
+        // Mock role
         when(courseQueryService.findPublishedCourseById(any(Long.class))).thenReturn(course);
         when(discountService.calculateDiscount(anyString(), any(MonetaryAmount.class)))
                 .thenThrow(new InputInvalidException("Invalid discount code"));

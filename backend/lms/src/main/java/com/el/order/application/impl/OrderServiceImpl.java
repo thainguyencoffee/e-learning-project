@@ -1,6 +1,7 @@
 package com.el.order.application.impl;
 
 import com.el.common.RolesBaseUtil;
+import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
@@ -82,7 +83,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order createOrder(String currentUsername, OrderRequestDTO orderRequestDTO) {
-
+        if (rolesBaseUtil.isAdmin() || rolesBaseUtil.isTeacher()) {
+            throw new AccessDeniedException("Only authenticated users can create orders");
+        }
         Set<OrderItem> items = new LinkedHashSet<>();
 
         for (OrderItemDTO itemDto : orderRequestDTO.items()) {

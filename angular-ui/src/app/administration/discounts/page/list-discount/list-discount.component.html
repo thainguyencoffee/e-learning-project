@@ -29,7 +29,13 @@
             <td>{{discount.id}}</td>
             <td>{{discount.code}}</td>
             <td>{{discount.type}}</td>
-            <td>{{discount.percentage || discount.fixedPrice}}</td>
+            <td>
+              @if (discount.type === 'FIXED') {
+                {{discount.fixedPrice}}
+              } @else {
+                {{discount.percentage}}% (upto {{discount.maxValue}})
+              }
+            </td>
             <td>{{discount.currentUsage}}</td>
             <td>{{discount.maxUsage}}</td>
             <td>

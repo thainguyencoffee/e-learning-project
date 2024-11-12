@@ -4,6 +4,7 @@ import {Observable} from "rxjs";
 import {PageWrapper} from "../../../common/dto/page-wrapper";
 import {DiscountDto} from "../model/discount-dto";
 import {Discount} from "../model/view/discount";
+import {DiscountSearchDto} from "../../../orders/model/discount-search.dto";
 
 @Injectable(
   {providedIn: 'root'}
@@ -50,8 +51,10 @@ export class DiscountService {
     return this.http.put<Discount>(this.resourcePath + '/' + id, data);
   }
 
-  getDiscountByCode(code: string) {
-    return this.http.get<Discount>(`${this.resourcePath}/code/${code}`);
+  getDiscountByCode(code: string, originalPrice: string) {
+    return this.http.get<DiscountSearchDto>(`${this.resourcePath}/code/${code}`, {
+      params: { originalPrice }
+    });
   }
 
 }

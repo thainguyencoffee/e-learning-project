@@ -22,6 +22,7 @@ class DiscountTests {
                 "DISCOUNT10",
                 Type.PERCENTAGE,
                 10.0,
+                Money.of(20000, Currencies.VND),
                 Money.of(5, Currencies.VND),
                 LocalDateTime.now().minusSeconds(3600),
                 LocalDateTime.now().plusSeconds(3600),
@@ -40,6 +41,7 @@ class DiscountTests {
                 "DISCOUNT10",
                 Type.PERCENTAGE,
                 10.0,
+                Money.of(20000, Currencies.VND),
                 Money.of(5, Currencies.VND),
                 LocalDateTime.now().minusSeconds(7200),
                 LocalDateTime.now().minusSeconds(3600),
@@ -59,6 +61,7 @@ class DiscountTests {
                 "DISCOUNT10",
                 Type.PERCENTAGE,
                 10.0,
+                Money.of(20000, Currencies.VND),
                 Money.of(5, Currencies.VND),
                 LocalDateTime.now().plusSeconds(3600),
                 LocalDateTime.now().plusSeconds(7200),
@@ -80,6 +83,7 @@ class DiscountTests {
                 "DISCOUNT10",
                 Type.PERCENTAGE,
                 10.0,
+                Money.of(20000, Currencies.VND),
                 Money.of(5, Currencies.VND),
                 LocalDateTime.now().minusSeconds(7200),
                 LocalDateTime.now().minusSeconds(3600),
@@ -102,6 +106,7 @@ class DiscountTests {
                 "DISCOUNT10",
                 Type.PERCENTAGE,
                 10.0,
+                Money.of(20000, Currencies.VND),
                 Money.of(5, Currencies.VND),
                 LocalDateTime.now().minusSeconds(3600),
                 LocalDateTime.now().plusSeconds(3600),
@@ -117,7 +122,8 @@ class DiscountTests {
                 "DISCOUNT20",
                 Type.FIXED,
                 null,
-                Money.of(20, Currencies.VND),
+                null,
+                Money.of(20000, Currencies.VND),
                 LocalDateTime.now().minusSeconds(3600),
                 LocalDateTime.now().plusSeconds(3600),
                 100
@@ -125,7 +131,7 @@ class DiscountTests {
         discount.updateInfo(newDiscount);
         assertEquals("DISCOUNT20", discount.getCode());
         assertEquals(Type.FIXED, discount.getType());
-        assertEquals(Money.of(20, Currencies.VND), discount.getFixedPrice());
+        assertEquals(Money.of(20000, Currencies.VND), discount.getFixedPrice());
     }
 
     @Test
@@ -135,7 +141,8 @@ class DiscountTests {
                 "DISCOUNT20",
                 Type.FIXED,
                 null,
-                Money.of(20, Currencies.VND),
+                null,
+                Money.of(20000, Currencies.VND),
                 LocalDateTime.now().minusSeconds(3600),
                 LocalDateTime.now().plusSeconds(3600),
                 100

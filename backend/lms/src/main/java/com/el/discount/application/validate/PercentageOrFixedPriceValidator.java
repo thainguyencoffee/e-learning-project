@@ -21,6 +21,7 @@ public class PercentageOrFixedPriceValidator implements ConstraintValidator<Perc
 
         // Determine if percentage and fixed price are null
         boolean percentageIsNull = discountDTO.percentage() == null;
+        boolean maxValueIsNull = discountDTO.maxValue() == null;
         boolean fixedPriceIsNull = discountDTO.fixedPrice() == null;
 
         // Validate based on the discount type
@@ -30,6 +31,13 @@ public class PercentageOrFixedPriceValidator implements ConstraintValidator<Perc
                     context.disableDefaultConstraintViolation();
                     context.buildConstraintViolationWithTemplate(ValidateMessages.NOT_NULL)
                             .addPropertyNode("percentage")
+                            .addConstraintViolation();
+                    return false; // Validation failed
+                }
+                if (maxValueIsNull) {
+                    context.disableDefaultConstraintViolation();
+                    context.buildConstraintViolationWithTemplate(ValidateMessages.NOT_NULL)
+                            .addPropertyNode("maxValue")
                             .addConstraintViolation();
                     return false; // Validation failed
                 }

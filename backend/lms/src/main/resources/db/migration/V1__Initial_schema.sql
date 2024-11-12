@@ -115,6 +115,7 @@ create table discount
     code               varchar(50) not null,
     type               varchar(50) not null,
     percentage         int,
+    max_value        varchar(50),
     fixed_price        varchar(50),
     start_date         timestamp   not null,
     end_date           timestamp   not null,

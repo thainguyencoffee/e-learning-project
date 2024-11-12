@@ -3,6 +3,7 @@ package com.el.course.application;
 import com.el.course.application.dto.*;
 import com.el.course.domain.Course;
 import com.el.course.domain.Lesson;
+import com.el.course.web.dto.QuizSubmitDTO;
 import jakarta.validation.Valid;
 
 import javax.money.MonetaryAmount;
@@ -83,4 +84,5 @@ public interface CourseService {
 
     void deleteQuestion(Long courseId, Long sectionId, Long quizId, Long questionId);
 
+    void submitQuiz(Long courseId, Long sectionId, Long quizId, @Valid QuizSubmitDTO quizSubmitDTO);
 }

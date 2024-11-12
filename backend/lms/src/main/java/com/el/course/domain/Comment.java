@@ -2,7 +2,6 @@ package com.el.course.domain;
 
 import com.el.common.exception.InputInvalidException;
 import lombok.Getter;
-import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.Table;
@@ -35,14 +34,9 @@ public class Comment {
     public Comment() {}
 
     public void updateInfo(String newContent, Set<String> newAttachmentUrls) {
-        final UrlValidator URL_VALIDATOR = new UrlValidator();
 
         if (content == null || content.isBlank()) {
             throw new InputInvalidException("Content of the comment is required");
-        }
-
-        if (newAttachmentUrls != null && !newAttachmentUrls.stream().allMatch(URL_VALIDATOR::isValid)) {
-            throw new InputInvalidException("Invalid attachment urls");
         }
 
         this.content = newContent;

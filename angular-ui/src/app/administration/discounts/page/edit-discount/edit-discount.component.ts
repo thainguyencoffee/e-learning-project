@@ -39,19 +39,21 @@ export class EditDiscountComponent implements OnInit {
   discountTypeChange(key: string) {
     if (key === 'PERCENTAGE') {
       this.editForm.get('percentage')?.setValidators([Validators.required, Validators.min(1), Validators.max(100)]);
+      this.editForm.get('maxValue')?.setValidators([Validators.required]);
+      this.editForm.get('currency')?.setValidators([Validators.required]);
       this.editForm.get('fixedPrice')?.setValidators([]);
-      this.editForm.get('currency')?.setValidators([]);
 
       // reset fixedPrice and currency
       this.editForm.get('fixedPrice')?.reset();
-      this.editForm.get('currency')?.reset();
     } else {
       this.editForm.get('percentage')?.setValidators([]);
+      this.editForm.get('maxValue')?.setValidators([]);
       this.editForm.get('fixedPrice')?.setValidators([Validators.required]);
       this.editForm.get('currency')?.setValidators([Validators.required]);
 
       // reset percentage
       this.editForm.get('percentage')?.reset();
+      this.editForm.get('maxValue')?.reset();
     }
 
     this.editForm.get('percentage')?.updateValueAndValidity();
@@ -63,7 +65,8 @@ export class EditDiscountComponent implements OnInit {
     id: new FormControl({value: null, disabled: true}),
     code: new FormControl(null, [Validators.required, Validators.maxLength(50), Validators.minLength(10), Validators.pattern(/^\S*$/)]),
     type: new FormControl(null, [Validators.required]),
-    currency: new FormControl<string | null>(null, []),
+    currency: new FormControl<string | null>(null, [Validators.required]),
+    maxValue: new FormControl<string | null>(null, []),
     fixedPrice: new FormControl<string | null>(null, []),
     percentage: new FormControl(null, []),
     startDate: new FormControl(null, [Validators.required]),
@@ -84,13 +87,20 @@ export class EditDiscountComponent implements OnInit {
       .subscribe({
         next: (data) => {
           updateForm(this.editForm, data)
-          if (data.fixedPrice) {
+          if (data.type === 'FIXED' && data.fixedPrice) {
             const currency = data.fixedPrice.substring(0, 3) || null;
             this.editForm.get('currency')?.setValue(currency);
 
             const fixedPriceString = data.fixedPrice.substring(3) || null;
             const fixedPriceNumber = Number(fixedPriceString!.replace(/,/g, ''));
             this.editForm.get('fixedPrice')?.setValue(fixedPriceNumber + '');
+          } else if (data.type === 'PERCENTAGE' && data.maxValue) {
+            const currency = data.maxValue.substring(0, 3) || null;
+            this.editForm.get('currency')?.setValue(currency);
+
+            const maxValueString = data.maxValue.substring(3) || null;
+            const maxValueNumber = Number(maxValueString!.replace(/,/g, ''));
+            this.editForm.get('maxValue')?.setValue(maxValueNumber + '');
           }
 
         },

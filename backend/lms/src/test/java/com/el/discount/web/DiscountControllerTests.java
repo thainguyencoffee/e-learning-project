@@ -1,5 +1,6 @@
 package com.el.discount.web;
 
+import com.el.common.Currencies;
 import com.el.common.config.CustomAuthenticationEntryPoint;
 import com.el.common.config.SecurityConfig;
 import com.el.common.config.jackson.JacksonCustomizations;
@@ -9,6 +10,7 @@ import com.el.discount.application.dto.DiscountDTO;
 import com.el.discount.domain.Discount;
 import com.el.discount.domain.Type;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -55,6 +57,7 @@ class DiscountControllerTests {
         discount = new Discount(UUID.randomUUID().toString(),
                 Type.PERCENTAGE,
                 10.0,
+                Money.of(20000, Currencies.VND),
                 null,
                 LocalDateTime.now().minusSeconds(3600),
                 LocalDateTime.now().plusSeconds(3600),
@@ -64,6 +67,7 @@ class DiscountControllerTests {
                 UUID.randomUUID().toString(),
                 Type.PERCENTAGE,
                 10.0,
+                Money.of(20000, Currencies.VND),
                 null,
                 LocalDateTime.now().minusSeconds(3600),
                 LocalDateTime.now().plusSeconds(3600),
@@ -144,19 +148,26 @@ class DiscountControllerTests {
     }
 
     @Test
-    void getDiscountByCode_shouldReturnDiscount() throws Exception {
+    void searchDiscountByCode_shouldReturnDiscount() throws Exception {
         when(discountService.findByCode(any())).thenReturn(discount);
 
-        mockMvc.perform(get("/discounts/code/123")
+        mockMvc.perform(get("/discounts/code/123?originalPrice=VND20000")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user")))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").exists());
+                .andExpect(status().isOk());
     }
 
     @Test
-    void getDiscountByCode_shouldReturn401_whenUserIsNotAuthenticated() throws Exception {
+    void searchDiscountByCode_originalPriceNull_shouldReturn400() throws Exception {
         mockMvc.perform(get("/discounts/code/123")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user")))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void searchDiscountByCode_shouldReturn401_whenUserIsNotAuthenticated() throws Exception {
+        mockMvc.perform(get("/discounts/code/123?originalPrice=VND20000")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -224,6 +235,7 @@ class DiscountControllerTests {
                 UUID.randomUUID().toString(),
                 Type.PERCENTAGE,
                 null, // null at same time
+                Money.of(20000, Currencies.VND),
                 null,
                 LocalDateTime.now().minusSeconds(3600),
                 LocalDateTime.now().plusSeconds(3600),
@@ -279,6 +291,7 @@ class DiscountControllerTests {
                 UUID.randomUUID().toString(),
                 Type.PERCENTAGE,
                 null, // null at same time
+                Money.of(20000, Currencies.VND),
                 null,
                 LocalDateTime.now().minusSeconds(3600),
                 LocalDateTime.now().plusSeconds(3600),
