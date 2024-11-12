@@ -29,6 +29,7 @@ public class Post {
     private Set<Emotion> emotions = new HashSet<>();
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;
+    @JsonIgnore
     private boolean deleted = false;
 
     public Post(String content, UserInfo info, Set<String> attachmentUrls) {
@@ -52,16 +53,9 @@ public class Post {
     }
 
     protected void updateInfo(String newContent, Set<String> newAttachmentUrls) {
-        final UrlValidator URL_VALIDATOR = new UrlValidator();
-
         if (newContent == null || newContent.isBlank()) {
             throw new InputInvalidException("Content of the post is required");
         }
-
-        if (newAttachmentUrls != null && !newAttachmentUrls.stream().allMatch(URL_VALIDATOR::isValid)) {
-            throw new InputInvalidException("Invalid attachment urls");
-        }
-
         this.content = newContent;
         this.attachmentUrls = newAttachmentUrls;
         this.lastModifiedDate = LocalDateTime.now();

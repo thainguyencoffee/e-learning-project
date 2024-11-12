@@ -25,6 +25,9 @@ public class SecurityConfig {
                                 "/courses/{courseId}/posts",
                                 "/courses/{courseId}/posts/{postId}").authenticated()
                         .requestMatchers(HttpMethod.GET, "/courses/{courseId}/posts/trash").hasAnyRole("teacher", "admin")
+                        .requestMatchers(
+                                "/courses/{courseId}/posts/{postId}/comments/**",
+                                "/courses/{courseId}/posts/{postId}/emotions/**").authenticated()
                         .requestMatchers("/courses/{courseId}/posts/**").hasAnyRole("teacher", "admin")
 
                         .requestMatchers("/courses/{courseId}/requests/{requestId}/approve").hasRole("admin")
