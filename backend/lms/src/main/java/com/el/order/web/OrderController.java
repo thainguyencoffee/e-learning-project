@@ -1,6 +1,5 @@
 package com.el.order.web;
 
-import com.el.common.exception.AccessDeniedException;
 import com.el.order.application.OrderService;
 import com.el.order.application.dto.OrderRequestDTO;
 import com.el.order.domain.Order;
@@ -46,9 +45,6 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<Order> createOrder(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody OrderRequestDTO orderRequestDTO) {
-        if (jwt.getClaimAsString("roles").contains("admin") || jwt.getClaimAsString("roles").contains("teacher")) {
-            throw new AccessDeniedException("You are not allowed to create order, only user can create order");
-        }
         String currentUsername = jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME);
         log.info("Create order OrderRequest: {}, created by: {}", orderRequestDTO, currentUsername);
         Order orderCreated = orderService.createOrder(currentUsername, orderRequestDTO);
