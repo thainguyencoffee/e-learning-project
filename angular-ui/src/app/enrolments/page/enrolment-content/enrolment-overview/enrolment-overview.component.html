@@ -8,9 +8,15 @@
       {{calcProgress(enrolmentWithCourse.progress)}}%
     </div>
   </div>
+  <h3>Completed date: {{enrolmentWithCourse.completedDate | date}}</h3>
 
   <h3>Teacher</h3>
   <p>{{enrolmentWithCourse.teacher}}</p>
+
+  <h3>Certificate</h3>
+  <p>
+    <a [href]="enrolmentWithCourse.certificate.url" target="_blank">Certificate</a>
+  </p>
 
   <h3>Language</h3>
   <p>{{enrolmentWithCourse.language}}</p>

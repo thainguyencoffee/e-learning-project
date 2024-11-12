@@ -83,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order createOrder(String currentUsername, OrderRequestDTO orderRequestDTO) {
-        if (!rolesBaseUtil.isUser()) {
+        if (rolesBaseUtil.isAdmin() || rolesBaseUtil.isTeacher()) {
             throw new AccessDeniedException("Only authenticated users can create orders");
         }
         Set<OrderItem> items = new LinkedHashSet<>();

@@ -48,6 +48,7 @@ public class Certificate {
         if (certified) throw new InputInvalidException("Certificate is already certified.");
         this.url = url;
         this.certified = true;
+        this.issuedDate = Instant.now();
     }
 
 }

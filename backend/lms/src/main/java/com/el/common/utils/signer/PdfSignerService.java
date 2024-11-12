@@ -38,24 +38,26 @@ public class PdfSignerService {
     }
 
     public byte[] signPdf(byte[] pdfContent) {
-        ByteArrayOutputStream signedOut = new ByteArrayOutputStream();
-        try {
-            PdfReader reader = new PdfReader(new ByteArrayInputStream(pdfContent));
-            PdfSigner signer = new PdfSigner(reader, signedOut, new StampingProperties());
-
-            signer.setFieldName("sig");
-
-            IExternalSignature pks = new PrivateKeySignature(loadPrivateKey(), "SHA-256", "BC");
-            IExternalDigest digest = new BouncyCastleDigest();
-
-            signer.signDetached(digest, pks, loadCertificateChain(), null, null, null, 0, PdfSigner.CryptoStandard.CMS);
-
-            log.info("Digital signature applied.");
-        } catch (Exception  e) {
-            log.error("Error signing PDF: {}", e.getMessage());
-            throw new RuntimeException("Failed to sign PDF.", e);
-        }
-        return signedOut.toByteArray();
+        // Now digital signature is not available
+        return pdfContent;
+//        ByteArrayOutputStream signedOut = new ByteArrayOutputStream();
+//        try {
+//            PdfReader reader = new PdfReader(new ByteArrayInputStream(pdfContent));
+//            PdfSigner signer = new PdfSigner(reader, signedOut, new StampingProperties());
+//
+//            signer.setFieldName("sig");
+//
+//            IExternalSignature pks = new PrivateKeySignature(loadPrivateKey(), "SHA-256", "BC");
+//            IExternalDigest digest = new BouncyCastleDigest();
+//
+//            signer.signDetached(digest, pks, loadCertificateChain(), null, null, null, 0, PdfSigner.CryptoStandard.CMS);
+//
+//            log.info("Digital signature applied.");
+//        } catch (Exception  e) {
+//            log.error("Error signing PDF: {}", e.getMessage());
+//            throw new RuntimeException("Failed to sign PDF.", e);
+//        }
+//        return signedOut.toByteArray();
     }
 
     private PrivateKey loadPrivateKey() {

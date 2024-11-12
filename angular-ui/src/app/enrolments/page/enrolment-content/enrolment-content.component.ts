@@ -25,7 +25,7 @@ export class EnrolmentContentComponent implements OnInit {
   router = inject(Router);
   enrolmentService = inject(EnrolmentsService);
   errorHandler = inject(ErrorHandler);
-  EnrolmentWithCourseDataService = inject(EnrolmentWithCourseDataService);
+  enrolmentWithCourseDataService = inject(EnrolmentWithCourseDataService);
 
   enrolmentId?: number;
   enrolmentWithCourse$!: Observable<EnrolmentWithCourseDto | null>;
@@ -39,11 +39,11 @@ export class EnrolmentContentComponent implements OnInit {
 
     this.enrolmentService.getEnrolmentWithCourseByEnrollmentId(this.enrolmentId)
       .subscribe({
-        next: (data) => this.EnrolmentWithCourseDataService.setEnrolmentWithCourse(data),
+        next: (data) => this.enrolmentWithCourseDataService.setEnrolmentWithCourse(data),
         error: (error) => this.errorHandler.handleServerError(error.error)
       })
 
-    this.enrolmentWithCourse$ = this.EnrolmentWithCourseDataService.enrolmentWithCourse$;
+    this.enrolmentWithCourse$ = this.enrolmentWithCourseDataService.enrolmentWithCourse$;
   }
 
   isActive(route: string): boolean {
