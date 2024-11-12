@@ -29,11 +29,9 @@ public class Post {
     private Set<Emotion> emotions = new HashSet<>();
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;
-    @JsonIgnore
     private boolean deleted = false;
 
     public Post(String content, UserInfo info, Set<String> attachmentUrls) {
-//        final UrlValidator URL_VALIDATOR = new UrlValidator();
 
         if (content == null || content.isBlank()) {
             throw new InputInvalidException("Content of the post is required");
@@ -41,10 +39,6 @@ public class Post {
         if (info == null) {
             throw new InputInvalidException("User info is required");
         }
-
-//        if (!attachmentUrls.stream().allMatch(URL_VALIDATOR::isValid)) {
-//            throw new InputInvalidException("Invalid photo URL");
-//        }
 
         this.content = content;
         this.info = info;

@@ -113,7 +113,7 @@ public class AwsS3UploadService implements UploadService {
         );
     }
 
-    private String uploadFileToS3(String fileName, String contentType, byte[] fileContent, boolean isPublic) {
+    private String uploadFileToS3(String fileName, String contentType, byte[] fileContent, boolean isPrivate) {
         if (fileName == null || fileName.isEmpty()) {
             throw new AmazonServiceS3Exception("File name is null or empty.");
         }
@@ -124,7 +124,7 @@ public class AwsS3UploadService implements UploadService {
                 .bucket(awsS3Properties.bucketName())
                 .key(key)
                 .contentType(contentType)
-                .acl(isPublic ? ObjectCannedACL.PUBLIC_READ : ObjectCannedACL.PRIVATE)
+                .acl(isPrivate ? ObjectCannedACL.PRIVATE : ObjectCannedACL.PUBLIC_READ)
                 .build();
 
         try {

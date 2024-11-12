@@ -98,9 +98,8 @@ public class CoursePostController {
     }
 
     @PostMapping("{postId}/emotions")
-    public ResponseEntity<Void> addEmotion(@PathVariable Long courseId, @PathVariable Long postId) {
-        courseService.addEmotion(courseId, postId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Long> addEmotion(@PathVariable Long courseId, @PathVariable Long postId) {
+        return ResponseEntity.ok(courseService.addEmotion(courseId, postId));
     }
 
     @DeleteMapping("{postId}/emotions/{emotionId}")
