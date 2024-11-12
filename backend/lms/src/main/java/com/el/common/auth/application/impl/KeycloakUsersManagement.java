@@ -1,6 +1,7 @@
 package com.el.common.auth.application.impl;
 
 import com.el.common.auth.application.UsersManagement;
+import com.el.common.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -51,6 +52,15 @@ public class KeycloakUsersManagement implements UsersManagement {
         return users.stream()
                 .filter(user -> hasRole(user, roleName))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public UserRepresentation getUser(String username) {
+        List<UserRepresentation> users = keycloak.realm(realmName).users().searchByUsername(username, true);
+        if (users.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+        return users.get(0);
     }
 
     private boolean hasRole(UserRepresentation user, String roleName) {

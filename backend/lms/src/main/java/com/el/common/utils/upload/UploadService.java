@@ -7,7 +7,11 @@ import java.util.Map;
 
 public interface UploadService {
 
-    String uploadFile(MultipartFile file) ;
+    String uploadFile(MultipartFile file, boolean isPrivate) ;
+
+    String uploadFile(byte[] fileContent, String fileName, String contentType, boolean isPrivate);
+
+    String generatePreSignedUrl(String url);
 
     void deleteFiles(List<String> urls);
 

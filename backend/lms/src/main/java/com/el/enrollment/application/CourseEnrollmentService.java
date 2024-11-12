@@ -28,4 +28,5 @@ public interface CourseEnrollmentService {
 
     void markLessonAsIncomplete(Long enrollmentId, Long lessonId);
 
+    void createCertificate(Long id, String student, Long courseId);
 }
