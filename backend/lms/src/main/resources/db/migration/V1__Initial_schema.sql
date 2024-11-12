@@ -174,9 +174,25 @@ create table course_enrollment
     completed          boolean     not null,
     created_by         varchar(50) not null,
     created_date       timestamp   not null,
+    completed_date     timestamp,
     last_modified_by   varchar(50) not null,
     last_modified_date timestamp   not null,
     constraint fk_course_enrollment primary key (id)
+);
+
+create table certificate (
+    id uuid DEFAULT gen_random_uuid() not null,
+    course_enrollment bigint not null references course_enrollment (id) on DELETE cascade,
+    full_name varchar(255) not null,
+    email varchar(255) not null,
+    student varchar(255) not null,
+    teacher varchar(255) not null,
+    url varchar(500) not null,
+    course_id bigint not null,
+    course_title varchar(255) not null,
+    issued_date timestamp not null,
+    certified boolean not null,
+    constraint fk_certificate primary key (id)
 );
 
 create table lesson_progress
@@ -184,6 +200,7 @@ create table lesson_progress
     id                bigserial not null,
     course_enrollment bigint    not null references course_enrollment (id) on DELETE cascade,
     lesson_id         bigint    not null,
+    lesson_title      varchar(255),
     completed         boolean   not null,
     completed_date    timestamp,
     constraint fk_lesson_progress primary key (id)

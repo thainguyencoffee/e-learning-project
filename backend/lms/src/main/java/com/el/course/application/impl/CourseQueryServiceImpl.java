@@ -95,7 +95,7 @@ public class CourseQueryServiceImpl implements CourseQueryService {
 
     @Override
     public CourseWithoutSectionsDTO findCourseWithoutSectionsDTOById(Long courseId) {
-        return courseRepository.findPublishedCourseDTOByIdAndPublishedAndDeleted(courseId, true, false)
+        return courseRepository.findCourseWithoutSectionsDTOByIdAndPublishedAndDeleted(courseId, true, false)
                 .orElseThrow(ResourceNotFoundException::new);
     }
 

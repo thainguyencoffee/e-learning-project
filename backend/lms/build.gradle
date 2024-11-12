@@ -26,47 +26,72 @@ repositories {
 ext {
     set('testKeycloakVersion', '3.3.1')
     springModulithVersion = "1.2.4"
+    springCloudVersion = "2023.0.3"
 }
 
 dependencies {
+    // Itext PDF
+    implementation 'com.itextpdf:itext7-core:8.0.5'
+    // Commons Validator
     implementation 'commons-validator:commons-validator:1.9.0'
-//    implementation 'com.github.javafaker:javafaker:1.0.2'
+    // Keycloak SDK
     implementation "org.keycloak:keycloak-admin-client:24.0.0"
+    // Stripe SDK
     implementation "com.stripe:stripe-java:27.0.0"
+    // AWS SDK
     implementation 'software.amazon.awssdk:s3:2.28.24'
     // error handling
     implementation('io.github.wimdeblauwe:error-handling-spring-boot-starter:4.3.0')
-
+    // OAuth2 Resource Server
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    // Java Money
     implementation 'org.javamoney:moneta:1.4.4'
+    // Spring Data JDBC
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    // Spring Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // Spring Web Servlet
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Flyway
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-database-postgresql'
+    // Spring Actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // Spring Modulith
     implementation 'org.springframework.modulith:spring-modulith-starter-core'
     implementation 'org.springframework.modulith:spring-modulith-starter-jdbc'
     testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
+    // Postgres
+    runtimeOnly 'org.postgresql:postgresql'
+    // Spring Boot Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // Spring Security Test
     testImplementation 'org.springframework.security:spring-security-test'
+    // Testcontainers
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:postgresql'
+    // Junit Jupiter
+    testImplementation 'org.testcontainers:junit-jupiter'
+    // Spring Modulith Test
     runtimeOnly 'org.springframework.modulith:spring-modulith-actuator'
     runtimeOnly 'org.springframework.modulith:spring-modulith-observability'
+    // Junit Platform Launcher
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Spring Webflux
     testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
+    // Testcontainers Keycloak
     testImplementation "com.github.dasniko:testcontainers-keycloak:${testKeycloakVersion}"
 }
 
 dependencyManagement {
     imports {
         mavenBom "org.springframework.modulith:spring-modulith-bom:$springModulithVersion"
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
     }
 }
 

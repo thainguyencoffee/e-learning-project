@@ -49,6 +49,11 @@ import {EditQuizComponent} from "./administration/courses/page/manage-quiz/edit-
 import {AddQuestionComponent} from "./administration/courses/page/manage-quiz/add-question/add-question.component";
 import {EditQuestionComponent} from "./administration/courses/page/manage-quiz/edit-question/edit-question.component";
 import {QuizTrashComponent} from "./administration/courses/page/manage-quiz/quiz-trash/quiz-trash.component";
+import {UppyComponent} from "./beta/uppy/uppy.component";
+import {EnrolmentStatisticsComponent} from "./administration/statistics/page/enrolment-statistics.component";
+import {
+  EnrolmentStatisticDetailComponent
+} from "./administration/statistics/page/enrolment-statistic-detail/enrolment-statistic-detail.component";
 
 export const routes: Routes = [
   {
@@ -131,6 +136,7 @@ export const routes: Routes = [
     component: DashboardComponent,
     // canActivate: [authGuard],
     children: [
+      // Course management
       {
         title: 'Course management center!',
         path: 'courses',
@@ -285,7 +291,19 @@ export const routes: Routes = [
         }
       },
 
-      // discount
+      // Student management
+      {
+        title: 'Enrolment statistics',
+        path: 'enrolment-statistics',
+        component: EnrolmentStatisticsComponent,
+      },
+      {
+        title: 'Enrolment statistics detail',
+        path: 'enrolment-statistics/:courseId',
+        component: EnrolmentStatisticDetailComponent
+      },
+
+      // Discount management
       {
         title: 'Discount management center!',
         path: 'discounts',
@@ -312,6 +330,11 @@ export const routes: Routes = [
     path: 'error',
     component: ErrorComponent,
     title: 'Error page'
+  },
+  {
+    title: 'Uppy',
+    path: 'beta/uppy',
+    component: UppyComponent,
   },
   {
     path: '**',

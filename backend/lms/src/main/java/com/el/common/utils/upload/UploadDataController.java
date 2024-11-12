@@ -20,9 +20,10 @@ public class UploadDataController {
     private final AwsS3UploadService awsS3UploadService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UploadResponse> uploadSingle(@RequestPart @NotNull(message = "File to upload is required.") MultipartFile file) {
+    public ResponseEntity<UploadResponse> uploadSingle(@RequestParam(value = "private", defaultValue = "false") boolean isPrivate,
+            @RequestPart @NotNull(message = "File to upload is required.") MultipartFile file) {
         log.info("Uploading single file: {}", file.getOriginalFilename());
-        String url = awsS3UploadService.uploadFile(file);
+        String url = awsS3UploadService.uploadFile(file, isPrivate);
         return ResponseEntity.ok(UploadResponse.success(url));
     }
 

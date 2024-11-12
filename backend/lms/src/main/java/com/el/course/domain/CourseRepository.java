@@ -1,6 +1,7 @@
 package com.el.course.domain;
 
 import com.el.course.application.dto.CourseWithoutSectionsDTO;
+import com.el.enrollment.application.dto.CourseInfoDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -21,13 +22,32 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
 
     Optional<Course> findByTeacherAndIdAndDeleted(String teacher, Long courseId, Boolean deleted);
 
-    @Query("select c.* from course c " +
-            "where c.published = :published and c.deleted = :deleted LIMIT :size OFFSET :page * :size")
+    @Query("""
+        SELECT c.id, c.title, c.thumbnail_url, c.description, c.language, c.subtitles, c.benefits, c.prerequisites, c.price, c.teacher
+            FROM course c
+            WHERE c.published = :published
+                AND c.deleted = :deleted
+    """)
     List<CourseWithoutSectionsDTO> findAllByPublishedAndDeleted(Boolean published, Boolean deleted, int page, int size);
 
-    @Query("select c.* from course c " +
-            "where c.id = :courseId and c.published = :published and c.deleted = :deleted")
-    Optional<CourseWithoutSectionsDTO> findPublishedCourseDTOByIdAndPublishedAndDeleted(Long courseId, Boolean published, Boolean deleted);
+    @Query("""
+        SELECT c.id, c.title, c.thumbnail_url, c.description, c.language, c.subtitles, c.benefits, c.prerequisites, c.price, c.teacher
+            FROM course c
+            WHERE c.id = :courseId
+                AND c.published = :published
+                AND c.deleted = :deleted
+    """)
+    Optional<CourseWithoutSectionsDTO> findCourseWithoutSectionsDTOByIdAndPublishedAndDeleted(Long courseId, Boolean published, Boolean deleted);
+
+    @Query("""
+        SELECT c.id, c.title, c.thumbnail_url, c.description, c.language, c.subtitles, c.benefits, c.prerequisites, c.price, c.teacher
+            FROM course c
+            WHERE c.id = :courseId
+                AND c.teacher = :teacher
+                AND c.published = :published
+                AND c.deleted = :deleted
+    """)
+    Optional<CourseWithoutSectionsDTO> findCourseWithoutSectionsDTOByIdAndPublishedAndDeleted(Long courseId, String teacher, Boolean published, Boolean deleted);
 
     Optional<Course> findByIdAndPublishedAndDeleted(Long courseId, Boolean published, Boolean deleted);
 
@@ -78,5 +98,25 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
             "join quiz q on s.id = q.course_section " +
             "where c.id = :courseId and s.id = :sectionId and q.id = :quizId and c.teacher = :teacher and c.deleted = false and q.deleted = :deleted")
     Optional<Quiz> findQuizByCourseIdAndSectionIdAndQuizIdAndTeacherAndDeleted(Long courseId, Long sectionId, Long quizId, String teacher, Boolean deleted);
+
+    /**
+     * Queries for <code>CourseEnrolmentQueryService</code> port
+     * */
+    @Query("""
+    SELECT c.id, c.title, c.thumbnail_url, c.teacher
+            FROM course c
+            WHERE c.id = :courseId
+                AND c.published = :published
+    """)
+    Optional<CourseInfoDTO> findCourseInfoDTOByIdAndPublishedAndTeacher(long courseId, boolean published);
+
+    @Query("""
+    SELECT c.id, c.title, c.thumbnail_url, c.teacher
+            FROM course c
+            WHERE c.id = :courseId
+                AND c.published = :published
+                AND c.teacher = :teacher
+    """)
+    Optional<CourseInfoDTO> findCourseInfoDTOByIdAndPublishedAndTeacher(long courseId, boolean published, String teacher);
 
 }

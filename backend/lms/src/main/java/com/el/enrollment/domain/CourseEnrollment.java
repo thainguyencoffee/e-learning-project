@@ -5,6 +5,7 @@ import com.el.common.exception.ResourceNotFoundException;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.*;
+import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -15,7 +16,7 @@ import java.util.Set;
 @Table("course_enrollment")
 @Getter
 @ToString
-public class CourseEnrollment {
+public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     @Id
     private Long id;
     private String student;
@@ -24,6 +25,8 @@ public class CourseEnrollment {
     @MappedCollection(idColumn = "course_enrollment")
     private Set<LessonProgress> lessonProgresses = new LinkedHashSet<>();
     private Boolean completed;
+    private Instant completedDate;
+    private Certificate certificate;
     @CreatedBy
     private String createdBy;
     @CreatedDate
@@ -70,6 +73,8 @@ public class CourseEnrollment {
     private void checkCompleted() {
         if (lessonProgresses.stream().allMatch(LessonProgress::isCompleted)) {
             this.completed = true;
+            this.completedDate = Instant.now();
+            registerEvent(new EnrolmentCompletedEvent(this.id, this.courseId, this.student));
         }
     }
 
@@ -91,5 +96,16 @@ public class CourseEnrollment {
                 .findFirst()
                 .orElseThrow(ResourceNotFoundException::new);
     }
+
+    public void createCertificate(String fullName, String email, String courseTitle, String teacher) {
+        // Create certificate
+        if (!this.completed) {
+            throw new InputInvalidException("You can't create certificate for an incomplete enrollment.");
+        }
+
+        this.certificate = new Certificate(fullName, email, this.student, this.courseId, courseTitle, teacher);
+    }
+
+    public record EnrolmentCompletedEvent(Long id, Long courseId, String student) {}
 
 }

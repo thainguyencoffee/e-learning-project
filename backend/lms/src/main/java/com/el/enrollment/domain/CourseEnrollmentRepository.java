@@ -1,6 +1,7 @@
 package com.el.enrollment.domain;
 
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
+import com.el.enrollment.application.dto.CourseInfoWithEnrolmentStatisticDTO;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -22,5 +23,48 @@ public interface CourseEnrollmentRepository extends CrudRepository<CourseEnrollm
     Optional<CourseEnrollment> findByIdAndStudent(Long id, String student);
 
     Optional<CourseEnrollment> findByCourseIdAndStudent(Long courseId, String student);
+
+    List<CourseEnrollment> findAllByCourseId(long courseId);
+
+    @Query("""
+        SELECT
+            c.id AS course_id,
+            c.title AS title,
+            c.thumbnail_url AS thumbnail_url,
+            c.description AS description,
+            c.teacher AS teacher,
+            COUNT(e.id) AS total_enrollments,
+            SUM(CASE WHEN e.completed = true THEN 1 ELSE 0 END) AS total_completed_enrollments
+        FROM
+            course c
+                JOIN
+            course_enrollment e ON c.id = e.course_id
+        WHERE
+            c.published = true
+        GROUP BY
+            c.id, c.title, c.thumbnail_url, c.description, c.teacher LIMIT :size OFFSET :page * :size
+    """)
+    List<CourseInfoWithEnrolmentStatisticDTO> findAllCourseStatistics(int page, int size);
+
+    @Query("""
+        SELECT
+            c.id AS course_id,
+            c.title AS title,
+            c.thumbnail_url AS thumbnail_url,
+            c.description AS description,
+            c.teacher AS teacher,
+            COUNT(e.id) AS total_enrollments,
+            SUM(CASE WHEN e.completed = true THEN 1 ELSE 0 END) AS total_completed_enrollments
+        FROM
+            course c
+                JOIN
+            course_enrollment e ON c.id = e.course_id
+        WHERE
+            c.published = true AND c.teacher = :teacher
+        GROUP BY
+            c.id, c.title, c.thumbnail_url, c.description, c.teacher LIMIT :size OFFSET :page * :size
+    """)
+    List<CourseInfoWithEnrolmentStatisticDTO> findAllCourseStatisticsByTeacher(String teacher, int page, int size);
+
 
 }
