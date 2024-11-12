@@ -67,12 +67,3 @@ export function calcDifference(price1: string, price2: string): string | null {
 
   return `${currency1}${difference.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
-
-export function calcMultiplier(price: string, multiplier: number): string {
-  const currency = price.substring(0, 3);
-  const numericPrice = parseFloat(price.substring(3).replace(/,/g, ''));
-
-  const result = numericPrice - (numericPrice * multiplier / 100);
-
-  return `${currency}${result.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}

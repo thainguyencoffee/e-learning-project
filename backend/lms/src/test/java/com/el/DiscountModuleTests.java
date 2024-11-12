@@ -1,7 +1,9 @@
 package com.el;
 
+import com.el.common.Currencies;
 import com.el.discount.application.dto.DiscountDTO;
 import com.el.discount.domain.Type;
+import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -27,6 +29,7 @@ class DiscountModuleTests extends AbstractLmsApplicationTests {
         DiscountDTO updateDiscountDTO = new DiscountDTO("DISCOUNT_30",
                 Type.PERCENTAGE,
                 30.0,
+                Money.of(20000, Currencies.VND),
                 null,
                 LocalDateTime.now().minusSeconds(360),
                 LocalDateTime.now().plusSeconds(360),

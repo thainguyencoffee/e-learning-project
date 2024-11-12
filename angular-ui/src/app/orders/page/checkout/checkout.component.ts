@@ -6,12 +6,12 @@ import {Subscription} from "rxjs";
 import {NgForOf, NgIf} from "@angular/common";
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {DiscountService} from "../../../administration/discounts/service/discount.service";
-import {Discount} from "../../../administration/discounts/model/view/discount";
 import {InputRowComponent} from "../../../common/input-row/input-row.component";
-import {calcDifference, calcMultiplier} from "../../../common/utils";
+import {calcDifference} from "../../../common/utils";
 import {OrdersService} from "../../service/orders.service";
 import {OrderRequestDto} from "../../model/order-request.dto";
 import {CourseWithoutSections} from "../../../browse-course/model/course-without-sections";
+import {DiscountSearchDto} from "../../model/discount-search.dto";
 
 @Component({
   selector: 'app-checkout',
@@ -40,11 +40,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   selectedCourse?: CourseWithoutSections;
   discountCode?: string = '';
-  discountSelected?: Discount;
+  discountSelected?: DiscountSearchDto;
 
   discountCodeForm = new FormGroup({
     discountCode: new FormControl(null, [])
   })
+
+  discountedPrice?: string;
 
   ngOnInit(): void {
     const courseId = +this.route.snapshot.params['courseId']; // this is for the route /checkout/:courseId
@@ -89,8 +91,11 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.discountCodeForm.value.discountCode) {
-      this.discountService.getDiscountByCode(this.discountCodeForm.value.discountCode).subscribe({
+    const code = this.discountCodeForm.value.discountCode;
+    const originalPrice = this.calcTotalPrice();
+
+    if (code && originalPrice) {
+      this.discountService.getDiscountByCode(code, originalPrice).subscribe({
         next: discount => {
           this.applyDiscount(discount);
         },
@@ -107,7 +112,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
   }
 
-  applyDiscount(discount?: Discount) {
+  applyDiscount(discount?: DiscountSearchDto) {
     this.discountSelected = discount;
   }
 
@@ -129,10 +134,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   calcDifference(price1: string, price2: string) {
     return calcDifference(price1, price2);
-  }
-
-  calcMultiplier(price: string, multiplier: number) {
-    return calcMultiplier(price, multiplier);
   }
 
   clearDiscount() {
