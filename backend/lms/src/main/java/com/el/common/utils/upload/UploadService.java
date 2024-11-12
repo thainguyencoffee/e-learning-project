@@ -2,14 +2,19 @@ package com.el.common.utils.upload;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
 
 public interface UploadService {
 
-    String uploadFile(MultipartFile file) ;
+    String uploadFile(MultipartFile file, boolean isPrivate) ;
 
-    void deleteFile(String url);
+    String uploadFile(byte[] fileContent, String fileName, String contentType, boolean isPrivate);
 
-    void deleteFiles(Set<String> urls);
+    String generatePreSignedUrl(String url);
+
+    void deleteFiles(List<String> urls);
+
+    Map<String, String> startMultipartUpload(String fileName);
 
 }

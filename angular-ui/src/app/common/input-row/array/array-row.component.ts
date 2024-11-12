@@ -1,9 +1,9 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {NgForOf, NgIf} from "@angular/common";
-import {FieldConfiguration} from "./field-configuration";
-import {InputRowComponent} from "../input-row/input-row.component";
-import {InputRowStandaloneComponent} from "../input-row/input-row-standalone.component";
+import {FieldConfiguration} from "../field-configuration";
+import {InputRowComponent} from "../input-row.component";
+import {InputRowStandaloneComponent} from "../standalone/input-row-standalone.component";
 
 @Component({
   selector: 'app-array-row',

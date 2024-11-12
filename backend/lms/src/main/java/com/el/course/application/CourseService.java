@@ -61,7 +61,7 @@ public interface CourseService {
 
     void deleteComment(Long courseId, Long postId, Long commentId);
 
-    void addEmotion(Long courseId, Long postId);
+    Long addEmotion(Long courseId, Long postId);
 
     void deleteEmotion(Long courseId, Long postId, Long emotionId);
 

@@ -1,9 +1,11 @@
 package com.el.enrollment.application.impl;
 
 import com.el.common.RolesBaseUtil;
+import com.el.common.auth.application.UsersManagement;
 import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
+import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.domain.Course;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
@@ -11,6 +13,7 @@ import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
 import com.el.enrollment.domain.LessonProgress;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +24,19 @@ import java.util.stream.Collectors;
 @Service
 public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
+    private final CertificateServiceS3Storage certificateServiceS3Storage;
     private final CourseEnrollmentRepository repository;
     private final CourseQueryService courseQueryService;
+    private final UsersManagement usersManagement;
     private final RolesBaseUtil rolesBaseUtil;
 
-    public CourseEnrollmentServiceImpl(CourseEnrollmentRepository repository,
-                                       CourseQueryService courseQueryService,
+    public CourseEnrollmentServiceImpl(CertificateServiceS3Storage certificateServiceS3Storage, CourseEnrollmentRepository repository,
+                                       CourseQueryService courseQueryService, UsersManagement usersManagement,
                                        RolesBaseUtil rolesBaseUtil) {
+        this.certificateServiceS3Storage = certificateServiceS3Storage;
         this.repository = repository;
         this.courseQueryService = courseQueryService;
+        this.usersManagement = usersManagement;
         this.rolesBaseUtil = rolesBaseUtil;
     }
 
@@ -71,9 +78,9 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
     public void enrollment(String student, Long courseId) {
         Course course = courseQueryService.findPublishedCourseById(courseId);
-        Set<LessonProgress> lessonProgresses = course.getLessonIds()
+        Set<LessonProgress> lessonProgresses = course.getLessonIds().entrySet()
                 .stream()
-                .map(LessonProgress::new)
+                .map(entry -> new LessonProgress(entry.getValue(), entry.getKey()))
                 .collect(Collectors.toSet());
 
         CourseEnrollment enrollment = new CourseEnrollment(student, courseId, lessonProgresses);
@@ -92,6 +99,27 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
         CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
         enrollment.markLessonAsIncomplete(lessonId);
         repository.save(enrollment);
+    }
+
+    @Override
+    public void createCertificate(Long id, String student, Long courseId) {
+        CourseEnrollment enrollment = repository.findByIdAndStudent(id, student)
+                .orElseThrow(ResourceNotFoundException::new);
+        CourseWithoutSectionsDTO courseInfo =
+                courseQueryService.findCourseWithoutSectionsDTOById(courseId);
+        UserRepresentation userRepresentation = usersManagement.getUser(student);
+
+        enrollment.createCertificate(getFullName(userRepresentation),
+                userRepresentation.getEmail(),
+                courseInfo.title(),
+                courseInfo.teacher());
+
+        certificateServiceS3Storage.createCertUrl(enrollment.getCertificate());
+        repository.save(enrollment);
+    }
+
+    private String getFullName(UserRepresentation userRepresentation) {
+        return userRepresentation.getFirstName() + " " + userRepresentation.getLastName();
     }
 
 }

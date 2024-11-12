@@ -16,6 +16,10 @@ public interface UsersManagement {
 
     List<UserRepresentation> search(String username, Boolean exact);
 
+    List<UserRepresentation> search(String username, Boolean exact, String roleName);
+
+    UserRepresentation getUser(String username);
+
     List<UserRepresentation> searchByEmail(String email, Boolean exact);
 
     List<UserRepresentation> searchByFirstName(String firstName, Boolean exact);

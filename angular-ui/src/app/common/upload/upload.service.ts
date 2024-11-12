@@ -19,7 +19,7 @@ export class UploadService {
   }
 
   deleteAll(imageUrls: string[]) {
-    return this.http.delete('/bff/api/upload', { body: { urls: imageUrls }});
+    return this.http.delete('/bff/api/upload/delete', { body: { urls: imageUrls }});
   }
 
 }

@@ -6,8 +6,8 @@ import {FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators} from
 import { updateFormAdvanced} from "../../../../../common/utils";
 import {QuestionDto} from "../../../model/question.dto";
 import {InputRowComponent} from "../../../../../common/input-row/input-row.component";
-import {FieldConfiguration} from "../../../../../common/input-object-row/field-configuration";
-import {ArrayRowComponent} from "../../../../../common/input-object-row/array-row.component";
+import {FieldConfiguration} from "../../../../../common/input-row/field-configuration";
+import {ArrayRowComponent} from "../../../../../common/input-row/array/array-row.component";
 
 @Component({
   selector: 'app-edit-question',

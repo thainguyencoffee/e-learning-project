@@ -6,8 +6,8 @@ import { ErrorHandler } from "../../../../../common/error-handler.injectable";
 import { InputRowComponent } from "../../../../../common/input-row/input-row.component";
 import { CourseService } from "../../../service/course.service";
 import { NgIf } from "@angular/common";
-import {FieldConfiguration} from "../../../../../common/input-object-row/field-configuration";
-import {ArrayRowComponent} from "../../../../../common/input-object-row/array-row.component";
+import {FieldConfiguration} from "../../../../../common/input-row/field-configuration";
+import {ArrayRowComponent} from "../../../../../common/input-row/array/array-row.component";
 
 @Component({
   selector: 'app-post-add',

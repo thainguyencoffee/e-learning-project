@@ -55,17 +55,39 @@
             </td>
             <td>
               <div class="float-end text-nowrap d-flex">
-                <a *ngIf="!isEditable(course)" [routerLink]="['/administration/courses', course.id, 'posts']" class="btn btn-sm btn-secondary me-2">
-                   Post List
+                <a *ngIf="!isEditable(course)" [routerLink]="['/administration/courses', course.id, 'posts']"
+                   class="btn btn-sm btn-secondary me-2">
+                  Post List
                 </a>
                 <a [routerLink]="['/administration/courses/', course.id]" class="btn btn-sm btn-secondary me-2">View</a>
                 <a *ngIf="isEditable(course)" [routerLink]="['/administration/courses/', course.id, 'sections', 'add']"
                    class="btn btn-sm btn-secondary me-2">Add Section</a>
                 <a *ngIf="isEditable(course)" [routerLink]="['/administration/courses/edit', course.id]"
                    class="btn btn-sm btn-secondary me-2">Edit</a>
-                <a *ngIf="isAdminCourse(course.teacher)"
-                   [routerLink]="['/administration/courses/assign-teacher', course.id]"
-                   class="btn btn-sm btn-secondary me-2">Assign teacher</a>
+                <a *ngIf="isPublished(course)" [routerLink]="['/administration/enrolment-statistics', course.id]"
+                   class="btn btn-sm btn-secondary me-2">Enrolment statistic</a>
+                @if (isEditable(course) && isAdminCourseOwner(course.teacher)) {
+                  <a *ngIf="isAdminCourseOwner(course.teacher)"
+                     [routerLink]="['/administration/courses/assign-teacher', course.id]"
+                     class="btn btn-sm btn-secondary me-2">Assign teacher</a>
+                } @else if (isEditable(course) && isAdmin()) {
+                  <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-secondary me-2 dropdown-toggle"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                      Change teacher
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li>
+                        <button (click)="unassignCurrentTeacher(course.id)" *ngIf="isAdmin()" class="dropdown-item">
+                          Unassign teacher: <span class="text-danger">{{ course.teacher }}</span>
+                        </button>
+                      </li>
+                      <li><a [routerLink]="['/administration/courses/assign-teacher', course.id]" class="dropdown-item">Assign
+                        another teacher</a></li>
+                    </ul>
+                  </div>
+                }
+
                 <a [routerLink]="['/administration/courses', course.id, 'requests']"
                    class="btn btn-sm btn-secondary me-2">
                   Request list

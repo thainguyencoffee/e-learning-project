@@ -4,8 +4,8 @@ import {CourseService} from "../../../service/course.service";
 import {ErrorHandler} from "../../../../../common/error-handler.injectable";
 import {FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {InputRowComponent} from "../../../../../common/input-row/input-row.component";
-import {ArrayRowComponent} from "../../../../../common/input-object-row/array-row.component";
-import {FieldConfiguration} from "../../../../../common/input-object-row/field-configuration";
+import {ArrayRowComponent} from "../../../../../common/input-row/array/array-row.component";
+import {FieldConfiguration} from "../../../../../common/input-row/field-configuration";
 import {QuestionDto} from "../../../model/question.dto";
 
 @Component({

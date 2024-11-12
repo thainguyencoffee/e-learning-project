@@ -1,4 +1,5 @@
 import {LessonProgress} from "./lesson-progress";
+import {ProgressDto} from "./progress.dto";
 
 export interface Enrolment {
   id: number,
@@ -11,4 +12,5 @@ export interface Enrolment {
   createdDate: string,
   lastModifiedBy: string,
   lastModifiedDate: string,
+  progress: ProgressDto
 }
