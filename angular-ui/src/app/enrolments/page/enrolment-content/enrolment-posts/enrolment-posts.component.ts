@@ -1,11 +1,8 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {AsyncPipe, DatePipe, NgClass, NgForOf, NgIf, NgStyle} from "@angular/common";
-import {ActivatedRoute, Router, RouterLink, RouterOutlet} from "@angular/router";
+import {ActivatedRoute, NavigationEnd, Router, RouterLink, RouterOutlet} from "@angular/router";
 import {FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
-import {Observable} from "rxjs";
-import {map} from "rxjs/operators";
-import {EnrolmentWithCourseDto} from "../../../model/enrolment-with-course-dto";
-import {EnrolmentWithCourseDataService} from "../enrolment-with-course-data.service";
+import {Subscription} from "rxjs";
 import {Post} from "../../../../administration/courses/model/view/post";
 import {EnrolmentsService} from "../../../service/enrolments.service";
 import {InputRowComponent} from "../../../../common/input-row/input-row.component";
@@ -14,6 +11,10 @@ import {Comment} from '../../../../administration/courses/model/view/comment';
 import {FieldConfiguration} from "../../../../common/input-row/field-configuration";
 import {ArrayRowComponent} from "../../../../common/input-row/array/array-row.component";
 import {Emotion} from "../../../../administration/courses/model/view/emotion";
+import {UserService} from "../../../../common/auth/user.service";
+import {PaginationUtils} from "../../../../common/dto/page-wrapper";
+import {CourseService} from "../../../../administration/courses/service/course.service";
+import {CommentDto} from "../../../model/comment-dto";
 
 
 @Component({
@@ -36,23 +37,24 @@ import {Emotion} from "../../../../administration/courses/model/view/emotion";
   ],
   templateUrl: './enrolment-posts.component.html',
 })
-export class EnrolmentPostsComponent implements OnInit {
+export class EnrolmentPostsComponent implements OnInit, OnDestroy {
+
   route = inject(ActivatedRoute);
   router = inject(Router);
   enrolmentService = inject(EnrolmentsService);
+  courseService = inject(CourseService);
+  userService = inject(UserService);
   errorHandler = inject(ErrorHandler);
 
-  enrolmentWithCourseDataService = inject(EnrolmentWithCourseDataService);
-  currentPage = 0;
-  enrolmentId?: number;
-  courseId!: number;
-  username?: string; // Ví dụ, username có thể lấy từ JWT hoặc session
-  postId!: number;
   commentToggles: { [postId: number]: boolean } = {}; // Toggle comment visibility
-  enrolmentWithCourse$!: Observable<EnrolmentWithCourseDto | null>;
-  posts$!: Observable<Post[]>;
 
-  displayAllComments: boolean = false;
+  enrolmentId?: number;
+  courseId?: number;
+  post?: Post;
+  paginationUtils?: PaginationUtils;
+  navigationSubscription?: Subscription;
+
+  commentIsOpen = false;
 
   addCommentForm = new FormGroup({
     content: new FormControl(null, [Validators.minLength(1), Validators.maxLength(10000)]),
@@ -79,28 +81,54 @@ export class EnrolmentPostsComponent implements OnInit {
   removeAttachment(index: number): void {
     this.attachmentUrls.removeAt(index);
   }
+
   getMessage(key: string, details?: any) {
     const messages: Record<string, string> = {
-      created: `Comment was add successfully.`
+      commented: 'Comment was added successfully.',
+      liked: `You liked this post.`,
     };
     return messages[key];
   }
+
   ngOnInit(): void {
-    this.route.parent?.params.subscribe(params => {
-      this.courseId = +params['id'];
-      this.postId = +params['id'];
-      this.enrolmentId = +params['id'];
-    });
+    this.loadData(0);
 
-    this.enrolmentWithCourse$ = this.enrolmentWithCourseDataService.enrolmentWithCourse$;
-
-    this.posts$ = this.enrolmentWithCourse$.pipe(
-      map(enrolment => {
-        console.log('Enrolment data:', enrolment);
-        return enrolment?.posts || [];
-      })
-    );
+    this.navigationSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.loadData(0);
+      }
+    })
   }
+
+  ngOnDestroy(): void {
+    this.navigationSubscription!.unsubscribe();
+  }
+
+  private loadData(pageNumber: number) {
+    this.enrolmentId = +this.route.snapshot.params['id'];
+    this.courseId = +this.route.snapshot.params['courseId'];
+
+    this.courseService.getAllPosts(pageNumber, this.courseId, 1).subscribe({
+      next: (pageWrapper) => {
+        this.paginationUtils = new PaginationUtils(pageWrapper.page);
+        const posts = pageWrapper.content as Post[];
+        if (posts.length > 0) {
+          this.post = posts[0];
+        }
+      }
+    })
+  }
+
+  onPageChange(pageNumber: number): void {
+    if (pageNumber >= 0 && pageNumber < this.paginationUtils!.totalPages) {
+      this.loadData(pageNumber);
+    }
+  }
+
+  getPageRange(): number[] {
+    return this.paginationUtils?.getPageRange() || [];
+  }
+
   handleSubmit(postId: number) {
     window.scrollTo(0, 0);
     this.addCommentForm.markAllAsTouched();
@@ -108,90 +136,69 @@ export class EnrolmentPostsComponent implements OnInit {
       return;
     }
 
-    const data =  this.addCommentForm.value;
+    const data = new CommentDto(this.addCommentForm.value);
 
-    this.enrolmentService.addComment(this.courseId, postId, data).subscribe({
+    this.enrolmentService.addComment(this.courseId!, postId, data).subscribe({
       next: () => this.router.navigate(['../'], {
         relativeTo: this.route,
         state: {
-          msgSuccess: this.getMessage('created')
+          msgSuccess: this.getMessage('commented')
         }
       }),
       error: (error) => this.errorHandler.handleServerError(error.error, this.addCommentForm, this.getMessage)
     });
   }
 
-  setCommentDisplayMode(showAll: boolean): void {
-    this.displayAllComments = showAll;
-    this.posts$.subscribe(posts => {
-      posts.forEach(post => this.filterComments(post));
-    });
-  }
-  filterComments(post: Post): void {
-    if (this.displayAllComments) {
-      // Hiển thị tất cả bình luận
+  setCommentDisplayMode(post: Post, showAll: boolean): void {
+    if (showAll) {
       post.comments = [...post.comments];
     } else {
       post.comments = post.comments?.sort((b,a ) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()) || [];
     }
   }
 
-// Return all comments or recent comments based on display mode
+  // Return all comments or recent comments based on display mode
   getDisplayComments(post: Post): Comment[] {
-    if (this.displayAllComments) {
+    if (this.commentIsOpen) {
       return post.comments || [];
     } else {
       return post.comments?.sort((a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()).slice(0, 2) || [];
     }
   }
 
-
   toggleComments(postId: number): void {
     this.commentToggles[postId] = !this.commentToggles[postId];
   }
 
-  getCurrentPagePost(posts: Post[]): Post | undefined {
-    return posts[this.currentPage];
-  }
-
-  previousPage(posts: Post[]): void {
-    if (this.currentPage > 0) this.currentPage--;
-  }
-
-  nextPage(posts: Post[]): void {
-    if (this.currentPage < posts.length - 1) this.currentPage++;
-  }
   toggleEmotion(post: Post): void {
-    const userEmotion = post.emotions?.find(e => e.username === this.username);
+    const currentUsername = this.userService.current.name;
+
+    const userEmotion = post.emotions?.find(e => e.username === currentUsername);
 
     if (userEmotion) {
       // Deleting the existing emotion
       if (userEmotion.id !== undefined) {
-        this.enrolmentService.deleteEmotion(this.courseId, post.id, userEmotion.id).subscribe({
-          next: () => {
-            post.emotions = post.emotions?.filter(e => e.id !== userEmotion.id);
-          },
+        this.enrolmentService.deleteEmotion(this.courseId!, post.id, userEmotion.id).subscribe({
+          next: _ => this.router.navigate(['.'], {
+            relativeTo: this.route
+          }),
           error: error => this.errorHandler.handleServerError(error)
         });
       }
     } else {
       // Adding a new emotion with the current user's username
-      this.enrolmentService.addEmotion(this.courseId, post.id, this.username!).subscribe({
-        next: (newEmotionId) => {
-          const newEmotion: Emotion = {
-            id: newEmotionId,
-            username: this.username!,
-            createdDate: new Date()
-          };
-          post.emotions = [...(post.emotions || []), newEmotion];
-        },
-        error: error => this.errorHandler.handleServerError(error)
+      this.enrolmentService.addEmotion(this.courseId!, post.id, currentUsername).subscribe({
+        next: _ => this.router.navigate(['.'], {
+          relativeTo: this.route
+        }),
+        error: error => this.errorHandler.handleServerError(error.error)
       });
     }
   }
-  isLikedByUser(post: Post): boolean {
-    return post.emotions?.some((emotion: Emotion) => emotion.username === this.username) ?? false;
-  }
 
+  isLiked(emotions: Emotion[]): boolean {
+    const currentUsername = this.userService.current.name;
+    return emotions?.some((emotion: Emotion) => emotion.username === currentUsername) ?? false;
+  }
 
 }

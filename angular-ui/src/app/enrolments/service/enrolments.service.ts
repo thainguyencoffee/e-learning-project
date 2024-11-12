@@ -15,15 +15,16 @@ import {Emotion} from "../../administration/courses/model/view/emotion";
 export class EnrolmentsService {
 
   http = inject(HttpClient);
-   baseUrl = '/bff/api/courses';
+  baseUrl = '/bff/api/courses';
   resourcePath = '/bff/api/enrollments' // fix typo later
+
   addComment(courseId: number, postId: number, commentData: CommentDto): Observable<void> {
     const url = `${this.baseUrl}/${courseId}/posts/${postId}/comments`;
     return this.http.post<void>(url, commentData);
   }
 
   addEmotion(courseId: number, postId: number, username: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${courseId}/posts/${postId}/emotions`, { username });
+    return this.http.post(`${this.baseUrl}/${courseId}/posts/${postId}/emotions`, {username});
   }
 
   deleteEmotion(courseId: number, postId: number, emotionId: number): Observable<any> {
@@ -46,6 +47,7 @@ export class EnrolmentsService {
   getComments(courseId: number, postId: number): Observable<Comment[]> {
     return this.http.get<Comment[]>(`/courses/${courseId}/posts/${postId}/comments`);
   }
+
   getEnrollmentById(enrollmentId: string) {
     return this.http.get<EnrolmentDTO>(`${this.resourcePath}/${enrollmentId}`);
   }
