@@ -1,5 +1,5 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {AsyncPipe, DatePipe, NgClass, NgForOf, NgIf} from "@angular/common";
+import {AsyncPipe, DatePipe, NgClass, NgForOf, NgIf, NgStyle} from "@angular/common";
 import {ActivatedRoute, Router, RouterLink, RouterOutlet} from "@angular/router";
 import {FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Observable} from "rxjs";
@@ -8,13 +8,12 @@ import {EnrolmentWithCourseDto} from "../../../model/enrolment-with-course-dto";
 import {EnrolmentWithCourseDataService} from "../enrolment-with-course-data.service";
 import {Post} from "../../../../administration/courses/model/view/post";
 import {EnrolmentsService} from "../../../service/enrolments.service";
-import {PostDto} from "../../../../administration/courses/model/post-dto";
 import {InputRowComponent} from "../../../../common/input-row/input-row.component";
-import {ArrayRowComponent} from "../../../../common/input-object-row/array-row.component";
-import {FieldConfiguration} from "../../../../common/input-object-row/field-configuration";
-import {AddCourseDto} from "../../../../administration/courses/model/add-course.dto";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
 import {Comment} from '../../../../administration/courses/model/view/comment';
+import {FieldConfiguration} from "../../../../common/input-row/field-configuration";
+import {ArrayRowComponent} from "../../../../common/input-row/array/array-row.component";
+import {Emotion} from "../../../../administration/courses/model/view/emotion";
 
 
 @Component({
@@ -32,7 +31,8 @@ import {Comment} from '../../../../administration/courses/model/view/comment';
     FormsModule,
     ReactiveFormsModule,
     InputRowComponent,
-    ArrayRowComponent
+    ArrayRowComponent,
+    NgStyle
   ],
   templateUrl: './enrolment-posts.component.html',
 })
@@ -53,7 +53,6 @@ export class EnrolmentPostsComponent implements OnInit {
   posts$!: Observable<Post[]>;
 
   displayAllComments: boolean = false;
-  comments = [ /* Mảng các bình luận với ngày tạo */ ];
 
   addCommentForm = new FormGroup({
     content: new FormControl(null, [Validators.minLength(1), Validators.maxLength(10000)]),
@@ -86,29 +85,6 @@ export class EnrolmentPostsComponent implements OnInit {
     };
     return messages[key];
   }
-
-  handleSubmit(postId: number): void {
-    window.scrollTo(0, 0);
-    if (!this.addCommentForm.valid) {
-      return;
-    }
-
-    const commentData = this.addCommentForm.value;
-    this.enrolmentService.addComment(this.courseId, postId, commentData).subscribe({
-      next: () => {
-        // Điều hướng lại đến trang hiện tại để tải lại
-        this.router.navigate([`/enrolments/${this.courseId}/posts`], {
-          queryParamsHandling: 'preserve',  // Giữ lại các query params nếu có
-          state: { msgSuccess: this.getMessage('created') }
-        });
-      },
-      error: (error) => {
-        this.errorHandler.handleServerError(error.error, this.addCommentForm);
-      }
-    });
-  }
-
-
   ngOnInit(): void {
     this.route.parent?.params.subscribe(params => {
       this.courseId = +params['id'];
@@ -124,6 +100,25 @@ export class EnrolmentPostsComponent implements OnInit {
         return enrolment?.posts || [];
       })
     );
+  }
+  handleSubmit(postId: number) {
+    window.scrollTo(0, 0);
+    this.addCommentForm.markAllAsTouched();
+    if (!this.addCommentForm.valid) {
+      return;
+    }
+
+    const data =  this.addCommentForm.value;
+
+    this.enrolmentService.addComment(this.courseId, postId, data).subscribe({
+      next: () => this.router.navigate(['../'], {
+        relativeTo: this.route,
+        state: {
+          msgSuccess: this.getMessage('created')
+        }
+      }),
+      error: (error) => this.errorHandler.handleServerError(error.error, this.addCommentForm, this.getMessage)
+    });
   }
 
   setCommentDisplayMode(showAll: boolean): void {
@@ -166,4 +161,37 @@ export class EnrolmentPostsComponent implements OnInit {
   nextPage(posts: Post[]): void {
     if (this.currentPage < posts.length - 1) this.currentPage++;
   }
+  toggleEmotion(post: Post): void {
+    const userEmotion = post.emotions?.find(e => e.username === this.username);
+
+    if (userEmotion) {
+      // Deleting the existing emotion
+      if (userEmotion.id !== undefined) {
+        this.enrolmentService.deleteEmotion(this.courseId, post.id, userEmotion.id).subscribe({
+          next: () => {
+            post.emotions = post.emotions?.filter(e => e.id !== userEmotion.id);
+          },
+          error: error => this.errorHandler.handleServerError(error)
+        });
+      }
+    } else {
+      // Adding a new emotion with the current user's username
+      this.enrolmentService.addEmotion(this.courseId, post.id, this.username!).subscribe({
+        next: (newEmotionId) => {
+          const newEmotion: Emotion = {
+            id: newEmotionId,
+            username: this.username!,
+            createdDate: new Date()
+          };
+          post.emotions = [...(post.emotions || []), newEmotion];
+        },
+        error: error => this.errorHandler.handleServerError(error)
+      });
+    }
+  }
+  isLikedByUser(post: Post): boolean {
+    return post.emotions?.some((emotion: Emotion) => emotion.username === this.username) ?? false;
+  }
+
+
 }

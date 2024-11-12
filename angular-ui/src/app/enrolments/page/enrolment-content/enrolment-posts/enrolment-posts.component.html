@@ -3,7 +3,7 @@
 
   <div *ngIf="posts$ | async as posts">
     <div *ngIf="getCurrentPagePost(posts) as post" class="post-container">
-      <div class="card my-4 shadow-sm border-0">
+      <div class="card my-4 shadow-sm border-opacity-10" >
         <!-- Post Header -->
         <div class="card-header bg-primary text-white d-flex align-items-center">
           <div>
@@ -12,23 +12,25 @@
           </div>
         </div>
 
-        <!-- Post Content -->
         <div class="card-body">
           <p class="card-text">{{ post.content }}</p>
 
-          <!-- Attachments Carousel -->
-          <div *ngIf="post.attachmentUrls?.length" class="attachments">
+          <div *ngIf="post.attachmentUrls?.length" class="attachments"
+               [ngStyle]="{ 'border': '1px solid ', 'border-radius': '8px', 'padding': '5px' }">
             <div [id]="'attachmentCarousel-' + post.id" class="carousel slide" data-bs-ride="carousel">
               <div class="carousel-inner">
-                <div *ngFor="let url of post.attachmentUrls; let i = index" class="carousel-item" [ngClass]="{ active: i === 0 }">
-                  <img [src]="url" alt="Attachment" class="d-block w-100 carousel-image" />
+                <div *ngFor="let url of post.attachmentUrls; let i = index" class="carousel-item"
+                     [ngClass]="{ active: i === 0 }">
+                  <img [src]="url" alt="Attachment" class="d-block w-100 carousel-image"/>
                 </div>
               </div>
-              <button class="carousel-control-prev" type="button" [attr.data-bs-target]="'#attachmentCarousel-' + post.id" data-bs-slide="prev">
+              <button class="carousel-control-prev" type="button"
+                      [attr.data-bs-target]="'#attachmentCarousel-' + post.id" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Previous</span>
               </button>
-              <button class="carousel-control-next" type="button" [attr.data-bs-target]="'#attachmentCarousel-' + post.id" data-bs-slide="next">
+              <button class="carousel-control-next" type="button"
+                      [attr.data-bs-target]="'#attachmentCarousel-' + post.id" data-bs-slide="next">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Next</span>
               </button>
@@ -45,70 +47,82 @@
             </div>
           </div>
 
-        <!-- Post Options -->
-        <div class="card-footer align-items-center">
-          <button class="btn btn-primary m-2">
-            Like
-          </button>
-          <button class="btn btn-outline-secondary" (click)="toggleComments(post.id)">
-            <i class="bi bi-chat-left-text"></i> Comment
-          </button>
-        </div>
+          <!-- Post Options -->
+          <div class="card-footer align-items-center mt-2">
+            <button class="btn btn-primary mt-2" (click)="toggleEmotion(post)">
+              <i class="bi"
+                 [ngClass]="{'bi-hand-thumbs-up-fill': isLikedByUser(post), 'bi-hand-thumbs-up': !isLikedByUser(post)}"></i>
+              {{ isLikedByUser(post) ? 'Liked' : 'Like' }}
+            </button>
 
-        <!-- Comments Section -->
-        <div *ngIf="commentToggles[post.id]" class="card-body bg-light">
-          <!-- Toggle Comment Display Mode -->
-          <div class="dropdown mb-2">
-            <a class="dropdown-toggle text-secondary text-decoration-none toggle-hover" role="button" id="commentDisplayDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-              {{ displayAllComments ? 'Show All Comments' : 'Show Recent Comments' }}
-            </a>
-            <ul class="dropdown-menu border-0" aria-labelledby="commentDisplayDropdown">
-              <li>
-                <a class="dropdown-item" (click)="setCommentDisplayMode(true)">Show All Comments</a>
-              </li>
-              <li>
-                <a class="dropdown-item" (click)="setCommentDisplayMode(false)">Show Recent Comments</a>
-              </li>
-            </ul>
+            <button class="btn btn-outline-secondary mt-2" (click)="toggleComments(post.id)">
+              <i class="bi bi-chat-left-text"></i> Comment
+            </button>
           </div>
-          <div *ngIf="post.comments?.length; else noComments">
-            <div *ngFor="let comment of getDisplayComments(post)" class="comment mb-3 p-2 border rounded bg-white">
-              <div class="d-flex align-items-center">
-                <strong class="text-primary">{{ comment.info.firstName }} {{ comment.info.lastName }}:</strong>
-                <span class="ms-2">{{ comment.content }}</span>
-              </div>
-              <div *ngIf="comment.attachmentUrls && comment.attachmentUrls.length > 0">
-                <div *ngFor="let url of comment.attachmentUrls" class="attachment-img-container mb-2">
-                  <img [src]="url" alt="" class="attachment-img img-fluid rounded" style="max-width: 150px; max-height: 150px; object-fit: cover;" />
-                </div>
-              </div>
-              <small class="text-muted d-block mt-1">{{ comment.createdDate | date: 'short' }}</small>
+
+          <!-- Comments Section -->
+          <div *ngIf="commentToggles[post.id]" class="card-body bg-light">
+            <!-- Toggle Comment Display Mode -->
+            <div class="dropdown mb-2">
+              <a class="dropdown-toggle text-secondary text-decoration-none toggle-hover" role="button"
+                 id="commentDisplayDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ displayAllComments ? 'Show All Comments' : 'Show Recent Comments' }}
+              </a>
+              <ul class="dropdown-menu border-0" aria-labelledby="commentDisplayDropdown">
+                <li>
+                  <a class="dropdown-item" (click)="setCommentDisplayMode(true)">Show All Comments</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" (click)="setCommentDisplayMode(false)">Show Recent Comments</a>
+                </li>
+              </ul>
             </div>
+            <div *ngIf="post.comments?.length; else noComments">
+              <div *ngFor="let comment of getDisplayComments(post)" class="comment mb-3 p-2 border rounded bg-white">
+                <div class="d-flex align-items-center">
+                  <strong class="text-primary">{{ comment.info.firstName }} {{ comment.info.lastName }}:</strong>
+                  <span class="ms-2">{{ comment.content }}</span>
+                </div>
+                <div *ngIf="comment.attachmentUrls && comment.attachmentUrls.length > 0">
+                  <div *ngFor="let url of comment.attachmentUrls" class="attachment-img-container mb-2">
+                    <img [src]="url" alt="" class="attachment-img img-fluid rounded"
+                         style="max-width: 150px; max-height: 150px; object-fit: cover;"/>
+                  </div>
+                </div>
+                <small class="text-muted d-block mt-1">{{ comment.createdDate | date: 'short' }}</small>
+              </div>
+            </div>
+            <form [formGroup]="addCommentForm" (ngSubmit)="handleSubmit(post.id)">
+              <app-input-row [group]="addCommentForm" rowType="textarea" field="content"
+                             label="Content"></app-input-row>
+
+              <app-array-row
+                [group]="addCommentForm"
+                [fieldConfiguration]="attachmentUrlFieldConfiguration"
+                [addItem]="addAttachment.bind(this)"
+                [removeItem]="removeAttachment.bind(this)"
+                field="attachmentUrls"
+                label="Image">
+              </app-array-row>
+
+              <button type="submit" class="btn btn-primary mt-2" [disabled]="addCommentForm.invalid">Add Comment
+              </button>
+            </form>
+            <ng-template #noComments>
+              <small class="text-muted">No comments available.</small>
+            </ng-template>
           </div>
-          <form [formGroup]="addCommentForm" (ngSubmit)="handleSubmit(post.id)">
-            <app-input-row [group]="addCommentForm" rowType="textarea" field="content" label="Content"></app-input-row>
 
-            <app-array-row
-              [group]="addCommentForm"
-              [fieldConfiguration]="attachmentUrlFieldConfiguration"
-              [addItem]="addAttachment.bind(this)"
-              [removeItem]="removeAttachment.bind(this)"
-              field="attachmentUrls"
-              label="Image">
-            </app-array-row>
-
-            <button type="submit" class="btn btn-primary mt-2" [disabled]="addCommentForm.invalid">Add Comment</button>
-          </form>
-          <ng-template #noComments>
-            <small class="text-muted">No comments available.</small>
-          </ng-template>
-        </div>
-
-        <!-- Pagination Controls -->
-        <div class="d-flex justify-content-center my-3">
-          <button class="btn btn-outline-primary" (click)="previousPage(posts)" [disabled]="currentPage === 0">Previous</button>
-          <span class="mx-2">Page {{ currentPage + 1 }} of {{ posts.length }}</span>
-          <button class="btn btn-outline-primary" (click)="nextPage(posts)" [disabled]="currentPage === posts.length - 1">Next</button>
+          <!-- Pagination Controls -->
+          <div class="d-flex justify-content-center my-3">
+            <button class="btn btn-outline-primary" (click)="previousPage(posts)" [disabled]="currentPage === 0">
+              Previous
+            </button>
+            <span class="mx-2">Page {{ currentPage + 1 }} of {{ posts.length }}</span>
+            <button class="btn btn-outline-primary" (click)="nextPage(posts)"
+                    [disabled]="currentPage === posts.length - 1">Next
+            </button>
+          </div>
         </div>
       </div>
     </div>
