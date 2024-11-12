@@ -13,6 +13,7 @@ import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
 import com.el.enrollment.domain.LessonProgress;
+import lombok.extern.slf4j.Slf4j;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
@@ -72,7 +74,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
         String student = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
         CourseEnrollment enrolment = repository.findByIdAndStudent(id, student)
                 .orElseThrow(ResourceNotFoundException::new);
-        Course course = courseQueryService.findPublishedCourseById(id);
+        Course course = courseQueryService.findPublishedCourseById(enrolment.getCourseId());
         return EnrolmentWithCourseDTO.of(enrolment, course);
     }
 
