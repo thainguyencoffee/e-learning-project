@@ -92,6 +92,12 @@ public class Post {
         if (isDeleted()) {
             throw new InputInvalidException("Post is deleted");
         }
+        this.emotions.stream()
+                .filter(e -> e.getUsername().equals(emotion.getUsername()))
+                .findAny()
+                .ifPresent(e -> {
+                    throw new InputInvalidException("User has already reacted to this post");
+                });
         emotions.add(emotion);
     }
 

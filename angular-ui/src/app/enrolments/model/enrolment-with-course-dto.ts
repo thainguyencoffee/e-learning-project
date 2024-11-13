@@ -6,6 +6,19 @@ export interface Progress {
   completedLessons: number,
 }
 
+export interface Certificate {
+  id: number,
+  fullName: string,
+  email: string,
+  student: string,
+  teacher: string,
+  url: string,
+  courseId: number,
+  courseTitle: string,
+  issuedDate: string,
+  certified: boolean
+}
+
 export interface EnrolmentWithCourseDto {
   courseId: number,
   title: string,
@@ -21,5 +34,7 @@ export interface EnrolmentWithCourseDto {
   student: string,
   lessonProgresses: LessonProgress[],
   completed: boolean,
+  completedDate: string,
+  certificate: Certificate,
   progress: Progress
 }

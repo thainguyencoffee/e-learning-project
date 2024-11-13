@@ -3,7 +3,7 @@ import {EnrolmentWithCourseDataService} from "../enrolment-with-course-data.serv
 import {Observable} from "rxjs";
 import {EnrolmentWithCourseDto, Progress} from "../../../model/enrolment-with-course-dto";
 import {ActivatedRoute} from "@angular/router";
-import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
+import {AsyncPipe, DatePipe, NgForOf, NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-overview',
@@ -11,7 +11,8 @@ import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
   imports: [
     NgIf,
     AsyncPipe,
-    NgForOf
+    NgForOf,
+    DatePipe
   ],
   templateUrl: './enrolment-overview.component.html',
   styleUrl: './enrolment-overview.component.css'

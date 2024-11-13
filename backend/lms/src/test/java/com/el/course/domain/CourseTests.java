@@ -10,9 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.money.MonetaryAmount;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -1107,7 +1105,7 @@ class CourseTests {
     @Test
     void addQuizToSection_ValidQuiz_AddsQuiz() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
 
         // Act
@@ -1150,7 +1148,7 @@ class CourseTests {
     @Test
     void addQuizToSection_PublishedCourse_ThrowsException() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
         when(course.isNotPublishedAndDeleted()).thenReturn(false);
 
@@ -1165,7 +1163,7 @@ class CourseTests {
     @Test
     void addQuizToSection_ExistingQuizTitle_ThrowsException() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
 
         // Act
@@ -1193,7 +1191,7 @@ class CourseTests {
     @Test
     void addQuizToSection_ExistingQuizAfterLesson_ThrowsException() {
         // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz();
+        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz1);
         course.addQuizToSection(1L, quiz1); // Thêm quiz đầu tiên
 
@@ -1211,7 +1209,7 @@ class CourseTests {
     @Test
     void updateQuizInSection_ValidQuiz_UpdatesQuiz() {
         // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz();
+        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz1);
         quiz1 = spy(quiz1);
         when(quiz1.getId()).thenReturn(1L);
@@ -1237,7 +1235,7 @@ class CourseTests {
     @Test
     void updateQuizInSection_QuizDuplicateTitle_ThrowsException() {
         // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz();
+        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz1);
         quiz1 = spy(quiz1);
         when(quiz1.getId()).thenReturn(1L);
@@ -1273,7 +1271,7 @@ class CourseTests {
     @Test
     void updateQuizInSection_QuizIdNotFound_ThrowsException() {
         // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz();
+        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz1);
         quiz1 = spy(quiz1);
         when(quiz1.getId()).thenReturn(1L);
@@ -1294,7 +1292,7 @@ class CourseTests {
     @Test
     void updateQuizInSection_PublishedCourse_ThrowsException() {
         // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz();
+        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz1);
         quiz1 = spy(quiz1);
         when(quiz1.getId()).thenReturn(1L);
@@ -1319,7 +1317,7 @@ class CourseTests {
     @Test
     void deleteQuizFromSection_ValidQuiz_DeletesQuiz() {
         // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz();
+        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz1);
         quiz1 = spy(quiz1);
         when(quiz1.getId()).thenReturn(1L);
@@ -1338,7 +1336,7 @@ class CourseTests {
     @Test
     void deleteQuizFromSection_PublishedCourse_ThrowsException() {
         // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz();
+        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz1);
         quiz1 = spy(quiz1);
         when(quiz1.getId()).thenReturn(1L);
@@ -1360,7 +1358,7 @@ class CourseTests {
     @Test
     void restoreQuiz_DeletedQuiz_RestoresQuiz() {
         // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz();
+        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz1);
         quiz1 = spy(quiz1);
         when(quiz1.getId()).thenReturn(1L);
@@ -1382,7 +1380,7 @@ class CourseTests {
     @Test
     void restoreQuiz_PublishedCourse_ThrowsException() {
         // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz();
+        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz1);
         quiz1 = spy(quiz1);
         when(quiz1.getId()).thenReturn(1L);
@@ -1407,7 +1405,7 @@ class CourseTests {
     @Test
     void forceDeleteQuiz_DeletedQuiz_ForceDeletesQuiz() {
         // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz();
+        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz1);
         quiz1 = spy(quiz1);
         when(quiz1.getId()).thenReturn(1L);
@@ -1429,7 +1427,7 @@ class CourseTests {
     @Test
     void forceDeleteQuiz_PublishedCourse_ThrowsException() {
         // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz();
+        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz1);
         quiz1 = spy(quiz1);
         when(quiz1.getId()).thenReturn(1L);
@@ -1454,7 +1452,7 @@ class CourseTests {
     @Test
     void addQuestionToQuiz_ValidQuestion_AddsQuestion() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
         quiz = spy(quiz);
         when(quiz.getId()).thenReturn(1L);
@@ -1477,7 +1475,7 @@ class CourseTests {
     @Test
     void addQuestionToQuiz_QuizNotFound_ThrowsException() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
         quiz = spy(quiz);
         when(quiz.getId()).thenReturn(1L);
@@ -1496,7 +1494,7 @@ class CourseTests {
     @Test
     void addQuestionToQuiz_PublishedCourse_ThrowsException() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
         quiz = spy(quiz);
         when(quiz.getId()).thenReturn(1L);
@@ -1519,7 +1517,7 @@ class CourseTests {
     @Test
     void addQuestionToQuiz_ExistingQuestionContent_ThrowsException() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
         quiz = spy(quiz);
         when(quiz.getId()).thenReturn(1L);
@@ -1548,7 +1546,7 @@ class CourseTests {
     @Test
     void addQuestionToQuiz_QuestionScoreInvalid_ThrowsException() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
         quiz = spy(quiz);
         when(quiz.getId()).thenReturn(1L);
@@ -1583,7 +1581,7 @@ class CourseTests {
     @Test
     void addQuestionToQuiz_QuestionSingleChoiceInvalidAnswerOptions_ThrowsException() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
         quiz = spy(quiz);
         when(quiz.getId()).thenReturn(1L);
@@ -1617,7 +1615,7 @@ class CourseTests {
     @Test
     void addQuestionToQuiz_QuestionMultipleChoiceInvalidAnswerOptions_ThrowsException() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
         quiz = spy(quiz);
         when(quiz.getId()).thenReturn(1L);
@@ -1651,7 +1649,7 @@ class CourseTests {
     @Test
     void addQuestionToQuiz_QuestionTrueFalseInvalidAnswerOptions_ThrowsException() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
         quiz = spy(quiz);
         when(quiz.getId()).thenReturn(1L);
@@ -1683,7 +1681,7 @@ class CourseTests {
     @Test
     void updateQuestionInQuiz_ValidQuestion_UpdatesQuestion() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
         quiz = spy(quiz);
         when(quiz.getId()).thenReturn(1L);
@@ -1723,7 +1721,7 @@ class CourseTests {
     @Test
     void updateQuestionInQuiz_QuestionNotFound_ThrowsException() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
         quiz = spy(quiz);
         when(quiz.getId()).thenReturn(1L);
@@ -1756,7 +1754,7 @@ class CourseTests {
     @Test
     void updateQuestionInQuiz_PublishedCourse_ThrowsException() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
         quiz = spy(quiz);
         when(quiz.getId()).thenReturn(1L);
@@ -1789,7 +1787,7 @@ class CourseTests {
     @Test
     void updateQuestionInQuiz_ExistingQuestionContent_ThrowsException() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
         quiz = spy(quiz);
         when(quiz.getId()).thenReturn(1L);
@@ -1829,7 +1827,7 @@ class CourseTests {
     @Test
     void deleteQuestionFromQuiz_ValidQuestion_DeletesQuestion() {
         // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz();
+        Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
         quiz = spy(quiz);
         when(quiz.getId()).thenReturn(1L);
@@ -1851,6 +1849,101 @@ class CourseTests {
         // Assert
         assertTrue(quiz.getQuestions().isEmpty());
         assertEquals(0, quiz.getTotalScore());
+    }
+
+    private Course createCourseWithQuizDefault() {
+        Course course = TestFactory.createDefaultCourse();
+        CourseSection section = spy(new CourseSection("SectionTitle"));
+        when(section.getId()).thenReturn(1L);
+        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
+        when(lesson.getId()).thenReturn(1L);
+
+        // Add Section to Course
+        course.addSection(section);
+        course.addLessonToSection(1L, lesson);
+
+        /**
+         * sectionId: 1,
+         * lessonId: 1,
+         * quizId: 1,
+         * */
+        Quiz quiz = spy(TestFactory.createDefaultQuiz(1L));
+        when(quiz.getAfterLessonId()).thenReturn(1L);
+        when(quiz.getId()).thenReturn(1L);
+        course.addQuizToSection(1L, quiz);
+
+        // prepare questions
+        AnswerOption answerOption1 = spyAnswerOption(new AnswerOption("Answer 1", true), 1);
+        AnswerOption answerOption2 = spyAnswerOption(new AnswerOption("Answer 2", false), 2);
+        AnswerOption answerOption3 = spyAnswerOption(new AnswerOption("Answer 3", false), 3);
+        Question question1 = spy(new Question("Question 1", QuestionType.SINGLE_CHOICE, 2, Set.of(answerOption1, answerOption2, answerOption3)));
+        when(question1.getId()).thenReturn(1L);
+        course.addQuestionToQuizInSection(1L, 1L, question1);
+
+        AnswerOption answerOption4 = spyAnswerOption(new AnswerOption("Answer 1", true), 4);
+        AnswerOption answerOption5 = spyAnswerOption(new AnswerOption("Answer 2", false), 5);
+        Question question2 = spy(new Question("Question 2", QuestionType.TRUE_FALSE, 3, Set.of(answerOption4, answerOption5)));
+        when(question2.getId()).thenReturn(2L);
+        course.addQuestionToQuizInSection(1L, 1L, question2);
+
+        AnswerOption answerOption6 = spyAnswerOption(new AnswerOption("Answer 1", true), 6);
+        AnswerOption answerOption7 = spyAnswerOption(new AnswerOption("Answer 2", false), 7);
+        AnswerOption answerOption8 = spyAnswerOption(new AnswerOption("Answer 3", true), 8);
+        Question question3 = spy(new Question("Question 3", QuestionType.MULTIPLE_CHOICE, 4, Set.of(answerOption6, answerOption7, answerOption8)));
+        when(question3.getId()).thenReturn(3L);
+        course.addQuestionToQuizInSection(1L, 1L, question3);
+
+        return course;
+    }
+
+    @Test
+    void testCalculateQuiz() {
+        Course course = createCourseWithQuizDefault();
+
+        // calculate quiz
+        QuizCalculationResult result = course.calculateQuiz(1L, new HashMap<>(
+                Map.of(
+                        1L, Set.of(1L),
+                        2L, Set.of(4L),
+                        3L, Set.of(6L, 7L)
+                )
+        ));
+        assertEquals(7, result.score());
+        assertTrue(result.passed());
+    }
+
+    @Test
+    void testCalculateQuizButInputAnswerInvalid() {
+        Course course = createCourseWithQuizDefault();
+
+        String msgCase1 = assertThrows(InputInvalidException.class, () -> {
+            course.calculateQuiz(1L, new HashMap<>(
+                    Map.of(
+                            1L, Set.of(1L, 2L), // question with id = 1 is single choice, but input answer has 2 answer
+                            2L, Set.of(4L),
+                            3L, Set.of(6L, 7L, 8L)
+                    )
+            ));
+        }).getMessage();
+
+        String msgCase2 = assertThrows(InputInvalidException.class, () -> {
+            course.calculateQuiz(1L, new HashMap<>(
+                    Map.of(
+                            1L, Set.of(1L),
+                            2L, Set.of(4L, 5L), // question with id = 2 is true false, but input answer has 2 answer
+                            3L, Set.of(6L, 7L, 8L)
+                    )
+            ));
+        }).getMessage();
+
+        assertEquals("Quiz calculation error: Single choice question must have exactly one answer.", msgCase1);
+        assertEquals("Quiz calculation error: Single choice question must have exactly one answer.", msgCase2);
+    }
+
+    AnswerOption spyAnswerOption(AnswerOption answerOption, long id) {
+        AnswerOption spyAnswerOption = spy(answerOption);
+        when(spyAnswerOption.getId()).thenReturn(id);
+        return spyAnswerOption;
     }
 
 }

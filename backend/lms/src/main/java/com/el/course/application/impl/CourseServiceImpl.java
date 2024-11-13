@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.money.MonetaryAmount;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -374,6 +376,12 @@ public class CourseServiceImpl implements CourseService {
         Course course = courseQueryService.findCourseById(courseId);
         course.deleteQuestionFromQuizInSection(sectionId, quizId, questionId);
         courseRepository.save(course);
+    }
+
+    @Override
+    public QuizCalculationResult calculateQuizScore(Long courseId, Long quizId, Map<Long, Set<Long>> answers) {
+        Course course = courseQueryService.findCourseById(courseId);
+        return course.calculateQuiz(quizId, answers);
     }
 
 }

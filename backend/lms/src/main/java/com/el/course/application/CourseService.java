@@ -3,9 +3,12 @@ package com.el.course.application;
 import com.el.course.application.dto.*;
 import com.el.course.domain.Course;
 import com.el.course.domain.Lesson;
-import jakarta.validation.Valid;
+import com.el.course.domain.QuizCalculationResult;
 
 import javax.money.MonetaryAmount;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface CourseService {
 
@@ -82,5 +85,11 @@ public interface CourseService {
     void updateQuestion(Long courseId, Long sectionId, Long quizId, Long questionId, QuestionDTO questionUpdateDTO);
 
     void deleteQuestion(Long courseId, Long sectionId, Long quizId, Long questionId);
+
+    /**
+     * This method will return {@code QuizCalculationResult} with detail. <br>
+     * score: The score of {@code answers } <br>
+     * passed: Is {@code  answers } pass or not */
+    QuizCalculationResult calculateQuizScore(Long courseId, Long quizId, Map<Long, Set<Long>> answers);
 
 }

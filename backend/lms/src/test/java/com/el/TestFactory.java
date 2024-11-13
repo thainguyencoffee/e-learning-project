@@ -9,6 +9,8 @@ import com.el.course.web.dto.CourseRequestRejectDTO;
 import com.el.discount.application.dto.DiscountDTO;
 import com.el.discount.domain.Discount;
 import com.el.discount.domain.Type;
+import com.el.enrollment.application.dto.QuestionSubmitDTO;
+import com.el.enrollment.application.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.LessonProgress;
 import com.el.order.domain.Order;
@@ -17,6 +19,7 @@ import org.javamoney.moneta.Money;
 import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -281,10 +284,10 @@ public class TestFactory {
         );
     }
 
-    public static Quiz createDefaultQuiz() {
+    public static Quiz createDefaultQuiz(Long lessonId) {
         return new Quiz("Lorem ipsum dolor sit amet, consectetur adipiscing elit",
                 "Donec congue elementum feugiat. Morbi egestas elit nec sodales rutrum. Nullam ut ullamcorper risus. Phasellus eget dignissim ante, sed varius odio. Duis aliquet arcu sed congue bibendum",
-                1L, 50);
+                lessonId, 50);
     }
 
     public static Question createDefaultQuestion() {
@@ -319,6 +322,14 @@ public class TestFactory {
                         new AnswerOptionDTO("Answer 4", false)),
                 2
         );
+    }
+
+    public static QuizSubmitDTO createQuizSubmitDTO() {
+        return new QuizSubmitDTO(
+                1L,
+                Set.of(new QuestionSubmitDTO(QuestionType.SINGLE_CHOICE, 1L, Set.of(1L)),
+                        new QuestionSubmitDTO(QuestionType.TRUE_FALSE, 2L, Set.of(4L))
+        ));
     }
 
 }

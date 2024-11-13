@@ -58,8 +58,6 @@ class OrderServiceTests {
 
         Course course = Mockito.mock(Course.class);
         when(courseQueryService.findPublishedCourseById(any(Long.class))).thenReturn(course);
-        // Mock role
-        when(rolesBaseUtil.isUser()).thenReturn(true);
         // Just mock the behavior of the course object called in the createOrder method
         when(course.getPrice()).thenReturn(Money.of(100, Currencies.VND));
         when(discountService.calculateDiscount(anyString(), any(MonetaryAmount.class)))
@@ -85,7 +83,6 @@ class OrderServiceTests {
                 Set.of(new OrderItemDTO(1L)), null);
         Course course = Mockito.mock(Course.class);
         // Mock role
-        when(rolesBaseUtil.isUser()).thenReturn(true);
         when(courseQueryService.findPublishedCourseById(any(Long.class))).thenReturn(course);
         // Just mock the behavior of the course object called in the createOrder method
         when(course.getPrice()).thenReturn(Money.of(100, Currencies.VND));
@@ -109,7 +106,7 @@ class OrderServiceTests {
         OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
                 Set.of(new OrderItemDTO(1L)), "DISCOUNT10");
         // Mock role
-        when(rolesBaseUtil.isUser()).thenReturn(false);
+        when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
         assertThrows(AccessDeniedException.class, () -> orderService.createOrder(TestFactory.user, orderRequestDTO));
     }
@@ -119,9 +116,6 @@ class OrderServiceTests {
         OrderRequestDTO orderRequestDTO = new OrderRequestDTO(
                 Set.of(new OrderItemDTO(1L)), "DISCOUNT10");
         when(courseQueryService.findPublishedCourseById(any(Long.class))).thenThrow(new ResourceNotFoundException());
-        // Mock role
-        when(rolesBaseUtil.isUser()).thenReturn(true);
-
         assertThrows(ResourceNotFoundException.class, () -> orderService.createOrder(TestFactory.user, orderRequestDTO));
     }
 
@@ -132,7 +126,6 @@ class OrderServiceTests {
         Course course = Mockito.mock(Course.class);
         when(course.getPrice()).thenReturn(Money.of(100, Currencies.VND));
         // Mock role
-        when(rolesBaseUtil.isUser()).thenReturn(true);
         when(courseQueryService.findPublishedCourseById(any(Long.class))).thenReturn(course);
         when(discountService.calculateDiscount(anyString(), any(MonetaryAmount.class)))
                 .thenThrow(new InputInvalidException("Invalid discount code"));

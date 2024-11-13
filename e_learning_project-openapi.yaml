@@ -132,6 +132,11 @@ paths:
           schema:
             type: "boolean"
             default: "false"
+        - name: "role"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
       responses:
         "200":
           description: "OK"
@@ -155,7 +160,14 @@ paths:
   /upload:
     post:
       summary: "POST upload"
-      operationId: "upload"
+      operationId: "uploadSingle"
+      parameters:
+        - name: "private"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+            default: "false"
       requestBody:
         content:
           multipart/form-data:
@@ -173,15 +185,16 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ObjectUrl"
+                $ref: "#/components/schemas/UploadResponse"
+  /upload/delete:
     delete:
-      summary: "DELETE upload"
+      summary: "DELETE upload/delete"
       operationId: "deleteAll"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ObjectUrls"
+              $ref: "#/components/schemas/UploadDTO"
         required: true
       responses:
         "200":
@@ -190,21 +203,180 @@ paths:
             '*/*':
               schema:
                 type: "object"
-  /published-courses:
-    get:
-      summary: "GET published-courses"
-      operationId: "getAllPublishedCourses"
+  /courses/{courseId}/posts/{postId}:
+    put:
+      summary: "PUT courses/{courseId}/posts/{postId}"
+      operationId: "updatePost"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "postId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CoursePostDTO"
+        required: true
       responses:
         "200":
           description: "OK"
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/CourseWithoutSectionsDTO"
-  /published-courses/{courseId}:
+                $ref: "#/components/schemas/Void"
+    delete:
+      summary: "DELETE courses/{courseId}/posts/{postId}"
+      operationId: "deletePost"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "postId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "force"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
     get:
-      summary: "GET published-courses/{courseId}"
-      operationId: "getPublishedCourseById"
+      summary: "GET courses/{courseId}/posts/{postId}"
+      operationId: "getPost"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "postId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Post"
+  /courses/{courseId}/posts/{postId}/comments/{commentId}:
+    put:
+      summary: "PUT courses/{courseId}/posts/{postId}/comments/{commentId}"
+      operationId: "updateComment"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "postId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "commentId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+    delete:
+      summary: "DELETE courses/{courseId}/posts/{postId}/comments/{commentId}"
+      operationId: "deleteComment"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "postId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "commentId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+  /courses/{courseId}/posts:
+    post:
+      summary: "POST courses/{courseId}/posts"
+      operationId: "createPost"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CoursePostDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "integer"
+                format: "int64"
+    get:
+      summary: "GET courses/{courseId}/posts"
+      operationId: "getAllPosts"
       parameters:
         - name: "courseId"
           in: "path"
@@ -218,7 +390,158 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/CourseWithoutSectionsDTO"
+                $ref: "#/components/schemas/Post"
+  /courses/{courseId}/posts/{postId}/restore:
+    post:
+      summary: "POST courses/{courseId}/posts/{postId}/restore"
+      operationId: "restorePost"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "postId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+  /courses/{courseId}/posts/{postId}/comments:
+    post:
+      summary: "POST courses/{courseId}/posts/{postId}/comments"
+      operationId: "addComment"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "postId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "integer"
+                format: "int64"
+    get:
+      summary: "GET courses/{courseId}/posts/{postId}/comments"
+      operationId: "getComments"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "postId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Comment"
+  /courses/{courseId}/posts/{postId}/emotions:
+    post:
+      summary: "POST courses/{courseId}/posts/{postId}/emotions"
+      operationId: "addEmotion"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "postId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "integer"
+                format: "int64"
+  /courses/{courseId}/posts/{postId}/emotions/{emotionId}:
+    delete:
+      summary: "DELETE courses/{courseId}/posts/{postId}/emotions/{emotionId}"
+      operationId: "deleteEmotion"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "postId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "emotionId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+  /courses/{courseId}/posts/trash:
+    get:
+      summary: "GET courses/{courseId}/posts/trash"
+      operationId: "getTrashedPost"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Post"
   /courses/{courseId}:
     put:
       summary: "PUT courses/{courseId}"
@@ -644,277 +967,21 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Course"
-  /payments:
-    post:
-      summary: "POST payments"
-      operationId: "payment"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PaymentRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Payment"
-  /payments/orders/{orderId}:
+  /published-courses:
     get:
-      summary: "GET payments/orders/{orderId}"
-      operationId: "getPaymentByMyOrderId"
-      parameters:
-        - name: "orderId"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-            format: "uuid"
+      summary: "GET published-courses"
+      operationId: "getAllPublishedCourses"
       responses:
         "200":
           description: "OK"
           content:
             '*/*':
               schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/Payment"
-  /discounts/{id}:
-    put:
-      summary: "PUT discounts/{id}"
-      operationId: "updateDiscount"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DiscountDTO"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Discount"
-    delete:
-      summary: "DELETE discounts/{id}"
-      operationId: "deleteDiscount"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "force"
-          in: "query"
-          required: false
-          schema:
-            type: "boolean"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Void"
+                $ref: "#/components/schemas/CourseWithoutSectionsDTO"
+  /published-courses/{courseId}:
     get:
-      summary: "GET discounts/{id}"
-      operationId: "getDiscountById"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Discount"
-  /discounts/calculate:
-    post:
-      summary: "POST discounts/calculate"
-      operationId: "calculateDiscountByCode"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CalculateDiscountRequest"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/MonetaryAmount"
-  /discounts:
-    post:
-      summary: "POST discounts"
-      operationId: "createDiscount"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DiscountDTO"
-        required: true
-      responses:
-        "201":
-          description: "Created"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Discount"
-    get:
-      summary: "GET discounts"
-      operationId: "getAllDiscounts"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Discount"
-  /discounts/{id}/restore:
-    post:
-      summary: "POST discounts/{id}/restore"
-      operationId: "restoreDiscount"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Void"
-  /discounts/code/{code}:
-    get:
-      summary: "GET discounts/code/{code}"
-      operationId: "getDiscountByCode"
-      parameters:
-        - name: "code"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Discount"
-  /discounts/trash:
-    get:
-      summary: "GET discounts/trash"
-      operationId: "getDeletedDiscounts"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Discount"
-  /enrollments/{enrollmentId}/lessons/{lessonId}:
-    put:
-      summary: "PUT enrollments/{enrollmentId}/lessons/{lessonId}"
-      operationId: "markLessonAsCompleted"
-      parameters:
-        - name: "enrollmentId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "lessonId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "mark"
-          in: "query"
-          required: true
-          schema:
-            type: "string"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Void"
-  /enrollments:
-    get:
-      summary: "GET enrollments"
-      operationId: "getAllEnrollments"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/CourseEnrollmentDTO"
-  /enrollments/{enrollmentId}:
-    get:
-      summary: "GET enrollments/{enrollmentId}"
-      operationId: "getEnrollmentById"
-      parameters:
-        - name: "enrollmentId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/CourseEnrollment"
-  /enrollments/count:
-    get:
-      summary: "GET enrollments/count"
-      operationId: "countEnrolmentsByCourseId"
-      parameters:
-        - name: "courseId"
-          in: "query"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "integer"
-                format: "int32"
-  /enrollments/course/{courseId}:
-    get:
-      summary: "GET enrollments/course/{courseId}"
-      operationId: "getEnrolmentByCourseId"
+      summary: "GET published-courses/{courseId}"
+      operationId: "getPublishedCourseById"
       parameters:
         - name: "courseId"
           in: "path"
@@ -928,363 +995,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/CourseEnrollment"
-  /enrollments/{enrollmentId}/content:
-    get:
-      summary: "GET enrollments/{enrollmentId}/content"
-      operationId: "getContentByEnrollmentId"
-      parameters:
-        - name: "enrollmentId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/EnrolmentWithCourseDTO"
-  /courses/{courseId}/posts/{postId}:
-    put:
-      summary: "PUT courses/{courseId}/posts/{postId}"
-      operationId: "updatePost"
-      parameters:
-        - name: "courseId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "postId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CoursePostDTO"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Void"
-    delete:
-      summary: "DELETE courses/{courseId}/posts/{postId}"
-      operationId: "deletePost"
-      parameters:
-        - name: "courseId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "postId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "force"
-          in: "query"
-          required: false
-          schema:
-            type: "boolean"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Void"
-    get:
-      summary: "GET courses/{courseId}/posts/{postId}"
-      operationId: "getPost"
-      parameters:
-        - name: "courseId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "postId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Post"
-  /courses/{courseId}/posts/{postId}/comments/{commentId}:
-    put:
-      summary: "PUT courses/{courseId}/posts/{postId}/comments/{commentId}"
-      operationId: "updateComment"
-      parameters:
-        - name: "courseId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "postId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "commentId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CommentDTO"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Void"
-    delete:
-      summary: "DELETE courses/{courseId}/posts/{postId}/comments/{commentId}"
-      operationId: "deleteComment"
-      parameters:
-        - name: "courseId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "postId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "commentId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Void"
-  /courses/{courseId}/posts:
-    post:
-      summary: "POST courses/{courseId}/posts"
-      operationId: "createPost"
-      parameters:
-        - name: "courseId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CoursePostDTO"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "integer"
-                format: "int64"
-    get:
-      summary: "GET courses/{courseId}/posts"
-      operationId: "getAllPosts"
-      parameters:
-        - name: "courseId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Post"
-  /courses/{courseId}/posts/{postId}/restore:
-    post:
-      summary: "POST courses/{courseId}/posts/{postId}/restore"
-      operationId: "restorePost"
-      parameters:
-        - name: "courseId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "postId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Void"
-  /courses/{courseId}/posts/{postId}/comments:
-    post:
-      summary: "POST courses/{courseId}/posts/{postId}/comments"
-      operationId: "addComment"
-      parameters:
-        - name: "courseId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "postId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CommentDTO"
-        required: true
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "integer"
-                format: "int64"
-    get:
-      summary: "GET courses/{courseId}/posts/{postId}/comments"
-      operationId: "getComments"
-      parameters:
-        - name: "courseId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "postId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Comment"
-  /courses/{courseId}/posts/{postId}/emotions:
-    post:
-      summary: "POST courses/{courseId}/posts/{postId}/emotions"
-      operationId: "addEmotion"
-      parameters:
-        - name: "courseId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "postId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Void"
-  /courses/{courseId}/posts/{postId}/emotions/{emotionId}:
-    delete:
-      summary: "DELETE courses/{courseId}/posts/{postId}/emotions/{emotionId}"
-      operationId: "deleteEmotion"
-      parameters:
-        - name: "courseId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "postId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-        - name: "emotionId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Void"
-  /courses/{courseId}/posts/trash:
-    get:
-      summary: "GET courses/{courseId}/posts/trash"
-      operationId: "getTrashedPost"
-      parameters:
-        - name: "courseId"
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Post"
+                $ref: "#/components/schemas/CourseWithoutSectionsDTO"
   /courses/{courseId}/sections/{sectionId}/quizzes/{quizId}:
     put:
       summary: "PUT courses/{courseId}/sections/{sectionId}/quizzes/{quizId}"
@@ -1607,6 +1318,343 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Quiz"
+  /payments:
+    post:
+      summary: "POST payments"
+      operationId: "payment"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Payment"
+  /payments/orders/{orderId}:
+    get:
+      summary: "GET payments/orders/{orderId}"
+      operationId: "getPaymentByMyOrderId"
+      parameters:
+        - name: "orderId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Payment"
+  /discounts/{id}:
+    put:
+      summary: "PUT discounts/{id}"
+      operationId: "updateDiscount"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscountDTO"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Discount"
+    delete:
+      summary: "DELETE discounts/{id}"
+      operationId: "deleteDiscount"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "force"
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+    get:
+      summary: "GET discounts/{id}"
+      operationId: "getDiscountById"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Discount"
+  /discounts/calculate:
+    post:
+      summary: "POST discounts/calculate"
+      operationId: "calculateDiscountByCode"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CalculateDiscountRequest"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MonetaryAmount"
+  /discounts:
+    post:
+      summary: "POST discounts"
+      operationId: "createDiscount"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscountDTO"
+        required: true
+      responses:
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Discount"
+    get:
+      summary: "GET discounts"
+      operationId: "getAllDiscounts"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Discount"
+  /discounts/{id}/restore:
+    post:
+      summary: "POST discounts/{id}/restore"
+      operationId: "restoreDiscount"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+  /discounts/code/{code}:
+    get:
+      summary: "GET discounts/code/{code}"
+      operationId: "searchDiscountByCode"
+      parameters:
+        - name: "code"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "originalPrice"
+          in: "query"
+          required: true
+          schema:
+            $ref: "#/components/schemas/MonetaryAmount"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DiscountSearchDTO"
+  /discounts/trash:
+    get:
+      summary: "GET discounts/trash"
+      operationId: "getDeletedDiscounts"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Discount"
+  /enrollments/{enrollmentId}/lessons/{lessonId}:
+    put:
+      summary: "PUT enrollments/{enrollmentId}/lessons/{lessonId}"
+      operationId: "markLessonAsCompleted"
+      parameters:
+        - name: "enrollmentId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "lessonId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "mark"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+  /enrollments:
+    get:
+      summary: "GET enrollments"
+      operationId: "getAllEnrollments"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CourseEnrollmentDTO"
+  /enrollments/{enrollmentId}:
+    get:
+      summary: "GET enrollments/{enrollmentId}"
+      operationId: "getEnrollmentById"
+      parameters:
+        - name: "enrollmentId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CourseEnrollment"
+  /enrollments/count:
+    get:
+      summary: "GET enrollments/count"
+      operationId: "countEnrolmentsByCourseId"
+      parameters:
+        - name: "courseId"
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "integer"
+                format: "int32"
+  /enrollments/course/{courseId}:
+    get:
+      summary: "GET enrollments/course/{courseId}"
+      operationId: "getEnrolmentByCourseId"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CourseEnrollment"
+  /enrollments/{enrollmentId}/content:
+    get:
+      summary: "GET enrollments/{enrollmentId}/content"
+      operationId: "getContentByEnrollmentId"
+      parameters:
+        - name: "enrollmentId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EnrolmentWithCourseDTO"
+  /enrollments/statistics:
+    get:
+      summary: "GET enrollments/statistics"
+      operationId: "minInfoWithEnrolmentStatistic"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CourseInfoWithEnrolmentStatisticDTO"
+  /enrollments/statistics/{courseId}:
+    get:
+      summary: "GET enrollments/statistics/{courseId}"
+      operationId: "courseWithEnrolmentStatistic"
+      parameters:
+        - name: "courseId"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CourseInfoWithEnrolmentsDTO"
 components:
   schemas:
     OrderItemDTO:
@@ -1694,66 +1742,102 @@ components:
         exp:
           type: "integer"
           format: "int64"
-    ObjectUrl:
+    UploadResponse:
       type: "object"
       properties:
         url:
           type: "string"
-    ObjectUrls:
+        message:
+          type: "string"
+    UploadDTO:
       type: "object"
       properties:
         urls:
           type: "array"
           items:
             type: "string"
-    CourseWithoutSectionsDTO:
+    CoursePostDTO:
+      type: "object"
+      properties:
+        content:
+          type: "string"
+        attachmentUrls:
+          type: "array"
+          items:
+            type: "string"
+    Void:
+      type: "object"
+      properties: { }
+    CommentDTO:
+      type: "object"
+      properties:
+        content:
+          type: "string"
+        attachmentUrls:
+          type: "array"
+          items:
+            type: "string"
+    Comment:
       type: "object"
       properties:
         id:
           type: "integer"
           format: "int64"
-        title:
+        content:
           type: "string"
-        thumbnailUrl:
-          type: "string"
-        description:
-          type: "string"
-        language:
-          type: "string"
-          enum:
-            - "ENGLISH"
-            - "VIETNAMESE"
-            - "JAPANESE"
-            - "KOREAN"
-            - "CHINESE"
-            - "FRENCH"
-            - "GERMAN"
-            - "SPANISH"
-        subtitles:
+        info:
+          $ref: "#/components/schemas/UserInfo"
+        attachmentUrls:
           type: "array"
           items:
             type: "string"
-            enum:
-              - "ENGLISH"
-              - "VIETNAMESE"
-              - "JAPANESE"
-              - "KOREAN"
-              - "CHINESE"
-              - "FRENCH"
-              - "GERMAN"
-              - "SPANISH"
-        benefits:
-          type: "array"
-          items:
-            type: "string"
-        prerequisites:
-          type: "array"
-          items:
-            type: "string"
-        price:
-          $ref: "#/components/schemas/MonetaryAmount"
-        teacher:
+        createdDate:
           type: "string"
+          format: "date-time"
+        lastModifiedDate:
+          type: "string"
+          format: "date-time"
+    Emotion:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        username:
+          type: "string"
+        createdDate:
+          type: "string"
+          format: "date-time"
+    Post:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        content:
+          type: "string"
+        info:
+          $ref: "#/components/schemas/UserInfo"
+        attachmentUrls:
+          type: "array"
+          items:
+            type: "string"
+        comments:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Comment"
+        emotions:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Emotion"
+        createdDate:
+          type: "string"
+          format: "date-time"
+        lastModifiedDate:
+          type: "string"
+          format: "date-time"
+        deleted:
+          type: "boolean"
     CourseUpdateDTO:
       type: "object"
       properties:
@@ -1911,65 +1995,6 @@ components:
           type: "string"
         approveMessage:
           type: "string"
-    Comment:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          format: "int64"
-        content:
-          type: "string"
-        info:
-          $ref: "#/components/schemas/UserInfo"
-        attachmentUrls:
-          type: "array"
-          items:
-            type: "string"
-        createdDate:
-          type: "string"
-          format: "date-time"
-        lastModifiedDate:
-          type: "string"
-          format: "date-time"
-    Emotion:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          format: "int64"
-        username:
-          type: "string"
-        createdDate:
-          type: "string"
-          format: "date-time"
-    Post:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          format: "int64"
-        content:
-          type: "string"
-        info:
-          $ref: "#/components/schemas/UserInfo"
-        attachmentUrls:
-          type: "array"
-          items:
-            type: "string"
-        comments:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Comment"
-        emotions:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Emotion"
-        createdDate:
-          type: "string"
-          format: "date-time"
-        lastModifiedDate:
-          type: "string"
-          format: "date-time"
     Course:
       type: "object"
       properties:
@@ -2086,9 +2111,6 @@ components:
       properties:
         title:
           type: "string"
-    Void:
-      type: "object"
-      properties: { }
     LessonDTO:
       type: "object"
       properties:
@@ -2164,6 +2186,102 @@ components:
       properties:
         title:
           type: "string"
+    CourseWithoutSectionsDTO:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        title:
+          type: "string"
+        thumbnailUrl:
+          type: "string"
+        description:
+          type: "string"
+        language:
+          type: "string"
+          enum:
+            - "ENGLISH"
+            - "VIETNAMESE"
+            - "JAPANESE"
+            - "KOREAN"
+            - "CHINESE"
+            - "FRENCH"
+            - "GERMAN"
+            - "SPANISH"
+        subtitles:
+          type: "array"
+          items:
+            type: "string"
+            enum:
+              - "ENGLISH"
+              - "VIETNAMESE"
+              - "JAPANESE"
+              - "KOREAN"
+              - "CHINESE"
+              - "FRENCH"
+              - "GERMAN"
+              - "SPANISH"
+        benefits:
+          type: "array"
+          items:
+            type: "string"
+        prerequisites:
+          type: "array"
+          items:
+            type: "string"
+        price:
+          $ref: "#/components/schemas/MonetaryAmount"
+        teacher:
+          type: "string"
+    QuizUpdateDTO:
+      type: "object"
+      properties:
+        title:
+          type: "string"
+        description:
+          type: "string"
+        passScorePercentage:
+          type: "integer"
+          format: "int32"
+    AnswerOptionDTO:
+      type: "object"
+      properties:
+        content:
+          type: "string"
+        correct:
+          type: "boolean"
+    QuestionDTO:
+      type: "object"
+      properties:
+        content:
+          type: "string"
+        type:
+          type: "string"
+          enum:
+            - "MULTIPLE_CHOICE"
+            - "SINGLE_CHOICE"
+            - "TRUE_FALSE"
+        options:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/AnswerOptionDTO"
+        score:
+          type: "integer"
+          format: "int32"
+    QuizDTO:
+      type: "object"
+      properties:
+        title:
+          type: "string"
+        description:
+          type: "string"
+        afterLessonId:
+          type: "integer"
+          format: "int64"
+        passScorePercentage:
+          type: "integer"
+          format: "int32"
     PaymentRequest:
       type: "object"
       properties:
@@ -2221,6 +2339,8 @@ components:
         percentage:
           type: "number"
           format: "double"
+        maxValue:
+          $ref: "#/components/schemas/MonetaryAmount"
         fixedPrice:
           $ref: "#/components/schemas/MonetaryAmount"
         startDate:
@@ -2248,6 +2368,8 @@ components:
         percentage:
           type: "number"
           format: "double"
+        maxValue:
+          $ref: "#/components/schemas/MonetaryAmount"
         fixedPrice:
           $ref: "#/components/schemas/MonetaryAmount"
         startDate:
@@ -2276,6 +2398,31 @@ components:
         code:
           type: "string"
         price:
+          $ref: "#/components/schemas/MonetaryAmount"
+    DiscountSearchDTO:
+      type: "object"
+      properties:
+        code:
+          type: "string"
+        type:
+          type: "string"
+          enum:
+            - "PERCENTAGE"
+            - "FIXED"
+        percentage:
+          type: "number"
+          format: "double"
+        maxValue:
+          $ref: "#/components/schemas/MonetaryAmount"
+        fixedPrice:
+          $ref: "#/components/schemas/MonetaryAmount"
+        startDate:
+          type: "string"
+          format: "date-time"
+        endDate:
+          type: "string"
+          format: "date-time"
+        discountPrice:
           $ref: "#/components/schemas/MonetaryAmount"
     CourseEnrollmentDTO:
       type: "object"
@@ -2307,10 +2454,37 @@ components:
         lessonId:
           type: "integer"
           format: "int64"
+        lessonTitle:
+          type: "string"
         completed:
           type: "boolean"
         completedDate:
           $ref: "#/components/schemas/Instant"
+    Certificate:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+        fullName:
+          type: "string"
+        email:
+          type: "string"
+        student:
+          type: "string"
+        teacher:
+          type: "string"
+        url:
+          type: "string"
+        courseId:
+          type: "integer"
+          format: "int64"
+        courseTitle:
+          type: "string"
+        issuedDate:
+          $ref: "#/components/schemas/Instant"
+        certified:
+          type: "boolean"
     CourseEnrollment:
       type: "object"
       properties:
@@ -2330,6 +2504,10 @@ components:
             $ref: "#/components/schemas/LessonProgress"
         completed:
           type: "boolean"
+        completedDate:
+          $ref: "#/components/schemas/Instant"
+        certificate:
+          $ref: "#/components/schemas/Certificate"
         createdBy:
           type: "string"
         createdDate:
@@ -2408,71 +2586,43 @@ components:
             $ref: "#/components/schemas/LessonProgress"
         completed:
           type: "boolean"
+        completedDate:
+          $ref: "#/components/schemas/Instant"
+        certificate:
+          $ref: "#/components/schemas/Certificate"
         progress:
           $ref: "#/components/schemas/Progress"
-    CoursePostDTO:
+    CourseInfoWithEnrolmentStatisticDTO:
       type: "object"
       properties:
-        content:
-          type: "string"
-        attachmentUrls:
-          type: "array"
-          items:
-            type: "string"
-    CommentDTO:
-      type: "object"
-      properties:
-        content:
-          type: "string"
-        attachmentUrls:
-          type: "array"
-          items:
-            type: "string"
-    QuizUpdateDTO:
-      type: "object"
-      properties:
-        title:
-          type: "string"
-        description:
-          type: "string"
-        passScorePercentage:
-          type: "integer"
-          format: "int32"
-    AnswerOptionDTO:
-      type: "object"
-      properties:
-        content:
-          type: "string"
-        correct:
-          type: "boolean"
-    QuestionDTO:
-      type: "object"
-      properties:
-        content:
-          type: "string"
-        type:
-          type: "string"
-          enum:
-            - "MULTIPLE_CHOICE"
-            - "SINGLE_CHOICE"
-            - "TRUE_FALSE"
-        options:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/AnswerOptionDTO"
-        score:
-          type: "integer"
-          format: "int32"
-    QuizDTO:
-      type: "object"
-      properties:
-        title:
-          type: "string"
-        description:
-          type: "string"
-        afterLessonId:
+        courseId:
           type: "integer"
           format: "int64"
-        passScorePercentage:
+        title:
+          type: "string"
+        thumbnailUrl:
+          type: "string"
+        teacher:
+          type: "string"
+        totalEnrollments:
           type: "integer"
-          format: "int32"
+          format: "int64"
+        totalCompletedEnrollments:
+          type: "integer"
+          format: "int64"
+    CourseInfoWithEnrolmentsDTO:
+      type: "object"
+      properties:
+        courseId:
+          type: "integer"
+          format: "int64"
+        title:
+          type: "string"
+        thumbnailUrl:
+          type: "string"
+        teacher:
+          type: "string"
+        enrolments:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/CourseEnrollment"

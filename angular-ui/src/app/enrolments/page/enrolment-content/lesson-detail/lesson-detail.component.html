@@ -23,8 +23,12 @@
         <button *ngIf="!lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)" (click)="markLessonAsCompleted(lessonDetail.id, lessonDetail.title)"
                 class="btn btn-success me-2">Mark as Completed</button>
 
-        <button *ngIf="lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)" (click)="markLessonAsIncomplete(lessonDetail.id, lessonDetail.title)"
-                class="btn btn-warning">Unmark as Incomplete</button>
+        @if(!enrolmentWithCourse.completed) {
+          <button *ngIf="lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)" (click)="markLessonAsIncomplete(lessonDetail.id, lessonDetail.title)"
+                  class="btn btn-warning">Unmark as Incomplete</button>
+        } @else {
+          <button *ngIf="lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)" disabled class="btn btn-warning">Unmark as Incomplete</button>
+        }
       </div>
       <div>
         <a *ngIf="lessonPrev" [routerLink]="['/enrolments', enrolmentId, 'lessons', lessonPrev]"
