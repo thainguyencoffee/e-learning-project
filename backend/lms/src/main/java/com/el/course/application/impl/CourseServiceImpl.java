@@ -6,11 +6,12 @@ import com.el.course.application.CourseQueryService;
 import com.el.course.application.CourseService;
 import com.el.course.application.dto.*;
 import com.el.course.domain.*;
-import com.el.course.web.dto.QuizSubmitDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.money.MonetaryAmount;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -378,8 +379,9 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void submitQuiz(Long courseId, Long sectionId, Long quizId, QuizSubmitDTO quizSubmitDTO) {
-        // TODO: Implement this method
+    public QuizCalculationResult calculateQuizScore(Long courseId, Long quizId, Map<Long, Set<Long>> answers) {
+        Course course = courseQueryService.findCourseById(courseId);
+        return course.calculateQuiz(quizId, answers);
     }
 
 }

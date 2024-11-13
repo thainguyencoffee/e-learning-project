@@ -4,7 +4,10 @@ package com.el.enrollment.domain;
 import com.el.TestFactory;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
+import com.el.course.domain.QuestionType;
 import org.junit.jupiter.api.Test;
+
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,15 +55,64 @@ class CourseEnrollmentTests {
     }
 
     @Test
-    void markAllLessonsAsCompleted_ShouldMarkEnrollmentAsCompleted_WhenAllLessonsCompleted() {
+    void markAllLessonsAsCompleted_ShouldOK() {
         CourseEnrollment enrollment = TestFactory.createDefaultCourseEnrollment();
         enrollment.markLessonAsCompleted(1L);
         enrollment.markLessonAsCompleted(2L);
 
-        assertTrue(enrollment.getCompleted());
+        // Update: enrollment.getCompleted() return true when all lessons are completed and all quizzes are submitted
+        assertFalse(enrollment.getCompleted());
         assertEquals(2, enrollment.getProgress().totalLessons());
         assertEquals(2, enrollment.getProgress().completedLessons());
         assertTrue(enrollment.getLessonProgresses().stream().allMatch(LessonProgress::isCompleted));
+    }
+
+    @Test
+    void testCreateQuizSubmission() {
+        long quizId = 1L;
+        Set<QuizAnswer> answers = Set.of(
+                new QuizAnswer(1L, 1L, QuestionType.SINGLE_CHOICE),
+                new QuizAnswer(2L, 2L, QuestionType.SINGLE_CHOICE));
+        QuizSubmission quizSubmission = new QuizSubmission(quizId, answers, 5, true);
+
+        assertEquals(quizId, quizSubmission.getQuizId());
+        assertEquals(answers, quizSubmission.getAnswers());
+        assertEquals(5, quizSubmission.getScore());
+        assertTrue(quizSubmission.isPassed());
+        assertNotNull(quizSubmission.getSubmittedDate());
+        assertNotNull(quizSubmission.getLastModifiedDate());
+    }
+
+    @Test
+    void markAllLessonsAsCompleted_ShouldEnrollmentCompleted_WhenAllQuizzesSubmitted() {
+        CourseEnrollment enrollment = TestFactory.createDefaultCourseEnrollment();
+        enrollment.markLessonAsCompleted(1L);
+        enrollment.markLessonAsCompleted(2L);
+
+        long quizId1 = 1L;
+        Set<QuizAnswer> answers1 = Set.of(
+                new QuizAnswer(1L, 1L, QuestionType.SINGLE_CHOICE),
+                new QuizAnswer(2L, 2L, QuestionType.SINGLE_CHOICE));
+        QuizSubmission quizSubmission1 = new QuizSubmission(quizId1, answers1, 5, true);
+        enrollment.addQuizSubmission(quizSubmission1);
+
+        long quizId2 = 2L;
+        Set<QuizAnswer> answers2 = Set.of(
+                new QuizAnswer(1L, 1L, QuestionType.SINGLE_CHOICE),
+                new QuizAnswer(2L, 2L, QuestionType.SINGLE_CHOICE));
+        QuizSubmission quizSubmission2 = new QuizSubmission(quizId2, answers2, 4, true);
+        enrollment.addQuizSubmission(quizSubmission2);
+
+        assertTrue(enrollment.getCompleted());
+        assertNotNull(enrollment.getCompletedDate());
+        assertEquals(2, enrollment.getProgress().totalLessons());
+        assertEquals(2, enrollment.getProgress().completedLessons());
+        assertTrue(enrollment.getLessonProgresses().stream().allMatch(LessonProgress::isCompleted));
+
+
+        /*whenCourseEnrollmentAsComplete_DoesNotMarkAsIncomplete*/
+        InputInvalidException e = assertThrows(InputInvalidException.class, () -> enrollment.markLessonAsIncomplete(1L));
+        assertEquals("You can't mark lesson as incomplete for a completed enrollment.", e.getMessage());
     }
 
     @Test
@@ -83,16 +135,6 @@ class CourseEnrollmentTests {
 
         InputInvalidException e = assertThrows(InputInvalidException.class, () -> enrollment.markLessonAsIncomplete(1L));
         assertEquals("LessonProgress is already incomplete.", e.getMessage());
-    }
-
-    @Test
-    void whenCourseEnrollmentAsComplete_DoesNotMarkAsIncomplete() {
-        CourseEnrollment enrollment = TestFactory.createDefaultCourseEnrollment();
-        enrollment.markLessonAsCompleted(1L);
-        enrollment.markLessonAsCompleted(2L);
-
-        InputInvalidException e = assertThrows(InputInvalidException.class, () -> enrollment.markLessonAsIncomplete(1L));
-        assertEquals("You can't mark lesson as incomplete for a completed enrollment.", e.getMessage());
     }
 
     @Test

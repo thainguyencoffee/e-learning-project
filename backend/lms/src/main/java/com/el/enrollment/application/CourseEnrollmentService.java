@@ -2,6 +2,7 @@ package com.el.enrollment.application;
 
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
+import com.el.enrollment.application.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import org.springframework.data.domain.Pageable;
 
@@ -29,4 +30,7 @@ public interface CourseEnrollmentService {
     void markLessonAsIncomplete(Long enrollmentId, Long lessonId);
 
     void createCertificate(Long id, String student, Long courseId);
+
+    void submitQuiz(Long enrollmentId, QuizSubmitDTO quizSubmitDTO);
+
 }

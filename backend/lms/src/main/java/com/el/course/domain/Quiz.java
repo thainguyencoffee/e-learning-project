@@ -8,6 +8,8 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Table("quiz")
@@ -92,6 +94,41 @@ public class Quiz {
         this.deleted = false;
     }
 
+    public int calculateScore(Map<Long, Set<Long>> answers) {
+        return answers.keySet().stream()
+                .mapToInt(questionId -> {
+                    Question question = findQuestionById(questionId);
+                    Set<Long> answerOptionIds = answers.get(questionId);
+
+                    if (answerOptionIds.isEmpty()) {
+                        throw new InputInvalidException("Quiz calculation error: Answer must not be empty.");
+                    }
+
+                    if ((question.getType() == QuestionType.SINGLE_CHOICE || question.getType() == QuestionType.TRUE_FALSE) && answerOptionIds.size() != 1) {
+                        throw new InputInvalidException("Quiz calculation error: Single choice question must have exactly one answer.");
+                    }
+
+                    if (question.getType() == QuestionType.SINGLE_CHOICE || question.getType() == QuestionType.TRUE_FALSE) {
+                        return question.getOptions().stream()
+                                .filter(option -> answerOptionIds.contains(option.getId()))
+                                .mapToInt(option -> option.getCorrect() ? question.getScore() : 0)
+                                .sum();
+                    } else {
+                        long correctAnswers = question.getOptions().stream()
+                                .filter(AnswerOption::getCorrect)
+                                .count();
+
+                        long selectedCorrectAnswers = answerOptionIds.stream()
+                                .filter(id -> question.getOptions().stream().anyMatch(option -> option.getId().equals(id) && option.getCorrect()))
+                                .count();
+
+                        return (int) ((double) selectedCorrectAnswers / correctAnswers * question.getScore());
+                    }
+                })
+                .sum();
+    }
+
+
     private Question findQuestionById(Long questionId) {
         return this.questions.stream()
                 .filter(question -> question.getId().equals(questionId))
@@ -99,4 +136,7 @@ public class Quiz {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
+    public Boolean isPassed(Integer score) {
+        return (double) score / this.totalScore * 100 >= this.passScorePercentage;
+    }
 }

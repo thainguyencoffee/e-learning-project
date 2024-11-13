@@ -14,10 +14,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Table("course")
@@ -510,6 +507,13 @@ public class Course extends AuditSupportClass {
         section.forceDeleteQuiz(quizId);
     }
 
+    public QuizCalculationResult calculateQuiz(long quizId, Map<Long, Set<Long>> answers) {
+        Quiz quiz = findQuizById(quizId);
+        Integer score = quiz.calculateScore(answers);
+        Boolean passed = quiz.isPassed(score);
+        return new QuizCalculationResult(score, passed);
+    }
+
     private Post findPostById(Long postId) {
         return this.posts.stream()
                 .filter(post -> post.getId().equals(postId))
@@ -517,12 +521,6 @@ public class Course extends AuditSupportClass {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
-    private CourseSection findSectionById(Long sectionId) {
-        return this.sections.stream()
-                .filter(section -> section.getId().equals(sectionId))
-                .findFirst()
-                .orElseThrow(ResourceNotFoundException::new);
-    }
 
     public boolean isNotPublishedAndDeleted() {
         return !published && !deleted;
@@ -535,6 +533,21 @@ public class Course extends AuditSupportClass {
     private boolean isValidCurrency(CurrencyUnit inputCurrency) {
         var validCurrencies = Set.of(Currencies.VND);
         return validCurrencies.contains(inputCurrency);
+    }
+
+    private Quiz findQuizById(Long quizId) {
+        return this.sections.stream()
+                .flatMap(section -> section.getQuizzes().stream())
+                .filter(quiz -> quiz.getId().equals(quizId))
+                .findFirst()
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    private CourseSection findSectionById(Long sectionId) {
+        return this.sections.stream()
+                .filter(section -> section.getId().equals(sectionId))
+                .findFirst()
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
     public Map<Long, String> getLessonIds() {

@@ -10,7 +10,7 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 
 @Table("course_enrollment")
@@ -23,10 +23,12 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     private Long courseId;
     private Instant enrollmentDate;
     @MappedCollection(idColumn = "course_enrollment")
-    private Set<LessonProgress> lessonProgresses = new LinkedHashSet<>();
+    private Set<LessonProgress> lessonProgresses = new HashSet<>();
     private Boolean completed;
     private Instant completedDate;
     private Certificate certificate;
+    @MappedCollection(idColumn = "course_enrollment")
+    private Set<QuizSubmission> quizSubmissions = new HashSet<>();
     @CreatedBy
     private String createdBy;
     @CreatedDate
@@ -71,11 +73,21 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     }
 
     private void checkCompleted() {
-        if (lessonProgresses.stream().allMatch(LessonProgress::isCompleted)) {
+        if (allLessonsCompleted() && allQuizSubmitPassed()) {
             this.completed = true;
             this.completedDate = Instant.now();
             registerEvent(new EnrolmentCompletedEvent(this.id, this.courseId, this.student));
         }
+    }
+
+    private boolean allLessonsCompleted() {
+        return lessonProgresses.stream().allMatch(LessonProgress::isCompleted);
+    }
+
+    private boolean allQuizSubmitPassed() {
+        int numberOfQuizzes = this.quizSubmissions.size();
+        boolean allQuizzesPassed = this.quizSubmissions.stream().allMatch(QuizSubmission::isPassed);
+        return numberOfQuizzes == lessonProgresses.size() && allQuizzesPassed;
     }
 
     public Progress getProgress() {
@@ -87,6 +99,15 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     public void addLessonProgress(LessonProgress lessonProgress) {
         if (lessonProgress == null) throw new InputInvalidException("LessonProgress must not be null.");
         lessonProgresses.add(lessonProgress);
+    }
+
+    public void addQuizSubmission(QuizSubmission quizSubmission) {
+        if (quizSubmission == null) throw new InputInvalidException("QuizSubmission must not be null.");
+        if (quizSubmissions.stream().anyMatch(qs -> qs.getQuizId().equals(quizSubmission.getQuizId()))) {
+            throw new InputInvalidException("QuizSubmission for this quiz already exists.");
+        }
+        quizSubmissions.add(quizSubmission);
+        checkCompleted();
     }
 
     public LessonProgress findLessonProgressByLessonId(Long lessonId) {

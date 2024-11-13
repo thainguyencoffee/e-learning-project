@@ -181,6 +181,26 @@ create table course_enrollment
     constraint fk_course_enrollment primary key (id)
 );
 
+create table quiz_submission(
+    id bigserial not null,
+    quiz_id bigint not null,
+    course_enrollment bigint not null references course_enrollment (id) on DELETE cascade,
+    score int not null,
+    passed boolean not null,
+    submitted_date timestamp not null,
+    last_modified_date timestamp not null,
+    constraint fk_quiz_submission primary key (id)
+);
+
+create table quiz_answer(
+    id bigserial not null,
+    quiz_submission bigint not null references quiz_submission (id) on DELETE cascade,
+    question_id bigint not null,
+    answer_option_ids bigint[] not null,
+    type varchar(50) not null,
+    constraint fk_quiz_answer primary key (id)
+);
+
 create table certificate (
     id uuid DEFAULT gen_random_uuid() not null,
     course_enrollment bigint not null references course_enrollment (id) on DELETE cascade,

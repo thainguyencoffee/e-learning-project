@@ -6,7 +6,6 @@ import com.el.course.application.dto.QuestionDTO;
 import com.el.course.application.dto.QuizDTO;
 import com.el.course.application.dto.QuizUpdateDTO;
 import com.el.course.domain.Quiz;
-import com.el.course.web.dto.QuizSubmitDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -97,15 +96,6 @@ public class CourseQuizController {
                                                @PathVariable Long quizId, @PathVariable Long questionId) {
         courseService.deleteQuestion(courseId, sectionId, quizId, questionId);
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("/{quizId}/submit")
-    public ResponseEntity<Void> submitQuiz(@PathVariable Long courseId,
-                                           @PathVariable Long sectionId,
-                                           @PathVariable Long quizId,
-                                           @Valid @RequestBody QuizSubmitDTO quizSubmitDTO) {
-        courseService.submitQuiz(courseId, sectionId, quizId, quizSubmitDTO);
-        return ResponseEntity.ok().build();
     }
 
 }

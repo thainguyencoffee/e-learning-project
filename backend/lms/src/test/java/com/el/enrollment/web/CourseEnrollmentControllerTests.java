@@ -5,7 +5,10 @@ import com.el.common.config.CustomAuthenticationEntryPoint;
 import com.el.common.config.SecurityConfig;
 import com.el.common.config.jackson.JacksonCustomizations;
 import com.el.common.exception.ResourceNotFoundException;
+import com.el.course.domain.QuestionType;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
+import com.el.enrollment.application.dto.QuestionSubmitDTO;
+import com.el.enrollment.application.dto.QuizSubmitDTO;
 import com.el.enrollment.application.impl.CourseEnrollmentServiceImpl;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
@@ -22,13 +25,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -146,5 +149,34 @@ class CourseEnrollmentControllerTests {
         ).andExpect(status().isNotFound());
     }
 
+    @Test
+    void quizSubmission_ValidRequest_SubmitsQuiz() throws Exception {
+        doNothing().when(courseEnrollmentService).submitQuiz(any(), any());
+
+        QuizSubmitDTO quizSubmitDTO = TestFactory.createQuizSubmitDTO();
+
+        mockMvc.perform(post("/enrollments/{enrollmentId}/submit-quiz", 1L)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(quizSubmitDTO))
+                .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user")))
+        ).andExpect(status().isOk());
+    }
+
+    @Test
+    void quizSubmission_InvalidRequest_BadRequest() throws Exception {
+        doNothing().when(courseEnrollmentService).submitQuiz(any(), any());
+
+        QuizSubmitDTO quizSubmitDTO = new QuizSubmitDTO(
+                1L,
+                Set.of(new QuestionSubmitDTO(QuestionType.SINGLE_CHOICE, 1L, Set.of(1L, 2L)),
+                        new QuestionSubmitDTO(QuestionType.TRUE_FALSE, 2L, Set.of(4L))
+                ));
+
+        mockMvc.perform(post("/enrollments/{enrollmentId}/submit-quiz", 1L)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(quizSubmitDTO))
+                .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user")))
+        ).andExpect(status().isBadRequest());
+    }
 
 }

@@ -1,12 +1,13 @@
-package com.el.course.web.dto;
+package com.el.enrollment.application.dto;
 
 import com.el.common.ValidateMessages;
 import com.el.course.domain.QuestionType;
 import com.el.course.web.validate.QuestionSubmitConstraint;
+import com.el.enrollment.domain.QuizAnswer;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.List;
+import java.util.Set;
 
 @QuestionSubmitConstraint
 public record QuestionSubmitDTO(
@@ -16,6 +17,12 @@ public record QuestionSubmitDTO(
         Long questionId,
         @NotNull(message = ValidateMessages.NOT_NULL)
         @NotEmpty
-        List<Long> answerOptionIds
+        Set<Long> answerOptionIds
 ) {
+        public QuizAnswer toQuizAnswer() {
+                if (type == QuestionType.TRUE_FALSE || type == QuestionType.SINGLE_CHOICE) {
+                        return new QuizAnswer(questionId(), answerOptionIds().iterator().next(), type());
+                }
+                return new QuizAnswer(questionId(), answerOptionIds(), type());
+        }
 }

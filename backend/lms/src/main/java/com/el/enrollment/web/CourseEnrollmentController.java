@@ -5,8 +5,10 @@ import com.el.common.exception.ResourceNotFoundException;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
 import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
+import com.el.enrollment.application.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -70,6 +72,13 @@ public class CourseEnrollmentController {
         } else {
             courseEnrollmentService.markLessonAsIncomplete(enrollmentId, lessonId);
         }
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{enrollmentId}/submit-quiz")
+    public ResponseEntity<Void> submitQuiz(@PathVariable Long enrollmentId,
+                                           @Valid @RequestBody QuizSubmitDTO quizSubmitDTO) {
+        courseEnrollmentService.submitQuiz(enrollmentId, quizSubmitDTO);
         return ResponseEntity.ok().build();
     }
 
