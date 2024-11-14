@@ -1,5 +1,6 @@
 package com.el.course.domain;
 
+import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import lombok.Getter;
@@ -103,11 +104,14 @@ public class Post {
                 });
     }
 
-    public void deleteComment(Long commentId) {
+    public void deleteComment(Long commentId, String username) {
         if (isDeleted()) {
             throw new InputInvalidException("Post is deleted");
         }
-        comments.removeIf(comment -> comment.getId().equals(commentId));
+        boolean deleted = comments.removeIf(comment -> comment.getId().equals(commentId) && comment.getInfo().username().equals(username));
+        if (!deleted) {
+            throw new AccessDeniedException("You cannot delete comment's other person");
+        }
     }
 
     public void deleteEmotion(Long emotionId) {

@@ -237,7 +237,7 @@ public class CourseServiceImpl implements CourseService {
     public Long addPost(Long courseId, CoursePostDTO coursePostDTO) {
         com.el.common.auth.web.dto.UserInfo userInfo = rolesBaseUtil.getCurrentUserInfoFromJwt();
 
-        Post post = coursePostDTO.toPost(new UserInfo(userInfo.firstName(), userInfo.lastName()));
+        Post post = coursePostDTO.toPost(new UserInfo(userInfo.firstName(), userInfo.lastName(), userInfo.username()));
         Course course = courseQueryService.findCourseById(courseId);
         course.addPost(post);
         courseRepository.save(course);
@@ -276,7 +276,7 @@ public class CourseServiceImpl implements CourseService {
     public Long addComment(Long courseId, Long postId, CommentDTO commentDTO) {
         com.el.common.auth.web.dto.UserInfo userInfo = rolesBaseUtil.getCurrentUserInfoFromJwt();
 
-        Comment comment = commentDTO.toComment(new UserInfo(userInfo.firstName(), userInfo.lastName()));
+        Comment comment = commentDTO.toComment(new UserInfo(userInfo.firstName(), userInfo.lastName(), userInfo.username()));
         Course course = courseQueryService.findPublishedCourseById(courseId);
         course.addCommentToPost(postId, comment);
         courseRepository.save(course);
@@ -292,8 +292,10 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void deleteComment(Long courseId, Long postId, Long commentId) {
+        String username = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+
         Course course = courseQueryService.findPublishedCourseById(courseId);
-        course.deleteCommentFromPost(postId, commentId);
+        course.deleteCommentFromPost(postId, commentId, username);
         courseRepository.save(course);
     }
 

@@ -87,7 +87,7 @@ class CourseJdbcTests {
     void testAddPost() {
         Course savedCourse = spy(courseRepository.save(courseWithSections));
         Post post = new Post("Quisque vitae rutrum turpis. Mauris non mauris purus. Mauris consequat nunc bibendum aliquam pharetra.",
-                new UserInfo("thai", "nguyen"),
+                new UserInfo("thai", "nguyen", "user"),
                 Set.of("http://placekitten.com/1", "http://placekitten.com/2"));
 
         when(savedCourse.isNotPublishedAndDeleted()).thenReturn(false);
@@ -112,10 +112,10 @@ class CourseJdbcTests {
     void testAddComment() {
         Course savedCourse = spy(courseRepository.save(courseWithSections));
         Post post = new Post("Quisque vitae rutrum turpis. Mauris non mauris purus. Mauris consequat nunc bibendum aliquam pharetra.",
-                new UserInfo("thai", "nguyen"),
+                new UserInfo("thai", "nguyen", "user"),
                 Set.of("http://placekitten.com/1", "http://placekitten.com/2"));
         Comment comment = new Comment("Quisque vitae rutrum turpis. Mauris non mauris purus. Mauris consequat nunc bibendum aliquam pharetra.",
-                new UserInfo("thai", "nguyen"),
+                new UserInfo("thai", "nguyen", "user"),
                 Set.of("http://placekitten.com/1", "http://placekitten.com/2"));
 
         when(savedCourse.isNotPublishedAndDeleted()).thenReturn(false);
@@ -144,7 +144,7 @@ class CourseJdbcTests {
     void testAddEmotion() {
         Course savedCourse = spy(courseRepository.save(courseWithSections));
         Post post = new Post("Quisque vitae rutrum turpis. Mauris non mauris purus. Mauris consequat nunc bibendum aliquam pharetra.",
-                new UserInfo("thai", "nguyen"),
+                new UserInfo("thai", "nguyen", "user"),
                 Set.of("http://placekitten.com/1", "http://placekitten.com/2"));
 
         when(savedCourse.isNotPublishedAndDeleted()).thenReturn(false);

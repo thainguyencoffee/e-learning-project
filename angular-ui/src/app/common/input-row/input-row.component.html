@@ -73,6 +73,10 @@
         <app-file-row [rowType]="rowType" [control]="dynamicControl!"></app-file-row>
       }
 
+      @else {
+        <div class="alert alert-danger">Unsupported row type: {{ rowType }}</div>
+      }
+
       <app-input-errors [control]="dynamicControl!"/>
     </div>
   }

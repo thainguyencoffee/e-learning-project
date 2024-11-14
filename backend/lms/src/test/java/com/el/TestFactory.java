@@ -253,7 +253,7 @@ public class TestFactory {
                         
                         Donec eleifend dignissim enim, et rutrum eros eleifend vel. Mauris interdum non leo at tincidunt. Aliquam tincidunt ac elit id ornare. Etiam felis magna, lobortis sed luctus hendrerit, semper non velit. Nunc vel odio vel justo gravida mattis at sed felis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Phasellus sed nisl euismod urna laoreet ullamcorper. Proin feugiat sem at libero ultricies semper. Morbi rutrum magna ac mauris cursus sollicitudin. Cras commodo neque sapien, imperdiet rhoncus sapien pretium ac. Integer sed enim non nisi aliquet placerat. Vivamus scelerisque feugiat diam, non blandit mauris aliquet ac. Vivamus ullamcorper diam dui, sit amet rhoncus velit pellentesque non. Nam luctus urna in purus porttitor eleifend.\s
                         """,
-                new UserInfo("thai", "nguyen"),
+                new UserInfo("thai", "nguyen", "user"),
                 Set.of("http://example.com/photo1.jpg", "http://example.com/photo2.jpg")
         );
     }

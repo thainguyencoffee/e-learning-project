@@ -53,28 +53,26 @@ export class PostListComponent implements OnInit,OnDestroy {
     return this.userService.current.name === teacher;
   }
 
-
   getPageRange(): number[] {
     return this.paginationUtils?.getPageRange() || [];
   }
+
   loadData(pageNumber: number): void {
     this.courseId = +this.route.snapshot.params['courseId'];
     this.courseService.getAllPosts(pageNumber, this.courseId!).subscribe({
       next: (pageWrapper) => {
         this.paginationUtils = new PaginationUtils(pageWrapper.page);
-        this.posts = pageWrapper.content as Post[]; // Đảm bảo posts là một mảng
+        this.posts = pageWrapper.content as Post[];
       },
-      error: (error) => {
-        console.error('Error loading posts:', error);
-        this.errorHandler.handleServerError(error.error);
-      }
+      error: (error) => this.errorHandler.handleServerError(error.error)
     });
   }
+
   confirmDelete(postId: number,post: Post) {
     if (confirm(this.getMessage('confirmDelete'))) {
       this.courseService.deletePost(this.courseId!,postId,post)
         .subscribe({
-          next: () => this.router.navigate(['/administration/courses', this.courseId, 'posts'], {
+          next: () => this.router.navigate(['/administration/courses', this.courseId, 'posts', 'trash'], {
             state: {
               msgSuccess: this.getMessage('deleted')
             }

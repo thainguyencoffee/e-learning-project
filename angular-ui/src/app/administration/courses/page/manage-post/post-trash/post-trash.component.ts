@@ -6,6 +6,7 @@ import {UserService} from "../../../../../common/auth/user.service";
 import {ErrorHandler} from "../../../../../common/error-handler.injectable";
 import {Subscription} from "rxjs";
 import {Post} from "../../../model/view/post";
+import {PaginationUtils} from "../../../../../common/dto/page-wrapper";
 
 @Component({
   selector: 'app-course-trash',
@@ -21,19 +22,19 @@ import {Post} from "../../../model/view/post";
 })
 export class PostTrashComponent implements OnInit, OnDestroy {
 
-  constructor(
-    private courseService: CourseService,
-    private userService: UserService) {
-  }
+  courseService = inject(CourseService);
+
   route = inject(ActivatedRoute);
   errorHandler = inject(ErrorHandler);
   router = inject(Router);
+
   postInTrash?: Post[];
   size!: number;
   number!: number;
   courseId?: number;
   totalElements!: number;
   totalPages!: number;
+  paginationUtils?: PaginationUtils;
   navigationSubscription?: Subscription;
 
   getMessage(key: string, details?: any) {
@@ -47,9 +48,8 @@ export class PostTrashComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.courseId = +this.route.snapshot.params['courseId'];
-
     this.loadData(0);
+
     this.navigationSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.loadData(0);
@@ -57,35 +57,28 @@ export class PostTrashComponent implements OnInit, OnDestroy {
     })
   }
 
-
   ngOnDestroy(): void {
     this.navigationSubscription!.unsubscribe();
   }
 
   onPageChange(pageNumber: number): void {
-    if (pageNumber >= 0 && pageNumber < this.totalPages) {
+    if (pageNumber >= 0 && pageNumber < this.paginationUtils!.totalPages) {
       this.loadData(pageNumber);
     }
   }
 
   getPageRange(): number[] {
-    const pageRange = [];
-    for (let i = 0; i < this.totalPages; i++) {
-      pageRange.push(i);
-    }
-    return pageRange;
+    return this.paginationUtils?.getPageRange() || [];
   }
 
   loadData(pageNumber: number): void {
+    this.courseId = +this.route.snapshot.params['courseId'];
 
     this.courseService.getTrashedPosts(pageNumber, this.courseId!)
       .subscribe({
         next: (pageWrapper) => {
           this.postInTrash = pageWrapper.content as Post[];
-          this.size = pageWrapper.page.size;
-          this.number = pageWrapper.page.number;
-          this.totalElements = pageWrapper.page.totalElements;
-          this.totalPages = pageWrapper.page.totalPages;
+          this.paginationUtils = new PaginationUtils(pageWrapper.page);
         },
         error: (error) => this.errorHandler.handleServerError(error.error)
       });
@@ -93,32 +86,31 @@ export class PostTrashComponent implements OnInit, OnDestroy {
 
   confirmDeleteForce(post: Post) {
     if (confirm(this.getMessage('confirmDelete'))) {
-      this.courseService.deletePostForce(post,this.courseId!)
+      this.courseService.deletePostForce(post, this.courseId!)
         .subscribe({
-          next: () => this.router.navigate(['/administration/courses', this.courseId, 'posts', 'trash'], {
+          next: () => this.router.navigate(['../'], {
+            relativeTo: this.route,
             state: {
               msgSuccess: this.getMessage('deleted')
             }
           }),
           error: (error) => this.errorHandler.handleServerError(error.error)
         });
-
     }
-
   }
 
   confirmRestore(postId: number,courseId:number) {
     if (confirm(this.getMessage('confirmRestore'))) {
       this.courseService.restorePost(courseId,postId)
         .subscribe({
-          next: () => this.router.navigate(['/administration/courses', this.courseId, 'posts', 'trash'], {
+          next: () => this.router.navigate(['../'], {
+            relativeTo: this.route,
             state: {
               msgSuccess: this.getMessage('restored')
             }
           }),
           error: (error) => this.errorHandler.handleServerError(error.error)
         });
-
     }
   }
 
