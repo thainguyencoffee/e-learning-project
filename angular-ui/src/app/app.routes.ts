@@ -49,11 +49,11 @@ import {EditQuizComponent} from "./administration/courses/page/manage-quiz/edit-
 import {AddQuestionComponent} from "./administration/courses/page/manage-quiz/add-question/add-question.component";
 import {EditQuestionComponent} from "./administration/courses/page/manage-quiz/edit-question/edit-question.component";
 import {QuizTrashComponent} from "./administration/courses/page/manage-quiz/quiz-trash/quiz-trash.component";
-import {UppyComponent} from "./beta/uppy/uppy.component";
 import {EnrolmentStatisticsComponent} from "./administration/statistics/page/enrolment-statistics.component";
 import {
   EnrolmentStatisticDetailComponent
 } from "./administration/statistics/page/enrolment-statistic-detail/enrolment-statistic-detail.component";
+import {RoleGuard} from "./role.guard";
 
 export const routes: Routes = [
   {
@@ -69,7 +69,14 @@ export const routes: Routes = [
       {
         title: 'Usage about unpublishing course',
         path: 'about-unpublish',
-        component: AboutUnpublishComponent
+        component: AboutUnpublishComponent,
+        canActivate: [RoleGuard],
+        data: {
+          requiredRoles: ['ROLE_admin', 'ROLE_teacher'],
+          deniedRoles: ['ROLE_user'],
+          errorStatus: 403,
+          errorMessage: 'Only admin and teacher can access usage page'
+        },
       }
     ]
   },
@@ -82,6 +89,10 @@ export const routes: Routes = [
     title: 'Course content',
     path: 'enrolments/:id',
     component: EnrolmentContentComponent,
+    canActivate: [RoleGuard],
+    data: {
+      requiredRoles: ['ROLE_user']
+    },
     children: [
       {
         title: 'Enrolment overview',
@@ -103,38 +114,83 @@ export const routes: Routes = [
   {
     title: 'Lesson detail',
     path: 'enrolments/:enrolmentId/lessons/:lessonId',
-    component: LessonDetailComponent
+    component: LessonDetailComponent,
+    canActivate: [RoleGuard],
+    data: {
+      requiredRoles: ['ROLE_user']
+    },
   },
   {
     title: 'Checkout course',
     path: 'checkout/:courseId',
-    component: CheckoutComponent
+    component: CheckoutComponent,
+    canActivate: [RoleGuard],
+    data: {
+      requiredRoles: ['ROLE_user'],
+      deniedRoles: ['ROLE_admin', 'ROLE_teacher'],
+      errorStatus: 403,
+      errorMessage: 'Only user can access checkout page'
+    }
   },
   {
     title: 'Checkout payment',
     path: 'checkout/pay/:orderId',
-    component: PaymentComponent
+    component: PaymentComponent,
+    canActivate: [RoleGuard],
+    data: {
+      requiredRoles: ['ROLE_user'],
+      deniedRoles: ['ROLE_admin', 'ROLE_teacher'],
+      errorStatus: 403,
+      errorMessage: 'Only user can access payment page'
+    }
   },
   {
     title: 'My Orders',
     path: 'my-orders',
-    component: MyOrdersComponent
+    component: MyOrdersComponent,
+    canActivate: [RoleGuard],
+    data: {
+      requiredRoles: ['ROLE_user'],
+      deniedRoles: ['ROLE_admin', 'ROLE_teacher'],
+      errorStatus: 403,
+      errorMessage: 'Only user can access my order page'
+    }
   },
   {
     title: 'My order detail',
     path: 'my-orders/:orderId',
-    component: MyOrderDetailComponent
+    component: MyOrderDetailComponent,
+    canActivate: [RoleGuard],
+    data: {
+      requiredRoles: ['ROLE_user'],
+      deniedRoles: ['ROLE_admin', 'ROLE_teacher'],
+      errorStatus: 403,
+      errorMessage: 'Only user can access my order detail page'
+    }
   },
   {
     title: 'Welcome to my courses!',
     path: 'my-enrolments',
-    component: MyEnrolmentsComponent
+    component: MyEnrolmentsComponent,
+    canActivate: [RoleGuard],
+    data: {
+      requiredRoles: ['ROLE_user'],
+      deniedRoles: ['ROLE_admin', 'ROLE_teacher'],
+      errorStatus: 403,
+      errorMessage: 'Only user can access my enrolments page'
+    }
   },
   {
     title: 'Welcome to dashboard!',
     path: 'administration',
     component: DashboardComponent,
-    // canActivate: [authGuard],
+    canActivate: [RoleGuard],
+    data: {
+      requiredRoles: ['ROLE_admin', 'ROLE_teacher'],
+      deniedRoles: ['ROLE_user'],
+      errorStatus: 403,
+      errorMessage: 'Only admin and teacher can access administration dashboard page'
+    },
     children: [
       // Course management
       {
@@ -330,11 +386,6 @@ export const routes: Routes = [
     path: 'error',
     component: ErrorComponent,
     title: 'Error page'
-  },
-  {
-    title: 'Uppy',
-    path: 'beta/uppy',
-    component: UppyComponent,
   },
   {
     path: '**',

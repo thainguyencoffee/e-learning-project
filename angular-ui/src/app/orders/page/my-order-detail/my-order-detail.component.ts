@@ -50,7 +50,17 @@ export class MyOrderDetailComponent implements OnInit, OnDestroy{
     this.orderService.getOrder(this.orderId!)
       .subscribe({
         next: (data) => this.order = data,
-        error: (error) => this.errorHandler.handleServerError(error.error)
+        error: (error) => {
+          if (error.status === 404) {
+            this.errorHandler.handleServerError({
+              status: 403,
+              message: 'You are not authorized to view this order',
+              code: 'NOT_OWNER'
+            })
+          } else {
+            this.errorHandler.handleServerError(error.error)
+          }
+        }
       })
     this.paymentService.getAllPaymentsByOrder(this.orderId!)
       .subscribe({

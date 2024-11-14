@@ -18,7 +18,7 @@
           </ul>
         </li>
 
-        <li class="nav-item dropdown" *ngIf="isAuthenticated">
+        <li class="nav-item dropdown" *ngIf="!isTeacher && !isAdmin">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             More
           </a>

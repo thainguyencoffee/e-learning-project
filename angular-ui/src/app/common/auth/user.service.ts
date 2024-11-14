@@ -82,6 +82,10 @@ export class UserService {
     });
   }
 
+  getUser() {
+    return this.http.get<UserInfoDto>('/bff/api/me')
+  }
+
   get valueChanges(): Observable<User> {
     return this.user$;
   }

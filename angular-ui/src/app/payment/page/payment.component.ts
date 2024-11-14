@@ -56,10 +56,19 @@ export class PaymentComponent implements OnInit {
         updateForm(this.paymentForm, {
           orderId: order.id,
           amount: order.discountedPrice || order.totalPrice,
-          token: 'hello world'
         })
       },
-      error: err => this.errorHandler.handleServerError(err.error)
+      error: error => {
+        if (error.status === 404) {
+          this.errorHandler.handleServerError({
+            status: 403,
+            message: 'You are not authorized to view this payment page.',
+            code: 'NOT_OWNER'
+          })
+        } else {
+          this.errorHandler.handleServerError(error.error)
+        }
+      }
     })
   }
 
