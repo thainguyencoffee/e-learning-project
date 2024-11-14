@@ -90,21 +90,21 @@ class CourseEnrollmentServiceTests {
     }
 
     @Test
-    void markLessonAsCompleted_Admin_MarksLessonAsCompleted() {
+    void markLessonAsCompleted_Admin_Throws() {
         // Arrange
         Long enrollmentId = 1L;
         Long lessonId = 1L;
 
         CourseEnrollment mockCourseEnrollment = Mockito.mock(CourseEnrollment.class);
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        when(courseEnrollmentRepository.findById(enrollmentId)).thenReturn(Optional.of(mockCourseEnrollment));
 
         // Act
-        courseEnrollmentService.markLessonAsCompleted(enrollmentId, lessonId);
+        assertThrows(AccessDeniedException.class, () ->
+                courseEnrollmentService.markLessonAsCompleted(enrollmentId, lessonId));
 
         // Assert
-        verify(mockCourseEnrollment, times(1)).markLessonAsCompleted(lessonId);
-        verify(courseEnrollmentRepository, times(1)).save(mockCourseEnrollment);
+        verify(mockCourseEnrollment, never()).markLessonAsCompleted(lessonId);
+        verify(courseEnrollmentRepository, never()).save(mockCourseEnrollment);
     }
 
     @Test
@@ -150,21 +150,21 @@ class CourseEnrollmentServiceTests {
     }
 
     @Test
-    void markLessonAsIncomplete_Admin_MarksLessonAsIncomplete() {
+    void markLessonAsIncomplete_Teacher_Throws() {
         // Arrange
         Long enrollmentId = 1L;
         Long lessonId = 1L;
 
         CourseEnrollment mockCourseEnrollment = Mockito.mock(CourseEnrollment.class);
-        when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        when(courseEnrollmentRepository.findById(enrollmentId)).thenReturn(Optional.of(mockCourseEnrollment));
+        when(rolesBaseUtil.isTeacher()).thenReturn(true);
 
         // Act
-        courseEnrollmentService.markLessonAsIncomplete(enrollmentId, lessonId);
+        assertThrows(AccessDeniedException.class, () ->
+                courseEnrollmentService.markLessonAsIncomplete(enrollmentId, lessonId));
 
         // Assert
-        verify(mockCourseEnrollment, times(1)).markLessonAsIncomplete(lessonId);
-        verify(courseEnrollmentRepository, times(1)).save(mockCourseEnrollment);
+        verify(mockCourseEnrollment, never()).markLessonAsIncomplete(lessonId);
+        verify(courseEnrollmentRepository, never()).save(mockCourseEnrollment);
     }
 
     @Test
