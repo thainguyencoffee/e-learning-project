@@ -11,7 +11,7 @@
       <a [routerLink]="['/enrolments', enrolmentId, 'lessons']" class="list-group-item list-group-item-action"
          [ngClass]="{'active': isActive('/enrolments/' + enrolmentId + '/lessons')}"
          [attr.aria-current]="isActive('/enrolments/' + enrolmentId + '/lessons')">Lessons</a>
-      <a [routerLink]="['/enrolments', enrolmentId, 'posts']" class="list-group-item list-group-item-action"
+      <a [routerLink]="['/enrolments', enrolmentId, 'posts']" [queryParams]="{courseId: enrolmentWithCourse.courseId}" class="list-group-item list-group-item-action"
          [ngClass]="{'active': isActive('/enrolments/' + enrolmentId + '/posts')}"
          [attr.aria-current]="isActive('/enrolments/' + enrolmentId + '/posts')">Posts</a>
     </div>

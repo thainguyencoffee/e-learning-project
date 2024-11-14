@@ -16,11 +16,32 @@ public interface CourseEnrollmentRepository extends CrudRepository<CourseEnrollm
             "from course_enrollment ce join course c on ce.course_id = c.id where ce.student = :student LIMIT :size OFFSET :page * :size")
     List<CourseEnrollmentDTO> findAllCourseEnrollmentDTOsByStudent(String student, int page, int size);
 
+    @Query("""
+    select ce.id, ce.student, ce.course_id, c.title, c.thumbnail_url, c.teacher, ce.enrollment_date, ce.completed
+        from course_enrollment ce
+        join course c on ce.course_id = c.id
+        where c.teacher = :teacher
+        LIMIT :size OFFSET :page * :size
+    """)
+    List<CourseEnrollmentDTO> findAllCourseEnrollmentDTOsByTeacher(String teacher, int page, int size);
+
     @Query("select ce.id, ce.student, ce.course_id, c.title, c.thumbnail_url, c.teacher, ce.enrollment_date, ce.completed " +
             "from course_enrollment ce join course c on ce.course_id = c.id LIMIT :size OFFSET :page * :size")
     List<CourseEnrollmentDTO> findAllCourseEnrollmentDTOs(int page, int size);
 
     Optional<CourseEnrollment> findByIdAndStudent(Long id, String student);
+
+    @Query("""
+        SELECT
+            ce.*
+        FROM
+            course_enrollment ce
+                JOIN
+            course c ON ce.course_id = c.id
+        WHERE
+            ce.id = :id AND c.teacher = :teacher
+    """)
+    Optional<CourseEnrollment> findByIdAndTeacher(Long id, String teacher);
 
     Optional<CourseEnrollment> findByCourseIdAndStudent(Long courseId, String student);
 

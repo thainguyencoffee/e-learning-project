@@ -26,7 +26,7 @@ import {NgIf} from "@angular/common";
       </video>
     }
 
-    @else if (rowType == 'docFile') {
+    @else if (rowType === 'docFile') {
       <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}"
              accept=".pdf, .doc, .docx"/>
       <p *ngIf="previewUrl">Your document was uploaded: {{ previewUrl }}</p>

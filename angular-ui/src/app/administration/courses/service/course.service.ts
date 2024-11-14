@@ -18,6 +18,7 @@ import {PostDto} from "../model/post-dto";
 import {EditQuizDto} from "../model/edit-quiz.dto";
 import {QuestionDto} from "../model/question.dto";
 import {Quiz} from "../model/view/quiz";
+import {CommentDto} from "../../../enrolments/model/comment.dto";
 
 @Injectable(
   {providedIn: 'root'}
@@ -152,13 +153,14 @@ export class CourseService {
   rejectRequest(courseId: number, requestId: number, data: RejectRequestDto) {
     return this.http.put<void>(`${this.resourcePath}/${courseId}/requests/${requestId}/reject`, data);
   }
+
   getAllPosts(pageNumber: number = 0,courseId: number, pageSize: number = 10): Observable<PageWrapper<Post>> {
     const url = `${this.resourcePath}/${courseId}/posts?page=${pageNumber}&size=${pageSize}`;
     return this.http.get<PageWrapper<Post>>(url);
   }
-  getPost(courseId: number, postId: number): Observable<PostDto> {
 
-    return this.http.get<PostDto>(`${this.resourcePath}/${courseId}/posts/${postId}`);
+  getPost(courseId: number, postId: number){
+    return this.http.get<Post>(`${this.resourcePath}/${courseId}/posts/${postId}`);
   }
 
   createPost(data: PostDto, courseId: number): Observable<void> {
@@ -176,25 +178,37 @@ export class CourseService {
       return this.http.delete<void>(`${this.resourcePath}/${courseId}/posts/${postId}`);
     }
   }
+
   restorePost(courseId: number, postId: number){
     return this.http.post<void>(`${this.resourcePath}/${courseId}/posts/${postId}/restore`, {});
   }
-  getTrashedPosts(pageNumber: number = 0,courseId: number,pageSize: number = 10): Observable<PageWrapper<Post>> {
+
+  getTrashedPosts(pageNumber: number = 0, courseId: number, pageSize: number = 10): Observable<PageWrapper<Post>> {
     const url = `${this.resourcePath}/${courseId}/posts/trash?page=${pageNumber}&size=${pageSize}`;
     return this.http.get<PageWrapper<Post>>(url);
   }
-  deletePostForce(post: Post,courseId:number): Observable<void> {
-    const url = `${this.resourcePath}/${courseId}/posts/${post.id}`;
-    const params = new HttpParams().set('force', 'true');
 
-    return this.http.delete<void>(url, { params }).pipe(
-      catchError((error) => {
-        console.error("Error deleting post forcefully:", error);
-        return throwError(() => new Error("Failed to delete post forcefully"));
-      })
-    );
+  deletePostForce(post: Post, courseId: number): Observable<void> {
+    return this.http.delete<void>(`${this.resourcePath}/${courseId}/posts/${post.id}`, {
+      params: { force: 'true' }
+    });
   }
 
+  addEmotion(courseId: number, postId: number) {
+    return this.http.post<number>(`${this.resourcePath}/${courseId}/posts/${postId}/emotions`, {})
+  }
+
+  addComment(courseId: number, postId: number, data: CommentDto) {
+    return this.http.post<number>(`${this.resourcePath}/${courseId}/posts/${postId}/comments`, data);
+  }
+
+  editComment(courseId: number, postId: number, commentId: number, data: CommentDto) {
+    return this.http.put<void>(`${this.resourcePath}/${courseId}/posts/${postId}/comments/${commentId}`, data);
+  }
+
+  deleteComment(courseId: number, postId: number, commentId: number) {
+    return this.http.delete<void>(`${this.resourcePath}/${courseId}/posts/${postId}/comments/${commentId}`)
+  }
 
   getQuiz(courseId: number, sectionId: number) {
     return this.http.get<PageWrapper<Quiz>>(`${this.resourcePath}/${courseId}/sections/${sectionId}/quizzes`);

@@ -21,9 +21,14 @@ public class SecurityConfig {
         return http
                         // Define authorization rules
                         .authorizeHttpRequests(authorize -> authorize
+                        // Allow all requests to /upload/** with any roles
+                        .requestMatchers("/upload/**").authenticated()
+
                         .requestMatchers(HttpMethod.GET,
                                 "/courses/{courseId}/posts",
                                 "/courses/{courseId}/posts/{postId}").authenticated()
+                        .requestMatchers("/courses/{courseId}/posts/{postId}/emotions/**").authenticated()
+                        .requestMatchers("/courses/{courseId}/posts/{postId}/comments/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/courses/{courseId}/posts/trash").hasAnyRole("teacher", "admin")
                         .requestMatchers("/courses/{courseId}/posts/**").hasAnyRole("teacher", "admin")
 

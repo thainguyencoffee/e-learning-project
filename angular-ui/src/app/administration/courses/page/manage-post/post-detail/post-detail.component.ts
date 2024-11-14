@@ -24,16 +24,14 @@ export class PostDetailComponent implements OnInit, OnDestroy {
   router = inject(Router);
   courseService = inject(CourseService);
   errorHandler = inject(ErrorHandler);
-  userService = inject(UserService);
+
   courseId?:number;
   postId?: number;
   post?: Post;
-  postDto?: PostDto;
   navigationSubscription?: Subscription;
 
   ngOnInit(): void {
     this.loadPost();
-    this.courseId = +this.route.snapshot.params['courseId'];
 
     this.navigationSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
@@ -47,12 +45,12 @@ export class PostDetailComponent implements OnInit, OnDestroy {
   }
 
   loadPost() {
-    const courseId = +this.route.snapshot.params['courseId'];
+    this.courseId = +this.route.snapshot.params['courseId'];
     this.postId = +this.route.snapshot.params['postId'];
 
-    this.courseService.getPost(courseId, this.postId)
+    this.courseService.getPost(this.courseId, this.postId)
       .subscribe({
-        next: (data) => this.postDto = data,
+        next: (data) => this.post = data,
         error: (error) => this.errorHandler.handleServerError(error.error)
       });
   }

@@ -418,12 +418,12 @@ public class Course extends AuditSupportClass {
         post.addComment(comment);
     }
 
-    public void deleteCommentFromPost(Long postId, Long commentId) {
+    public void deleteCommentFromPost(Long postId, Long commentId, String username) {
         if (isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot delete a comment from an unpublished course.");
         }
         Post post = findPostById(postId);
-        post.deleteComment(commentId);
+        post.deleteComment(commentId, username);
     }
 
     public void addEmotionToPost(Long postId, Emotion emotion) {
@@ -434,13 +434,6 @@ public class Course extends AuditSupportClass {
         post.addEmotion(emotion);
     }
 
-    public void deleteEmotionFromPost(Long postId, Long emotionId) {
-        if (isNotPublishedAndDeleted()) {
-            throw new InputInvalidException("Cannot delete an emotion from an unpublished course.");
-        }
-        Post post = findPostById(postId);
-        post.deleteEmotion(emotionId);
-    }
 
     public void addQuizToSection(Long sectionId, Quiz quiz) {
         if (!isNotPublishedAndDeleted()) {

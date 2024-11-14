@@ -102,10 +102,4 @@ public class CoursePostController {
         return ResponseEntity.ok(courseService.addEmotion(courseId, postId));
     }
 
-    @DeleteMapping("{postId}/emotions/{emotionId}")
-    public ResponseEntity<Void> deleteEmotion(@PathVariable Long courseId, @PathVariable Long postId, @PathVariable Long emotionId) {
-        courseService.deleteEmotion(courseId, postId, emotionId);
-        return ResponseEntity.noContent().build();
-    }
-
 }

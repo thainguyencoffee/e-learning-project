@@ -52,24 +52,29 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     public List<CourseEnrollmentDTO> findAllCourseEnrollments(Pageable pageable) {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
+        String currentUsername = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
 
         if (rolesBaseUtil.isAdmin()) {
             return repository.findAllCourseEnrollmentDTOs(page, size);
+        } else if (rolesBaseUtil.isTeacher()) {
+            return repository.findAllCourseEnrollmentDTOsByTeacher(currentUsername, page, size);
         } else if (rolesBaseUtil.isUser()) {
-            String student = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
-            return repository.findAllCourseEnrollmentDTOsByStudent(student, page, size);
+            return repository.findAllCourseEnrollmentDTOsByStudent(currentUsername, page, size);
         }
         throw new AccessDeniedException("Access denied");
     }
 
     @Override
     public CourseEnrollment findCourseEnrollmentById(Long id) {
+        String currentUsername = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
         if (rolesBaseUtil.isAdmin()) {
             return repository.findById(id)
                     .orElseThrow(ResourceNotFoundException::new);
+        } else if (rolesBaseUtil.isTeacher()) {
+            return repository.findByIdAndTeacher(id, currentUsername)
+                    .orElseThrow(ResourceNotFoundException::new);
         } else if (rolesBaseUtil.isUser()) {
-            String student = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
-            return repository.findByIdAndStudent(id, student)
+            return repository.findByIdAndStudent(id, currentUsername)
                     .orElseThrow(ResourceNotFoundException::new);
         }
         throw new AccessDeniedException("Access denied");
@@ -77,9 +82,15 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
     @Override
     public EnrolmentWithCourseDTO findEnrolmentWithCourseById(Long id) {
-        String student = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
-        CourseEnrollment enrolment = repository.findByIdAndStudent(id, student)
-                .orElseThrow(ResourceNotFoundException::new);
+        CourseEnrollment enrolment;
+        if (rolesBaseUtil.isAdmin() || rolesBaseUtil.isTeacher()) {
+            enrolment = repository.findById(id)
+                    .orElseThrow(ResourceNotFoundException::new);
+        } else {
+            String student = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+            enrolment = repository.findByIdAndStudent(id, student)
+                    .orElseThrow(ResourceNotFoundException::new);
+        }
         Course course = courseQueryService.findPublishedCourseById(enrolment.getCourseId());
         return EnrolmentWithCourseDTO.of(enrolment, course);
     }
@@ -97,6 +108,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
     @Override
     public void markLessonAsCompleted(Long enrollmentId, Long lessonId) {
+        checkAccess();
         CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
         enrollment.markLessonAsCompleted(lessonId);
         repository.save(enrollment);
@@ -104,6 +116,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
     @Override
     public void markLessonAsIncomplete(Long enrollmentId, Long lessonId) {
+        checkAccess();
         CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
         enrollment.markLessonAsIncomplete(lessonId);
         repository.save(enrollment);
@@ -128,6 +141,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
     @Override
     public void submitQuiz(Long enrollmentId, QuizSubmitDTO quizSubmitDTO) {
+        checkAccess();
         CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
         QuizCalculationResult calculationResult = courseService.calculateQuizScore(enrollment.getCourseId(), quizSubmitDTO.quizId(), quizSubmitDTO.getAnswers());
         enrollment.addQuizSubmission(new QuizSubmission(quizSubmitDTO.quizId(), quizSubmitDTO.toQuizAnswers(), calculationResult.score(), calculationResult.passed()));
@@ -136,6 +150,12 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
     private String getFullName(UserRepresentation userRepresentation) {
         return userRepresentation.getFirstName() + " " + userRepresentation.getLastName();
+    }
+
+    private void checkAccess() {
+        if (rolesBaseUtil.isTeacher() || rolesBaseUtil.isAdmin()) {
+            throw new AccessDeniedException("You are not allowed to write, only students can write. You just can read.");
+        }
     }
 
 }

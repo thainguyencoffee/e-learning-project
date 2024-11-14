@@ -69,7 +69,6 @@ export class EditPostComponent implements OnInit {
     this.courseId = +this.route.snapshot.params['courseId'];
     this.postId = +this.route.snapshot.params['postId'];
 
-    // Tải dữ liệu bài viết để chỉnh sửa
     this.courseService.getPost(this.courseId!, this.postId!)
       .subscribe({
        next: (data) => {

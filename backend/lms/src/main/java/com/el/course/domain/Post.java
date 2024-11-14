@@ -1,8 +1,8 @@
 package com.el.course.domain;
 
+import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.data.annotation.Id;
@@ -95,17 +95,23 @@ public class Post {
         this.emotions.stream()
                 .filter(e -> e.getUsername().equals(emotion.getUsername()))
                 .findAny()
-                .ifPresent(e -> {
-                    throw new InputInvalidException("User has already reacted to this post");
+                .ifPresentOrElse(e -> {
+                    // If the user has already reacted to the post, remove the reaction
+                    emotions.remove(e);
+                }, () -> {
+                    // If the user has not reacted to the post, add the reaction
+                    emotions.add(emotion);
                 });
-        emotions.add(emotion);
     }
 
-    public void deleteComment(Long commentId) {
+    public void deleteComment(Long commentId, String username) {
         if (isDeleted()) {
             throw new InputInvalidException("Post is deleted");
         }
-        comments.removeIf(comment -> comment.getId().equals(commentId));
+        boolean deleted = comments.removeIf(comment -> comment.getId().equals(commentId) && comment.getInfo().username().equals(username));
+        if (!deleted) {
+            throw new AccessDeniedException("You cannot delete comment's other person");
+        }
     }
 
     public void deleteEmotion(Long emotionId) {
