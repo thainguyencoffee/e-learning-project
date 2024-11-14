@@ -66,8 +66,6 @@ public interface CourseService {
 
     Long addEmotion(Long courseId, Long postId);
 
-    void deleteEmotion(Long courseId, Long postId, Long emotionId);
-
     void updateComment(Long courseId, Long postId, Long commentId, CommentDTO commentDTO);
 
     Long addQuizToSection(Long courseId, Long sectionId, QuizDTO quizDTO);

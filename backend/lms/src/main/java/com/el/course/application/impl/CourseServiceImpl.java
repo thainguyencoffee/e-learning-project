@@ -295,17 +295,10 @@ public class CourseServiceImpl implements CourseService {
         String username = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
 
         Emotion emotion = new Emotion(username);
-        Course course = courseQueryService.findCourseById(courseId);
+        Course course = courseQueryService.findPublishedCourseById(courseId);
         course.addEmotionToPost(postId, emotion);
         courseRepository.save(course);
         return emotion.getId();
-    }
-
-    @Override
-    public void deleteEmotion(Long courseId, Long postId, Long emotionId) {
-        Course course = courseQueryService.findCourseById(courseId);
-        course.deleteEmotionFromPost(postId, emotionId);
-        courseRepository.save(course);
     }
 
     @Override

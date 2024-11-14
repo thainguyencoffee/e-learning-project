@@ -434,13 +434,6 @@ public class Course extends AuditSupportClass {
         post.addEmotion(emotion);
     }
 
-    public void deleteEmotionFromPost(Long postId, Long emotionId) {
-        if (isNotPublishedAndDeleted()) {
-            throw new InputInvalidException("Cannot delete an emotion from an unpublished course.");
-        }
-        Post post = findPostById(postId);
-        post.deleteEmotion(emotionId);
-    }
 
     public void addQuizToSection(Long sectionId, Quiz quiz) {
         if (!isNotPublishedAndDeleted()) {
