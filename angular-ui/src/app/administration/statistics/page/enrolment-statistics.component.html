@@ -38,6 +38,7 @@
             <td>{{ item.totalCompletedEnrollments }}</td>
             <td>
               <a [routerLink]="['/administration/enrolment-statistics/', item.courseId]" class="btn btn-sm btn-secondary me-2">View</a>
+              <a [routerLink]="['/administration/enrolment-statistics/posts']" [queryParams]="{courseId: item.courseId}" class="btn btn-sm btn-secondary me-2">Posts</a>
             </td>
           </tr>
         }

@@ -1,3 +1,18 @@
+@if (isAdminOrTeacher()) {
+  <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+    <h1 class="text-primary fw-bold">Enrolments statistic Posts</h1>
+    <a routerLink="/administration/enrolment-statistics" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Back to list
+    </a>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+    <a [routerLink]="['/administration/courses', courseId, 'posts', 'add']"
+       [queryParams]="{ returnUrl: router.url }"
+       class="btn btn-primary">Create new Post</a>
+  </div>
+}
+
 @if (!posts || posts.length === 0) {
   <div>No posts could be found.</div>
 } @else {
@@ -8,6 +23,21 @@
         <div>
           <h5 class="m-0">{{ post.info.firstName }}</h5>
           <small class="text-light">{{ post.createdDate | date: 'medium' }}</small>
+        </div>
+        <div class="dropdown mt-2" *ngIf="isAdminOrTeacher()">
+          <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <a [routerLink]="['/administration/courses/', courseId, 'posts', post.id, 'edit']" class="dropdown-item text-primary">
+                Edit
+              </a>
+            </li>
+            <li>
+              <button class="dropdown-item text-danger" (click)="confirmDelete(post.id!, post)">Delete</button>
+            </li>
+          </ul>
         </div>
       </div>
       <div class="card-body">

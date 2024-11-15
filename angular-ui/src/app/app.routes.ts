@@ -352,6 +352,12 @@ export const routes: Routes = [
         path: 'enrolment-statistics',
         component: EnrolmentStatisticsComponent,
       },
+      // Link posts
+      {
+        title: 'Enrolment statistics posts',
+        path: 'enrolment-statistics/posts',
+        component: EnrolmentPostsComponent
+      },
       {
         title: 'Enrolment statistics detail',
         path: 'enrolment-statistics/:courseId',

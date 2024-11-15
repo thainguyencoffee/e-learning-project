@@ -76,12 +76,23 @@ export class PostAddComponent implements OnInit{
     const data = new PostDto(this.addForm.value);
 
     this.courseService.createPost(data, this.courseId!).subscribe({
-      next: () => this.router.navigate(['../'], {
-        relativeTo: this.route,
-        state: {
-          msgSuccess: this.getMessage('created')
+      next: () => {
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        if (returnUrl) {
+          this.router.navigateByUrl(returnUrl, {
+            state: {
+              msgSuccess: this.getMessage('created')
+            }
+          });
+        } else {
+          this.router.navigate(['../'], {
+            relativeTo: this.route,
+            state: {
+              msgSuccess: this.getMessage('created')
+            }
+          });
         }
-      }),
+      },
       error: (error) => this.errorHandler.handleServerError(error.error, this.addForm, this.getMessage)
     });
   }
