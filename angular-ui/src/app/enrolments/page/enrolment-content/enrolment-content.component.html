@@ -1,8 +1,18 @@
 <div class="row">
+  <!-- Thông tin khóa học -->
   <div class="col-md-4 col-12" *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse">
-    <img [src]="enrolmentWithCourse?.thumbnailUrl" class="img-thumbnail" alt="">
-    <h2>{{ enrolmentWithCourse?.title }}</h2>
-    <p>{{ enrolmentWithCourse?.description }}</p>
+    <div class="card">
+      <img [src]="enrolmentWithCourse?.thumbnailUrl"
+           class="img-fluid card-img-top"
+           alt="Course Thumbnail"
+           style="width: 100%; height: 300px; object-fit: cover;">
+      <div class="card-body">
+        <h2 class="card-title">{{ enrolmentWithCourse?.title }}</h2>
+        <p class="card-text text-truncate" style="max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          {{ enrolmentWithCourse?.description }}
+        </p>
+      </div>
+    </div>
 
     <div class="list-group">
       <a [routerLink]="['/enrolments', enrolmentId, 'overview']" class="list-group-item list-group-item-action"
@@ -17,8 +27,8 @@
     </div>
   </div>
 
+  <!-- Nội dung chi tiết -->
   <div class="col-md-8 col-12">
     <router-outlet></router-outlet>
   </div>
 </div>
-

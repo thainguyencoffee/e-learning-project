@@ -1,13 +1,11 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
   <div class="container-fluid">
-    <a class="navbar-brand" routerLink="/">
-      <img src="assets/Thinking.jpg" alt="Logo" width="40" height="34" class="d-inline-block align-text-top">
-      EL
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <!-- Logo và Menu "Advanced" ở bên trái -->
+    <div class="d-flex align-items-center">
+      <a class="navbar-brand" routerLink="/">
+        <img src="assets/Thinking.jpg" alt="Logo" width="40" height="34" class="d-inline-block align-text-top">
+        EL
+      </a>
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item dropdown" *ngIf="isTeacher || isAdmin">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -17,7 +15,6 @@
             <li><a class="dropdown-item" routerLink="/administration">Administration</a></li>
           </ul>
         </li>
-
         <li class="nav-item dropdown" *ngIf="isAuthenticated">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             More
@@ -27,16 +24,73 @@
             <li><a class="dropdown-item" routerLink="/my-enrolments">My Course Enrollments</a></li>
           </ul>
         </li>
+      </ul>
+    </div>
 
+    <!-- Tìm kiếm ở bên trái -->
+    <form class="d-flex flex-grow-1" role="search">
+      <input class="form-control search-input" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
+    <!-- Login và Logout ở bên phải -->
+    <div class="ms-auto">
+      <ul class="navbar-nav mb-2 mb-lg-0">
         <li class="nav-item">
           <app-login *ngIf="!isAuthenticated"></app-login>
           <app-logout *ngIf="isAuthenticated"></app-logout>
         </li>
       </ul>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
     </div>
   </div>
 </nav>
+
+<style>
+  .navbar {
+    padding: 0.8rem 2rem;
+    background-color: #ffffff; /* Màu nền trắng giống như Udemy */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+    z-index: 100; /* Đảm bảo navbar luôn nằm trên cùng */
+  }
+
+  .form-control {
+    max-width: 1000px;  /* Điều chỉnh chiều rộng tối đa nếu cần */
+    width: 100%;        /* Đảm bảo ô tìm kiếm chiếm toàn bộ không gian */
+    border-radius: 20px; /* Tạo đường viền tròn cho ô tìm kiếm */
+    padding-left: 20px;  /* Thêm khoảng cách từ bên trái cho ô tìm kiếm */
+  }
+
+  .search-input {
+    max-width: 1000px; /* Tăng chiều rộng của ô tìm kiếm */
+    width: 100%;      /* Đảm bảo ô tìm kiếm chiếm toàn bộ chiều rộng có sẵn */
+  }
+
+  .navbar-nav .nav-item .nav-link {
+    font-weight: 500;
+    font-size: 16px;
+  }
+
+  .navbar-nav .nav-item .nav-link:hover {
+    color: #007bff; /* Màu sắc thay đổi khi hover */
+  }
+
+  .btn-outline-success {
+    border-color: #28a745;
+    color: #28a745;
+    border-radius: 20px; /* Tạo viền tròn cho nút tìm kiếm */
+  }
+
+  .btn-outline-success:hover {
+    background-color: #28a745;
+    color: white;
+  }
+
+  /* Đảm bảo khoảng cách giữa các phần tử trong navbar */
+  .d-flex {
+    display: flex;
+    align-items: center;
+  }
+
+  .ms-auto {
+    margin-left: auto; /* Đẩy phần đăng nhập/đăng xuất sang bên phải */
+  }
+</style>

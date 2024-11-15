@@ -1,32 +1,46 @@
-@if (!courseWithoutSectionsList || courseWithoutSectionsList.length === 0) {
-  <div>No course could be found.</div>
-} @else {
-
-  @for (course of courseWithoutSectionsList; track course.id) {
-    <div class="card" style="width: 18rem;">
-      <a [routerLink]="['courses', course.id]">
-        <img [src]="course.thumbnailUrl || 'https://placehold.co/600x400/000000/FFF'" class="card-img-top" alt="...">
-      </a>
-      <div class="card-body">
-        <h5 class="card-title">{{course.title}}</h5>
-        <p class="card-text">{{course.description}}</p>
-        <a [routerLink]="['checkout', course.id]" class="btn btn-primary">Buy now</a>
+<div *ngFor="let language of Object.keys(groupedCourses)">
+  <h3 class="mt-4 mb-3">{{ language }}</h3>
+  <div class="row g-4">
+    @if (!groupedCourses[language] || groupedCourses[language].length === 0) {
+      <div class="col-12 text-center">
+        <div class="alert alert-warning">No course could be found.</div>
       </div>
-    </div>
-  }
-
-  <nav aria-label="Page navigation example">
-    <ul class="pagination">
-      <li class="page-item" [class.disabled]="paginationUtils!.number === 0">
-        <button class="page-link" (click)="onPageChange(paginationUtils!.number - 1)">Previous</button>
-      </li>
-      <li class="page-item" *ngFor="let page of getPageRange()" [class.active]="page === paginationUtils!.number">
-        <button class="page-link" (click)="onPageChange(page)">{{ page + 1 }}</button>
-      </li>
-      <li class="page-item" [class.disabled]="paginationUtils!.number === paginationUtils!.totalPages - 1">
-        <button class="page-link" (click)="onPageChange(paginationUtils!.number + 1)">Next</button>
-      </li>
-    </ul>
-  </nav>
-
-}
+    } @else {
+      <div id="courseSlider-{{language}}" class="carousel slide">
+        <div class="carousel-inner">
+          <div class="carousel-item" *ngFor="let courseChunk of chunkCourses(groupedCourses[language], 4); let i = index" [class.active]="i === 0">
+            <div class="row">
+              <div class="col-md-3" *ngFor="let course of courseChunk">
+                <div class="card course-card shadow-sm border-light rounded h-100 position-relative">
+                  <a [routerLink]="['courses', course.id]">
+                    <img [src]="course.thumbnailUrl || 'https://placehold.co/600x400/000000/FFF'"
+                         class="card-img-top rounded-top"
+                         alt="Course Thumbnail"
+                         style="object-fit: cover; height: 180px;">
+                  </a>
+                  <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-dark fw-semibold text-truncate">{{ course.title }}</h5>
+                    <p class="card-text text-truncate">{{ course.teacher }}</p>
+                    <p class="card-text text-truncate-2">{{ course.price }}</p>
+                    <div class="mt-auto">
+                      <a [routerLink]="['checkout', course.id]" class="btn btn-primary btn-sm w-100">Buy now</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Carousel Controls for Each Language Slider -->
+        <button class="carousel-control-prev" type="button" [attr.data-bs-target]="'#courseSlider-' + language" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" [attr.data-bs-target]="'#courseSlider-' + language" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -1,33 +1,99 @@
-<footer class="bg-dark text-white mt-5">
-  <div class="container py-4">
+<footer class="bg-dark text-white py-5">
+  <div class="container">
     <div class="row">
-      <div class="col-md-4 text-center">
-        <h5>About</h5>
-        <a routerLink="/">
-          <img src="assets/Thinking.jpg" alt="About Icon" class="img-thumbnail w-25">
-        </a>
-        <h5 class="mt-2 font-weight-bold">LMS Project</h5>
+      <!-- About Us Section -->
+      <div class="col-md-3">
+        <h5>About Us</h5>
+        <p>Empowering education through innovative Learning Management Systems.</p>
+        <a href="/" class="text-white">Learn More</a>
       </div>
-      <div class="col-md-4">
-        <h5>License</h5>
-        <p>Undefined.</p>
-      </div>
-      <div class="col-md-4">
-        <h5>Docs</h5>
+
+      <!-- Support Section -->
+      <div class="col-md-3">
+        <h5>Support</h5>
         <ul class="list-unstyled">
-          <li>
-            <a class="icon-link icon-link-hover" style="--bs-link-hover-color-rgb: 25, 135, 84;" routerLink="/usage">
-              Usage
-              <i class="bi bi-arrow-right"></i>
-            </a>
-          </li>
-          <li><a href="#" class="text-white">API Reference</a></li>
-          <li><a href="#" class="text-white">FAQ</a></li>
+          <li><a href="#" class="text-white">Help Center</a></li>
+          <li><a href="#" class="text-white">Contact Us</a></li>
+          <li><a href="#" class="text-white">Customer Support</a></li>
+        </ul>
+      </div>
+
+      <!-- Legal Section -->
+      <div class="col-md-3">
+        <h5>Legal</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="text-white">Terms of Service</a></li>
+          <li><a href="#" class="text-white">Privacy Policy</a></li>
+          <li><a href="#" class="text-white">Cookie Policy</a></li>
+        </ul>
+      </div>
+
+      <!-- Resources Section -->
+      <div class="col-md-3">
+        <h5>Resources</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="text-white">Blog</a></li>
+          <li><a href="#" class="text-white">Careers</a></li>
+          <li><a href="#" class="text-white">Affiliate Program</a></li>
         </ul>
       </div>
     </div>
-    <div class="text-center mt-4">
-      <p>&copy; undefined.</p>
+
+    <!-- Social Media Section -->
+    <div class="row mt-4">
+      <div class="col-md-12 text-center">
+        <h5>Follow Us</h5>
+        <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i> Facebook</a>
+        <a href="#" class="text-white me-3"><i class="bi bi-twitter"></i> Twitter</a>
+        <a href="#" class="text-white me-3"><i class="bi bi-linkedin"></i> LinkedIn</a>
+        <a href="#" class="text-white"><i class="bi bi-instagram"></i> Instagram</a>
+      </div>
+    </div>
+
+    <!-- Footer Bottom Text -->
+    <div class="row mt-4">
+      <div class="col-md-12 text-center">
+        <p>&copy; 2024 LMS Project. All Rights Reserved.</p>
+      </div>
     </div>
   </div>
 </footer>
+<style>
+  footer {
+    background-color: #343a40; /* Màu nền footer giống như của Udemy */
+  }
+
+  footer h5 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+
+  footer p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  footer a {
+    font-size: 14px;
+    color: white;
+    text-decoration: none;
+  }
+
+  footer a:hover {
+    text-decoration: underline;
+  }
+
+  footer .bi {
+    font-size: 18px;
+  }
+
+  footer .me-3 {
+    margin-right: 10px;
+  }
+
+  footer .row {
+    margin-bottom: 20px;
+  }
+
+</style>

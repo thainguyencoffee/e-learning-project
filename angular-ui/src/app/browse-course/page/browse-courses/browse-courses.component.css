@@ -1,0 +1,99 @@
+/* Standardize card dimensions */
+
+.course-card {
+  width: 18rem; /* Fixed width */
+  height: 100%; /* Makes sure the card stretches vertically */
+  display: flex;
+  flex-direction: column;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Makes the content area flexible */
+  padding: 1rem; /* Adjust padding as needed */
+}
+
+/* Image styling */
+/* Image styling */
+.card-img-top {
+  height: 200px; /* Fixed height for the image */
+  width: 100%; /* Ensures the image spans the full width of the container */
+  object-fit: contain; /* Ensures the whole image is visible without cropping */
+}
+
+
+/* Title and description truncation */
+.card-title {
+  font-size: 1rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.text-truncate-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limits description to 2 lines */
+  -webkit-box-orient: vertical;
+}
+
+/* Ensuring button stays at the bottom */
+.mt-auto {
+  margin-top: auto; /* Pushes the button to the bottom */
+}
+
+.btn {
+  width: 100%; /* Ensures button takes full width */
+}
+
+.pagination-btn {
+  background-color: transparent;
+  border: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.5rem;
+  cursor: pointer;
+  color: #007bff;
+}
+
+.prev-btn {
+  left: -2rem; /* Adjust this as needed */
+}
+
+.next-btn {
+  right: -2rem; /* Adjust this as needed */
+}
+
+.pagination-btn svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+/* Thêm CSS cơ bản cho keen-slider */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgba(0, 0, 0, 0.5); /* Thay đổi màu và độ mờ */
+  border-radius: 50%; /* Tạo nút tròn */
+  padding: 10px; /* Tăng kích thước */
+}
+
+.carousel-control-prev-icon:hover,
+.carousel-control-next-icon:hover {
+  background-color: rgba(0, 0, 0, 0.8); /* Tăng độ đậm khi di chuột */
+}
+.carousel-control-prev,
+.carousel-control-next {
+  width: auto; /* Đảm bảo nút không chiếm toàn bộ chiều rộng */
+}
+
+.carousel-control-prev {
+  left: -30px; /* Điều chỉnh khoảng cách nút "Previous" */
+}
+
+.carousel-control-next {
+  right: -30px; /* Điều chỉnh khoảng cách nút "Next" */
+}
+
+
+

@@ -1,27 +1,58 @@
-<div *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse">
-  <h1>Course content</h1>
+<div *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse"
+     [ngStyle]="{ 'max-width': '800px', 'margin': 'auto', 'font-family': 'Arial, sans-serif', 'color': '#333' }">
 
+  <h1
+    [ngStyle]="{ 'text-align': 'center', 'font-size': '2rem', 'font-weight': 'bold', 'margin-bottom': '1rem', 'color': '#4A4A4A' }">
+    Course Lesson</h1>
   <div class="container mt-4">
-    <div *ngFor="let section of enrolmentWithCourseDataService.sortSectionAndLessons(enrolmentWithCourse).sections" class="mb-4">
-      <h3 class="text-primary">{{ section.title }}</h3>
+    <div *ngFor="let section of enrolmentWithCourseDataService.sortSectionAndLessons(enrolmentWithCourse).sections"
+         class="mb-5">
+      <!-- Section Title -->
+      <h3
+        [ngStyle]="{ 'font-size': '1.6rem', 'font-weight': 'bold', 'color': '#333', 'border-bottom': '2px solid #4A90E2', 'padding-bottom': '10px' }">
+        {{ section.title }}
+      </h3>
+
+      <!-- Lessons in Section -->
       <div class="list-group">
         <div *ngFor="let lesson of section.lessons; let i = index"
-             class="list-group-item d-flex justify-content-between align-items-center">
+             class="list-group-item d-flex justify-content-between align-items-center"
+             [ngStyle]="{
+               'background-color': '#f9f9f9',
+               'padding': '15px',
+               'border-radius': '10px',
+               'margin-bottom': '12px',
+               'box-shadow': '0 4px 12px rgba(0, 0, 0, 0.1)'
+             }">
 
-          <span class="text-decoration-underline">{{ lesson.title }}</span>
+          <div [ngStyle]="{
+               'font-size': '1.2rem',
+               'color': '#333',
+               'font-weight': 'bold',
+               'letter-spacing': '1px'
+             }">
+            {{ lesson.title }}
+          </div>
 
           <a [routerLink]="['/enrolments', enrolmentId, 'lessons', lesson.id]" class="btn"
              [queryParams]="{
                 lessonPrev: enrolmentWithCourseDataService.getPrevLesson(lesson.id),
                 lessonNext: enrolmentWithCourseDataService.getNextLesson(lesson.id)
              }"
-             [ngClass]="{'btn-success': isCompleted(lesson.id, enrolmentWithCourse.lessonProgresses),
-                           'btn-primary': !isCompleted(lesson.id, enrolmentWithCourse.lessonProgresses)}">Learn</a>
-
+             [ngClass]="{
+               'btn-success': isCompleted(lesson.id, enrolmentWithCourse.lessonProgresses),
+               'btn-primary': !isCompleted(lesson.id, enrolmentWithCourse.lessonProgresses)
+             }"
+             [ngStyle]="{
+               'padding': '10px 20px',
+               'font-size': '1rem',
+               'font-weight': 'bold',
+               'border-radius': '30px'
+             }">
+            Learn
+          </a>
         </div>
       </div>
     </div>
   </div>
-
 </div>
-

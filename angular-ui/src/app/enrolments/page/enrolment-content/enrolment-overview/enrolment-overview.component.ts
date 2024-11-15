@@ -3,7 +3,7 @@ import {EnrolmentWithCourseDataService} from "../enrolment-with-course-data.serv
 import {Observable} from "rxjs";
 import {EnrolmentWithCourseDto, Progress} from "../../../model/enrolment-with-course-dto";
 import {ActivatedRoute} from "@angular/router";
-import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
+import {AsyncPipe, DatePipe, NgClass, NgForOf, NgIf, NgStyle} from "@angular/common";
 
 @Component({
   selector: 'app-overview',
@@ -11,12 +11,17 @@ import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
   imports: [
     NgIf,
     AsyncPipe,
-    NgForOf
+    NgForOf,
+    DatePipe,
+    NgStyle,
+    NgClass
   ],
   templateUrl: './enrolment-overview.component.html',
   styleUrl: './enrolment-overview.component.css'
 })
 export class EnrolmentOverviewComponent implements OnInit{
+  hover: boolean = false;
+
 
   route = inject(ActivatedRoute);
   enrolmentWithCourseDataService = inject(EnrolmentWithCourseDataService);

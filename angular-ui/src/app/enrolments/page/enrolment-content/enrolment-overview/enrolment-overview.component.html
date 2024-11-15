@@ -1,33 +1,59 @@
-<div *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse">
-  <h1>Overview</h1>
+<div *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse"
+     [ngStyle]="{ 'max-width': '800px', 'margin': 'auto', 'font-family': 'Arial, sans-serif', 'color': '#333' }">
+  <h1 [ngStyle]="{ 'text-align': 'center', 'font-size': '2rem', 'font-weight': 'bold', 'margin-bottom': '1rem', 'color': '#4A4A4A' }">Course Overview</h1>
 
-  <h3>Your Progress</h3>
-  <div class="progress" role="progressbar" aria-label="Example with label"
-       [attr.aria-valuenow]="calcProgress(enrolmentWithCourse.progress)" aria-valuemin="0" aria-valuemax="100">
-    <div class="progress-bar" [style.width]="calcProgress(enrolmentWithCourse.progress) + '%'">
-      {{calcProgress(enrolmentWithCourse.progress)}}%
+  <!-- Progress Section -->
+  <section [ngStyle]="{ 'background': '#fff', 'border': '1px solid #E0E0E0', 'border-radius': '12px', 'padding': '20px', 'margin-bottom': '20px', 'box-shadow': '0 4px 12px rgba(0, 0, 0, 0.1)' }">
+    <h2 [ngStyle]="{ 'font-size': '1.25rem', 'color': '#333', 'margin-bottom': '10px' }">Your Progress</h2>
+    <div [ngStyle]="{ 'height': '24px', 'background-color': '#f1f1f1', 'border-radius': '12px', 'overflow': 'hidden', 'margin': '10px 0' }" role="progressbar" aria-label="Progress bar with completion percentage"
+         [attr.aria-valuenow]="calcProgress(enrolmentWithCourse.progress)" aria-valuemin="0" aria-valuemax="100">
+      <div [ngStyle]="{ 'height': '100%', 'background': 'linear-gradient(90deg, #4caf50, #8bc34a)', 'text-align': 'center', 'color': 'white', 'font-weight': 'bold' }"
+           [style.width]="calcProgress(enrolmentWithCourse.progress) + '%'">
+        {{calcProgress(enrolmentWithCourse.progress)}}%
+      </div>
     </div>
-  </div>
+  </section>
+  <!-- Instructor Section -->
+  <section [ngStyle]="{ 'background': '#fff', 'border': '1px solid #E0E0E0', 'border-radius': '12px', 'padding': '20px', 'margin-bottom': '20px', 'box-shadow': '0 4px 12px rgba(0, 0, 0, 0.1)' }">
+    <h2 [ngStyle]="{ 'font-size': '1.25rem', 'color': '#333', 'margin-bottom': '10px' }">Instructor</h2>
+    <p [ngStyle]="{ 'font-size': '1rem', 'color': '#555' }">{{enrolmentWithCourse.teacher}}</p>
+  </section>
+  <!-- Details Section -->
+  <section [ngStyle]="{ 'background': '#fff', 'border': '1px solid #E0E0E0', 'border-radius': '12px', 'padding': '20px', 'margin-bottom': '20px', 'box-shadow': '0 4px 12px rgba(0, 0, 0, 0.1)' }">
+    <div>
+      <h2 [ngStyle]="{ 'font-size': '1.25rem', 'color': '#333', 'margin-bottom': '10px' }">Language</h2>
+      <p [ngStyle]="{ 'font-size': '1rem', 'color': '#555' }">{{enrolmentWithCourse.language}}</p>
+    </div>
+  </section>
+    <section [ngStyle]="{ 'background': '#fff', 'border': '1px solid #E0E0E0', 'border-radius': '12px', 'padding': '20px', 'margin-bottom': '20px', 'box-shadow': '0 4px 12px rgba(0, 0, 0, 0.1)' }">
+    <div>
+      <h2 [ngStyle]="{ 'font-size': '1.25rem', 'color': '#333', 'margin-bottom': '10px'}">Subtitles</h2>
+      <ul [ngStyle]="{ 'list-style': 'inside', 'padding': '0', 'margin': '0' }">
+        <p [ngStyle]="{ 'font-size': '1rem', 'color': '#555' }">{{enrolmentWithCourse.subtitles}}</p>
+      </ul>
+    </div>
+  </section>
 
-  <h3>Teacher</h3>
-  <p>{{enrolmentWithCourse.teacher}}</p>
+  <!-- Benefits Section -->
+  <section [ngStyle]="{ 'background': '#fff', 'border': '1px solid #E0E0E0', 'border-radius': '12px', 'padding': '20px', 'margin-bottom': '20px', 'box-shadow': '0 4px 12px rgba(0, 0, 0, 0.1)' }">
+    <h2 [ngStyle]="{ 'font-size': '1.25rem', 'color': '#333', 'margin-bottom': '10px' }">Benefits</h2>
+    <ul [ngStyle]="{ 'list-style': 'inside', 'padding': '0', 'margin': '0' }">
+      <p  [ngStyle]="{ 'font-size': '1rem', 'color': '#555' }">{{enrolmentWithCourse.benefits}}</p>
+    </ul>
+  </section>
 
-  <h3>Language</h3>
-  <p>{{enrolmentWithCourse.language}}</p>
-
-  <h3>Subtitles</h3>
-  <ul>
-    <li *ngFor="let subtitle of enrolmentWithCourse.subtitles">{{subtitle}}</li>
-  </ul>
-
-  <h3>benefits</h3>
-  <ul>
-    <li *ngFor="let benefit of enrolmentWithCourse.benefits">{{benefit}}</li>
-  </ul>
-
-  <h3>prerequisites</h3>
-  <ul>
-    <li *ngFor="let prerequisite of enrolmentWithCourse.prerequisites">{{prerequisite}}</li>
-  </ul>
-
+  <!-- Prerequisites Section -->
+  <section [ngStyle]="{ 'background': '#fff', 'border': '1px solid #E0E0E0', 'border-radius': '12px', 'padding': '20px', 'margin-bottom': '20px', 'box-shadow': '0 4px 12px rgba(0, 0, 0, 0.1)' }">
+    <h2 [ngStyle]="{ 'font-size': '1.25rem', 'color': '#333', 'margin-bottom': '10px' }">Prerequisites</h2>
+    <ul [ngStyle]="{ 'list-style': 'inside', 'padding': '0', 'margin': '0' }">
+      <p [ngStyle]="{ 'font-size': '1rem', 'color': '#555' }">{{enrolmentWithCourse.prerequisites}}</p>
+    </ul>
+  </section>
 </div>
+
+<!-- Inline Hover Style -->
+<style>
+  .hovered-link {
+    text-decoration: underline;
+  }
+</style>
