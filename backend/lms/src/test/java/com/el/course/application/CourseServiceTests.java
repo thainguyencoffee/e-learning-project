@@ -75,7 +75,7 @@ class CourseServiceTests {
         courseForPublish.addLessonToSection(1L, new Lesson("Lesson 1", Lesson.Type.TEXT, "https://example.com/lesson1"));
 
         // update validate updatePrice, Course.validSections return true
-        courseForPublish.changePrice(Money.of(100, Currencies.VND));
+        courseForPublish.changePrice(Money.of(20000, Currencies.VND));
 
     }
 
@@ -216,7 +216,7 @@ class CourseServiceTests {
     void updatePrice_ValidCourseIdAndPrice_UpdatesPrice() {
         when(courseQueryService.findCourseById(1L)).thenReturn(courseWithSections);
 
-        MonetaryAmount newPrice = Money.of(100, Currencies.VND);
+        MonetaryAmount newPrice = Money.of(100, Currencies.USD);
         courseService.updatePrice(1L, newPrice);
         verify(courseRepository, times(1)).save(courseWithSections);
         assertEquals(newPrice, courseWithSections.getPrice());
@@ -226,7 +226,7 @@ class CourseServiceTests {
     void updatePrice_CourseNotFound_ThrowsException() {
         when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
 
-        MonetaryAmount newPrice = Money.of(100, Currencies.VND);
+        MonetaryAmount newPrice = Money.of(100, Currencies.USD);
         assertThrows(ResourceNotFoundException.class, () -> courseService.updatePrice(1L, newPrice));
         verify(courseRepository, never()).save(any(Course.class));
     }

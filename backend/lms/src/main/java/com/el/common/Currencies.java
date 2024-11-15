@@ -5,5 +5,7 @@ import javax.money.Monetary;
 
 public interface Currencies {
 
-	static final CurrencyUnit VND = Monetary.getCurrency("VND");
+	CurrencyUnit VND = Monetary.getCurrency("VND");
+
+	CurrencyUnit USD = Monetary.getCurrency("USD");
 }

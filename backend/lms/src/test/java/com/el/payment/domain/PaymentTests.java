@@ -15,7 +15,7 @@ class PaymentTests {
     @Test
     void createPayment_ValidParameters_CreatesPaymentSuccessfully() {
         UUID orderId = UUID.randomUUID();
-        MonetaryAmount amount = Money.of(100, Currencies.VND);
+        MonetaryAmount amount = Money.of(10000, Currencies.VND);
         PaymentMethod paymentMethod = PaymentMethod.STRIPE;
 
         Payment payment = new Payment(orderId, amount, paymentMethod);
@@ -39,7 +39,7 @@ class PaymentTests {
     @Test
     void markPaid_ValidTransactionId_MarksPaymentAsPaid() {
         UUID orderId = UUID.randomUUID();
-        MonetaryAmount amount = Money.of(100, Currencies.VND);
+        MonetaryAmount amount = Money.of(23, Currencies.USD);
         PaymentMethod paymentMethod = PaymentMethod.STRIPE;
         Payment payment = new Payment(orderId, amount, paymentMethod);
         String transactionId = "TX123456";
@@ -55,7 +55,7 @@ class PaymentTests {
     @Test
     void markPaid_NonPendingStatus_ThrowsException() {
         UUID orderId = UUID.randomUUID();
-        MonetaryAmount amount = Money.of(100, Currencies.VND);
+        MonetaryAmount amount = Money.of(10000, Currencies.VND);
         PaymentMethod paymentMethod = PaymentMethod.STRIPE;
         Payment payment = new Payment(orderId, amount, paymentMethod);
         String receiptUrl = "https://example.com/receipt";
@@ -67,11 +67,11 @@ class PaymentTests {
     @Test
     void markFailed_PendingStatus_MarksPaymentAsFailed() {
         UUID orderId = UUID.randomUUID();
-        MonetaryAmount amount = Money.of(100, Currencies.VND);
+        MonetaryAmount amount = Money.of(10000, Currencies.VND);
         PaymentMethod paymentMethod = PaymentMethod.STRIPE;
         Payment payment = new Payment(orderId, amount, paymentMethod);
 
-        payment.markFailed();
+        payment.markFailed("Insufficient funds");
 
         assertEquals(PaymentStatus.FAILED, payment.getStatus());
     }
@@ -79,14 +79,30 @@ class PaymentTests {
     @Test
     void markFailed_NonPendingStatus_ThrowsException() {
         UUID orderId = UUID.randomUUID();
-        MonetaryAmount amount = Money.of(100, Currencies.VND);
+        MonetaryAmount amount = Money.of(10000, Currencies.VND);
         PaymentMethod paymentMethod = PaymentMethod.STRIPE;
         Payment payment = new Payment(orderId, amount, paymentMethod);
 
         String receiptUrl = "https://example.com/receipt";
         payment.markPaid("TX123456", receiptUrl);
 
-        assertThrows(InputInvalidException.class, payment::markFailed);
+        assertThrows(InputInvalidException.class, () -> payment.markFailed("Insufficient funds"));
+    }
+
+    @Test
+    void throwException_invalidAmount() {
+        UUID orderId = UUID.randomUUID();
+        MonetaryAmount amount = Money.of(1000001000, Currencies.VND);
+        PaymentMethod paymentMethod = PaymentMethod.STRIPE;
+        assertThrows(InputInvalidException.class, () -> new Payment(orderId, amount, paymentMethod));
+    }
+
+    @Test
+    void throwException_invalidAmount2() {
+        UUID orderId = UUID.randomUUID();
+        MonetaryAmount amount = Money.of(10001, Currencies.USD);
+        PaymentMethod paymentMethod = PaymentMethod.STRIPE;
+        assertThrows(InputInvalidException.class, () -> new Payment(orderId, amount, paymentMethod));
     }
 
 

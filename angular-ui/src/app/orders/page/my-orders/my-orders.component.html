@@ -33,7 +33,7 @@
             </td>
             <td>{{ order.createdBy }}</td>
             <td>
-              <a class="btn btn-secondary" *ngIf="order.status === 'PENDING'" [routerLink]="['/checkout/pay', order.id]">Pay now</a>
+              <a class="btn btn-secondary mx-2" *ngIf="order.status === 'PENDING'" [routerLink]="['/checkout/pay', order.id]">Pay now</a>
               <a class="btn btn-secondary" [routerLink]="['/my-orders', order.id]">Detail</a>
             </td>
           </tr>

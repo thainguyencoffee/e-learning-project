@@ -7,4 +7,5 @@ export interface Payment {
   paymentMethod: string;
   transactionId: string;
   receiptUrl: string;
+  failureReason: string;
 }

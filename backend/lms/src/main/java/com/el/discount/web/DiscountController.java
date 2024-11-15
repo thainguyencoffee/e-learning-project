@@ -1,13 +1,10 @@
 package com.el.discount.web;
 
-import com.el.common.ValidateMessages;
 import com.el.discount.application.DiscountService;
 import com.el.discount.application.dto.DiscountDTO;
 import com.el.discount.application.dto.DiscountSearchDTO;
 import com.el.discount.domain.Discount;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,10 +38,6 @@ public class DiscountController {
         return ResponseEntity.ok(discountService.searchDiscountByCode(code, originalPrice));
     }
 
-    @PostMapping("/calculate")
-    public ResponseEntity<MonetaryAmount> calculateDiscountByCode(@Valid @RequestBody CalculateDiscountRequest request) {
-        return ResponseEntity.ok(discountService.calculateDiscount(request.code(), request.price()));
-    }
 
     @GetMapping("/trash")
     public ResponseEntity<Page<Discount>> getDeletedDiscounts(Pageable pageable) {
@@ -82,11 +75,5 @@ public class DiscountController {
         discountService.restoreDiscount(id);
         return ResponseEntity.ok().build();
     }
-
-    public record CalculateDiscountRequest(
-            @NotBlank(message = ValidateMessages.NOT_BLANK)
-            String code,
-            @NotNull(message = ValidateMessages.NOT_NULL)
-            MonetaryAmount price) {}
 
 }

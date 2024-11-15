@@ -34,6 +34,7 @@ export class EditDiscountComponent implements OnInit {
 
   currenciesMap: Record<string, string> = {
     VND: 'VND',
+    USD: 'USD',
   }
 
   discountTypeChange(key: string) {

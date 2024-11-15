@@ -36,7 +36,7 @@ class CourseTests {
         courseWithSections.addSection(courseSection);
         courseWithSections.addLessonToSection(courseSection.getId(), lesson);
 
-        courseWithSections.changePrice(Money.of(100, Currencies.VND));
+        courseWithSections.changePrice(Money.of(1000, Currencies.VND));
     }
 
     @AfterEach
@@ -166,7 +166,20 @@ class CourseTests {
 
     @Test
     void changePrice_ValidPrice_ChangesPrice() {
-        MonetaryAmount newPrice = Money.of(100, Currencies.VND);
+        MonetaryAmount newPrice = Money.of(1000000000, Currencies.VND);
+        courseWithSections.changePrice(newPrice);
+        assertEquals(newPrice, courseWithSections.getPrice());
+    }
+
+    @Test
+    void changePrice_PriceTooBig_ThrowsException() {
+        MonetaryAmount newPrice = Money.of(1000001000, Currencies.VND);
+        assertThrows(InputInvalidException.class, () -> courseNoSections.changePrice(newPrice));
+    }
+
+    @Test
+    void changePrice_USDCurrency_ChangesPrice() {
+        MonetaryAmount newPrice = Money.of(100, Currencies.USD);
         courseWithSections.changePrice(newPrice);
         assertEquals(newPrice, courseWithSections.getPrice());
     }

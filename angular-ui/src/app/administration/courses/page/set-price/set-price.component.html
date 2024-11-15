@@ -15,5 +15,5 @@
 <form [formGroup]="setForm" (ngSubmit)="handleSubmit()">
   <app-input-row [group]="setForm" field="price" label="Price" rowType="number" />
   <app-input-row [group]="setForm" field="currency" label="Currency" rowType="select" [options]="currenciesMap"/>
-  <input type="submit" value="Add Section" class="btn btn-primary mt-4" />
+  <input type="submit" value="Change price" class="btn btn-primary mt-4" />
 </form>

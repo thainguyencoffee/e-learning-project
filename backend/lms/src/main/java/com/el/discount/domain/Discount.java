@@ -1,7 +1,7 @@
 package com.el.discount.domain;
 
 import com.el.common.AuditSupportClass;
-import com.el.common.Currencies;
+import com.el.common.MoneyUtils;
 import com.el.common.exception.InputInvalidException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -11,7 +11,6 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
-import javax.money.NumberValue;
 import java.time.LocalDateTime;
 
 @Getter
@@ -57,28 +56,6 @@ public class Discount extends AuditSupportClass {
         this.currentUsage = 0;
 
         validateDiscount();
-        validateMoneyNumber();
-    }
-
-    private void validateMoneyNumber() {
-        if (type == Type.PERCENTAGE) {
-            NumberValue number = this.maxValue.getNumber();
-            CurrencyUnit currency = this.maxValue.getCurrency();
-            if (currency == Currencies.VND) {
-                if (number.intValue() % 1000 != 0) {
-                    throw new InputInvalidException("Vietnamese currency must be a multiple of 1000.");
-                }
-            }
-        }
-        if (type == Type.FIXED) {
-            NumberValue number = this.fixedPrice.getNumber();
-            CurrencyUnit currency = this.fixedPrice.getCurrency();
-            if (currency == Currencies.VND) {
-                if (number.intValue() % 1000 != 0) {
-                    throw new InputInvalidException("Vietnamese currency must be a multiple of 1000.");
-                }
-            }
-        }
     }
 
     public boolean isExpired() {
@@ -96,10 +73,11 @@ public class Discount extends AuditSupportClass {
 
     public MonetaryAmount calculateDiscount(MonetaryAmount originalPrice) {
         if (!isValid()) {
-            throw new InputInvalidException("Discount is not valid.");
+            throw new InputInvalidException("Discount must active and not expired to be used.");
         }
 
         if (canIncreaseUsage()) {
+            checkCurrency(originalPrice);
             if (this.type == Type.PERCENTAGE) {
                 MonetaryAmount multiply = originalPrice.multiply(this.percentage / 100);
                 if (multiply.isGreaterThan(this.maxValue)) {
@@ -111,6 +89,13 @@ public class Discount extends AuditSupportClass {
             }
         }
         return Money.zero(originalPrice.getCurrency());
+    }
+
+    private void checkCurrency(MonetaryAmount originalPrice) {
+        CurrencyUnit currency = this.type == Type.PERCENTAGE ? this.maxValue.getCurrency() : this.fixedPrice.getCurrency();
+        if (!originalPrice.getCurrency().equals(currency)) {
+            throw new InputInvalidException("Currency mismatch. Discount currency must be the same as the original price.");
+        }
     }
 
     public void increaseUsage() {
@@ -136,38 +121,32 @@ public class Discount extends AuditSupportClass {
         if (type == null) {
             throw new InputInvalidException("Discount type must not be empty.");
         }
-        if (percentage == null && fixedPrice == null) {
-            throw new InputInvalidException("Discount percentage or fixed amount must be provided.");
+
+        if (type == Type.PERCENTAGE) {
+            if (percentage == null) {
+                throw new InputInvalidException("Discount percentage must be provided.");
+            }
+            if (percentage < 0 || percentage > 100)
+                throw new InputInvalidException("Percentage must be between 0 and 100.");
+            if (maxValue == null)
+                throw new InputInvalidException("Max value must be provided for percentage discount.");
+            MoneyUtils.checkValidPrice(maxValue);
+        } else {
+            if (fixedPrice == null)
+                throw new InputInvalidException("Fixed price must be provided for fixed discount.");
+            MoneyUtils.checkValidPrice(fixedPrice);
         }
+
+        validateDates();
+    }
+
+    private void validateDates() {
         if (startDate == null || endDate == null) {
             throw new InputInvalidException("Start date and end date must be provided.");
         }
 
-        validateDates();
-        validateDiscountType();
-    }
-
-    private void validateDates() {
         if (startDate.isAfter(endDate)) {
             throw new InputInvalidException("Start date cannot be after end date.");
-        }
-    }
-
-    private void validateDiscountType() {
-        if (type == Type.PERCENTAGE && (percentage < 0 || percentage > 100)) {
-            throw new InputInvalidException("Percentage must be between 0 and 100.");
-        }
-
-        if (type == Type.PERCENTAGE && maxValue == null) {
-            throw new InputInvalidException("Max value must be provided for percentage discount.");
-        }
-
-        if (type == Type.PERCENTAGE && maxValue.isLessThan(Money.zero(maxValue.getCurrency()))) {
-            throw new InputInvalidException("Max value must be greater than zero.");
-        }
-
-        if (type == Type.FIXED && fixedPrice.isLessThan(Money.zero(fixedPrice.getCurrency()))) {
-            throw new InputInvalidException("Fixed amount must be greater than zero.");
         }
     }
 

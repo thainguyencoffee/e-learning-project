@@ -3,7 +3,8 @@
 </div>
 
 <form [formGroup]="paymentForm">
-  <app-input-row [group]="paymentForm" field="orderId" label="Order ID"/>
+  <div class="alert alert-info">OrderID: {{orderId}}</div>
+  <app-input-row [group]="paymentForm" field="orderId" label="Order ID" hidden/>
   <app-input-row [group]="paymentForm" field="amount" label="Amount" />
   <app-input-row [group]="paymentForm" field="paymentMethod" label="Payment Method"
                  rowType="radio" [options]="paymentMethodsMap" (optionsChange)="paymentMethodSelected($event)"/>
