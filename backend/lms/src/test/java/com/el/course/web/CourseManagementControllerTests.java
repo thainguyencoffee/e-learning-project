@@ -773,7 +773,7 @@ class CourseManagementControllerTests {
 
     @Test
     void addLesson_ValidCourseIdAndSectionId_AddsLesson() throws Exception {
-        LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null);
+        LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com");
         when(courseService.addLesson(any(), any(), any()))
                 .thenReturn(1L);
 
@@ -787,7 +787,7 @@ class CourseManagementControllerTests {
 
     @Test
     void addLesson_CourseNotFound_ThrowsException() throws Exception {
-        LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null);
+        LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com");
 
         Mockito.doThrow(new ResourceNotFoundException()).when(courseService).addLesson(any(), any(), any());
 
@@ -800,7 +800,7 @@ class CourseManagementControllerTests {
 
     @Test
     void addLesson_SectionNotFound_ThrowsException() throws Exception {
-        LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null);
+        LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com");
         Mockito.doThrow(new ResourceNotFoundException()).when(courseService).addLesson(any(), any(), any());
 
         mockMvc.perform(post("/courses/1/sections/999/lessons")
@@ -812,7 +812,7 @@ class CourseManagementControllerTests {
 
     @Test
     void addLesson_UserNotTeacher_ShouldReturnForbidden() throws Exception {
-        LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null);
+        LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com");
 
         mockMvc.perform(post("/courses/1/sections/2/lessons")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -826,7 +826,7 @@ class CourseManagementControllerTests {
         Mockito.doThrow(new InputInvalidException("Cannot add lesson to a published course."))
                 .when(courseService).addLesson(any(), any(), any());
 
-        LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com", null);
+        LessonDTO lessonDTO = new LessonDTO("LessonTitle", Lesson.Type.TEXT, "https://example.com");
 
         mockMvc.perform(post("/courses/1/sections/2/lessons")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -837,7 +837,7 @@ class CourseManagementControllerTests {
 
     @Test
     void updateLesson_ValidCourseIdAndSectionIdAndLessonId_UpdatesLesson() throws Exception {
-        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated");
         doNothing().when(courseService).updateLesson(1L, 2L, 3L, lessonDTO.toLesson());
 
         mockMvc.perform(put("/courses/1/sections/2/lessons/3")
@@ -849,7 +849,7 @@ class CourseManagementControllerTests {
 
     @Test
     void updateLesson_CourseNotFound_ThrowsException() throws Exception {
-        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated");
         Mockito.doThrow(new ResourceNotFoundException()).when(courseService).updateLesson(any(), any(), any(), any());
 
         mockMvc.perform(put("/courses/1/sections/2/lessons/3")
@@ -861,7 +861,7 @@ class CourseManagementControllerTests {
 
     @Test
     void updateLesson_SectionNotFound_ThrowsException() throws Exception {
-        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated");
         Mockito.doThrow(new ResourceNotFoundException()).when(courseService).updateLesson(any(), any(), any(), any());
 
         mockMvc.perform(put("/courses/1/sections/999/lessons/3")
@@ -873,7 +873,7 @@ class CourseManagementControllerTests {
 
     @Test
     void updateLesson_LessonNotFound_ThrowsException() throws Exception {
-        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated");
         Mockito.doThrow(new ResourceNotFoundException()).when(courseService).updateLesson(any(), any(), any(), any());
 
         mockMvc.perform(put("/courses/1/sections/2/lessons/999")
@@ -885,7 +885,7 @@ class CourseManagementControllerTests {
 
     @Test
     void updateLesson_UserNotTeacher_ShouldReturnForbidden() throws Exception {
-        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated");
 
         mockMvc.perform(put("/courses/1/sections/2/lessons/3")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -896,7 +896,7 @@ class CourseManagementControllerTests {
 
     @Test
     void updateLesson_PublishedCourse_ThrowsException() throws Exception {
-        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated", null);
+        LessonDTO lessonDTO = new LessonDTO("UpdatedLessonTitle", Lesson.Type.TEXT, "https://example.com/updated");
         Mockito.doThrow(new InputInvalidException("Cannot update lesson in a published course."))
                 .when(courseService).updateLesson(any(), any(), any(), any());
 

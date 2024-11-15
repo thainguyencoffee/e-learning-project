@@ -43,12 +43,6 @@ import {PostAddComponent} from "./administration/courses/page/manage-post/post-a
 import {PostDetailComponent} from "./administration/courses/page/manage-post/post-detail/post-detail.component";
 import {EditPostComponent} from "./administration/courses/page/manage-post/post-edit/post-edit.component";
 import {PostTrashComponent} from "./administration/courses/page/manage-post/post-trash/post-trash.component";
-// import {ManageQuizComponent} from "./administration/courses/page/manage-quiz/manage-quiz.component";
-// import {AddQuizComponent} from "./administration/courses/page/manage-quiz/add-quiz/add-quiz.component";
-// import {EditQuizComponent} from "./administration/courses/page/manage-quiz/edit-quiz/edit-quiz.component";
-// import {AddQuestionComponent} from "./administration/courses/page/manage-quiz/add-question/add-question.component";
-// import {EditQuestionComponent} from "./administration/courses/page/manage-quiz/edit-question/edit-question.component";
-// import {QuizTrashComponent} from "./administration/courses/page/manage-quiz/quiz-trash/quiz-trash.component";
 import {EnrolmentStatisticsComponent} from "./administration/statistics/page/enrolment-statistics.component";
 import {
   EnrolmentStatisticDetailComponent
@@ -247,37 +241,6 @@ export const routes: Routes = [
         path: 'courses/:courseId/sections/:sectionId/lessons/edit/:lessonId',
         component: EditLessonComponent
       },
-      // Manage Quiz
-      // {
-      //   title: "Manage Quiz",
-      //   path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes',
-      //   component: ManageQuizComponent
-      // },
-      // {
-      //   title: "Quiz Trash",
-      //   path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes/trash',
-      //   component: QuizTrashComponent
-      // },
-      // {
-      //   title: 'Add Quiz',
-      //   path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes/add',
-      //   component: AddQuizComponent
-      // },
-      // {
-      //   title: 'Edit Quiz',
-      //   path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes/edit/:quizId',
-      //   component: EditQuizComponent
-      // },
-      // {
-      //   title: 'Add Question',
-      //   path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes/add-question/:quizId',
-      //   component: AddQuestionComponent
-      // },
-      // {
-      //   title: 'Edit Question',
-      //   path: 'courses/:courseId/sections/:sectionId/lessons/:lessonId/quizzes/:quizId/edit-question/:questionId',
-      //   component: EditQuestionComponent
-      // },
       {
         title: 'Request course list',
         path: 'courses/:courseId/requests',

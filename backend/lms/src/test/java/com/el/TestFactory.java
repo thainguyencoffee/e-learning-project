@@ -2,15 +2,12 @@ package com.el;
 
 import com.el.common.Currencies;
 import com.el.course.application.dto.*;
-import com.el.course.application.dto.QuestionDTO.AnswerOptionDTO;
 import com.el.course.domain.*;
 import com.el.course.web.dto.CourseRequestApproveDTO;
 import com.el.course.web.dto.CourseRequestRejectDTO;
 import com.el.discount.application.dto.DiscountDTO;
 import com.el.discount.domain.Discount;
 import com.el.discount.domain.Type;
-import com.el.enrollment.application.dto.QuestionSubmitDTO;
-import com.el.enrollment.application.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.LessonProgress;
 import com.el.order.domain.Order;
@@ -19,7 +16,6 @@ import org.javamoney.moneta.Money;
 import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -60,9 +56,9 @@ public class TestFactory {
         // add lessons to section 1
 
         Lesson lesson1 = new Lesson("Lesson 1.1...",
-                Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null);
+                Lesson.Type.VIDEO, "http://example.com/lesson1.mp4");
         Lesson lesson2 = new Lesson("Lesson 1.2...",
-                Lesson.Type.VIDEO, "http://example.com/lesson2.mp4", null);
+                Lesson.Type.VIDEO, "http://example.com/lesson2.mp4");
 
         course.addLessonToSection(1L, lesson1);
         course.addLessonToSection(1L, lesson2);
@@ -74,11 +70,11 @@ public class TestFactory {
 
         // add lessons to section 2
         Lesson lesson3 = new Lesson("Lesson 2.1...",
-                Lesson.Type.VIDEO, "http://example.com/lesson2.1.mp4", null);
+                Lesson.Type.VIDEO, "http://example.com/lesson2.1.mp4");
         Lesson lesson4 = new Lesson("Lesson 2.2...",
-                Lesson.Type.VIDEO, "http://example.com/lesson2.2.mp4", null);
+                Lesson.Type.VIDEO, "http://example.com/lesson2.2.mp4");
         Lesson lesson5 = new Lesson("Lesson 2.3...",
-                Lesson.Type.VIDEO, "http://example.com/lesson2.3.mp4", null);
+                Lesson.Type.VIDEO, "http://example.com/lesson2.3.mp4");
 
         course.addLessonToSection(2L, lesson3);
         course.addLessonToSection(2L, lesson4);
@@ -282,54 +278,6 @@ public class TestFactory {
                 "",
                 Set.of("http://example.com/photo1.jpg", "http://example.com/photo2.jpg")
         );
-    }
-
-    public static Quiz createDefaultQuiz(Long lessonId) {
-        return new Quiz("Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-                "Donec congue elementum feugiat. Morbi egestas elit nec sodales rutrum. Nullam ut ullamcorper risus. Phasellus eget dignissim ante, sed varius odio. Duis aliquet arcu sed congue bibendum",
-                lessonId, 50);
-    }
-
-    public static Question createDefaultQuestion() {
-        return new Question("Question " + UUID.randomUUID(),
-                QuestionType.SINGLE_CHOICE,
-                2,
-                Set.of(new AnswerOption("Answer 1", true),
-                new AnswerOption("Answer 2", false),
-                new AnswerOption("Answer 3", false))
-        );
-    }
-
-    public static QuizDTO createDefaultQuizDTO(Long lessonId) {
-        return new QuizDTO("Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-                "Donec congue elementum feugiat. Morbi egestas elit nec sodales rutrum. Nullam ut ullamcorper risus. Phasellus eget dignissim ante, sed varius odio. Duis aliquet arcu sed congue bibendum",
-                lessonId, 50);
-    }
-
-    public static QuizUpdateDTO createDefaultQuizUpdateDTO() {
-        return new QuizUpdateDTO("Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-                "Donec congue elementum feugiat. Morbi egestas elit nec sodales rutrum. Nullam ut ullamcorper risus. Phasellus eget dignissim ante, sed varius odio. Duis aliquet arcu sed congue bibendum",
-                50);
-    }
-
-
-    public static QuestionDTO createDefaultQuestionDTO() {
-        return new QuestionDTO("Donec pharetra in lacus a pulvinar. Fusce eget nulla odio. Sed nec varius massa.",
-                QuestionType.SINGLE_CHOICE,
-                Set.of(new AnswerOptionDTO("Answer 1", true),
-                        new AnswerOptionDTO("Answer 2", false),
-                        new AnswerOptionDTO("Answer 3", false),
-                        new AnswerOptionDTO("Answer 4", false)),
-                2
-        );
-    }
-
-    public static QuizSubmitDTO createQuizSubmitDTO() {
-        return new QuizSubmitDTO(
-                1L,
-                Set.of(new QuestionSubmitDTO(QuestionType.SINGLE_CHOICE, 1L, Set.of(1L)),
-                        new QuestionSubmitDTO(QuestionType.TRUE_FALSE, 2L, Set.of(4L))
-        ));
     }
 
 }

@@ -27,8 +27,6 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     private Boolean completed;
     private Instant completedDate;
     private Certificate certificate;
-    @MappedCollection(idColumn = "course_enrollment")
-    private Set<QuizSubmission> quizSubmissions = new HashSet<>();
     @CreatedBy
     private String createdBy;
     @CreatedDate
@@ -84,10 +82,6 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
         return lessonProgresses.stream().allMatch(LessonProgress::isCompleted);
     }
 
-    private boolean allQuizSubmitPassed() {
-        return this.quizSubmissions.stream().allMatch(QuizSubmission::isPassed);
-    }
-
     public Progress getProgress() {
         int totalLessons = this.lessonProgresses.size();
         int completedLessons = (int) this.lessonProgresses.stream().filter(LessonProgress::isCompleted).count();
@@ -97,15 +91,6 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     public void addLessonProgress(LessonProgress lessonProgress) {
         if (lessonProgress == null) throw new InputInvalidException("LessonProgress must not be null.");
         lessonProgresses.add(lessonProgress);
-    }
-
-    public void addQuizSubmission(QuizSubmission quizSubmission) {
-        if (quizSubmission == null) throw new InputInvalidException("QuizSubmission must not be null.");
-        if (quizSubmissions.stream().anyMatch(qs -> qs.getQuizId().equals(quizSubmission.getQuizId()))) {
-            throw new InputInvalidException("QuizSubmission for this quiz already exists.");
-        }
-        quizSubmissions.add(quizSubmission);
-        checkCompleted();
     }
 
     public LessonProgress findLessonProgressByLessonId(Long lessonId) {

@@ -115,7 +115,7 @@ public class Course extends AuditSupportClass {
         if (!isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot change price of a published course.");
         }
-        if (!validSections()) {
+        if (validSections()) {
             throw new InputInvalidException("Cannot change price of a course without sections or section without lessons");
         }
         if (!isValidCurrency(newPrice.getCurrency())) {
@@ -128,7 +128,7 @@ public class Course extends AuditSupportClass {
     }
 
     private boolean validSections() {
-        return !this.sections.isEmpty() && this.sections.stream().allMatch(CourseSection::hasLessons);
+        return this.sections.isEmpty() || !this.sections.stream().allMatch(CourseSection::hasLessons);
     }
 
 
@@ -149,7 +149,7 @@ public class Course extends AuditSupportClass {
         if (isPublishedAndNotDeleted()) {
             throw new InputInvalidException("Cannot request publish for a published course.");
         }
-        if (!validSections() || this.getTeacher() == null) {
+        if (validSections() || this.getTeacher() == null) {
             throw new InputInvalidException("Cannot publish a course without sections or teacher.");
         }
         if (courseRequest.getType() != RequestType.PUBLISH) {
@@ -342,7 +342,7 @@ public class Course extends AuditSupportClass {
         }
         CourseSection section = findSectionById(sectionId);
         section.removeLesson(lessonId);
-    };
+    }
 
     public void delete() {
         if (!isNotPublishedAndDeleted()) {
@@ -434,79 +434,6 @@ public class Course extends AuditSupportClass {
         post.addEmotion(emotion);
     }
 
-
-    public void addQuizToSection(Long sectionId, Quiz quiz) {
-        if (!isNotPublishedAndDeleted()) {
-            throw new InputInvalidException("Cannot add a quiz to a published course.");
-        }
-        CourseSection section = findSectionById(sectionId);
-        section.findLessonById(quiz.getAfterLessonId());
-        section.addQuiz(quiz);
-    }
-
-    public void addQuestionToQuizInSection(Long sectionId, Long quizId, Question question) {
-        if (!isNotPublishedAndDeleted()) {
-            throw new InputInvalidException("Cannot add a question to a published course.");
-        }
-        CourseSection section = findSectionById(sectionId);
-        section.addQuestionToQuiz(quizId, question);
-    }
-
-    public void updateQuestionInQuizInSection(Long sectionId, Long quizId, Long questionId, Question updatedQuestion) {
-        if (!isNotPublishedAndDeleted()) {
-            throw new InputInvalidException("Cannot update a question in a published course.");
-        }
-        CourseSection section = findSectionById(sectionId);
-        section.updateQuestionInQuiz(quizId, questionId, updatedQuestion);
-    }
-
-    public void deleteQuestionFromQuizInSection(Long sectionId, Long quizId, Long questionId) {
-        if (!isNotPublishedAndDeleted()) {
-            throw new InputInvalidException("Cannot delete a question from a published course.");
-        }
-        CourseSection section = findSectionById(sectionId);
-        section.deleteQuestionFromQuiz(quizId, questionId);
-    }
-
-    public void updateQuizInSection(Long sectionId, Long quizId, String newTitle, String newDescription, Integer newPassScorePercent) {
-        if (!isNotPublishedAndDeleted()) {
-            throw new InputInvalidException("Cannot update a quiz in a published course.");
-        }
-        CourseSection section = findSectionById(sectionId);
-        section.updateQuiz(quizId, newTitle, newDescription, newPassScorePercent);
-    }
-
-    public void deleteQuizFromSection(Long sectionId, Long quizId) {
-        if (!isNotPublishedAndDeleted()) {
-            throw new InputInvalidException("Cannot delete a quiz from a published course.");
-        }
-        CourseSection section = findSectionById(sectionId);
-        section.deleteQuiz(quizId);
-    }
-
-    public void restoreQuizInSection(Long sectionId, Long quizId) {
-        if (!isNotPublishedAndDeleted()) {
-            throw new InputInvalidException("Cannot restore a quiz in a published course.");
-        }
-        CourseSection section = findSectionById(sectionId);
-        section.restoreQuiz(quizId);
-    }
-
-    public void forceDeleteQuizFromSection(Long sectionId, Long quizId) {
-        if (!isNotPublishedAndDeleted()) {
-            throw new InputInvalidException("Cannot force delete a quiz in a published course.");
-        }
-        CourseSection section = findSectionById(sectionId);
-        section.forceDeleteQuiz(quizId);
-    }
-
-    public QuizCalculationResult calculateQuiz(long quizId, Map<Long, Set<Long>> answers) {
-        Quiz quiz = findQuizById(quizId);
-        Integer score = quiz.calculateScore(answers);
-        Boolean passed = quiz.isPassed(score);
-        return new QuizCalculationResult(score, passed);
-    }
-
     private Post findPostById(Long postId) {
         return this.posts.stream()
                 .filter(post -> post.getId().equals(postId))
@@ -526,14 +453,6 @@ public class Course extends AuditSupportClass {
     private boolean isValidCurrency(CurrencyUnit inputCurrency) {
         var validCurrencies = Set.of(Currencies.VND);
         return validCurrencies.contains(inputCurrency);
-    }
-
-    private Quiz findQuizById(Long quizId) {
-        return this.sections.stream()
-                .flatMap(section -> section.getQuizzes().stream())
-                .filter(quiz -> quiz.getId().equals(quizId))
-                .findFirst()
-                .orElseThrow(ResourceNotFoundException::new);
     }
 
     private CourseSection findSectionById(Long sectionId) {

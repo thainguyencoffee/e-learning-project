@@ -10,10 +10,9 @@ public record LessonDTO(
         String title,
         @NotNull(message = ValidateMessages.NOT_NULL)
         Lesson.Type type,
-        String link,
-        Long quiz
+        String link
 ) {
     public Lesson toLesson() {
-        return new Lesson(title, type, link, quiz);
+        return new Lesson(title, type, link);
     }
 }

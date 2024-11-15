@@ -254,8 +254,7 @@ abstract class AbstractLmsApplicationTests {
                         .body(BodyInserters.fromValue(new LessonDTO(
                                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vestibulum mi quis libero luctus sollicitudin. Suspendisse laoreet vulputate est",
                                 Lesson.Type.VIDEO,
-                                "https://www.youtube.com/watch?v=1",
-                                null)
+                                "https://www.youtube.com/watch?v=1")
                         ))
                         .exchange()
                         .expectStatus().isOk();
@@ -266,8 +265,7 @@ abstract class AbstractLmsApplicationTests {
                         .body(BodyInserters.fromValue(new LessonDTO(
                                 "Donec facilisis vel tortor eget efficitur. Sed congue ante mi, sed tristique purus feugiat a",
                                 Lesson.Type.VIDEO,
-                                "https://www.youtube.com/watch?v=2",
-                                null)
+                                "https://www.youtube.com/watch?v=2")
                         ))
                         .exchange()
                         .expectStatus().isOk();
@@ -322,31 +320,6 @@ abstract class AbstractLmsApplicationTests {
         // Assert
         assertThat(postId).isNotNull();
         return postId;
-    }
-
-    protected Long performCreateQuiz(QuizDTO quizDTO, Long courseId, Long sectionId) {
-        // Act: Add quiz
-        var quizId = webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/quizzes", courseId, sectionId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(quizDTO))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(Long.class).returnResult().getResponseBody();
-
-        // Assert
-        assertThat(quizId).isNotNull();
-        return quizId;
-    }
-
-    protected Long performCreateQuestion(QuestionDTO questionDTO, Long id, Long sectionId, Long quizId) {
-        return webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/questions", id, sectionId, quizId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(questionDTO))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(Long.class).returnResult().getResponseBody();
     }
 
     private static KeycloakToken authenticateWith(
