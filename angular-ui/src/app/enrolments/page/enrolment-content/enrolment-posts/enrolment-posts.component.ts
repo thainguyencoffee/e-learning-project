@@ -19,17 +19,13 @@ import {updateFormAdvanced} from "../../../../common/utils";
   standalone: true,
   imports: [
     NgForOf,
-    NgClass,
-    RouterLink,
-    RouterOutlet,
     NgIf,
-    AsyncPipe,
     DatePipe,
     FormsModule,
-    NgStyle,
     ReactiveFormsModule,
     InputRowComponent,
-    ArrayRowComponent
+    ArrayRowComponent,
+    RouterLink
   ],
   templateUrl: './enrolment-posts.component.html',
 })
@@ -106,6 +102,8 @@ export class EnrolmentPostsComponent implements OnInit {
   getMessage(key: string, details?: any) {
     const messages: Record<string, string> = {
       confirmDeleteComment: `Do you really want to remove this comment?`,
+      confirmDelete: `Do you really want to delete this post?`,
+      deleted: `Post has been deleted`
     }
     return messages[key];
   }
@@ -213,6 +211,25 @@ export class EnrolmentPostsComponent implements OnInit {
 
   cancelEdit(comment: Comment) {
     comment.isEditing = false;
+  }
+
+  isAdminOrTeacher() {
+    return this.userService.current.hasAnyRole('ROLE_admin', 'ROLE_teacher');
+  }
+
+  confirmDelete(postId: number, post: Post) {
+    if (confirm(this.getMessage('confirmDelete'))) {
+      this.courseService.deletePost(this.courseId!,postId,post)
+        .subscribe({
+          next: () => this.router.navigate(['/administration/courses', this.courseId, 'posts', 'trash'], {
+            state: {
+              msgSuccess: this.getMessage('deleted')
+            }
+          }),
+          error: (error) => this.errorHandler.handleServerError(error.error)
+        });
+
+    }
   }
 
 }

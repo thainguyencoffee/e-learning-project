@@ -19,7 +19,6 @@ export class RoleGuard implements CanActivate {
     return this.userService.getUser().pipe(
       map(user => {
         if (user.username) {
-          console.log("User: ", user);
           const isDenied = deniedRoles?.some(role => user.roles.includes(role));
           if (isDenied) {
             this.router.navigate(['/error'], {state: {errorStatus, errorMessage}});
@@ -34,7 +33,6 @@ export class RoleGuard implements CanActivate {
           this.router.navigate(['/error'], {state: {errorStatus, errorMessage}});
           return false;
         } else {
-          console.log('Unauthorized');
           this.router.navigate(['/error'], {
             state: {
               errorStatus: 401,

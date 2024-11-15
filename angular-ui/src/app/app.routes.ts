@@ -187,7 +187,6 @@ export const routes: Routes = [
     canActivate: [RoleGuard],
     data: {
       requiredRoles: ['ROLE_admin', 'ROLE_teacher'],
-      deniedRoles: ['ROLE_user'],
       errorStatus: 403,
       errorMessage: 'Only admin and teacher can access administration dashboard page'
     },
@@ -352,6 +351,12 @@ export const routes: Routes = [
         title: 'Enrolment statistics',
         path: 'enrolment-statistics',
         component: EnrolmentStatisticsComponent,
+      },
+      // Link posts
+      {
+        title: 'Enrolment statistics posts',
+        path: 'enrolment-statistics/posts',
+        component: EnrolmentPostsComponent
       },
       {
         title: 'Enrolment statistics detail',

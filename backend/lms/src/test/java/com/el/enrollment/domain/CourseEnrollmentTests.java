@@ -61,7 +61,8 @@ class CourseEnrollmentTests {
         enrollment.markLessonAsCompleted(2L);
 
         // Update: enrollment.getCompleted() return true when all lessons are completed and all quizzes are submitted
-        assertFalse(enrollment.getCompleted());
+        // this return true because all lessons are completed and no quizzes created yet
+        assertTrue(enrollment.getCompleted());
         assertEquals(2, enrollment.getProgress().totalLessons());
         assertEquals(2, enrollment.getProgress().completedLessons());
         assertTrue(enrollment.getLessonProgresses().stream().allMatch(LessonProgress::isCompleted));
