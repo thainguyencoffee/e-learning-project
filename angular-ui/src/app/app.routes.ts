@@ -187,7 +187,6 @@ export const routes: Routes = [
     canActivate: [RoleGuard],
     data: {
       requiredRoles: ['ROLE_admin', 'ROLE_teacher'],
-      deniedRoles: ['ROLE_user'],
       errorStatus: 403,
       errorMessage: 'Only admin and teacher can access administration dashboard page'
     },
