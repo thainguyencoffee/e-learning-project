@@ -7,7 +7,6 @@ import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.dto.*;
-import com.el.course.application.dto.QuestionDTO.AnswerOptionDTO;
 import com.el.course.application.impl.CourseServiceImpl;
 import com.el.course.domain.*;
 import com.el.discount.application.DiscountService;
@@ -21,7 +20,6 @@ import org.mockito.MockitoAnnotations;
 import javax.money.MonetaryAmount;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -74,7 +72,7 @@ class CourseServiceTests {
         CourseSection section = spy(new CourseSection("Billie Jean [4K] 30th Anniversary, 2001"));
         when(section.getId()).thenReturn(1L);
         courseForPublish.addSection(section);
-        courseForPublish.addLessonToSection(1L, new Lesson("Lesson 1", Lesson.Type.TEXT, "https://example.com/lesson1", null));
+        courseForPublish.addLessonToSection(1L, new Lesson("Lesson 1", Lesson.Type.TEXT, "https://example.com/lesson1"));
 
         // update validate updatePrice, Course.validSections return true
         courseForPublish.changePrice(Money.of(100, Currencies.VND));
@@ -477,7 +475,7 @@ class CourseServiceTests {
 
     @Test
     void addLesson_ValidCourseIdAndSectionId_AddsLesson() {
-        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null);
+        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com");
         Course course = spy(this.course);
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
@@ -496,7 +494,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null);
+        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com");
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.addLesson(1L, 2L, lesson));
 
@@ -510,7 +508,7 @@ class CourseServiceTests {
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
         doThrow(new ResourceNotFoundException()).when(course).addLessonToSection(any(Long.class), any(Lesson.class));
-        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null);
+        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com");
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.addLesson(1L, 999L, lesson));
 
@@ -524,7 +522,7 @@ class CourseServiceTests {
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
         doReturn(false).when(course).isNotPublishedAndDeleted();
-        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null);
+        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com");
 
         assertThrows(InputInvalidException.class, () -> courseService.addLesson(1L, 2L, lesson));
 
@@ -537,7 +535,7 @@ class CourseServiceTests {
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher");
-        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null);
+        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com");
 
         assertThrows(AccessDeniedException.class, () -> courseService.addLesson(1L, 2L, lesson));
 
@@ -547,7 +545,7 @@ class CourseServiceTests {
     @Test
     void updateLesson_ValidCourseIdAndSectionIdAndLessonId_UpdatesLesson() {
         Course course = spy(this.course);
-        Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/updated", null);
+        Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/updated");
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
@@ -562,7 +560,7 @@ class CourseServiceTests {
 
     @Test
     void updateLesson_CourseNotFound_ThrowsException() {
-        Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/updated", null);
+        Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/updated");
         when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
@@ -575,7 +573,7 @@ class CourseServiceTests {
     @Test
     void updateLesson_SectionNotFound_ThrowsException() {
         Course course = spy(this.course);
-        Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/updated", null);
+        Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/updated");
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
@@ -592,7 +590,7 @@ class CourseServiceTests {
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher");
-        Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/updated", null);
+        Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/updated");
 
         assertThrows(AccessDeniedException.class, () -> courseService.updateLesson(1L, 2L, 3L, updatedLesson));
 
@@ -995,262 +993,6 @@ class CourseServiceTests {
         courseService.deleteForcePost(1L, 1L);
 
         verify(courseRepository, times(1)).save(spy);
-    }
-
-    @Test
-    void addQuizToSection_ValidCourseIdAndSectionId_AddsQuiz() {
-        Course spy = spy(course);
-        doNothing().when(spy).addQuizToSection(anyLong(), any());
-        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
-
-        QuizDTO quizDTO = new QuizDTO("Quiz Title", "Quiz Description", 1L, 50);
-        courseService.addQuizToSection(1L, 1L, quizDTO);
-
-        verify(courseRepository, times(1)).save(spy);
-    }
-
-    @Test
-    void addQuizToSection_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
-
-        QuizDTO quizDTO = new QuizDTO("Quiz Title", "Quiz Description", 1L, 50);
-
-        assertThrows(ResourceNotFoundException.class, () -> courseService.addQuizToSection(1L, 1L, quizDTO));
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void addQuizToSection_SectionNotFound_ThrowsException() {
-        Course spy = spy(course);
-        doThrow(new ResourceNotFoundException()).when(spy).addQuizToSection(anyLong(), any());
-        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
-
-        QuizDTO quizDTO = new QuizDTO("Quiz Title", "Quiz Description", 1L, 50);
-
-        assertThrows(ResourceNotFoundException.class, () -> courseService.addQuizToSection(1L, 999L, quizDTO));
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void addQuizToSection_PublishedCourse_ThrowsException() {
-        Course spy = spy(course);
-        doReturn(false).when(spy).isNotPublishedAndDeleted();
-        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
-
-        QuizDTO quizDTO = new QuizDTO("Quiz Title", "Quiz Description", 1L, 50);
-
-        String msg = assertThrows(InputInvalidException.class, () -> courseService.addQuizToSection(1L, 1L, quizDTO)).getMessage();
-        assertEquals("Cannot add a quiz to a published course.", msg);
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void updateQuiz_ValidCourseIdAndSectionIdAndQuizId_UpdatesQuiz() {
-        Course course = spy(this.course);
-        QuizUpdateDTO quizUpdateDTO = new QuizUpdateDTO("Updated Title", "Updated Description", 85);
-
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        doNothing().when(course).updateQuizInSection(2L, 3L, quizUpdateDTO.title(), quizUpdateDTO.description(), 85);
-
-        courseService.updateQuiz(1L, 2L, 3L, quizUpdateDTO);
-
-        verify(courseQueryService, times(1)).findCourseById(1L);
-        verify(course, times(1)).updateQuizInSection(2L, 3L, quizUpdateDTO.title(), quizUpdateDTO.description(), 85);
-        verify(courseRepository, times(1)).save(course);
-    }
-
-    @Test
-    void updateQuiz_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
-
-        QuizUpdateDTO quizUpdateDTO = new QuizUpdateDTO("Updated Title", "Updated Description", 85);
-
-        assertThrows(ResourceNotFoundException.class, () -> courseService.updateQuiz(1L, 2L, 3L, quizUpdateDTO));
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void updateQuiz_SectionNotFound_ThrowsException() {
-        Course course = spy(this.course);
-        QuizUpdateDTO quizUpdateDTO = new QuizUpdateDTO("Updated Title", "Updated Description", 85);
-
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        doThrow(new ResourceNotFoundException()).when(course).updateQuizInSection(999L, 3L,
-                quizUpdateDTO.title(), quizUpdateDTO.description(), 85);
-
-        assertThrows(ResourceNotFoundException.class, () -> courseService.updateQuiz(1L, 999L, 3L, quizUpdateDTO));
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void updateQuiz_QuizNotFound_ThrowsException() {
-        Course course = spy(this.course);
-        QuizUpdateDTO quizUpdateDTO = new QuizUpdateDTO("Updated Title", "Updated Description", 85);
-
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        doThrow(new ResourceNotFoundException()).when(course).updateQuizInSection(2L, 999L,
-                quizUpdateDTO.title(), quizUpdateDTO.description(), 85);
-
-        assertThrows(ResourceNotFoundException.class, () -> courseService.updateQuiz(1L, 2L, 999L, quizUpdateDTO));
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void updateQuiz_PublishedCourse_ThrowsException() {
-        Course course = spy(this.course);
-        QuizUpdateDTO quizUpdateDTO = new QuizUpdateDTO("Updated Title", "Updated Description", 85);
-
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        doReturn(false).when(course).isNotPublishedAndDeleted();
-
-        assertThrows(InputInvalidException.class, () -> courseService.updateQuiz(1L, 2L, 3L, quizUpdateDTO));
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-
-    @Test
-    void deleteQuiz_ValidCourseIdAndSectionIdAndQuizId_DeletesQuiz() {
-        Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        doNothing().when(course).deleteQuizFromSection(2L, 3L);
-
-        courseService.deleteQuiz(1L, 2L, 3L);
-
-        verify(courseQueryService, times(1)).findCourseById(1L);
-        verify(course, times(1)).deleteQuizFromSection(2L, 3L);
-        verify(courseRepository, times(1)).save(course);
-    }
-
-    @Test
-    void deleteQuiz_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
-
-        assertThrows(ResourceNotFoundException.class, () -> courseService.deleteQuiz(1L, 2L, 3L));
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void deleteQuiz_PublishedCourse_ThrowsException() {
-        Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        doReturn(false).when(course).isNotPublishedAndDeleted();
-
-        assertThrows(InputInvalidException.class, () -> courseService.deleteQuiz(1L, 2L, 3L));
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void restoreQuiz_ValidCourseIdAndSectionIdAndQuizId_RestoresQuiz() {
-        Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        doNothing().when(course).restoreQuizInSection(2L, 3L);
-
-        courseService.restoreQuiz(1L, 2L, 3L);
-
-        verify(courseQueryService, times(1)).findCourseById(1L);
-        verify(course, times(1)).restoreQuizInSection(2L, 3L);
-        verify(courseRepository, times(1)).save(course);
-    }
-
-    @Test
-    void restoreQuiz_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
-
-        assertThrows(ResourceNotFoundException.class, () -> courseService.restoreQuiz(1L, 2L, 3L));
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void deleteForceQuiz_ValidCourseIdAndSectionIdAndQuizId_ForceDeletesQuiz() {
-        Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        doNothing().when(course).forceDeleteQuizFromSection(2L, 3L);
-
-        courseService.deleteForceQuiz(1L, 2L, 3L);
-
-        verify(courseQueryService, times(1)).findCourseById(1L);
-        verify(course, times(1)).forceDeleteQuizFromSection(2L, 3L);
-        verify(courseRepository, times(1)).save(course);
-    }
-
-    @Test
-    void deleteForceQuiz_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
-
-        assertThrows(ResourceNotFoundException.class, () -> courseService.deleteForceQuiz(1L, 2L, 3L));
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void addQuestionToQuiz_ValidCourseIdAndSectionIdAndQuizId_AddsQuestion() {
-        Course spy = spy(course);
-        doNothing().when(spy).addQuestionToQuizInSection(anyLong(), anyLong(), any());
-        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
-
-        QuestionDTO questionDTO = new QuestionDTO("Question content", QuestionType.SINGLE_CHOICE,
-                Set.of(new AnswerOptionDTO("Option 1", true), new AnswerOptionDTO("Option 2", false)), 1);
-        courseService.addQuestionToQuiz(1L, 1L, 1L, questionDTO);
-
-        verify(courseRepository, times(1)).save(spy);
-    }
-
-    @Test
-    void addQuestionToQuiz_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
-
-        QuestionDTO questionDTO = new QuestionDTO("Question content", QuestionType.SINGLE_CHOICE,
-                Set.of(new AnswerOptionDTO("Option 1", true), new AnswerOptionDTO("Option 2", false)), 1);
-
-        assertThrows(ResourceNotFoundException.class, () -> courseService.addQuestionToQuiz(1L, 1L, 1L, questionDTO));
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void updateQuestion_ValidCourseIdAndSectionIdAndQuizIdAndQuestionId_UpdatesQuestion() {
-        Course course = spy(this.course);
-
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        doNothing().when(course).updateQuestionInQuizInSection(anyLong(), anyLong(), any(), any(Question.class));
-
-        QuestionDTO questionDTO = new QuestionDTO("Question content", QuestionType.SINGLE_CHOICE,
-                Set.of(new AnswerOptionDTO("Option 1", true), new AnswerOptionDTO("Option 2", false)), 1);
-
-        courseService.updateQuestion(1L, 2L, 3L, 4L, questionDTO);
-
-        verify(courseQueryService, times(1)).findCourseById(1L);
-        verify(courseRepository, times(1)).save(course);
-    }
-
-    @Test
-    void updateQuestion_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
-
-        QuestionDTO questionDTO = new QuestionDTO("Question content", QuestionType.SINGLE_CHOICE,
-                Set.of(new AnswerOptionDTO("Option 1", true), new AnswerOptionDTO("Option 2", false)), 1);
-
-        assertThrows(ResourceNotFoundException.class, () -> courseService.updateQuestion(1L, 2L, 3L, 4L, questionDTO));
-        verify(courseRepository, never()).save(any(Course.class));
-    }
-
-    @Test
-    void deleteQuestion_ValidCourseIdAndSectionIdAndQuizIdAndQuestionId_DeletesQuestion() {
-        Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        doNothing().when(course).deleteQuestionFromQuizInSection(2L, 3L, 4L);
-
-        courseService.deleteQuestion(1L, 2L, 3L, 4L);
-
-        verify(courseQueryService, times(1)).findCourseById(1L);
-        verify(course, times(1)).deleteQuestionFromQuizInSection(2L, 3L, 4L);
-        verify(courseRepository, times(1)).save(course);
-    }
-
-    @Test
-    void deleteQuestion_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
-
-        assertThrows(ResourceNotFoundException.class, () -> courseService.deleteQuestion(1L, 2L, 3L, 4L));
-        verify(courseRepository, never()).save(any(Course.class));
     }
 
 }

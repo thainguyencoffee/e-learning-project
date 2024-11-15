@@ -3,7 +3,6 @@ package com.el.course.domain;
 import com.el.TestFactory;
 import com.el.common.Currencies;
 import com.el.common.config.DataAuditConfig;
-import com.structurizr.documentation.Section;
 import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -162,33 +161,6 @@ class CourseJdbcTests {
 
         assertTrue(postOptional.isPresent());
         assertEquals(3, postOptional.get().getEmotions().size());
-    }
-
-    @Test
-    void testAddQuizToSection() {
-        Course savedCourse = spy(courseRepository.save(courseWithSections));
-        CourseSection section = savedCourse.getSections().iterator().next();
-        Long lessonId = section.getLessons().iterator().next().getId();
-
-        Quiz quiz = new Quiz("Quiz 1", "Quiz description", lessonId, 100);
-
-        when(savedCourse.isNotPublishedAndDeleted()).thenReturn(true);
-
-        savedCourse.addQuizToSection(section.getId(), quiz);
-        courseRepository.save(savedCourse);
-
-        Optional<Course> retrievedCourse = courseRepository.findById(savedCourse.getId());
-
-        assertTrue(retrievedCourse.isPresent());
-        assertNotNull(quiz.getId());
-
-        // Test add question to quiz
-        Question question = new Question("Question 1", QuestionType.SINGLE_CHOICE, 2,
-                Set.of(new AnswerOption("Answer 1", true), new AnswerOption("Answer 2", false)));
-        quiz.addQuestion(question);
-        courseRepository.save(savedCourse);
-
-        assertNotNull(question.getId());
     }
 
 }

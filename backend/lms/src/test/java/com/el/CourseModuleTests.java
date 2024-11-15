@@ -2,7 +2,6 @@ package com.el;
 
 import com.el.common.Currencies;
 import com.el.course.application.dto.*;
-import com.el.course.application.dto.QuestionDTO.AnswerOptionDTO;
 import com.el.course.domain.*;
 import com.el.course.web.dto.AssignTeacherDTO;
 import com.el.course.web.dto.CourseRequestApproveDTO;
@@ -638,7 +637,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
-        LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+        LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt");
 
         // Act
         var sectionId = course.getSections().iterator().next().getId();
@@ -660,7 +659,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
-        LessonDTO lessonDTO = new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4", null);
+        LessonDTO lessonDTO = new LessonDTO("Lesson 1", Lesson.Type.VIDEO, "http://example.com/lesson1.mp4");
 
         // Gửi request POST để thêm lesson cho section của khóa học
         var sectionId = course.getSections().iterator().next().getId();
@@ -671,7 +670,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
                 .exchange()
                 .expectStatus().isOk();
 
-        LessonDTO lessonDTODup = new LessonDTO("Lesson 1", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+        LessonDTO lessonDTODup = new LessonDTO("Lesson 1", Lesson.Type.TEXT, "http://example.com/lesson2.txt");
 
         webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
@@ -689,7 +688,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
 
         approvePublishByCourseId(course.getId());
 
-        LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+        LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt");
 
         // Gửi request POST để thêm lesson cho section của khóa học
         var courseSection = course.getSections().iterator().next();
@@ -703,7 +702,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
 
     @Test
     void testAddLesson_UserIsNotTeacherOrAdmin_Forbidden() {
-        LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+        LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt");
 
         // Gửi request POST để thêm lesson cho section của khóa học
         webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", 999L, 111L)
@@ -722,7 +721,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
 
 
         // Gửi request POST để thêm lesson cho section của khóa học
-        LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+        LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt");
 
         var sectionId = course.getSections().iterator().next().getId();
         var lessonId = webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
@@ -737,7 +736,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         assertThat(lessonId).isNotNull();
         ;
 
-        LessonDTO updateLessonDTO = new LessonDTO("New title", Lesson.Type.TEXT, "http://example.com/lesson1.txt", null);
+        LessonDTO updateLessonDTO = new LessonDTO("New title", Lesson.Type.TEXT, "http://example.com/lesson1.txt");
 
         // Act
         var section = course.getSections().iterator().next();
@@ -756,7 +755,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
-        LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+        LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt");
 
         // Gửi request POST để thêm lesson cho section của khóa học
         var sectionId = course.getSections().iterator().next().getId();
@@ -773,7 +772,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         assertThat(lessonId).isNotNull();
 
         //act
-        LessonDTO updateLessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+        LessonDTO updateLessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt");
 
         // Gửi request PUT để cập nhật lesson của khóa học
         var section = course.getSections().iterator().next();
@@ -793,7 +792,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
 
         approvePublishByCourseId(course.getId());
 
-        LessonDTO updateLessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+        LessonDTO updateLessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt");
 
         // Gửi request PUT để cập nhật lesson của khóa học
         var courseSection = course.getSections().iterator().next();
@@ -809,7 +808,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
 
     @Test
     void testUpdateLesson_UserIsNotTeacherOrAdmin_Forbidden() {
-        LessonDTO updateLessonDTO = new LessonDTO("New title", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+        LessonDTO updateLessonDTO = new LessonDTO("New title", Lesson.Type.TEXT, "http://example.com/lesson2.txt");
 
         // Gửi request PUT để cập nhật lesson của khóa học
         webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/lessons/{lessonId}", 1000L, 2000L, 3000L)
@@ -828,7 +827,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         // Arrange: Add lesson
-        LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt", null);
+        LessonDTO lessonDTO = new LessonDTO("Lesson 2", Lesson.Type.TEXT, "http://example.com/lesson2.txt");
 
         var sectionId = course.getSections().iterator().next().getId();
         var lessonId = webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", course.getId(), sectionId)
@@ -1086,360 +1085,6 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.content.length()").isEqualTo(0);
-    }
-
-    @Test
-    void testAddQuizToCourse_Successful() {
-        // Arrange
-        var courseDTO = TestFactory.createDefaultCourseDTO();
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
-
-        CourseSection courseSection = course.getSections().iterator().next();
-        Long sectionId = courseSection.getId();
-        Long lessonId = courseSection.getLessons().iterator().next().getId();
-
-        QuizDTO quizDTO = TestFactory.createDefaultQuizDTO(lessonId);
-
-        // Act
-        var quizId = performCreateQuiz(quizDTO, course.getId(), sectionId);
-
-        // Act: Get quiz
-        webTestClient.get().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}", course.getId(), sectionId, quizId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.id").isEqualTo(quizId)
-                .jsonPath("$.title").isEqualTo(quizDTO.title())
-                .jsonPath("$.description").isEqualTo(quizDTO.description())
-                .jsonPath("$.passScorePercentage").isEqualTo(quizDTO.passScorePercentage())
-                .jsonPath("$.afterLessonId").isEqualTo(lessonId)
-                .jsonPath("$.questions").isArray()
-                .jsonPath("$.delete").doesNotExist();
-
-        webTestClient.get().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}", course.getId(), sectionId, quizId)
-                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isForbidden();
-    }
-
-    @Test
-    void testUpdateQuiz_Successful() {
-        // Arrange
-        var courseDTO = TestFactory.createDefaultCourseDTO();
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
-
-        CourseSection courseSection = course.getSections().iterator().next();
-        Long sectionId = courseSection.getId();
-        Long lessonId = courseSection.getLessons().iterator().next().getId();
-
-        QuizDTO quizDTO = TestFactory.createDefaultQuizDTO(lessonId);
-
-        // Act: Add quiz
-        var quizId = performCreateQuiz(quizDTO, course.getId(), sectionId);
-
-        // Assert
-        assertThat(quizId).isNotNull();
-
-        // Act: Update quiz
-        QuizUpdateDTO updateQuizDTO = TestFactory.createDefaultQuizUpdateDTO();
-
-        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}", course.getId(), sectionId, quizId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(updateQuizDTO))
-                .exchange()
-                .expectStatus().isOk();
-
-        // Act: Get quiz
-        webTestClient.get().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}", course.getId(), sectionId, quizId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.id").isEqualTo(quizId)
-                .jsonPath("$.title").isEqualTo(updateQuizDTO.title())
-                .jsonPath("$.description").isEqualTo(updateQuizDTO.description())
-                .jsonPath("$.passScorePercentage").isEqualTo(updateQuizDTO.passScorePercentage())
-                .jsonPath("$.afterLessonId").isEqualTo(lessonId)
-                .jsonPath("$.delete").doesNotExist();
-    }
-
-    @Test
-    void testDeleteQuiz_Successful() {
-        // Arrange
-        var courseDTO = TestFactory.createDefaultCourseDTO();
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
-
-        CourseSection courseSection = course.getSections().iterator().next();
-        Long sectionId = courseSection.getId();
-        Long lessonId = courseSection.getLessons().iterator().next().getId();
-
-        QuizDTO quizDTO = TestFactory.createDefaultQuizDTO(lessonId);
-
-        // Act: Add quiz
-        var quizId = performCreateQuiz(quizDTO, course.getId(), sectionId);
-
-        // Assert
-        assertThat(quizId).isNotNull();
-
-        // Act: Delete quiz
-        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}", course.getId(), sectionId, quizId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isNoContent();
-
-        // Act: Get quiz in trash
-        webTestClient.get().uri("/courses/{courseId}/sections/{sectionId}/quizzes/trash", course.getId(), sectionId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.content.length()").isEqualTo(1)
-                .jsonPath("$.content[0].id").isEqualTo(quizId);
-
-        // Act: Get quiz
-        webTestClient.get().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}", course.getId(), sectionId, quizId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isNotFound();
-    }
-
-    @Test
-    void testRestoreQuiz_Successful() {
-        // Arrange
-        var courseDTO = TestFactory.createDefaultCourseDTO();
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
-
-        CourseSection courseSection = course.getSections().iterator().next();
-        Long sectionId = courseSection.getId();
-        Long lessonId = courseSection.getLessons().iterator().next().getId();
-
-        QuizDTO quizDTO = TestFactory.createDefaultQuizDTO(lessonId);
-
-        // Act: Add quiz
-        var quizId = performCreateQuiz(quizDTO, course.getId(), sectionId);
-
-        // Assert
-        assertThat(quizId).isNotNull();
-
-        // Act: Delete quiz
-        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}", course.getId(), sectionId, quizId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isNoContent();
-
-        // Act: Restore quiz
-        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/restore", course.getId(), sectionId, quizId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk();
-
-        // Act: Get quiz in trash
-        webTestClient.get().uri("/courses/{courseId}/sections/{sectionId}/quizzes/trash", course.getId(), sectionId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.content.length()").isEqualTo(0);
-
-        // Act: Get quiz
-        webTestClient.get().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}", course.getId(), sectionId, quizId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk();
-    }
-
-    @Test
-    void testDeleteForceQuiz_Successful() {
-        // Arrange
-        var courseDTO = TestFactory.createDefaultCourseDTO();
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
-
-        CourseSection courseSection = course.getSections().iterator().next();
-        Long sectionId = courseSection.getId();
-        Long lessonId = courseSection.getLessons().iterator().next().getId();
-
-        QuizDTO quizDTO = TestFactory.createDefaultQuizDTO(lessonId);
-
-        // Act: Add quiz
-        var quizId = performCreateQuiz(quizDTO, course.getId(), sectionId);
-
-        // Assert
-        assertThat(quizId).isNotNull();
-
-        // Act: Delete quiz
-        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}", course.getId(), sectionId, quizId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isNoContent();
-
-        // Act: Delete force
-        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}?force=true", course.getId(), sectionId, quizId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isNoContent();
-
-        // Act: Get quiz in trash
-        webTestClient.get().uri("/courses/{courseId}/sections/{sectionId}/quizzes/trash", course.getId(), sectionId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.content.length()").isEqualTo(0);
-    }
-
-    @Test
-    void testAddQuestionToQuiz_Successful() {
-        // Arrange
-        var courseDTO = TestFactory.createDefaultCourseDTO();
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
-
-        CourseSection courseSection = course.getSections().iterator().next();
-        Long sectionId = courseSection.getId();
-        Long lessonId = courseSection.getLessons().iterator().next().getId();
-
-        QuizDTO quizDTO = TestFactory.createDefaultQuizDTO(lessonId);
-
-        // Act: Add quiz
-        var quizId = performCreateQuiz(quizDTO, course.getId(), sectionId);
-
-        // Assert
-        assertThat(quizId).isNotNull();
-
-        // Act: Add question
-        QuestionDTO questionDTO = TestFactory.createDefaultQuestionDTO();
-
-        var questionId = performCreateQuestion(questionDTO, course.getId(), sectionId, quizId);
-
-        // Act: Get question
-        webTestClient.get().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}", course.getId(), sectionId, quizId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.title").isEqualTo(quizDTO.title())
-                .jsonPath("$.questions.length()").isEqualTo(1)
-                .jsonPath("$.totalScore").isEqualTo(questionDTO.score())
-                .jsonPath("$.questions[0].id").isEqualTo(questionId)
-                .jsonPath("$.questions[0].content").isEqualTo(questionDTO.content())
-                .jsonPath("$.questions[0].type").isEqualTo(questionDTO.type().name())
-                .jsonPath("$.questions[0].options.length()").isEqualTo(4)
-                .jsonPath("$.questions[0].score").isEqualTo(questionDTO.score());
-
-        webTestClient.get().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/questions/{questionId}", course.getId(), sectionId, quizId, questionId)
-                .headers(header -> header.setBearerAuth(userToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isForbidden();
-    }
-
-    @Test
-    void testUpdateQuestion_Successful() {
-        // Arrange
-        var courseDTO = TestFactory.createDefaultCourseDTO();
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
-
-        CourseSection courseSection = course.getSections().iterator().next();
-        Long sectionId = courseSection.getId();
-        Long lessonId = courseSection.getLessons().iterator().next().getId();
-
-        QuizDTO quizDTO = TestFactory.createDefaultQuizDTO(lessonId);
-
-        // Act: Add quiz
-        var quizId = performCreateQuiz(quizDTO, course.getId(), sectionId);
-
-        // Assert
-        assertThat(quizId).isNotNull();
-
-        // Act: Add question
-        QuestionDTO questionDTO = TestFactory.createDefaultQuestionDTO();
-
-        var questionId = performCreateQuestion(questionDTO, course.getId(), sectionId, quizId);
-
-        // Assert
-        assertThat(questionId).isNotNull();
-
-        // Act: Update question
-        QuestionDTO updateQuestionDTO = new QuestionDTO("New content (Update)", QuestionType.TRUE_FALSE,
-                Set.of(
-                        new AnswerOptionDTO("True answer", true),
-                        new AnswerOptionDTO("False answer", false)
-                ), 3);
-
-        webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/questions/{questionId}", course.getId(), sectionId, quizId, questionId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(updateQuestionDTO))
-                .exchange()
-                .expectStatus().isOk();
-
-        // Act: Get question
-        webTestClient.get().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}", course.getId(), sectionId, quizId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.title").isEqualTo(quizDTO.title())
-                .jsonPath("$.questions.length()").isEqualTo(1)
-                .jsonPath("$.totalScore").isEqualTo(updateQuestionDTO.score())
-                .jsonPath("$.questions[0].id").isEqualTo(questionId)
-                .jsonPath("$.questions[0].content").isEqualTo(updateQuestionDTO.content())
-                .jsonPath("$.questions[0].type").isEqualTo(updateQuestionDTO.type().name())
-                .jsonPath("$.questions[0].options.length()").isEqualTo(2)
-                .jsonPath("$.questions[0].score").isEqualTo(updateQuestionDTO.score());
-    }
-
-    @Test
-    void testDeleteQuestion_Successful() {
-        // Arrange
-        var courseDTO = TestFactory.createDefaultCourseDTO();
-        CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
-
-        CourseSection courseSection = course.getSections().iterator().next();
-        Long sectionId = courseSection.getId();
-        Long lessonId = courseSection.getLessons().iterator().next().getId();
-
-        QuizDTO quizDTO = TestFactory.createDefaultQuizDTO(lessonId);
-
-        // Act: Add quiz
-        var quizId = performCreateQuiz(quizDTO, course.getId(), sectionId);
-
-        // Assert
-        assertThat(quizId).isNotNull();
-
-        // Act: Add question
-        QuestionDTO questionDTO = TestFactory.createDefaultQuestionDTO();
-
-        var questionId = performCreateQuestion(questionDTO, course.getId(), sectionId, quizId);
-
-        // Assert
-        assertThat(questionId).isNotNull();
-
-        // Act: Delete question
-        webTestClient.delete().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/questions/{questionId}", course.getId(), sectionId, quizId, questionId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isNoContent();
-
-        // Act: Get question
-        webTestClient.get().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}", course.getId(), sectionId, quizId)
-                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.title").isEqualTo(quizDTO.title())
-                .jsonPath("$.questions.length()").isEqualTo(0);
     }
 
 }

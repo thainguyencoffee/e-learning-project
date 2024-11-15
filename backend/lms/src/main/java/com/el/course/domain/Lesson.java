@@ -16,22 +16,20 @@ public class Lesson {
     private String title;
     private Type type;
     private String link;
-    private Long quiz;
     private Integer orderIndex;
 
     public enum Type {
         VIDEO, TEXT, QUIZ, ASSIGNMENT
     }
 
-    public Lesson (String title, Type type, String link, Long quiz) {
+    public Lesson (String title, Type type, String link) {
         if (title.isBlank()) throw new InputInvalidException("Lesson title must not be empty.");
         if (type == null) throw new InputInvalidException("Lesson type must not be null.");
 
-        validateLinkOrQuiz(type, link, quiz);
+        validateLink(type, link);
         this.title = title;
         this.type = type;
         this.link = link;
-        this.quiz = quiz;
     }
 
     public void updateFrom(Lesson updatedLesson) {
@@ -40,12 +38,11 @@ public class Lesson {
 
         this.title = updatedLesson.getTitle();
         this.type = updatedLesson.getType();
-        validateLinkOrQuiz(updatedLesson.getType(), updatedLesson.getLink(), updatedLesson.getQuiz());
+        validateLink(updatedLesson.getType(), updatedLesson.getLink());
         this.link = updatedLesson.getLink();
-        this.quiz = updatedLesson.getQuiz();
     }
 
-    private void validateLinkOrQuiz(Type type, String link, Long quiz) {
+    private void validateLink(Type type, String link) {
         switch (type) {
             case VIDEO:
             case TEXT:
@@ -55,11 +52,6 @@ public class Lesson {
                 // validate link format
                 if (!link.startsWith("http://") && !link.startsWith("https://")) {
                     throw new InputInvalidException("Link must is a valid URL.");
-                }
-                break;
-            case QUIZ:
-                if (quiz == null) {
-                    throw new InputInvalidException("Quiz ID must not be null for QUIZ lesson.");
                 }
                 break;
             default:

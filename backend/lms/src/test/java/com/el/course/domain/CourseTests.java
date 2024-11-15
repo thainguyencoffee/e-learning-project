@@ -32,7 +32,7 @@ class CourseTests {
 //        courseSection.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
 
         courseWithSections = TestFactory.createDefaultCourse();
-        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null);
+        Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com");
         courseWithSections.addSection(courseSection);
         courseWithSections.addLessonToSection(courseSection.getId(), lesson);
 
@@ -353,7 +353,7 @@ class CourseTests {
 
         // Add lesson to section
         // Khi thêm một lesson mới vào section, không có lesson nào trùng title
-        Lesson lesson = new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1", null);
+        Lesson lesson = new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1");
         courseNoSections.addLessonToSection(section.getId(), lesson);
 
         assertEquals(1, lesson.getOrderIndex());
@@ -369,8 +369,8 @@ class CourseTests {
 
         // Add lesson to section
         // Khi thêm một lesson mới vào section, không có lesson nào trùng title
-        Lesson lesson1 = new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1", null);
-        Lesson lesson2 = new Lesson("LessonTitle 2", Lesson.Type.TEXT, "https://www.example.com/2", null);
+        Lesson lesson1 = new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1");
+        Lesson lesson2 = new Lesson("LessonTitle 2", Lesson.Type.TEXT, "https://www.example.com/2");
         courseNoSections.addLessonToSection(section.getId(), lesson1);
         courseNoSections.addLessonToSection(section.getId(), lesson2);
 
@@ -387,9 +387,9 @@ class CourseTests {
         courseNoSections.addSection(section);
 
         // Add lesson to section
-        Lesson lesson1 = spy(new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1", null));
+        Lesson lesson1 = spy(new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1"));
         when(lesson1.getId()).thenReturn(1L);
-        Lesson lesson2 = spy(new Lesson("LessonTitle 2", Lesson.Type.TEXT, "https://www.example.com/2", null));
+        Lesson lesson2 = spy(new Lesson("LessonTitle 2", Lesson.Type.TEXT, "https://www.example.com/2"));
         when(lesson2.getId()).thenReturn(2L);
         courseNoSections.addLessonToSection(section.getId(), lesson1);
         courseNoSections.addLessonToSection(section.getId(), lesson2);
@@ -401,7 +401,7 @@ class CourseTests {
         courseNoSections.removeLessonFromSection(1L, 1L);
 
         // Add new lesson
-        Lesson lesson3 = new Lesson("LessonTitle 3", Lesson.Type.TEXT, "https://www.example.com/3", null);
+        Lesson lesson3 = new Lesson("LessonTitle 3", Lesson.Type.TEXT, "https://www.example.com/3");
         courseNoSections.addLessonToSection(section.getId(), lesson3);
 
         // Verify order index of lesson 2 and lesson 3
@@ -416,9 +416,9 @@ class CourseTests {
         courseNoSections.addSection(section);
 
         // Add lesson to section
-        Lesson lesson1 = spy(new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1", null));
+        Lesson lesson1 = spy(new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1"));
         when(lesson1.getId()).thenReturn(1L);
-        Lesson lesson2 = spy(new Lesson("LessonTitle 2", Lesson.Type.TEXT, "https://www.example.com/2", null));
+        Lesson lesson2 = spy(new Lesson("LessonTitle 2", Lesson.Type.TEXT, "https://www.example.com/2"));
         when(lesson2.getId()).thenReturn(2L);
 
         courseNoSections.addLessonToSection(section.getId(), lesson1);
@@ -431,7 +431,7 @@ class CourseTests {
         courseNoSections.removeLessonFromSection(1L, 2L);
 
         // Add new lesson
-        Lesson lesson3 = new Lesson("LessonTitle 3", Lesson.Type.TEXT, "https://www.example.com/3", null);
+        Lesson lesson3 = new Lesson("LessonTitle 3", Lesson.Type.TEXT, "https://www.example.com/3");
         courseNoSections.addLessonToSection(section.getId(), lesson3);
 
         // Verify order index of lesson 2 and lesson 3
@@ -448,10 +448,10 @@ class CourseTests {
         courseNoSections.addSection(section);
 
         // add lesson to section
-        courseNoSections.addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1", null));
+        courseNoSections.addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1"));
 
         assertThrows(InputInvalidException.class, () -> courseNoSections
-                .addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/2", null)));
+                .addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/2")));
     }
 
     @Test
@@ -462,10 +462,10 @@ class CourseTests {
         courseNoSections.addSection(section);
 
         // Add lesson to section
-        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1", null));
+        section.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1"));
 
         assertThrows(InputInvalidException.class, () -> courseNoSections
-                .addLessonToSection(1L, new Lesson("LessonTitle 2", Lesson.Type.TEXT, "https://www.example.com/1", null)));
+                .addLessonToSection(1L, new Lesson("LessonTitle 2", Lesson.Type.TEXT, "https://www.example.com/1")));
     }
 
     @Test
@@ -473,12 +473,12 @@ class CourseTests {
         Course course = spy(courseNoSections);
         when(course.isNotPublishedAndDeleted()).thenReturn(false);
 
-        assertThrows(InputInvalidException.class, () -> course.addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null)));
+        assertThrows(InputInvalidException.class, () -> course.addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com")));
     }
 
     @Test
     void addLessonToSection_SectionNotFound_ThrowsException() {
-        assertThrows(ResourceNotFoundException.class, () -> courseNoSections.addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null)));
+        assertThrows(ResourceNotFoundException.class, () -> courseNoSections.addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com")));
     }
 
     @Test
@@ -488,11 +488,11 @@ class CourseTests {
         courseNoSections.addSection(section);
 
         // Add lesson to section
-        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1", null));
+        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1"));
         when(lesson.getId()).thenReturn(1L);
         courseNoSections.addLessonToSection(1L, lesson);
 
-        courseNoSections.updateLessonInSection(1L, 1L, new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/2", null));
+        courseNoSections.updateLessonInSection(1L, 1L, new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/2"));
         assertEquals("UpdatedLessonTitle", section.findLessonById(1L).getTitle());
     }
 
@@ -504,17 +504,17 @@ class CourseTests {
         courseNoSections.addSection(section);
 
         // Tạo và thêm một Lesson đầu tiên với title và link cố định
-        Lesson lesson1 = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1", null));
+        Lesson lesson1 = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1"));
         when(lesson1.getId()).thenReturn(1L);
         courseNoSections.addLessonToSection(1L, lesson1);
 
         // Tạo và thêm một Lesson khác với title hoặc link trùng
-        Lesson lesson2 = spy(new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/2", null));
+        Lesson lesson2 = spy(new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/2"));
         when(lesson2.getId()).thenReturn(2L);
         courseNoSections.addLessonToSection(1L, lesson2);
 
         // Thử cập nhật lesson1 với title trùng với lesson2
-        Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/3", null);
+        Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/3");
 
         assertThrows(InputInvalidException.class, () ->
                 courseNoSections.updateLessonInSection(1L, 1L, updatedLesson)
@@ -528,15 +528,15 @@ class CourseTests {
         when(section.getId()).thenReturn(1L);
         courseNoSections.addSection(section);
 
-        Lesson lesson1 = spy(new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1", null));
+        Lesson lesson1 = spy(new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/1"));
         when(lesson1.getId()).thenReturn(1L);
         courseNoSections.addLessonToSection(1L, lesson1);
 
-        Lesson lesson2 = spy(new Lesson("LessonTitle 2", Lesson.Type.TEXT, "https://www.example.com/2", null));
+        Lesson lesson2 = spy(new Lesson("LessonTitle 2", Lesson.Type.TEXT, "https://www.example.com/2"));
         when(lesson2.getId()).thenReturn(2L);
         courseNoSections.addLessonToSection(1L, lesson2);
 
-        Lesson updatedLesson = new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/2", null);
+        Lesson updatedLesson = new Lesson("LessonTitle 1", Lesson.Type.TEXT, "https://www.example.com/2");
 
         assertThrows(InputInvalidException.class, () -> courseNoSections
                 .updateLessonInSection(1L, 1L, updatedLesson));
@@ -548,12 +548,12 @@ class CourseTests {
         Course course = spy(courseNoSections);
         when(course.isNotPublishedAndDeleted()).thenReturn(false);
 
-        assertThrows(InputInvalidException.class, () -> course.updateLessonInSection(1L, 1L, new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com", null)));
+        assertThrows(InputInvalidException.class, () -> course.updateLessonInSection(1L, 1L, new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com")));
     }
 
     @Test
     void updateLessonInSection_SectionNotFound_ThrowsException() {
-        assertThrows(ResourceNotFoundException.class, () -> courseNoSections.updateLessonInSection(1L, 1L, new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com", null)));
+        assertThrows(ResourceNotFoundException.class, () -> courseNoSections.updateLessonInSection(1L, 1L, new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com")));
     }
 
     @Test
@@ -562,12 +562,12 @@ class CourseTests {
         when(section.getId()).thenReturn(1L);
         courseNoSections.addSection(section);
 
-        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1", null));
+        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com/1"));
         when(lesson.getId()).thenReturn(1L);
         courseNoSections.addLessonToSection(1L, lesson);
 
         assertThrows(ResourceNotFoundException.class, () -> courseNoSections.updateLessonInSection(1L, 2L,
-                new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/2", null)));
+                new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/2")));
     }
 
     @Test
@@ -576,7 +576,7 @@ class CourseTests {
         when(section.getId()).thenReturn(1L);
         courseNoSections.addSection(section);
 
-        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
+        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com"));
         when(lesson.getId()).thenReturn(1L);
         courseNoSections.addLessonToSection(1L, lesson);
 
@@ -596,7 +596,7 @@ class CourseTests {
         when(section.getId()).thenReturn(1L);
         courseNoSections.addSection(section);
 
-        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
+        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com"));
         when(lesson.getId()).thenReturn(1L);
         courseNoSections.addLessonToSection(1L, lesson);
 
@@ -1083,867 +1083,6 @@ class CourseTests {
 
         coursePublished.forceDeletePost(1L);
         assertFalse(coursePublished.getPosts().contains(postTemplate));
-    }
-
-    private Course prepareSectionInCourseForQuiz(Quiz quiz) {
-        // Arrange
-        Course course = spy(TestFactory.createDefaultCourse());
-
-        // Add Section and Mock
-        CourseSection section = spy(new CourseSection("SectionTitle"));
-        when(section.getId()).thenReturn(1L);
-        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
-        when(lesson.getId()).thenReturn(quiz.getAfterLessonId()); // sure quiz.getAfterLessonId contain in lessons of section
-
-        // Add Section to Course
-        course.addSection(section);
-        course.addLessonToSection(1L, lesson);
-
-        return course;
-    }
-
-    @Test
-    void addQuizToSection_ValidQuiz_AddsQuiz() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-
-        // Act
-        course.addQuizToSection(1L, quiz);
-        CourseSection section = course.getSections().iterator().next();
-        Quiz addedQuiz = section.getQuizzes().iterator().next();
-
-        // Assert
-        assertEquals(1, section.getQuizzes().size());
-        assertEquals(quiz.getTitle(), addedQuiz.getTitle());
-        assertEquals(quiz.getDescription(), addedQuiz.getDescription());
-        assertEquals(quiz.getAfterLessonId(), addedQuiz.getAfterLessonId());
-        assertEquals(0, addedQuiz.getQuestions().size());
-        assertEquals(quiz.getPassScorePercentage(), addedQuiz.getPassScorePercentage());
-        assertEquals(0, addedQuiz.getTotalScore());
-    }
-
-    @Test
-    void addQuizToSection_QuizAfterLessonNotFound_ThrowsException() {
-        // Arrange
-        Quiz quiz = new Quiz("Quiz Title", "Quiz Description", 999L, 70); // ID không tồn tại
-        Course course = spy(TestFactory.createDefaultCourse());
-
-        // Add Section and Mock
-        CourseSection section = spy(new CourseSection("SectionTitle"));
-        when(section.getId()).thenReturn(1L);
-        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
-        when(lesson.getId()).thenReturn(1L); // sure quiz.getAfterLessonId not contain in lessons of section
-
-        // Add Section to Course
-        course.addSection(section);
-        course.addLessonToSection(1L, lesson);
-
-        // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> {
-            course.addQuizToSection(1L, quiz);
-        }, "Should throw ResourceNotFoundException when lesson afterQuizId not found.");
-    }
-
-    @Test
-    void addQuizToSection_PublishedCourse_ThrowsException() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
-
-        // Act & Assert
-        String msg = assertThrows(InputInvalidException.class, () -> {
-            course.addQuizToSection(1L, quiz);
-        }, "Should throw InputInvalidException when trying to add quiz to a published course.").getMessage();
-
-        assertEquals("Cannot add a quiz to a published course.", msg);
-    }
-
-    @Test
-    void addQuizToSection_ExistingQuizTitle_ThrowsException() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-
-        // Act
-        course.addQuizToSection(1L, quiz);
-        CourseSection section = course.getSections().iterator().next();
-
-        assertEquals(1, section.getQuizzes().size());
-
-        // Arrange for second quiz
-        Lesson lesson = spy(new Lesson("Another lesson", Lesson.Type.TEXT, "https://www.example.com/another-lesson", null));
-        when(lesson.getId()).thenReturn(2L); // sure quiz.getAfterLessonId contain in lessons of section
-        course.addLessonToSection(1L, lesson);
-
-        Quiz anotherQuiz = new Quiz(quiz.getTitle(), "Another quiz description", 2L, 80);
-
-        // Assert
-        String msg = assertThrows(InputInvalidException.class, () -> {
-            course.addQuizToSection(1L, anotherQuiz);
-        }, "Should throw InputInvalidException when trying to add quiz with existing title.").getMessage();
-
-        assertEquals("Duplicate quiz title.", msg);
-    }
-
-
-    @Test
-    void addQuizToSection_ExistingQuizAfterLesson_ThrowsException() {
-        // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz1);
-        course.addQuizToSection(1L, quiz1); // Thêm quiz đầu tiên
-
-        // Tạo quiz thứ hai với afterLessonId trùng với quiz đầu tiên
-        Quiz quiz2 = new Quiz("Another Quiz", "Different Description", quiz1.getAfterLessonId(), 70);
-
-        // Act & Assert
-        String msg = assertThrows(InputInvalidException.class, () -> {
-            course.addQuizToSection(1L, quiz2);
-        }, "Should throw InputInvalidException when trying to add a quiz after a lesson that already has a quiz.").getMessage();
-
-        assertEquals("There is already a quiz after the lesson.", msg);
-    }
-
-    @Test
-    void updateQuizInSection_ValidQuiz_UpdatesQuiz() {
-        // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz1);
-        quiz1 = spy(quiz1);
-        when(quiz1.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz1);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Act
-        course.updateQuizInSection(1L, 1L,
-                "Updated Quiz Title",
-                "Updated Quiz Description",
-                80);
-
-        // Assert
-        Quiz quizAfterUpdate = section.getQuizzes().iterator().next();
-
-        assertEquals("Updated Quiz Title", quizAfterUpdate.getTitle());
-        assertEquals("Updated Quiz Description", quizAfterUpdate.getDescription());
-        assertEquals(80, quizAfterUpdate.getPassScorePercentage());
-    }
-
-    @Test
-    void updateQuizInSection_QuizDuplicateTitle_ThrowsException() {
-        // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz1);
-        quiz1 = spy(quiz1);
-        when(quiz1.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz1);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Arrange second lesson and quiz
-        Lesson lesson = spy(new Lesson("Another lesson", Lesson.Type.TEXT, "https://www.example.com/another-lesson", null));
-        when(lesson.getId()).thenReturn(2L); // sure quiz.getAfterLessonId contain in lessons of section
-        course.addLessonToSection(1L, lesson);
-
-        // Create second quiz and add it to section with lesson 2
-        Quiz quiz2 = new Quiz("Quiz 2", "Different Description", 2L, 70);
-        quiz2 = spy(quiz2);
-        when(quiz2.getId()).thenReturn(2L);
-        course.addQuizToSection(1L, quiz2);
-
-        assertEquals(2, section.getQuizzes().size());
-
-        String quiz1Title = quiz1.getTitle();
-
-        // Act & Assert
-        String msg = assertThrows(InputInvalidException.class, () -> course.updateQuizInSection(1L, 2L,
-                quiz1Title,
-                "Updated Quiz Description",
-                80), "Should throw InputInvalidException when trying to update quiz with existing title.").getMessage();
-
-        assertEquals("Duplicate quiz title.", msg);
-    }
-
-    @Test
-    void updateQuizInSection_QuizIdNotFound_ThrowsException() {
-        // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz1);
-        quiz1 = spy(quiz1);
-        when(quiz1.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz1);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> {
-            course.updateQuizInSection(1L, 999L,
-                    "Updated Quiz Title",
-                    "Updated Quiz Description",
-                    80);
-        }, "Should throw ResourceNotFoundException when quiz not found.");
-    }
-
-    @Test
-    void updateQuizInSection_PublishedCourse_ThrowsException() {
-        // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz1);
-        quiz1 = spy(quiz1);
-        when(quiz1.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz1);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
-
-        // Act & Assert
-        String msg = assertThrows(InputInvalidException.class, () -> {
-            course.updateQuizInSection(1L, 1L,
-                    "Updated Quiz Title",
-                    "Updated Quiz Description",
-                    80);
-        }, "Should throw InputInvalidException when trying to update quiz in a published course.").getMessage();
-
-        assertEquals("Cannot update a quiz in a published course.", msg);
-    }
-
-    @Test
-    void deleteQuizFromSection_ValidQuiz_DeletesQuiz() {
-        // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz1);
-        quiz1 = spy(quiz1);
-        when(quiz1.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz1);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Act
-        course.deleteQuizFromSection(1L, 1L);
-
-        // Assert
-        assertTrue(quiz1.isDeleted());
-    }
-
-    @Test
-    void deleteQuizFromSection_PublishedCourse_ThrowsException() {
-        // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz1);
-        quiz1 = spy(quiz1);
-        when(quiz1.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz1);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
-
-        // Act & Assert
-        String msg = assertThrows(InputInvalidException.class, () -> {
-            course.deleteQuizFromSection(1L, 1L);
-        }, "Should throw InputInvalidException when trying to delete quiz from a published course.").getMessage();
-
-        assertEquals("Cannot delete a quiz from a published course.", msg);
-    }
-
-    @Test
-    void restoreQuiz_DeletedQuiz_RestoresQuiz() {
-        // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz1);
-        quiz1 = spy(quiz1);
-        when(quiz1.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz1);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        course.deleteQuizFromSection(1L, 1L);
-        assertTrue(quiz1.isDeleted());
-
-        // Act
-        course.restoreQuizInSection(1L, 1L);
-
-        // Assert
-        assertFalse(quiz1.isDeleted());
-    }
-
-    @Test
-    void restoreQuiz_PublishedCourse_ThrowsException() {
-        // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz1);
-        quiz1 = spy(quiz1);
-        when(quiz1.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz1);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        course.deleteQuizFromSection(1L, 1L);
-        assertTrue(quiz1.isDeleted());
-
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
-
-        // Act & Assert
-        String msg = assertThrows(InputInvalidException.class, () -> {
-            course.restoreQuizInSection(1L, 1L);
-        }, "Should throw InputInvalidException when trying to restore quiz in a published course.").getMessage();
-
-        assertEquals("Cannot restore a quiz in a published course.", msg);
-    }
-
-    @Test
-    void forceDeleteQuiz_DeletedQuiz_ForceDeletesQuiz() {
-        // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz1);
-        quiz1 = spy(quiz1);
-        when(quiz1.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz1);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        course.deleteQuizFromSection(1L, 1L);
-        assertTrue(quiz1.isDeleted());
-
-        // Act
-        course.forceDeleteQuizFromSection(1L, 1L);
-
-        // Assert
-        assertFalse(section.getQuizzes().contains(quiz1));
-    }
-
-    @Test
-    void forceDeleteQuiz_PublishedCourse_ThrowsException() {
-        // Arrange
-        Quiz quiz1 = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz1);
-        quiz1 = spy(quiz1);
-        when(quiz1.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz1);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        course.deleteQuizFromSection(1L, 1L);
-        assertTrue(quiz1.isDeleted());
-
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
-
-        // Act & Assert
-        String msg = assertThrows(InputInvalidException.class, () -> {
-            course.forceDeleteQuizFromSection(1L, 1L);
-        }, "Should throw InputInvalidException when trying to force delete quiz in a published course.").getMessage();
-
-        assertEquals("Cannot force delete a quiz in a published course.", msg);
-    }
-
-    @Test
-    void addQuestionToQuiz_ValidQuestion_AddsQuestion() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-        quiz = spy(quiz);
-        when(quiz.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Act
-        Question question = TestFactory.createDefaultQuestion();
-        course.addQuestionToQuizInSection(1L, 1L, question);
-
-        // Assert
-        Quiz quizAfterAddQuestion = section.getQuizzes().iterator().next();
-        assertEquals(1, quizAfterAddQuestion.getQuestions().size());
-        assertEquals(question, quizAfterAddQuestion.getQuestions().iterator().next());
-        assertEquals(question.getScore(), quizAfterAddQuestion.getTotalScore());
-    }
-
-    @Test
-    void addQuestionToQuiz_QuizNotFound_ThrowsException() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-        quiz = spy(quiz);
-        when(quiz.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> {
-            Question question = TestFactory.createDefaultQuestion();
-            course.addQuestionToQuizInSection(1L, 999L, question);
-        }, "Should throw ResourceNotFoundException when quiz not found.");
-    }
-
-    @Test
-    void addQuestionToQuiz_PublishedCourse_ThrowsException() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-        quiz = spy(quiz);
-        when(quiz.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
-
-        // Act & Assert
-        String msg = assertThrows(InputInvalidException.class, () -> {
-            Question question = TestFactory.createDefaultQuestion();
-            course.addQuestionToQuizInSection(1L, 1L, question);
-        }, "Should throw InputInvalidException when trying to add question to a published course.").getMessage();
-
-        assertEquals("Cannot add a question to a published course.", msg);
-    }
-
-    @Test
-    void addQuestionToQuiz_ExistingQuestionContent_ThrowsException() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-        quiz = spy(quiz);
-        when(quiz.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Add question
-        Question question = TestFactory.createDefaultQuestion();
-        course.addQuestionToQuizInSection(1L, 1L, question);
-
-        // Act & Assert
-        String msg = assertThrows(InputInvalidException.class, () -> {
-            Question anotherQuestion = new Question(question.getContent(), QuestionType.SINGLE_CHOICE, 2,
-                    Set.of(new AnswerOption("Answer 1", true),
-                            new AnswerOption("Answer 2", false),
-                            new AnswerOption("Answer 3", false)));
-
-            course.addQuestionToQuizInSection(1L, 1L, anotherQuestion);
-        }, "Should throw InputInvalidException when trying to add question with existing content.").getMessage();
-
-        assertEquals("Duplicate question content.", msg);
-    }
-
-    @Test
-    void addQuestionToQuiz_QuestionScoreInvalid_ThrowsException() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-        quiz = spy(quiz);
-        when(quiz.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Act & Assert
-        String msgForCase1 = assertThrows(InputInvalidException.class, () -> {
-            Question question = new Question("Question content 1", QuestionType.SINGLE_CHOICE, -1,
-                    Set.of(new AnswerOption("Answer 1", true),
-                            new AnswerOption("Answer 2", false),
-                            new AnswerOption("Answer 3", false)));
-
-            course.addQuestionToQuizInSection(1L, 1L, question);
-        }, "Should throw InputInvalidException when trying to add question with invalid score.").getMessage();
-
-        String msgForCase2 = assertThrows(InputInvalidException.class, () -> {
-            Question question = new Question("Question content 2", QuestionType.SINGLE_CHOICE, 6,
-                    Set.of(new AnswerOption("Answer 1", true),
-                            new AnswerOption("Answer 2", false),
-                            new AnswerOption("Answer 3", false)));
-
-            course.addQuestionToQuizInSection(1L, 1L, question);
-        }, "Should throw InputInvalidException when trying to add question with invalid score.").getMessage();
-
-        assertEquals("Score of a question must be a non-negative number. Maximum score is 5.", msgForCase1);
-        assertEquals("Score of a question must be a non-negative number. Maximum score is 5.", msgForCase2);
-    }
-
-    @Test
-    void addQuestionToQuiz_QuestionSingleChoiceInvalidAnswerOptions_ThrowsException() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-        quiz = spy(quiz);
-        when(quiz.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Act & Assert
-        String msgForCase1 = assertThrows(InputInvalidException.class, () -> {
-            Question question = new Question("Question content 1", QuestionType.SINGLE_CHOICE, 2,
-                    Set.of(new AnswerOption("Answer 1", true),
-                            new AnswerOption("Answer 2", true),
-                            new AnswerOption("Answer 3", false),
-                            new AnswerOption("Answer 4", false)));
-
-            course.addQuestionToQuizInSection(1L, 1L, question);
-        }, "Should throw InputInvalidException when trying to add question single choice but has two correct options.").getMessage();
-
-        String msgForCase2 = assertThrows(InputInvalidException.class, () -> {
-            Question question = new Question("Question content 2", QuestionType.SINGLE_CHOICE, 2,
-                    Set.of(new AnswerOption("Answer 1", true)));
-
-            course.addQuestionToQuizInSection(1L, 1L, question);
-        }, "Should throw InputInvalidException when trying to add question with one answer option.").getMessage();
-
-        assertEquals("A single choice question must have exactly 1 correct option.", msgForCase1);
-        assertEquals("A single choice question must have at least 2 options.", msgForCase2);
-    }
-
-    @Test
-    void addQuestionToQuiz_QuestionMultipleChoiceInvalidAnswerOptions_ThrowsException() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-        quiz = spy(quiz);
-        when(quiz.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Act & Assert
-        String msgForCase1 = assertThrows(InputInvalidException.class, () -> {
-            Question question = new Question("Question content 1", QuestionType.MULTIPLE_CHOICE, 2,
-                    Set.of(new AnswerOption("Answer 1", true),
-                            new AnswerOption("Answer 2", false),
-                            new AnswerOption("Answer 3", false),
-                            new AnswerOption("Answer 4", false)));
-
-            course.addQuestionToQuizInSection(1L, 1L, question);
-        }, "Should throw InputInvalidException when trying to add question multiple choice but has one correct option.").getMessage();
-
-        String msgForCase2 = assertThrows(InputInvalidException.class, () -> {
-            Question question = new Question("Question content 2", QuestionType.MULTIPLE_CHOICE, 2,
-                    Set.of(new AnswerOption("Answer 1", true)));
-
-            course.addQuestionToQuizInSection(1L, 1L, question);
-        }, "Should throw InputInvalidException when trying to add question with one answer option.").getMessage();
-
-        assertEquals("A multiple choice question must have at least 2 correct options.", msgForCase1);
-        assertEquals("A multiple choice question must have at least 2 options.", msgForCase2);
-    }
-
-    @Test
-    void addQuestionToQuiz_QuestionTrueFalseInvalidAnswerOptions_ThrowsException() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-        quiz = spy(quiz);
-        when(quiz.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Act & Assert
-        String msgForCase1 = assertThrows(InputInvalidException.class, () -> {
-            Question question = new Question("Question content 1", QuestionType.TRUE_FALSE, 2,
-                    Set.of(new AnswerOption("True", true),
-                            new AnswerOption("False", true)));
-
-            course.addQuestionToQuizInSection(1L, 1L, question);
-        }, "Should throw InputInvalidException when trying to add question true false but has two correct options.").getMessage();
-
-        String msgForCase2 = assertThrows(InputInvalidException.class, () -> {
-            Question question = new Question("Question content 2", QuestionType.TRUE_FALSE, 2,
-                    Set.of(new AnswerOption("True", true)));
-
-            course.addQuestionToQuizInSection(1L, 1L, question);
-        }, "Should throw InputInvalidException when trying to add question with one answer option.").getMessage();
-
-        assertEquals("A true/false question must have exactly 1 correct option.", msgForCase1);
-        assertEquals("A true/false question must have exactly 2 options.", msgForCase2);
-    }
-
-    @Test
-    void updateQuestionInQuiz_ValidQuestion_UpdatesQuestion() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-        quiz = spy(quiz);
-        when(quiz.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Add question
-        Question question = spy(TestFactory.createDefaultQuestion());
-        when(question.getId()).thenReturn(1L);
-        course.addQuestionToQuizInSection(1L, 1L, question);
-
-        assertEquals(quiz.getTotalScore(), question.getScore());
-
-        // Act
-        Question updatedQuestionContent = new Question("Updated Question Content", QuestionType.MULTIPLE_CHOICE, 5,
-                Set.of(new AnswerOption("Answer 1", true),
-                        new AnswerOption("Answer 2", false),
-                        new AnswerOption("Answer 3", true),
-                        new AnswerOption("Answer 4", false),
-                        new AnswerOption("Answer 5", false)));
-        course.updateQuestionInQuizInSection(1L, 1L, question.getId(), updatedQuestionContent);
-
-        // Assert
-        Quiz quizAfterUpdate = section.getQuizzes().iterator().next();
-        Question updatedQuestion = quizAfterUpdate.getQuestions().iterator().next();
-
-        assertEquals(quiz.getTotalScore(), 5);
-        assertEquals("Updated Question Content", updatedQuestion.getContent());
-        assertEquals(QuestionType.MULTIPLE_CHOICE, updatedQuestion.getType());
-        assertEquals(5, updatedQuestion.getScore());
-        assertEquals(5, updatedQuestion.getOptions().size());
-        assertEquals(updatedQuestion.getScore(), quizAfterUpdate.getTotalScore());
-    }
-
-    @Test
-    void updateQuestionInQuiz_QuestionNotFound_ThrowsException() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-        quiz = spy(quiz);
-        when(quiz.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Add question
-        Question question = spy(TestFactory.createDefaultQuestion());
-        when(question.getId()).thenReturn(1L);
-        course.addQuestionToQuizInSection(1L, 1L, question);
-
-        assertEquals(quiz.getTotalScore(), question.getScore());
-
-        // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> {
-            Question updatedQuestionContent = new Question("Updated Question Content", QuestionType.MULTIPLE_CHOICE, 5,
-                    Set.of(new AnswerOption("Answer 1", true),
-                            new AnswerOption("Answer 2", false),
-                            new AnswerOption("Answer 3", true),
-                            new AnswerOption("Answer 4", false),
-                            new AnswerOption("Answer 5", false)));
-            course.updateQuestionInQuizInSection(1L, 1L, 999L, updatedQuestionContent);
-        }, "Should throw ResourceNotFoundException when question not found.");
-
-        assertEquals(quiz.getTotalScore(), question.getScore());
-    }
-
-    @Test
-    void updateQuestionInQuiz_PublishedCourse_ThrowsException() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-        quiz = spy(quiz);
-        when(quiz.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Add question
-        Question question = spy(TestFactory.createDefaultQuestion());
-        when(question.getId()).thenReturn(1L);
-        course.addQuestionToQuizInSection(1L, 1L, question);
-
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
-
-        // Act & Assert
-        String msg = assertThrows(InputInvalidException.class, () -> {
-            Question updatedQuestionContent = new Question("Updated Question Content", QuestionType.MULTIPLE_CHOICE, 5,
-                    Set.of(new AnswerOption("Answer 1", true),
-                            new AnswerOption("Answer 2", false),
-                            new AnswerOption("Answer 3", true),
-                            new AnswerOption("Answer 4", false),
-                            new AnswerOption("Answer 5", false)));
-            course.updateQuestionInQuizInSection(1L, 1L, question.getId(), updatedQuestionContent);
-        }, "Should throw InputInvalidException when trying to update question in a published course.").getMessage();
-
-        assertEquals("Cannot update a question in a published course.", msg);
-    }
-
-    @Test
-    void updateQuestionInQuiz_ExistingQuestionContent_ThrowsException() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-        quiz = spy(quiz);
-        when(quiz.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Add question
-        Question question = spy(TestFactory.createDefaultQuestion());
-        when(question.getId()).thenReturn(1L);
-        course.addQuestionToQuizInSection(1L, 1L, question);
-
-        assertEquals(quiz.getTotalScore(), question.getScore());
-
-        // Add another question
-        Question anotherQuestion = spy(TestFactory.createDefaultQuestion());
-        when(anotherQuestion.getId()).thenReturn(2L);
-        course.addQuestionToQuizInSection(1L, 1L, anotherQuestion);
-
-        assertEquals(quiz.getTotalScore(), anotherQuestion.getScore() + question.getScore());
-
-        // Act & Assert
-        String msg = assertThrows(InputInvalidException.class, () -> {
-            Question updatedQuestionContent = new Question(anotherQuestion.getContent(), QuestionType.MULTIPLE_CHOICE, 5,
-                    Set.of(new AnswerOption("Answer 1", true),
-                            new AnswerOption("Answer 2", false),
-                            new AnswerOption("Answer 3", true),
-                            new AnswerOption("Answer 4", false),
-                            new AnswerOption("Answer 5", false)));
-            course.updateQuestionInQuizInSection(1L, 1L, question.getId(), updatedQuestionContent);
-        }, "Should throw InputInvalidException when trying to update question with existing content.").getMessage();
-
-        assertEquals("Duplicate question content.", msg);
-    }
-
-    @Test
-    void deleteQuestionFromQuiz_ValidQuestion_DeletesQuestion() {
-        // Arrange
-        Quiz quiz = TestFactory.createDefaultQuiz(1L);
-        Course course = prepareSectionInCourseForQuiz(quiz);
-        quiz = spy(quiz);
-        when(quiz.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz);
-
-        CourseSection section = course.getSections().iterator().next();
-        assertEquals(1, section.getQuizzes().size());
-
-        // Add question
-        Question question = spy(TestFactory.createDefaultQuestion());
-        when(question.getId()).thenReturn(1L);
-        course.addQuestionToQuizInSection(1L, 1L, question);
-
-        assertEquals(quiz.getTotalScore(), question.getScore());
-
-        // Act
-        course.deleteQuestionFromQuizInSection(1L, 1L, question.getId());
-
-        // Assert
-        assertTrue(quiz.getQuestions().isEmpty());
-        assertEquals(0, quiz.getTotalScore());
-    }
-
-    private Course createCourseWithQuizDefault() {
-        Course course = TestFactory.createDefaultCourse();
-        CourseSection section = spy(new CourseSection("SectionTitle"));
-        when(section.getId()).thenReturn(1L);
-        Lesson lesson = spy(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
-        when(lesson.getId()).thenReturn(1L);
-
-        // Add Section to Course
-        course.addSection(section);
-        course.addLessonToSection(1L, lesson);
-
-        /**
-         * sectionId: 1,
-         * lessonId: 1,
-         * quizId: 1,
-         * */
-        Quiz quiz = spy(TestFactory.createDefaultQuiz(1L));
-        when(quiz.getAfterLessonId()).thenReturn(1L);
-        when(quiz.getId()).thenReturn(1L);
-        course.addQuizToSection(1L, quiz);
-
-        // prepare questions
-        AnswerOption answerOption1 = spyAnswerOption(new AnswerOption("Answer 1", true), 1);
-        AnswerOption answerOption2 = spyAnswerOption(new AnswerOption("Answer 2", false), 2);
-        AnswerOption answerOption3 = spyAnswerOption(new AnswerOption("Answer 3", false), 3);
-        Question question1 = spy(new Question("Question 1", QuestionType.SINGLE_CHOICE, 2, Set.of(answerOption1, answerOption2, answerOption3)));
-        when(question1.getId()).thenReturn(1L);
-        course.addQuestionToQuizInSection(1L, 1L, question1);
-
-        AnswerOption answerOption4 = spyAnswerOption(new AnswerOption("Answer 1", true), 4);
-        AnswerOption answerOption5 = spyAnswerOption(new AnswerOption("Answer 2", false), 5);
-        Question question2 = spy(new Question("Question 2", QuestionType.TRUE_FALSE, 3, Set.of(answerOption4, answerOption5)));
-        when(question2.getId()).thenReturn(2L);
-        course.addQuestionToQuizInSection(1L, 1L, question2);
-
-        AnswerOption answerOption6 = spyAnswerOption(new AnswerOption("Answer 1", true), 6);
-        AnswerOption answerOption7 = spyAnswerOption(new AnswerOption("Answer 2", false), 7);
-        AnswerOption answerOption8 = spyAnswerOption(new AnswerOption("Answer 3", true), 8);
-        Question question3 = spy(new Question("Question 3", QuestionType.MULTIPLE_CHOICE, 4, Set.of(answerOption6, answerOption7, answerOption8)));
-        when(question3.getId()).thenReturn(3L);
-        course.addQuestionToQuizInSection(1L, 1L, question3);
-
-        return course;
-    }
-
-    @Test
-    void testCalculateQuiz() {
-        Course course = createCourseWithQuizDefault();
-
-        // calculate quiz
-        QuizCalculationResult result = course.calculateQuiz(1L, new HashMap<>(
-                Map.of(
-                        1L, Set.of(1L),
-                        2L, Set.of(4L),
-                        3L, Set.of(6L, 7L)
-                )
-        ));
-        assertEquals(7, result.score());
-        assertTrue(result.passed());
-    }
-
-    @Test
-    void testCalculateQuizButInputAnswerInvalid() {
-        Course course = createCourseWithQuizDefault();
-
-        String msgCase1 = assertThrows(InputInvalidException.class, () -> {
-            course.calculateQuiz(1L, new HashMap<>(
-                    Map.of(
-                            1L, Set.of(1L, 2L), // question with id = 1 is single choice, but input answer has 2 answer
-                            2L, Set.of(4L),
-                            3L, Set.of(6L, 7L, 8L)
-                    )
-            ));
-        }).getMessage();
-
-        String msgCase2 = assertThrows(InputInvalidException.class, () -> {
-            course.calculateQuiz(1L, new HashMap<>(
-                    Map.of(
-                            1L, Set.of(1L),
-                            2L, Set.of(4L, 5L), // question with id = 2 is true false, but input answer has 2 answer
-                            3L, Set.of(6L, 7L, 8L)
-                    )
-            ));
-        }).getMessage();
-
-        assertEquals("Quiz calculation error: Single choice question must have exactly one answer.", msgCase1);
-        assertEquals("Quiz calculation error: Single choice question must have exactly one answer.", msgCase2);
-    }
-
-    AnswerOption spyAnswerOption(AnswerOption answerOption, long id) {
-        AnswerOption spyAnswerOption = spy(answerOption);
-        when(spyAnswerOption.getId()).thenReturn(id);
-        return spyAnswerOption;
     }
 
 }

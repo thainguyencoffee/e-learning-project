@@ -4,10 +4,7 @@ package com.el.enrollment.domain;
 import com.el.TestFactory;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
-import com.el.course.domain.QuestionType;
 import org.junit.jupiter.api.Test;
-
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -68,42 +65,12 @@ class CourseEnrollmentTests {
         assertTrue(enrollment.getLessonProgresses().stream().allMatch(LessonProgress::isCompleted));
     }
 
-    @Test
-    void testCreateQuizSubmission() {
-        long quizId = 1L;
-        Set<QuizAnswer> answers = Set.of(
-                new QuizAnswer(1L, 1L, QuestionType.SINGLE_CHOICE),
-                new QuizAnswer(2L, 2L, QuestionType.SINGLE_CHOICE));
-        QuizSubmission quizSubmission = new QuizSubmission(quizId, answers, 5, true);
-
-        assertEquals(quizId, quizSubmission.getQuizId());
-        assertEquals(answers, quizSubmission.getAnswers());
-        assertEquals(5, quizSubmission.getScore());
-        assertTrue(quizSubmission.isPassed());
-        assertNotNull(quizSubmission.getSubmittedDate());
-        assertNotNull(quizSubmission.getLastModifiedDate());
-    }
 
     @Test
-    void markAllLessonsAsCompleted_ShouldEnrollmentCompleted_WhenAllQuizzesSubmitted() {
+    void markAllLessonsAsCompleted_ShouldEnrollmentCompleted() {
         CourseEnrollment enrollment = TestFactory.createDefaultCourseEnrollment();
         enrollment.markLessonAsCompleted(1L);
         enrollment.markLessonAsCompleted(2L);
-
-        // Just need to mark all lessons as completed to complete the enrollment, quizzes don't need
-//        long quizId1 = 1L;
-//        Set<QuizAnswer> answers1 = Set.of(
-//                new QuizAnswer(1L, 1L, QuestionType.SINGLE_CHOICE),
-//                new QuizAnswer(2L, 2L, QuestionType.SINGLE_CHOICE));
-//        QuizSubmission quizSubmission1 = new QuizSubmission(quizId1, answers1, 5, true);
-//        enrollment.addQuizSubmission(quizSubmission1);
-//
-//        long quizId2 = 2L;
-//        Set<QuizAnswer> answers2 = Set.of(
-//                new QuizAnswer(1L, 1L, QuestionType.SINGLE_CHOICE),
-//                new QuizAnswer(2L, 2L, QuestionType.SINGLE_CHOICE));
-//        QuizSubmission quizSubmission2 = new QuizSubmission(quizId2, answers2, 4, true);
-//        enrollment.addQuizSubmission(quizSubmission2);
 
         assertTrue(enrollment.getCompleted());
         assertNotNull(enrollment.getCompletedDate());
