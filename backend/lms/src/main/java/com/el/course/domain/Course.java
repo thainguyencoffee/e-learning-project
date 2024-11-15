@@ -1,18 +1,16 @@
 package com.el.course.domain;
 
 import com.el.common.AuditSupportClass;
-import com.el.common.Currencies;
+import com.el.common.MoneyUtils;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.common.exception.InputInvalidException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.ToString;
-import org.javamoney.moneta.Money;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
-import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
 import java.util.*;
 
@@ -118,12 +116,7 @@ public class Course extends AuditSupportClass {
         if (validSections()) {
             throw new InputInvalidException("Cannot change price of a course without sections or section without lessons");
         }
-        if (!isValidCurrency(newPrice.getCurrency())) {
-            throw new InputInvalidException("Currency is not supported. We support VND only.");
-        }
-        if (newPrice.isLessThan(Money.zero(newPrice.getCurrency()))) {
-            throw new InputInvalidException("Price cannot be negative.");
-        }
+        MoneyUtils.checkValidPrice(newPrice);
         this.price = newPrice;
     }
 
@@ -328,7 +321,7 @@ public class Course extends AuditSupportClass {
         section.addLesson(lesson);
     }
 
-    public void updateLessonInSection(Long sectionId, Long lessonId, Lesson updatedLesson){
+    public void updateLessonInSection(Long sectionId, Long lessonId, Lesson updatedLesson) {
         if (!isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot add a lesson to a published course.");
         }
@@ -336,7 +329,7 @@ public class Course extends AuditSupportClass {
         section.updateLesson(lessonId, updatedLesson);
     }
 
-    public void removeLessonFromSection(Long sectionId, Long lessonId){
+    public void removeLessonFromSection(Long sectionId, Long lessonId) {
         if (!isNotPublishedAndDeleted()) {
             throw new InputInvalidException("Cannot add a lesson to a published course.");
         }
@@ -448,11 +441,6 @@ public class Course extends AuditSupportClass {
 
     public boolean isPublishedAndNotDeleted() {
         return published && !deleted;
-    }
-
-    private boolean isValidCurrency(CurrencyUnit inputCurrency) {
-        var validCurrencies = Set.of(Currencies.VND);
-        return validCurrencies.contains(inputCurrency);
     }
 
     private CourseSection findSectionById(Long sectionId) {

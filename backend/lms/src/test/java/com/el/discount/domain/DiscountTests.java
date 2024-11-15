@@ -78,7 +78,7 @@ class DiscountTests {
     }
 
     @Test
-    void calculateDiscount_shouldThrowException_whenDiscountIsInvalid() {
+    void calculateDiscount_shouldThrowException_whenDiscountIsInvalidOrNotActive() {
         discount = new Discount(
                 "DISCOUNT10",
                 Type.PERCENTAGE,
@@ -89,8 +89,27 @@ class DiscountTests {
                 LocalDateTime.now().minusSeconds(3600),
                 100
         );
-        MonetaryAmount originalPrice = Money.of(100, Currencies.VND);
-        assertThrows(InputInvalidException.class, () -> discount.calculateDiscount(originalPrice));
+        MonetaryAmount originalPrice = Money.of(100000, Currencies.VND);
+        String msg = assertThrows(InputInvalidException.class, () -> discount.calculateDiscount(originalPrice)).getMessage();
+        assertEquals("Discount must active and not expired to be used.", msg);
+    }
+
+    @Test
+    void calculateDiscount_shouldThrowException_whenDifferentCurrency() {
+        discount = new Discount(
+                "DISCOUNT10",
+                Type.PERCENTAGE,
+                10.0,
+                Money.of(20000, Currencies.VND),
+                null,
+                LocalDateTime.now().minusSeconds(3600),
+                LocalDateTime.now().plusSeconds(3600),
+                100
+        );
+
+        MonetaryAmount originalPrice = Money.of(100, Currencies.USD);
+        String msg = assertThrows(InputInvalidException.class, () -> discount.calculateDiscount(originalPrice)).getMessage();
+        assertEquals("Currency mismatch. Discount currency must be the same as the original price.", msg);
     }
 
     @Test

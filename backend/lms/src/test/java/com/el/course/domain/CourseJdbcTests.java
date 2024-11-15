@@ -36,7 +36,7 @@ class CourseJdbcTests {
     @BeforeEach
     void setUp() {
         courseWithSections = TestFactory.createCourseWithSections();
-        courseWithSections.changePrice(Money.of(100, Currencies.VND));
+        courseWithSections.changePrice(Money.of(23000, Currencies.VND));
     }
 
     @Test

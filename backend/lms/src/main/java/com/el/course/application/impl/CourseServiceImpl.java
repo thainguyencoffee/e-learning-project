@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.money.MonetaryAmount;
-import java.util.Map;
-import java.util.Set;
 
 @Service
 @Transactional
@@ -39,7 +37,7 @@ public class CourseServiceImpl implements CourseService {
     public Course updateCourse(Long courseId, CourseUpdateDTO courseUpdateDTO) {
         Course course = courseQueryService.findCourseById(courseId);
 
-        if (!canUpdateCourse(course)) {
+        if (cannotUpdateCourse(course)) {
             throw new AccessDeniedException("You do not have permission to update this course");
         }
 
@@ -57,7 +55,7 @@ public class CourseServiceImpl implements CourseService {
     public void deleteCourse(Long courseId) {
         Course course = courseQueryService.findCourseById(courseId);
 
-        if (!canUpdateCourse(course)) {
+        if (cannotUpdateCourse(course)) {
             throw new AccessDeniedException("You do not have permission to update this course");
         }
 
@@ -69,7 +67,7 @@ public class CourseServiceImpl implements CourseService {
     public void deleteCourseForce(Long courseId) {
         Course course = courseQueryService.findCourseInTrashById(courseId);
 
-        if (!canUpdateCourse(course)) {
+        if (cannotUpdateCourse(course)) {
             throw new AccessDeniedException("You do not have permission to update this course");
         }
 
@@ -81,7 +79,7 @@ public class CourseServiceImpl implements CourseService {
     public void restoreCourse(Long courseId) {
         Course course = courseQueryService.findCourseDeleted(courseId);
 
-        if (!canUpdateCourse(course)) {
+        if (cannotUpdateCourse(course)) {
             throw new AccessDeniedException("You do not have permission to update this course");
         }
 
@@ -103,7 +101,7 @@ public class CourseServiceImpl implements CourseService {
     public Long addSection(Long courseId, CourseSectionDTO courseSectionDTO) {
         Course course = courseQueryService.findCourseById(courseId);
 
-        if (!canUpdateCourse(course)) {
+        if (cannotUpdateCourse(course)) {
             throw new AccessDeniedException("You do not have permission to update this course");
         }
 
@@ -117,7 +115,7 @@ public class CourseServiceImpl implements CourseService {
     public void updateSectionInfo(Long courseId, Long sectionId, String newTitle) {
         Course course = courseQueryService.findCourseById(courseId);
 
-        if (!canUpdateCourse(course)) {
+        if (cannotUpdateCourse(course)) {
             throw new AccessDeniedException("You do not have permission to update this course");
         }
 
@@ -129,7 +127,7 @@ public class CourseServiceImpl implements CourseService {
     public void removeSection(Long courseId, Long sectionId) {
         Course course = courseQueryService.findCourseById(courseId);
 
-        if (!canUpdateCourse(course)) {
+        if (cannotUpdateCourse(course)) {
             throw new AccessDeniedException("You do not have permission to update this course");
         }
 
@@ -141,7 +139,7 @@ public class CourseServiceImpl implements CourseService {
     public Long addLesson(Long courseId, Long sectionId, Lesson lesson) {
         Course course = courseQueryService.findCourseById(courseId);
 
-        if (!canUpdateCourse(course)) {
+        if (cannotUpdateCourse(course)) {
             throw new AccessDeniedException("You do not have permission to update this course");
         }
 
@@ -154,7 +152,7 @@ public class CourseServiceImpl implements CourseService {
     public void updateLesson(Long courseId, Long sectionId, Long lessonId, Lesson updatedLesson) {
         Course course = courseQueryService.findCourseById(courseId);
 
-        if (!canUpdateCourse(course)) {
+        if (cannotUpdateCourse(course)) {
             throw new AccessDeniedException("You do not have permission to update this course");
         }
 
@@ -166,7 +164,7 @@ public class CourseServiceImpl implements CourseService {
     public void removeLesson(Long courseId, Long sectionId, Long lessonId) {
         Course course = courseQueryService.findCourseById(courseId);
 
-        if (!canUpdateCourse(course)) {
+        if (cannotUpdateCourse(course)) {
             throw new AccessDeniedException("You do not have permission to update this course");
         }
 
@@ -182,13 +180,13 @@ public class CourseServiceImpl implements CourseService {
         return courseRepository.save(course);
     }
 
-    private boolean canUpdateCourse(Course course) {
+    private boolean cannotUpdateCourse(Course course) {
         if (rolesBaseUtil.isAdmin()) {
-            return true;
+            return false;
         }
 
         String currentUserId = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
-        return course.getTeacher().equals(currentUserId);
+        return !course.getTeacher().equals(currentUserId);
     }
 
     @Override

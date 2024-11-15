@@ -41,7 +41,7 @@ class PaymentServiceTests {
 
     @Test
     void pay_ValidPaymentRequest_CreatesAndProcessesPayment() throws StripeException {
-        PaymentRequest paymentRequest = new PaymentRequest(UUID.randomUUID(), Money.of(100L, Currencies.VND),
+        PaymentRequest paymentRequest = new PaymentRequest(UUID.randomUUID(), Money.of(10000, Currencies.VND),
                 PaymentMethod.STRIPE, UUID.randomUUID().toString());
 
         when(charge.getId()).thenReturn("ch_1J2Y3Z4A5B6C7D8E9F0G");
@@ -64,36 +64,31 @@ class PaymentServiceTests {
     @Test
     void testPay_withStripePaymentFailure_shouldMarkPaymentFailed() throws StripeException {
         // Arrange
-        PaymentRequest paymentRequest = new PaymentRequest(UUID.randomUUID(), Money.of(100L, Currencies.VND), PaymentMethod.STRIPE, UUID.randomUUID().toString());
+        PaymentRequest paymentRequest = new PaymentRequest(UUID.randomUUID(), Money.of(40, Currencies.USD),
+                PaymentMethod.STRIPE, UUID.randomUUID().toString());
 
-        // Giả lập Stripe ném ngoại lệ
         when(stripePaymentGateway.charge(paymentRequest)).thenThrow(new RuntimeException("Stripe payment failed"));
-
-        // Giả lập lưu trạng thái failed
         when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act & Assert
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            paymentService.pay(paymentRequest);
-        });
+        Payment payment = paymentService.pay(paymentRequest);
 
-        // Xác nhận rằng payment đã được đánh dấu là failed và lưu vào repository
         verify(paymentRepository, times(1)).save(argThat(p -> p.getStatus() == PaymentStatus.FAILED));
-        assertEquals("Stripe payment failed", exception.getCause().getMessage());
+        assertEquals("Unexpected error: Stripe payment failed", payment.getFailureReason());
     }
 
     @Test
     void testPay_WithMethodUnsupported_shouldMarkPaymentFailed() throws StripeException {
-        PaymentRequest paymentRequest = new PaymentRequest(UUID.randomUUID(), Money.of(100L, Currencies.VND),
+        PaymentRequest paymentRequest = new PaymentRequest(UUID.randomUUID(), Money.of(10000, Currencies.VND),
                 PaymentMethod.PAYPAL, UUID.randomUUID().toString());
 
         when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> paymentService.pay(paymentRequest));
+        Payment payment = paymentService.pay(paymentRequest);
 
         verify(paymentRepository, times(1)).save(argThat(p -> p.getStatus() == PaymentStatus.FAILED));
         verify(stripePaymentGateway, never()).charge(any(PaymentRequest.class));
-        assertEquals("Unsupported payment method: " + PaymentMethod.PAYPAL.name(), exception.getMessage());
+        assertEquals("Unsupported payment method: " + PaymentMethod.PAYPAL.name(), payment.getFailureReason());
     }
 
 }

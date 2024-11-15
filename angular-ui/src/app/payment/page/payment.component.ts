@@ -74,7 +74,7 @@ export class PaymentComponent implements OnInit {
 
   getMessage(key: string, details?: any) {
     const messages: Record<string, string> = {
-      paid: `Payment was successful.`
+      created: `Payment was created successful.`
     };
     return messages[key];
   }
@@ -92,7 +92,7 @@ export class PaymentComponent implements OnInit {
       .subscribe({
         next: (payment) => this.router.navigate(['/my-orders', payment.orderId], {
           state: {
-            msgSuccess: this.getMessage('paid')
+            msgSuccess: this.getMessage('created')
           }
         }),
         error: (error) => this.errorHandler.handleServerError(error.error, this.paymentForm, this.getMessage)

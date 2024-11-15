@@ -44,6 +44,7 @@ export class AddDiscountComponent {
 
   currenciesMap: Record<string, string> = {
     VND: 'VND',
+    USD: 'USD',
   }
 
   discountTypeChange(key: string) {

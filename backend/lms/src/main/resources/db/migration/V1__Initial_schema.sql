@@ -111,6 +111,7 @@ create table payment
     status         varchar(50)                    not null,
     transaction_id varchar(50),
     receipt_url    varchar(500),
+    failure_reason varchar(500),
     constraint fk_payment primary key (id)
 );
 
