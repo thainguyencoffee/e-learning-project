@@ -85,9 +85,7 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     }
 
     private boolean allQuizSubmitPassed() {
-        int numberOfQuizzes = this.quizSubmissions.size();
-        boolean allQuizzesPassed = this.quizSubmissions.stream().allMatch(QuizSubmission::isPassed);
-        return numberOfQuizzes == lessonProgresses.size() && allQuizzesPassed;
+        return this.quizSubmissions.stream().allMatch(QuizSubmission::isPassed);
     }
 
     public Progress getProgress() {

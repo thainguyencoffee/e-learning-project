@@ -18,7 +18,6 @@ import {Section} from "../../../../administration/courses/model/view/section";
     RouterLink
   ],
   templateUrl: './enrolment-lessons.component.html',
-  styleUrl: './enrolment-lessons.component.css'
 })
 export class EnrolmentLessonsComponent implements OnInit {
 

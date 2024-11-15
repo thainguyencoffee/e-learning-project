@@ -5,35 +5,44 @@
   <div class="progress" role="progressbar" aria-label="Example with label"
        [attr.aria-valuenow]="calcProgress(enrolmentWithCourse.progress)" aria-valuemin="0" aria-valuemax="100">
     <div class="progress-bar" [style.width]="calcProgress(enrolmentWithCourse.progress) + '%'">
-      {{calcProgress(enrolmentWithCourse.progress)}}%
+      {{ calcProgress(enrolmentWithCourse.progress) }}%
     </div>
   </div>
-  <h3>Completed date: {{enrolmentWithCourse.completedDate | date}}</h3>
+  <h3>Completed date: {{ enrolmentWithCourse.completedDate | date }}</h3>
 
   <h3>Teacher</h3>
-  <p>{{enrolmentWithCourse.teacher}}</p>
+  <p>{{ enrolmentWithCourse.teacher }}</p>
 
-  <h3>Certificate</h3>
-  <p>
-    <a [href]="enrolmentWithCourse.certificate.url" target="_blank">Certificate</a>
-  </p>
+  <div *ngIf="enrolmentWithCourse.completed">
+    <div class="alert alert-success">
+      <h3>Completed</h3>
+      <p>Congratulations! You have completed this course. Please
+        <a href="">review</a>
+        this course to help us.</p>
+
+      <h3>Certificate</h3>
+      <p>
+        <a [href]="enrolmentWithCourse.certificate.url" target="_blank">Certificate</a>
+      </p>
+    </div>
+  </div>
 
   <h3>Language</h3>
-  <p>{{enrolmentWithCourse.language}}</p>
+  <p>{{ enrolmentWithCourse.language }}</p>
 
   <h3>Subtitles</h3>
   <ul>
-    <li *ngFor="let subtitle of enrolmentWithCourse.subtitles">{{subtitle}}</li>
+    <li *ngFor="let subtitle of enrolmentWithCourse.subtitles">{{ subtitle }}</li>
   </ul>
 
   <h3>benefits</h3>
   <ul>
-    <li *ngFor="let benefit of enrolmentWithCourse.benefits">{{benefit}}</li>
+    <li *ngFor="let benefit of enrolmentWithCourse.benefits">{{ benefit }}</li>
   </ul>
 
   <h3>prerequisites</h3>
   <ul>
-    <li *ngFor="let prerequisite of enrolmentWithCourse.prerequisites">{{prerequisite}}</li>
+    <li *ngFor="let prerequisite of enrolmentWithCourse.prerequisites">{{ prerequisite }}</li>
   </ul>
 
 </div>
