@@ -155,9 +155,9 @@
               <a *ngIf="isEditable()"
                  [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'edit', lesson.id]"
                  class="btn btn-secondary btn-sm custom-button">Edit</a>
-              <a *ngIf="isEditable()"
-                 [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', lesson.id, 'quizzes']"
-                 class="btn btn-secondary btn-sm custom-button">Manage quiz</a>
+<!--              <a *ngIf="isEditable()"-->
+<!--                 [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', lesson.id, 'quizzes']"-->
+<!--                 class="btn btn-secondary btn-sm custom-button">Manage quiz</a>-->
               <button *ngIf="isEditable()"
                       type="button"
                       (click)="confirmDeleteLesson(section.id, lesson.id, lesson)"

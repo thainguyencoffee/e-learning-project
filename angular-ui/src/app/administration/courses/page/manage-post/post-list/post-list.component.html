@@ -1,11 +1,11 @@
 <div class="d-flex flex-wrap mb-4">
   <h1 class="flex-grow-1">Post List</h1>
   <div>
-    <a routerLink="/administration/courses" class="btn btn-outline-secondary">
-      Back to list
-    </a>
-    <a [routerLink]="['/administration/courses', courseId, 'posts', 'add']" class="btn btn-primary ms-2"> <!-- Thêm lớp ms-2 -->
+    <a [routerLink]="['/administration/courses', courseId, 'posts', 'add']" class="btn btn-primary"> <!-- Thêm lớp ms-2 -->
       Add Post
+    </a>
+    <a routerLink="/administration/courses" class="btn btn-secondary ms-2">
+      Back to list
     </a>
   </div>
 
