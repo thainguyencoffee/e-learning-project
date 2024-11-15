@@ -73,7 +73,7 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     }
 
     private void checkCompleted() {
-        if (allLessonsCompleted() && allQuizSubmitPassed()) {
+        if (allLessonsCompleted()/* && allQuizSubmitPassed()*/) {
             this.completed = true;
             this.completedDate = Instant.now();
             registerEvent(new EnrolmentCompletedEvent(this.id, this.courseId, this.student));
