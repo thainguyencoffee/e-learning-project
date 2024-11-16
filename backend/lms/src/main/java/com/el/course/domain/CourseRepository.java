@@ -1,16 +1,36 @@
 package com.el.course.domain;
 
 import com.el.course.application.dto.CourseWithoutSectionsDTO;
+import com.el.course.application.dto.teacher.CountDataDTO;
 import com.el.enrollment.application.dto.CourseInfoDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
 public interface CourseRepository extends CrudRepository<Course, Long> {
+
+    @Query("""
+        SELECT 
+            c.teacher,
+            COUNT(CASE WHEN c.published = TRUE THEN 1 END) as number_of_courses,
+            COUNT(e.id) as number_of_students,
+            COUNT(CASE when e.completed = TRUE THEN 1 END) as number_of_certificates,
+            COUNT(CASE WHEN c.published = FALSE THEN 1 END) as number_of_draft_courses
+        FROM 
+            course c
+        LEFT JOIN 
+            course_enrollment e ON c.id = e.course_id
+        WHERE
+            c.teacher = :teacher
+        GROUP BY 
+            c.teacher
+    """)
+    CountDataDTO getCountDataDTOByTeacher(String teacher);
 
     Page<Course> findAll(Pageable pageable);
 
@@ -97,4 +117,5 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
     """)
     Optional<CourseInfoDTO> findCourseInfoDTOByIdAndPublishedAndTeacher(long courseId, boolean published, String teacher);
 
+    int countCourseByTeacherAndCreatedDateAfter(String teacher, Instant createdDateAfter);
 }
