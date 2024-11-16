@@ -117,16 +117,17 @@ create table payment
 
 create table course_enrollment
 (
-    id                 bigserial   not null,
-    course_id          bigint      not null,
-    student            varchar(50) not null,
-    enrollment_date    timestamp   not null,
-    completed          boolean     not null,
-    created_by         varchar(50) not null,
-    created_date       timestamp   not null,
+    id                 bigserial    not null,
+    course_id          bigint       not null,
+    teacher            varchar(255) not null,
+    student            varchar(255) not null,
+    enrollment_date    timestamp    not null,
+    completed          boolean      not null,
+    created_by         varchar(50)  not null,
+    created_date       timestamp    not null,
     completed_date     timestamp,
-    last_modified_by   varchar(50) not null,
-    last_modified_date timestamp   not null,
+    last_modified_by   varchar(50)  not null,
+    last_modified_date timestamp    not null,
     constraint fk_course_enrollment primary key (id)
 );
 
@@ -193,4 +194,35 @@ create table emotion
     username     varchar(50) not null,
     created_date timestamp   not null,
     constraint fk_emotion primary key (id)
+);
+
+create table salary
+(
+    id                 bigserial    not null,
+    teacher            varchar(255) not null,
+    rank               varchar(50)  not null,
+    base_salary        varchar(50)  not null,
+    nos_all_time       int          not null,
+    noc_all_time       int          not null,
+    created_by         varchar(50)  not null,
+    created_date       timestamp    not null,
+    last_modified_by   varchar(50)  not null,
+    last_modified_date timestamp    not null,
+    constraint fk_salary primary key (id)
+);
+
+create table salary_payment
+(
+    id             bigserial   not null,
+    salary         bigint      not null references salary (id) on DELETE cascade,
+    type           varchar(50) not null,
+    amount         varchar(50) not null,
+    created_date   timestamp   not null,
+    paid_date      timestamp,
+    noc_by_month   int         not null,
+    nos_by_month   int         not null,
+    total_amount   varchar(50) not null,
+    status         varchar(50) not null,
+    failure_reason varchar(500),
+    constraint fk_salary_payment primary key (id)
 );

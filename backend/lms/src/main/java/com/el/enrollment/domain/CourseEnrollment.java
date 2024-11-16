@@ -21,6 +21,7 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     private Long id;
     private String student;
     private Long courseId;
+    private String teacher;
     private Instant enrollmentDate;
     @MappedCollection(idColumn = "course_enrollment")
     private Set<LessonProgress> lessonProgresses = new HashSet<>();
@@ -36,18 +37,21 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     @LastModifiedDate
     private Instant lastModifiedDate;
 
-    public CourseEnrollment(String student, Long courseId, Set<LessonProgress> lessonProgresses) {
+    public CourseEnrollment(String student, Long courseId, String teacher, Set<LessonProgress> lessonProgresses) {
         if (student == null) throw new InputInvalidException("Student must not be null.");
         if (courseId == null) throw new InputInvalidException("CourseId must not be null.");
+        if (teacher == null) throw new InputInvalidException("Teacher must not be null.");
         if (lessonProgresses == null || lessonProgresses.isEmpty())
             throw new InputInvalidException("LessonProgresses must not be null or empty.");
 
         this.student = student;
         this.courseId = courseId;
+        this.teacher = teacher;
         this.enrollmentDate = Instant.now();
         this.completed = false;
 
         lessonProgresses.forEach(this::addLessonProgress);
+        registerEvent(new EnrolmentCreatedEvent(teacher));
     }
 
     public void markLessonAsCompleted(Long lessonId) {
@@ -111,5 +115,6 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     }
 
     public record EnrolmentCompletedEvent(Long id, Long courseId, String student) {}
+    public record EnrolmentCreatedEvent(String teacher) {}
 
 }

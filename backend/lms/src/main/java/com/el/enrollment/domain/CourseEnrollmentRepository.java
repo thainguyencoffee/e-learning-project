@@ -5,6 +5,7 @@ import com.el.enrollment.application.dto.CourseInfoWithEnrolmentStatisticDTO;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,5 +88,5 @@ public interface CourseEnrollmentRepository extends CrudRepository<CourseEnrollm
     """)
     List<CourseInfoWithEnrolmentStatisticDTO> findAllCourseStatisticsByTeacher(String teacher, int page, int size);
 
-
+    int countCourseEnrollmentByTeacherAndCreatedDateAfter(String teacher, Instant createdDateAfter);
 }
