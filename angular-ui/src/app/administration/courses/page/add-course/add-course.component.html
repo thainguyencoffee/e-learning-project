@@ -10,8 +10,16 @@
   <app-input-row [group]="addForm" field="thumbnailUrl" label="Thumbnail" rowType="imageFile"/>
   <app-input-row [group]="addForm" rowType="textarea" field="description" label="Description" />
   <app-input-row [group]="addForm" rowType="radio" field="language" label="Language" [options]="languagesMap"/>
-  <app-input-row [group]="addForm" rowType="textarea" field="benefits" label="Benefits" />
-  <app-input-row [group]="addForm" rowType="textarea" field="prerequisites" label="Prerequisites"/>
+  <app-array-row [group]="addForm"
+                 [addItem]="addBenefit.bind(this)"
+                 [removeItem]="removeBenefit.bind(this)"
+                 field="benefits" label="Benefits"
+                 [fieldConfiguration]="benefitsFieldConfiguration"/>
+  <app-array-row [group]="addForm"
+                 [addItem]="addPrerequisite.bind(this)"
+                 [removeItem]="removePrerequisite.bind(this)"
+                 field="prerequisites" label="Prerequisites"
+                 [fieldConfiguration]="prerequisitesFieldConfiguration"/>
   <app-input-row [group]="addForm" rowType="multiselect" field="subtitles" label="Subtitles" [options]="languagesMap"/>
   <input type="submit" value="Add Course" class="btn btn-primary mt-4" />
 </form>

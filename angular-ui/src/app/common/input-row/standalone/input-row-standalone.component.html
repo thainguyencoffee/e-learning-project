@@ -9,23 +9,26 @@
     </div>
   } @else {
     <div class="col-md-10">
+<!--      @else if (rowType === 'imageFile' || rowType === 'videoFile' || rowType === 'docFile') {-->
+<!--        <app-file-row [rowType]="rowType" [control]="control"></app-file-row>-->
+<!--      }-->
       @if (rowType === 'text' || rowType === 'password' || rowType === 'email' || rowType === 'tel') {
-        <input [id]="index" [type]="rowType" formControlName="" [placeholder]="placeholder"
+        <input [id]="index" [type]="rowType" [formControl]="control!" [placeholder]="placeholder"
                class="form-control {{ getInputClasses() }}"/>
       }
 
       @else if (rowType === 'number') {
-        <input [id]="index" type="number" formControlName="" [placeholder]="placeholder"
+        <input [id]="index" type="number" [formControl]="control!" [placeholder]="placeholder"
                class="form-control {{ getInputClasses() }}"/>
       }
 
       @else if (rowType === 'textarea') {
-        <textarea [id]="index" formControlName="" [placeholder]="placeholder"
+        <textarea [id]="index" [formControl]="control!" [placeholder]="placeholder"
                   class="form-control {{ getInputClasses() }}"></textarea>
       }
 
       @else if (rowType === 'select') {
-        <select [id]="index" formControlName=""
+        <select [id]="index" [formControl]="control!"
                 class="form-select {{ getInputClasses() }}">
           <option [ngValue]="null">Please select</option>
           @for (option of optionsMap! | keyvalue; track option.key) {
@@ -35,7 +38,7 @@
       }
 
       @else if (rowType === 'multiselect') {
-        <select [id]="index" formControlName="" multiple="true"
+        <select [id]="index" [formControl]="control!" multiple="true"
                 class="form-select {{ getInputClasses() }}">
           @for (option of optionsMap! | keyvalue; track option.key) {
             <option [ngValue]="option.key">{{ option.value }}</option>
@@ -46,7 +49,7 @@
       @else if (rowType === 'radio') {
         @if (!isRequired()) {
           <div class="form-check form-check-inline pt-2">
-            <input [id]="index" formControlName="" [value]="null" type="radio"
+            <input [id]="index" [formControl]="control!" [value]="null" type="radio"
                    class="form-check-input {{ inputClass }}"/>
             <label [for]="index" class="form-check-label">Please select</label>
           </div>
@@ -54,7 +57,7 @@
         <div *ngFor="let option of optionsMap! | keyvalue" class="form-check form-check-inline pt-2">
           <input
             [id]="index + '_' + option.key"
-            formControlName=""
+            [formControl]="control!"
             [value]="option.key"
             type="radio"
             class="form-check-input {{ getInputClasses() }}"
