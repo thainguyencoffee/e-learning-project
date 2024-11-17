@@ -2,6 +2,7 @@ package com.el.common.auth.web;
 
 import com.el.common.auth.application.impl.KeycloakUsersManagement;
 import com.el.common.auth.web.dto.UserInfo;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,10 +49,10 @@ public class UserResourceController {
     public List<UserInfo> searchUsersWithSearch(
             @RequestParam("username") String username,
             @RequestParam(value = "exact", required = false, defaultValue = "false") Boolean exact,
-            @RequestParam(value = "role", required = false) String roleName) {
+            @RequestParam(value = "role", required = false) String roleName, Pageable pageable) {
 
         if (roleName != null && !roleName.isBlank()) {
-            return keycloakUsersManagement.search(username, exact, roleName)
+            return keycloakUsersManagement.search(username, exact, roleName, pageable)
                     .stream().map(UserInfo::fromUserRepresentation)
                     .collect(Collectors.toList());
 
