@@ -33,6 +33,7 @@ public class Course extends AbstractAggregateRoot<Course> {
     private Set<CourseSection> sections = new HashSet<>();
     private MonetaryAmount price;
     private Boolean published;
+    private LocalDateTime publishedDate;
     private Boolean unpublished;
     private String teacher;
     private String approvedBy;
@@ -184,6 +185,7 @@ public class Course extends AbstractAggregateRoot<Course> {
                 }).orElseThrow(ResourceNotFoundException::new);
         this.approvedBy = approvedBy;
         this.published = true;
+        this.publishedDate = LocalDateTime.now();
         this.unpublished = false;
 
         registerEvent(new CoursePublishedEvent(this.id, this.teacher));

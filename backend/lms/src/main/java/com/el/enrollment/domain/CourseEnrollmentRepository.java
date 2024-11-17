@@ -1,5 +1,7 @@
 package com.el.enrollment.domain;
 
+import com.el.common.projection.MonthStats;
+import com.el.course.domain.StudentsByCourseDTO;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.dto.CourseInfoWithEnrolmentStatisticDTO;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -89,4 +91,32 @@ public interface CourseEnrollmentRepository extends CrudRepository<CourseEnrollm
     List<CourseInfoWithEnrolmentStatisticDTO> findAllCourseStatisticsByTeacher(String teacher, int page, int size);
 
     int countCourseEnrollmentByTeacherAndCreatedDateAfter(String teacher, LocalDateTime createdDateAfter);
+
+    @Query("""
+        select extract(MONTH from ce.enrollment_date) as month, COUNT(ce.id) AS count
+        from course_enrollment ce
+            join course c on ce.course_id = c.id
+        where c.teacher = :teacher and extract(YEAR from ce.enrollment_date) = :year
+        group by extract(MONTH from ce.enrollment_date)
+    """)
+    List<MonthStats> statsMonthEnrolledByTeacherAndYear(String teacher, Integer year);
+
+    @Query("""
+        SELECT
+            c.id,
+            c.title,
+            c.thumbnail_url,
+            COUNT(ce.student) AS total_students,
+            COUNT(CASE WHEN ce.completed THEN 1 END) AS completed_students
+        FROM course c
+            JOIN course_enrollment ce ON c.id = ce.course_id
+        WHERE c.teacher = :teacher
+        GROUP BY
+            c.id, c.title, c.thumbnail_url
+        ORDER BY
+            completed_students DESC
+        LIMIT :size OFFSET :page * :size
+    """)
+    List<StudentsByCourseDTO> statsStudentsByCourse(String teacher, int page, int size);
+
 }

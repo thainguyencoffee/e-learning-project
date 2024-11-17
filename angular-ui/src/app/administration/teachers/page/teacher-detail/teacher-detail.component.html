@@ -1,1 +1,81 @@
-<p>teacher-detail works!</p>
+<div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+  <h1 class="text-primary fw-bold">Teacher Detail Center</h1>
+  <a [routerLink]="[userService.current.hasAnyRole('ROLE_teacher') ? '/administration' : '/administration/teachers']"
+     class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Back to list
+  </a>
+</div>
+
+
+<div class="alert alert-primary">
+  These are the statistics in the year {{selectedYear}}
+</div>
+
+<a class="btn btn-primary mx-2" [routerLink]="['/administration/teachers', teacher]" [queryParams]="{year: currentYear - 2}">{{currentYear - 2}}</a>
+<a class="btn btn-primary mx-2" [routerLink]="['/administration/teachers', teacher]" [queryParams]="{year: currentYear - 1}">{{currentYear - 1}}</a>
+<a class="btn btn-primary mx-2" [routerLink]="['/administration/teachers', teacher]" [queryParams]="{year: currentYear}">{{currentYear}}</a>
+
+<div class="container my-4">
+  <div class="row">
+    <!-- Courses By Month -->
+    <div class="col-12 col-md-6 col-lg-6 mb-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title text-center">Courses By Month</h5>
+          <canvas id="coursesByMonthCanvas" class="chart-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Draft Courses By Month -->
+    <div class="col-12 col-md-6 col-lg-6 mb-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title text-center">Draft Courses By Month</h5>
+          <canvas id="draftCoursesByMonthCanvas" class="chart-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Students Enrolled By Month -->
+    <div class="col-12 col-md-6 col-lg-6 mb-4 mx-auto">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title text-center">Students Enrolled By Month</h5>
+          <canvas id="studentsEnrolledByMonthCanvas" class="chart-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container my-4">
+  <!-- Table Displaying Students By Course -->
+  <div class="mb-4">
+    <h3>Students By Course</h3>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover align-middle">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Thumbnail</th>
+          <th>Total Students</th>
+          <th>Total Students completed!</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let course of teacherDetailDto?.statistics?.studentsByCourse">
+          <td>{{ course.id }}</td>
+          <td>{{ course.title }}</td>
+          <td>
+            <img [src]="course.thumbnailUrl" alt="Thumbnail" class="img-fluid" style="max-width: 40px;">
+          </td>
+          <td>{{ course.totalStudents }}</td>
+          <td>{{ course.completedStudents }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -191,11 +191,17 @@ export const routes: Routes = [
       {
         title: 'Teacher management center!',
         path: 'teachers',
-        component: ListTeachersComponent
+        component: ListTeachersComponent,
+        canActivate: [RoleGuard],
+        data: {
+          requiredRoles: ['ROLE_admin'],
+          errorStatus: 403,
+          errorMessage: 'Only admin can access teachers management page'
+        },
       },
       {
         title: 'Teacher detail',
-        path: 'teachers/:username',
+        path: 'teachers/:teacher',
         component: TeacherDetailComponent
       },
       // Course management
