@@ -1,5 +1,6 @@
 package com.el.enrollment.application;
 
+import com.el.TestFactory;
 import com.el.common.RolesBaseUtil;
 import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.InputInvalidException;
@@ -48,6 +49,7 @@ class CourseEnrollmentServiceTests {
         Course mockCourse = Mockito.mock(Course.class);
         Map<Long, String> lessonTitles = Map.of(1L, "Course Lesson 1", 2L, "Course Lesson 2");
         when(mockCourse.getLessonIds()).thenReturn(lessonTitles);
+        when(mockCourse.getTeacher()).thenReturn(TestFactory.teacher);
         when(courseQueryService.findPublishedCourseById(courseId)).thenReturn(mockCourse);
 
         // Act

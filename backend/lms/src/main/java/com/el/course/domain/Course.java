@@ -1,6 +1,5 @@
 package com.el.course.domain;
 
-import com.el.common.AuditSupportClass;
 import com.el.common.MoneyUtils;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.common.exception.InputInvalidException;
@@ -8,16 +7,18 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.*;
+import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.money.MonetaryAmount;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Getter
 @Table("course")
 @ToString
-public class Course extends AuditSupportClass {
+public class Course extends AbstractAggregateRoot<Course> {
     @Id
     private Long id;
     private String title;
@@ -44,6 +45,14 @@ public class Course extends AuditSupportClass {
     private boolean deleted;
     @Version
     private int version;
+    @CreatedBy
+    private String createdBy;
+    @CreatedDate
+    private LocalDateTime createdDate;
+    @LastModifiedBy
+    private String lastModifiedBy;
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
 
     public Course(
             String title,
@@ -176,6 +185,11 @@ public class Course extends AuditSupportClass {
         this.approvedBy = approvedBy;
         this.published = true;
         this.unpublished = false;
+
+        registerEvent(new CoursePublishedEvent(this.id, this.teacher));
+    }
+
+    public record CoursePublishedEvent(Long courseId, String teacher) {
     }
 
     public void rejectPublish(Long courseRequestId, String rejectedBy, String rejectReason) {

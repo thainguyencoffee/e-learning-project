@@ -228,12 +228,12 @@ public class TestFactory {
     // Course Enrollment
 
     public static CourseEnrollment createDefaultCourseEnrollment() {
-        return new CourseEnrollment(user, 1L, Set.of(
+        return new CourseEnrollment(user, 1L, teacher, Set.of(
                 new LessonProgress("Course Lesson 1", 1L), new LessonProgress("Course Lesson 2", 2L)));
     }
 
     public static CourseEnrollment createCourseEnrollmentWithEmptyLessonProgress() {
-        return new CourseEnrollment(user, 1L, Set.of());
+        return new CourseEnrollment(user, 1L, teacher, Set.of());
     }
 
     public static Post createDefaultPost() {

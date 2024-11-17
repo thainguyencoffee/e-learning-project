@@ -48,6 +48,8 @@ import {
   EnrolmentStatisticDetailComponent
 } from "./administration/statistics/page/enrolment-statistic-detail/enrolment-statistic-detail.component";
 import {RoleGuard} from "./role.guard";
+import {ListTeachersComponent} from "./administration/teachers/page/list-teachers/list-teachers.component";
+import {TeacherDetailComponent} from "./administration/teachers/page/teacher-detail/teacher-detail.component";
 
 export const routes: Routes = [
   {
@@ -185,6 +187,17 @@ export const routes: Routes = [
       errorMessage: 'Only admin and teacher can access administration dashboard page'
     },
     children: [
+      // Teacher management
+      {
+        title: 'Teacher management center!',
+        path: 'teachers',
+        component: ListTeachersComponent
+      },
+      {
+        title: 'Teacher detail',
+        path: 'teachers/:username',
+        component: TeacherDetailComponent
+      },
       // Course management
       {
         title: 'Course management center!',

@@ -10,8 +10,16 @@
   <app-input-row [group]="editForm" field="title" label="Title" />
   <app-input-row [group]="editForm" field="thumbnailUrl" label="Thumbnail" rowType="imageFile"/>
   <app-input-row [group]="editForm" rowType="textarea" field="description" label="Description" />
-  <app-input-row [group]="editForm" rowType="textarea" field="benefits" label="Benefits" />
-  <app-input-row [group]="editForm" rowType="textarea" field="prerequisites" label="Prerequisites"/>
+  <app-array-row [group]="editForm"
+                 [addItem]="addBenefit.bind(this)"
+                 [removeItem]="removeBenefit.bind(this)"
+                 field="benefits" label="Benefits"
+                 [fieldConfiguration]="benefitsFieldConfiguration"/>
+  <app-array-row [group]="editForm"
+                 [addItem]="addPrerequisite.bind(this)"
+                 [removeItem]="removePrerequisite.bind(this)"
+                 field="prerequisites" label="Prerequisites"
+                 [fieldConfiguration]="prerequisitesFieldConfiguration"/>
   <app-input-row [group]="editForm" rowType="multiselect" field="subtitles" label="Subtitles" [options]="languagesMap"/>
   <input type="submit" value="Edit Course" class="btn btn-primary mt-4" />
 </form>

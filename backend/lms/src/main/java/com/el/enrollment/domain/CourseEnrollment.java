@@ -9,7 +9,7 @@ import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,33 +21,37 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     private Long id;
     private String student;
     private Long courseId;
-    private Instant enrollmentDate;
+    private String teacher;
+    private LocalDateTime enrollmentDate;
     @MappedCollection(idColumn = "course_enrollment")
     private Set<LessonProgress> lessonProgresses = new HashSet<>();
     private Boolean completed;
-    private Instant completedDate;
+    private LocalDateTime completedDate;
     private Certificate certificate;
     @CreatedBy
     private String createdBy;
     @CreatedDate
-    private Instant createdDate;
+    private LocalDateTime createdDate;
     @LastModifiedBy
     private String lastModifiedBy;
     @LastModifiedDate
-    private Instant lastModifiedDate;
+    private LocalDateTime lastModifiedDate;
 
-    public CourseEnrollment(String student, Long courseId, Set<LessonProgress> lessonProgresses) {
+    public CourseEnrollment(String student, Long courseId, String teacher, Set<LessonProgress> lessonProgresses) {
         if (student == null) throw new InputInvalidException("Student must not be null.");
         if (courseId == null) throw new InputInvalidException("CourseId must not be null.");
+        if (teacher == null) throw new InputInvalidException("Teacher must not be null.");
         if (lessonProgresses == null || lessonProgresses.isEmpty())
             throw new InputInvalidException("LessonProgresses must not be null or empty.");
 
         this.student = student;
         this.courseId = courseId;
-        this.enrollmentDate = Instant.now();
+        this.teacher = teacher;
+        this.enrollmentDate = LocalDateTime.now();
         this.completed = false;
 
         lessonProgresses.forEach(this::addLessonProgress);
+        registerEvent(new EnrolmentCreatedEvent(teacher));
     }
 
     public void markLessonAsCompleted(Long lessonId) {
@@ -73,7 +77,7 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     private void checkCompleted() {
         if (allLessonsCompleted()/* && allQuizSubmitPassed()*/) {
             this.completed = true;
-            this.completedDate = Instant.now();
+            this.completedDate = LocalDateTime.now();
             registerEvent(new EnrolmentCompletedEvent(this.id, this.courseId, this.student));
         }
     }
@@ -111,5 +115,6 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     }
 
     public record EnrolmentCompletedEvent(Long id, Long courseId, String student) {}
+    public record EnrolmentCreatedEvent(String teacher) {}
 
 }

@@ -99,7 +99,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
                 .map(entry -> new LessonProgress(entry.getValue(), entry.getKey()))
                 .collect(Collectors.toSet());
 
-        CourseEnrollment enrollment = new CourseEnrollment(student, courseId, lessonProgresses);
+        CourseEnrollment enrollment = new CourseEnrollment(student, courseId, course.getTeacher(), lessonProgresses);
         repository.save(enrollment);
     }
 

@@ -7,6 +7,7 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,9 +48,37 @@ public class KeycloakUsersManagement implements UsersManagement {
     }
 
     @Override
+    public List<UserRepresentation> search(String username, Boolean exact, Pageable pageable) {
+        return List.of();
+    }
+
+    @Override
     public List<UserRepresentation> search(String username, Boolean exact, String roleName) {
         List<UserRepresentation> users = keycloak.realm(realmName).users().searchByUsername(username, exact);
         return users.stream()
+                .filter(user -> hasRole(user, roleName))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserRepresentation> search(String username, Boolean exact, String roleName, Pageable pageable) {
+        int pageNumber = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
+        int first = pageNumber * pageSize;
+        List<UserRepresentation> users = keycloak.realm(realmName).users().search(username, first, pageSize);
+        return users.stream()
+                .filter(user -> hasRole(user, roleName))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserRepresentation> searchByRole(String roleName, Pageable pageable) {
+        int pageNumber = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
+        int first = pageNumber * pageSize;
+
+        List<UserRepresentation> allUsers = keycloak.realm(realmName).users().list(first, pageSize);
+        return allUsers.stream()
                 .filter(user -> hasRole(user, roleName))
                 .collect(Collectors.toList());
     }
