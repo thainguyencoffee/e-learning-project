@@ -24,7 +24,7 @@ public class PdfGenerationService {
 
             document.setMargins(50, 50, 50, 50);
 
-            String imagePath = "src/main/resources/static/certificate-background.jpg";
+            String imagePath = "src/main/resources/certificate-background.jpg";
             Image bgImage = new Image(ImageDataFactory.create(imagePath)).scaleToFit(900, 300);
             bgImage.setFixedPosition(95, 500); // Adjust the position of the background image
             document.add(bgImage);
