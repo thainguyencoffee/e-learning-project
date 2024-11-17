@@ -1,5 +1,6 @@
 package com.el.course.domain;
 
+import com.el.common.projection.MonthStats;
 import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.application.dto.teacher.CountDataDTO;
 import com.el.enrollment.application.dto.CourseInfoDTO;
@@ -118,4 +119,21 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
     Optional<CourseInfoDTO> findCourseInfoDTOByIdAndPublishedAndTeacher(long courseId, boolean published, String teacher);
 
     int countCourseByTeacherAndCreatedDateAfter(String teacher, LocalDateTime createdDateAfter);
+
+    @Query("""
+        SELECT extract(MONTH from c.published_date) as month, COUNT(c.id) AS count
+            FROM course c
+            WHERE c.teacher = :teacher AND extract(YEAR from c.published_date) = :year AND c.published = true
+            GROUP BY extract(MONTH from c.published_date)
+    """)
+    List<MonthStats> statsMonthPublishedCourseByTeacherAndYear(String teacher, Integer year);
+
+    @Query("""
+        SELECT extract(MONTH from c.created_date) as month, COUNT(c.id) AS count
+            FROM course c
+            WHERE c.teacher = :teacher AND extract(YEAR from c.created_date) = :year AND c.published = false
+            GROUP BY extract(MONTH from c.created_date)
+    """)
+    List<MonthStats> statsMonthDraftCourseByTeacherAndYear(String teacher, Integer year);
+
 }

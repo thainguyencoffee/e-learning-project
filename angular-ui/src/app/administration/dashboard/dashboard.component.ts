@@ -20,4 +20,9 @@ export class DashboardComponent {
     return this.userService.current.hasAnyRole('ROLE_admin')
   }
 
+  getTeacher() {
+    const current = this.userService.current;
+    return current.hasAnyRole('ROLE_teacher') ? current.name : undefined;
+  }
+
 }

@@ -4,6 +4,7 @@ create table course
     title              varchar(255) not null,
     thumbnail_url      varchar(500),
     published          boolean      not null,
+    published_date     timestamp,
     unpublished        boolean      not null,
     description        varchar(2000),
     price              varchar(50),
