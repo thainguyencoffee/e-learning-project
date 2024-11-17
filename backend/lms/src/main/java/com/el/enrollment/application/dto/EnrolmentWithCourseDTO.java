@@ -8,7 +8,7 @@ import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.LessonProgress;
 import com.el.enrollment.domain.Progress;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
@@ -29,7 +29,7 @@ public record EnrolmentWithCourseDTO(
         String student,
         Set<LessonProgress> lessonProgresses,
         Boolean completed,
-        Instant completedDate,
+        LocalDateTime completedDate,
         Certificate certificate,
         Progress progress
 ) {

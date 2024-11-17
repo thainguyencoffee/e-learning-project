@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Table("certificate")
@@ -20,7 +20,7 @@ public class Certificate {
     private String url;
     private Long courseId;
     private String courseTitle;
-    private Instant issuedDate;
+    private LocalDateTime issuedDate;
     private boolean certified;
 
     public Certificate(String fullName, String email, String student, Long courseId, String courseTitle, String teacher) {
@@ -48,7 +48,7 @@ public class Certificate {
         if (certified) throw new InputInvalidException("Certificate is already certified.");
         this.url = url;
         this.certified = true;
-        this.issuedDate = Instant.now();
+        this.issuedDate = LocalDateTime.now();
     }
 
 }

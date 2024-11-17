@@ -10,7 +10,7 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.money.MonetaryAmount;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Getter
@@ -20,7 +20,7 @@ public class Order extends AbstractAggregateRoot<Order> {
     private UUID id;
     @MappedCollection(idColumn = "orders")
     private Set<OrderItem> items = new HashSet<>();
-    private Instant orderDate;
+    private LocalDateTime orderDate;
     private MonetaryAmount totalPrice;
     private MonetaryAmount discountedPrice;
     private String discountCode;
@@ -28,16 +28,16 @@ public class Order extends AbstractAggregateRoot<Order> {
     @CreatedBy
     private String createdBy;
     @CreatedDate
-    private Instant createdDate;
+    private LocalDateTime createdDate;
     @LastModifiedBy
     private String lastModifiedBy;
     @LastModifiedDate
-    private Instant lastModifiedDate;
+    private LocalDateTime lastModifiedDate;
 
     public Order(Set<OrderItem> items) {
         if (items.isEmpty()) throw new InputInvalidException("Order must contain at least one item.");
 
-        this.orderDate = Instant.now();
+        this.orderDate = LocalDateTime.now();
         this.status = Status.PENDING;
 
         items.forEach(this::addItem);

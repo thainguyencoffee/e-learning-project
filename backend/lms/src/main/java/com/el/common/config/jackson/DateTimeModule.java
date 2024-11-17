@@ -7,22 +7,22 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 public class DateTimeModule extends SimpleModule {
 
     public DateTimeModule() {
-        addSerializer(Instant.class, new DateTimeSerializer());
+        addSerializer(LocalDateTime.class, new DateTimeSerializer());
     }
 
-    static class DateTimeSerializer extends StdSerializer<Instant> {
+    static class DateTimeSerializer extends StdSerializer<LocalDateTime> {
 
         public DateTimeSerializer() {
-            super(Instant.class);
+            super(LocalDateTime.class);
         }
 
         @Override
-        public void serialize(Instant instant, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+        public void serialize(LocalDateTime instant, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
             if (instant != null) {
                 String formattedInstant = TimeUtils.FORMATTER.format(instant);
                 jsonGenerator.writeString(formattedInstant);

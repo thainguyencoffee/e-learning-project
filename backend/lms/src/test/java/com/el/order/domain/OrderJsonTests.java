@@ -15,7 +15,7 @@ import org.springframework.boot.test.json.JsonContent;
 import org.springframework.context.annotation.Import;
 
 import java.io.IOException;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -42,7 +42,7 @@ class OrderJsonTests {
         Order orderMock = Mockito.spy(order);
         Mockito.when(orderMock.getId()).thenReturn(UUID.randomUUID()); // Mocking id
         Mockito.when(orderMock.getCreatedBy()).thenReturn("user101"); // Mocking createdBy
-        var createdDate = Instant.now();
+        var createdDate = LocalDateTime.now();
         var createdDateString = TimeUtils.FORMATTER.format(createdDate);
         Mockito.when(orderMock.getCreatedDate()).thenReturn(createdDate); // Mocking createdBy
 

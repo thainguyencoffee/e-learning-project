@@ -10,5 +10,5 @@ export interface CountDataDto {
 
 export interface TeacherDto {
   info: UserInfo,
-  count: CountDataDto
+  count?: CountDataDto
 }

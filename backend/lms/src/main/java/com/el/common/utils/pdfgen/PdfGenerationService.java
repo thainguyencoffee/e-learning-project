@@ -1,10 +1,13 @@
 package com.el.common.utils.pdfgen;
 
 import com.el.enrollment.domain.Certificate;
+import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.properties.TextAlignment;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayOutputStream;
@@ -13,28 +16,53 @@ import java.io.ByteArrayOutputStream;
 public class PdfGenerationService {
 
     public static byte[] generatePdfFromCertificate(Certificate certificate) {
-        // Logic tạo PDF từ chứng chỉ
-        // using ByteArrayOutputStream to write the content
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        // Logic to generate PDF
-        try {
+
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             PdfWriter writer = new PdfWriter(out);
             PdfDocument pdf = new PdfDocument(writer);
             Document document = new Document(pdf);
 
-            // Add content to PDF
-            document.add(new Paragraph("Certificate of Completion"));
-            document.add(new Paragraph("Student: " + certificate.getStudent()));
-            document.add(new Paragraph("Course: " + certificate.getCourseTitle()));
-            document.add(new Paragraph("Issued Date: " + certificate.getIssuedDate()));
+            document.setMargins(50, 50, 50, 50);
+
+            String imagePath = "src/main/resources/certificate-background.jpg";
+            Image bgImage = new Image(ImageDataFactory.create(imagePath)).scaleToFit(900, 300);
+            bgImage.setFixedPosition(95, 500); // Adjust the position of the background image
+            document.add(bgImage);
+
+            document.add(new Paragraph(certificate.getFullName())
+                    .setFontSize(18)
+                    .setBold()
+                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER)
+                    .setFixedPosition(55, 673, 500));
+
+            document.add(new Paragraph("has successfully completed the course")
+                    .setFontSize(14)
+                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER)
+                    .setFixedPosition(65, 655, 500));
+
+            document.add(new Paragraph(certificate.getCourseTitle())
+                    .setFontSize(16)
+                    .setBold()
+                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER)
+                    .setFixedPosition(60, 632, 500));
+
+            document.add(new Paragraph("Teacher: "  +  certificate.getTeacher())
+                    .setFontSize(16)
+                    .setBold()
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setFixedPosition(60, 610, 500));
+
+            document.add(new Paragraph("Issued date: " + certificate.getIssuedDate())
+                    .setFontSize(12)
+                    .setBold()
+                    .setFontColor(com.itextpdf.kernel.colors.ColorConstants.WHITE)
+                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER)
+                    .setFixedPosition(60, 500, 500));
 
             document.close();
-            log.info("PDF generated for certificate of student {}", certificate.getStudent());
+            return out.toByteArray();
         } catch (Exception e) {
-            log.error("Error generating PDF for certificate: {}", e.getMessage());
-            throw new RuntimeException("Failed to generate PDF.", e);
+            throw new RuntimeException("Error generating certificate", e);
         }
-        return out.toByteArray();
     }
-
 }

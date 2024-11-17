@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Table("lesson_progress")
@@ -16,7 +16,7 @@ public class LessonProgress {
     private Long lessonId;
     private String lessonTitle;
     private boolean completed;
-    private Instant completedDate;
+    private LocalDateTime completedDate;
 
     public LessonProgress(String lessonTitle, Long lessonId) {
         if (lessonId == null) throw new InputInvalidException("LessonId must not be null.");
@@ -33,7 +33,7 @@ public class LessonProgress {
         }
 
         this.completed = true;
-        this.completedDate = Instant.now();
+        this.completedDate = LocalDateTime.now();
     }
 
     public void markAsIncomplete() {

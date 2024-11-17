@@ -26,10 +26,10 @@
             <td>{{teacherDto.info.firstName}}</td>
             <td>{{teacherDto.info.lastName}}</td>
             <td>{{teacherDto.info.email}}</td>
-            <td>{{teacherDto.count.numberOfCourses}}</td>
-            <td>{{teacherDto.count.numberOfStudents}}</td>
-            <td>{{teacherDto.count.numberOfCertificates}}</td>
-            <td>{{teacherDto.count.numberOfDraftCourses}}</td>
+            <td>{{teacherDto.count?.numberOfCourses || 'nah'}}</td>
+            <td>{{teacherDto.count?.numberOfStudents || 'nah'}}</td>
+            <td>{{teacherDto.count?.numberOfCertificates || 'nah'}}</td>
+            <td>{{teacherDto.count?.numberOfDraftCourses || 'nah'}}</td>
             <td>
               <div class="float-end text-nowrap d-flex">
                 <a [routerLink]="['/administration/teachers/', teacherDto.info.username]" class="btn btn-sm btn-secondary me-2">View</a>
