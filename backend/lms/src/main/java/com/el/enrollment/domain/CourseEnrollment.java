@@ -9,7 +9,7 @@ import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,20 +22,20 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     private String student;
     private Long courseId;
     private String teacher;
-    private Instant enrollmentDate;
+    private LocalDateTime enrollmentDate;
     @MappedCollection(idColumn = "course_enrollment")
     private Set<LessonProgress> lessonProgresses = new HashSet<>();
     private Boolean completed;
-    private Instant completedDate;
+    private LocalDateTime completedDate;
     private Certificate certificate;
     @CreatedBy
     private String createdBy;
     @CreatedDate
-    private Instant createdDate;
+    private LocalDateTime createdDate;
     @LastModifiedBy
     private String lastModifiedBy;
     @LastModifiedDate
-    private Instant lastModifiedDate;
+    private LocalDateTime lastModifiedDate;
 
     public CourseEnrollment(String student, Long courseId, String teacher, Set<LessonProgress> lessonProgresses) {
         if (student == null) throw new InputInvalidException("Student must not be null.");
@@ -47,7 +47,7 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
         this.student = student;
         this.courseId = courseId;
         this.teacher = teacher;
-        this.enrollmentDate = Instant.now();
+        this.enrollmentDate = LocalDateTime.now();
         this.completed = false;
 
         lessonProgresses.forEach(this::addLessonProgress);
@@ -77,7 +77,7 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     private void checkCompleted() {
         if (allLessonsCompleted()/* && allQuizSubmitPassed()*/) {
             this.completed = true;
-            this.completedDate = Instant.now();
+            this.completedDate = LocalDateTime.now();
             registerEvent(new EnrolmentCompletedEvent(this.id, this.courseId, this.student));
         }
     }

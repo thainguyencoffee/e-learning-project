@@ -20,7 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -60,7 +60,7 @@ class CourseEnrollmentControllerTests {
                 "demo title",
                 "https://example.com",
                 TestFactory.teacher,
-                Instant.now(),
+                LocalDateTime.now(),
                 false
         );
         when(courseEnrollmentService.findAllCourseEnrollments(pageable)).thenReturn(List.of(enrollmentDTO));

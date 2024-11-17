@@ -85,7 +85,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   handleSearchForm() {
-    window.scrollTo(0, 0);
     this.discountCodeForm.markAllAsTouched();
     if (!this.discountCodeForm.valid) {
       return;

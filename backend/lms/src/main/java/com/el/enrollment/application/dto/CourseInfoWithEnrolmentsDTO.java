@@ -2,7 +2,7 @@ package com.el.enrollment.application.dto;
 
 import com.el.enrollment.domain.CourseEnrollment;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record CourseInfoWithEnrolmentsDTO(

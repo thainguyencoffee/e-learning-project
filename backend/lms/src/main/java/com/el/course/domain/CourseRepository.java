@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -117,5 +117,5 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
     """)
     Optional<CourseInfoDTO> findCourseInfoDTOByIdAndPublishedAndTeacher(long courseId, boolean published, String teacher);
 
-    int countCourseByTeacherAndCreatedDateAfter(String teacher, Instant createdDateAfter);
+    int countCourseByTeacherAndCreatedDateAfter(String teacher, LocalDateTime createdDateAfter);
 }

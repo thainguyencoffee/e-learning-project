@@ -1,6 +1,6 @@
 package com.el.enrollment.application.dto;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 public record CourseEnrollmentDTO(
         Long id,
@@ -9,7 +9,7 @@ public record CourseEnrollmentDTO(
         String title,
         String thumbnailUrl,
         String teacher,
-        Instant enrollmentDate,
+        LocalDateTime enrollmentDate,
         Boolean completed
 ) {
 }

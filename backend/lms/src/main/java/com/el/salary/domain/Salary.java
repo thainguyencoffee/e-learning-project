@@ -9,7 +9,7 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.money.MonetaryAmount;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,11 +28,11 @@ public class Salary {
     @CreatedBy
     private String createdBy;
     @CreatedDate
-    private Instant createdDate;
+    private LocalDateTime createdDate;
     @LastModifiedBy
     private String lastModifiedBy;
     @LastModifiedDate
-    private Instant lastModifiedDate;
+    private LocalDateTime lastModifiedDate;
 
     public Salary(String teacher) {
         if (teacher == null || teacher.isBlank())

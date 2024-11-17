@@ -12,7 +12,7 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.money.MonetaryAmount;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Getter
@@ -48,11 +48,11 @@ public class Course extends AbstractAggregateRoot<Course> {
     @CreatedBy
     private String createdBy;
     @CreatedDate
-    private Instant createdDate;
+    private LocalDateTime createdDate;
     @LastModifiedBy
     private String lastModifiedBy;
     @LastModifiedDate
-    private Instant lastModifiedDate;
+    private LocalDateTime lastModifiedDate;
 
     public Course(
             String title,
