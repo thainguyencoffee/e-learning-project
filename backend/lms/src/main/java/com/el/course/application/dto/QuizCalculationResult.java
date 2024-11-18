@@ -1,4 +1,4 @@
-package com.el.course.domain;
+package com.el.course.application.dto;
 
 public record QuizCalculationResult(
         Integer score,

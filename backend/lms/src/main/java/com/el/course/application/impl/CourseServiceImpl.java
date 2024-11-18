@@ -7,7 +7,6 @@ import com.el.course.application.CourseService;
 import com.el.course.application.EnsureEnrolmentCompleted;
 import com.el.course.application.dto.*;
 import com.el.course.domain.*;
-import com.el.enrollment.application.CourseEnrollmentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

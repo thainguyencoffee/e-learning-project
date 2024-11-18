@@ -8,7 +8,7 @@ import com.el.course.application.CourseQueryService;
 import com.el.course.application.CourseService;
 import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.domain.Course;
-import com.el.course.domain.QuizCalculationResult;
+import com.el.course.application.dto.QuizCalculationResult;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
 import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
