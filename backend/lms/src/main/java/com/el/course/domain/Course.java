@@ -42,6 +42,9 @@ public class Course extends AbstractAggregateRoot<Course> {
     @MappedCollection(idColumn = "course")
     private Set<Post> posts = new HashSet<>();
 
+    @MappedCollection(idColumn = "course")
+    private Set<Review> reviews = new HashSet<>();
+
     @JsonIgnore
     private boolean deleted;
     @Version
@@ -560,4 +563,25 @@ public class Course extends AbstractAggregateRoot<Course> {
         Post post = findPostById(postId);
         post.updateComment(commentId, content, strings);
     }
+
+    public void addReview(Review review) {
+        if (isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot add a review to an unpublished course.");
+        }
+        this.reviews.stream()
+                .filter(r -> r.getUsername().equals(review.getUsername()))
+                .findFirst()
+                .ifPresent(r -> {
+                    throw new InputInvalidException("User already reviewed this course.");
+                });
+        this.reviews.add(review);
+    }
+
+    public double getAverageRating() {
+        if (this.reviews.isEmpty()) {
+            return 0;
+        }
+        return this.reviews.stream().mapToDouble(Review::getRating).sum() / this.reviews.size();
+    }
+
 }

@@ -6,6 +6,7 @@ import com.el.course.domain.Course;
 import com.el.course.domain.RequestType;
 import com.el.course.web.dto.*;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
+@Slf4j
 @RestController
 @RequestMapping("/courses")
 public class CourseManagementController {
@@ -167,6 +169,14 @@ public class CourseManagementController {
                                                @PathVariable Long lessonId) {
         courseService.removeLesson(courseId, sectionId, lessonId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{courseId}/reviews")
+    public ResponseEntity<Long> addReview(@PathVariable Long courseId,
+                                          @RequestParam("enrollmentId") Long enrollmentId,
+                                          @RequestBody @Valid ReviewDTO reviewDTO) {
+        log.info("Add review for course: " + courseId + " with enrollment: " + enrollmentId);
+        return ResponseEntity.ok(courseService.addReview(courseId, enrollmentId, reviewDTO));
     }
 
 }
