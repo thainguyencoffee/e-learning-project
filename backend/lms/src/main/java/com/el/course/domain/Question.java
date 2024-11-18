@@ -17,9 +17,10 @@ public class Question {
     private QuestionType type;
     @MappedCollection(idColumn = "question")
     private Set<AnswerOption> options;
+    private Boolean trueFalseAnswer;
     private Integer score;
 
-    public Question(String content, QuestionType type, Integer score, Set<AnswerOption> options) {
+    public Question(String content, QuestionType type, Integer score, Set<AnswerOption> options, Boolean trueFalseAnswer) {
 
         if (content == null || content.isBlank())
             throw new InputInvalidException("Content of a question must not be empty.");
@@ -34,6 +35,7 @@ public class Question {
         this.type = type;
         this.score = score;
         this.options = options;
+        this.trueFalseAnswer = trueFalseAnswer;
 
         validateTypeAndOptions();
     }
@@ -52,32 +54,30 @@ public class Question {
         this.type = updatedQuestion.getType();
         this.score = updatedQuestion.getScore();
         this.options = updatedQuestion.getOptions();
+        this.trueFalseAnswer = updatedQuestion.getTrueFalseAnswer();
 
         validateTypeAndOptions();
     }
 
     private void validateTypeAndOptions() {
-        if (options.stream().anyMatch(o -> options.stream().filter(o2 -> o2.getContent().equals(o.getContent())).count() > 1))
-            throw new InputInvalidException("Duplicate answer option content.");
-
-        if (type == QuestionType.SINGLE_CHOICE) {
+        if (type == QuestionType.TRUE_FALSE) {
+            if (trueFalseAnswer == null) {
+                throw new InputInvalidException("True/False question must define the option is true or false.");
+            }
+        } else {
+            if (options.stream().anyMatch(o -> options.stream().filter(o2 -> o2.getContent().equals(o.getContent())).count() > 1))
+                throw new InputInvalidException("Duplicate answer option content.");
             if (options.size() < 2)
-                throw new InputInvalidException("A single choice question must have at least 2 options.");
+                throw new InputInvalidException("Question must have at least 2 options.");
 
-            if (options.stream().filter(AnswerOption::getCorrect).count() != 1)
-                throw new InputInvalidException("A single choice question must have exactly 1 correct option.");
-        } else if (type == QuestionType.MULTIPLE_CHOICE) {
-            if (options.size() < 2)
-                throw new InputInvalidException("A multiple choice question must have at least 2 options.");
+            long numberOfCorrect = options.stream().filter(AnswerOption::getCorrect).count();
+            if (numberOfCorrect == 0)
+                throw new InputInvalidException("Question must have at least 1 correct option.");
 
-            if (options.stream().filter(AnswerOption::getCorrect).count() < 2)
-                throw new InputInvalidException("A multiple choice question must have at least 2 correct options.");
-        } else if (type == QuestionType.TRUE_FALSE) {
-            if (options.size() != 2)
-                throw new InputInvalidException("A true/false question must have exactly 2 options.");
-
-            if (options.stream().filter(AnswerOption::getCorrect).count() != 1)
-                throw new InputInvalidException("A true/false question must have exactly 1 correct option.");
+            if (type == QuestionType.SINGLE_CHOICE) {
+                if (numberOfCorrect != 1)
+                    throw new InputInvalidException("A single choice question must have exactly 1 correct option.");
+            }
         }
     }
 

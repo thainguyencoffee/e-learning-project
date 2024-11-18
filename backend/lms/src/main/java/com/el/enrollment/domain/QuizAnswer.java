@@ -16,7 +16,18 @@ public class QuizAnswer {
     private Long id;
     private Long questionId;
     private Set<Long> answerOptionIds = new HashSet<>();
+    private Boolean trueFalseAnswer;
     private QuestionType type;
+
+    public QuizAnswer(Long questionId, Boolean trueFalseAnswer, QuestionType type) {
+        validateQuestionId(questionId);
+        if (type == null) {
+            throw new InputInvalidException("Question type cannot be null.");
+        }
+        this.type = type;
+        this.questionId = questionId;
+        this.trueFalseAnswer = trueFalseAnswer;
+    }
 
     public QuizAnswer(Long questionId, Long answerOptionId, QuestionType type) {
         validateQuestionId(questionId);

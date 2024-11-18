@@ -168,8 +168,8 @@ class CourseEnrollmentControllerTests {
 
         QuizSubmitDTO quizSubmitDTO = new QuizSubmitDTO(
                 1L,
-                Set.of(new QuestionSubmitDTO(QuestionType.SINGLE_CHOICE, 1L, Set.of(1L, 2L)),
-                        new QuestionSubmitDTO(QuestionType.TRUE_FALSE, 2L, Set.of(4L))
+                Set.of(new QuestionSubmitDTO(QuestionType.SINGLE_CHOICE, 1L, Set.of(1L, 2L), null),
+                        new QuestionSubmitDTO(QuestionType.TRUE_FALSE, 2L, null, true)
                 ));
 
         mockMvc.perform(post("/enrollments/{enrollmentId}/submit-quiz", 1L)

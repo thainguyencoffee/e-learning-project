@@ -73,11 +73,12 @@ create table quiz
 
 create table question
 (
-    id      bigserial     not null,
-    quiz    bigint        not null references quiz (id) on DELETE cascade,
-    content varchar(1000) not null,
-    type    varchar(50)   not null,
-    score   int           not null,
+    id                bigserial     not null,
+    quiz              bigint        not null references quiz (id) on DELETE cascade,
+    content           varchar(1000) not null,
+    type              varchar(50)   not null,
+    score             int           not null,
+    true_false_answer boolean,
     constraint fk_question primary key (id)
 );
 
@@ -90,12 +91,13 @@ create table answer_option
     constraint fk_answer_option primary key (id)
 );
 
-create table review (
+create table review
+(
     id          bigserial    not null,
     course      bigint       not null references course (id) on DELETE cascade,
     username    varchar(50)  not null,
     rating      int          not null,
-    comment     varchar(500) not null ,
+    comment     varchar(500) not null,
     review_date timestamp    not null,
     constraint fk_review primary key (id)
 );
@@ -192,7 +194,8 @@ create table quiz_answer
     id                bigserial   not null,
     quiz_submission   bigint      not null references quiz_submission (id) on DELETE cascade,
     question_id       bigint      not null,
-    answer_option_ids bigint[] not null,
+    answer_option_ids bigint[],
+    true_false_answer boolean,
     type              varchar(50) not null,
     constraint fk_quiz_answer primary key (id)
 );
