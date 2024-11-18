@@ -15,6 +15,8 @@
           </a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" routerLink="/administration">Administration</a></li>
+            <li *ngIf="isTeacher || isAdmin"><a class="dropdown-item" [href]="accountManagementUrl" target="_blank">Account</a></li>
+            <li *ngIf="isAdmin"><a class="dropdown-item" [href]="adminConsoleUrl" target="_blank">Admin console</a></li>
           </ul>
         </li>
 
