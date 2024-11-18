@@ -26,6 +26,7 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     @MappedCollection(idColumn = "course_enrollment")
     private Set<LessonProgress> lessonProgresses = new HashSet<>();
     private Boolean completed;
+    private Boolean reviewed = false;
     private LocalDateTime completedDate;
     private Certificate certificate;
     @MappedCollection(idColumn = "course_enrollment")
@@ -49,11 +50,9 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
         this.student = student;
         this.courseId = courseId;
         this.teacher = teacher;
-        this.enrollmentDate = LocalDateTime.now();
         this.completed = false;
 
         lessonProgresses.forEach(this::addLessonProgress);
-        registerEvent(new EnrolmentCreatedEvent(teacher));
     }
 
     public void markLessonAsCompleted(Long lessonId) {
@@ -127,6 +126,18 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
         }
 
         this.certificate = new Certificate(fullName, email, this.student, this.courseId, courseTitle, teacher);
+    }
+
+    public void markAsEnrolled() {
+        this.enrollmentDate = LocalDateTime.now();
+        registerEvent(new EnrolmentCreatedEvent(teacher));
+    }
+
+    public void markAsReviewed() {
+        if (reviewed) {
+            throw new InputInvalidException("Course enrollment is already reviewed.");
+        }
+        reviewed = true;
     }
 
     public record EnrolmentCompletedEvent(Long id, Long courseId, String student) {}

@@ -24,6 +24,7 @@ public class SecurityConfig {
                         // Allow all requests to /upload/** with any roles
                         .requestMatchers("/upload/**").authenticated()
 
+                        .requestMatchers("courses/{courseId}/reviews").authenticated()
                         .requestMatchers(HttpMethod.GET,
                                 "/courses/{courseId}/posts",
                                 "/courses/{courseId}/posts/{postId}").authenticated()

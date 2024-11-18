@@ -19,6 +19,7 @@ import {EditQuizDto} from "../model/edit-quiz.dto";
 import {QuestionDto} from "../model/question.dto";
 import {Quiz} from "../model/view/quiz";
 import {CommentDto} from "../../../enrolments/model/comment.dto";
+import {ReviewDto} from "../model/review.dto";
 
 @Injectable(
   {providedIn: 'root'}
@@ -251,6 +252,10 @@ export class CourseService {
     return this.http.delete<void>(`${this.resourcePath}/${courseId}/sections/${sectionId}/quizzes/${quizId}`, {
       params: { force: 'true' }
     });
+  }
+
+  submitReview(courseId: number, enrollmentId: number, data: ReviewDto) {
+    return this.http.post<number>(`${this.resourcePath}/${courseId}/reviews?enrollmentId=${enrollmentId}`, data);
   }
 
 }

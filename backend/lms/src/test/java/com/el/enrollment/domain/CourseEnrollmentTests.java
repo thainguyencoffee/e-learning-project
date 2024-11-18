@@ -17,7 +17,7 @@ class CourseEnrollmentTests {
     void courseEnrollmentConstructor_ShouldCreatedEnrollmentWhenValid() {
         CourseEnrollment enrollment = TestFactory.createDefaultCourseEnrollment();
 
-        assertNotNull(enrollment.getEnrollmentDate());
+        assertNull(enrollment.getEnrollmentDate());
         assertEquals(TestFactory.user, enrollment.getStudent());
         assertEquals(1L, enrollment.getCourseId());
         assertFalse(enrollment.getCompleted());

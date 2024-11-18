@@ -65,6 +65,12 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     }
 
     @Override
+    public CourseEnrollment findCourseEnrollmentByCourseIdAndStudent(Long courseId, String student) {
+        return repository.findByCourseIdAndStudent(courseId, student)
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Override
     public CourseEnrollment findCourseEnrollmentById(Long id) {
         String currentUsername = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
         if (rolesBaseUtil.isAdmin()) {
@@ -103,6 +109,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
                 .collect(Collectors.toSet());
 
         CourseEnrollment enrollment = new CourseEnrollment(student, courseId, course.getTeacher(), lessonProgresses);
+        enrollment.markAsEnrolled();
         repository.save(enrollment);
     }
 
@@ -145,6 +152,13 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
         CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
         QuizCalculationResult calculationResult = courseService.calculateQuizScore(enrollment.getCourseId(), quizSubmitDTO.quizId(), quizSubmitDTO.getAnswers());
         enrollment.addQuizSubmission(new QuizSubmission(quizSubmitDTO.quizId(), quizSubmitDTO.toQuizAnswers(), calculationResult.score(), calculationResult.passed()));
+        repository.save(enrollment);
+    }
+
+    @Override
+    public void markAsReviewed(Long courseId, String student) {
+        CourseEnrollment enrollment = findCourseEnrollmentByCourseIdAndStudent(courseId, student);
+        enrollment.markAsReviewed();
         repository.save(enrollment);
     }
 

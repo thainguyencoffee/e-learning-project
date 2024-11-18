@@ -576,6 +576,10 @@ public class Course extends AbstractAggregateRoot<Course> {
                     throw new InputInvalidException("User already reviewed this course.");
                 });
         this.reviews.add(review);
+        registerEvent(new CourseReviewedEvent(this.id, review.getUsername()));
+    }
+
+    public record CourseReviewedEvent(Long courseId, String username) {
     }
 
     public double getAverageRating() {

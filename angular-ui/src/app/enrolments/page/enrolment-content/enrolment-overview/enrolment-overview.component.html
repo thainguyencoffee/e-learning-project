@@ -17,8 +17,15 @@
     <div class="alert alert-success">
       <h3>Completed</h3>
       <p>Congratulations! You have completed this course. Please
-        <a href="">review</a>
+        <button class="btn btn-primary" (click)="onToggleReviewBtn()">review</button>
         this course to help us.</p>
+      @if (toggleReviewBtn) {
+        <form [formGroup]="reviewForm" (ngSubmit)="handleSubmit(enrolmentWithCourse.courseId)">
+          <app-input-row [group]="reviewForm" label="Rating" field="rating" rowType="radio" [options]="ratingOptions"/>
+          <app-input-row [group]="reviewForm" label="Comment" field="comment" rowType="textarea"/>
+          <button type="submit" class="btn btn-primary">Review</button>
+        </form>
+      }
 
       <h3>Certificate</h3>
       <p>
