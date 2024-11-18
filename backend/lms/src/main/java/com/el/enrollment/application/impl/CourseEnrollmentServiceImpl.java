@@ -8,12 +8,15 @@ import com.el.course.application.CourseQueryService;
 import com.el.course.application.CourseService;
 import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.domain.Course;
+import com.el.course.domain.QuizCalculationResult;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
 import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
+import com.el.enrollment.application.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
 import com.el.enrollment.domain.LessonProgress;
+import com.el.enrollment.domain.QuizSubmission;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.data.domain.Pageable;
@@ -133,6 +136,15 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
                 courseInfo.teacher());
 
         certificateServiceS3Storage.createCertUrl(enrollment.getCertificate());
+        repository.save(enrollment);
+    }
+
+    @Override
+    public void submitQuiz(Long enrollmentId, QuizSubmitDTO quizSubmitDTO) {
+        checkAccess();
+        CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        QuizCalculationResult calculationResult = courseService.calculateQuizScore(enrollment.getCourseId(), quizSubmitDTO.quizId(), quizSubmitDTO.getAnswers());
+        enrollment.addQuizSubmission(new QuizSubmission(quizSubmitDTO.quizId(), quizSubmitDTO.toQuizAnswers(), calculationResult.score(), calculationResult.passed()));
         repository.save(enrollment);
     }
 

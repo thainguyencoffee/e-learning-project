@@ -177,6 +177,57 @@ public class CourseQueryServiceImpl implements CourseQueryService {
         throw new AccessDeniedException("Access denied");
     }
 
+    @Override
+    public List<Quiz> findQuizzesByCourseIdAndSectionId(Long courseId, Long sectionId, Pageable pageable) {
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+        String currentUser = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+
+        if (rolesBaseUtil.isAdmin()) {
+            return courseRepository.findAllQuizzesByCourseIdAndSectionIdAndDeleted(courseId, sectionId, false, page, size);
+        }
+
+        if(rolesBaseUtil.isTeacher()) {
+            return courseRepository.findAllQuizzesByCourseIdAndSectionIdAndTeacherAndDeleted(courseId, sectionId, currentUser, false, page, size);
+        }
+
+        throw new AccessDeniedException("Access denied");
+    }
+
+    @Override
+    public Quiz findQuizByCourseIdAndSectionIdAndQuizId(Long courseId, Long sectionId, Long quizId) {
+        String currentUser = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+
+        if (rolesBaseUtil.isAdmin()) {
+            return courseRepository.findQuizByCourseIdAndSectionIdAndQuizIdAndDeleted(courseId, sectionId, quizId, false)
+                    .orElseThrow(ResourceNotFoundException::new);
+        }
+
+        if(rolesBaseUtil.isTeacher()) {
+            return courseRepository.findQuizByCourseIdAndSectionIdAndQuizIdAndTeacherAndDeleted(courseId, sectionId, quizId, currentUser, false)
+                    .orElseThrow(ResourceNotFoundException::new);
+        }
+
+        throw new AccessDeniedException("Access denied");
+    }
+
+    @Override
+    public List<Quiz> findTrashQuizzesByCourseIdAndSectionId(Long courseId, Long sectionId, Pageable pageable) {
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+        String currentUser = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+
+        if (rolesBaseUtil.isAdmin()) {
+            return courseRepository.findAllQuizzesByCourseIdAndSectionIdAndDeleted(courseId, sectionId, true, page, size);
+        }
+
+        if(rolesBaseUtil.isTeacher()) {
+            return courseRepository.findAllQuizzesByCourseIdAndSectionIdAndTeacherAndDeleted(courseId, sectionId, currentUser, true, page, size);
+        }
+
+        throw new AccessDeniedException("Access denied");
+    }
+
     private boolean isUserEnrolled(Long courseId, String username) {
         return courseEnrollmentRepository.findByCourseIdAndStudent(courseId, username).isPresent();
     }

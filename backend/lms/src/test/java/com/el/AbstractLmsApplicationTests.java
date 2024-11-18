@@ -322,6 +322,31 @@ abstract class AbstractLmsApplicationTests {
         return postId;
     }
 
+    protected Long performCreateQuiz(QuizDTO quizDTO, Long courseId, Long sectionId) {
+        // Act: Add quiz
+        var quizId = webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/quizzes", courseId, sectionId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(quizDTO))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Long.class).returnResult().getResponseBody();
+
+        // Assert
+        assertThat(quizId).isNotNull();
+        return quizId;
+    }
+
+    protected Long performCreateQuestion(QuestionDTO questionDTO, Long id, Long sectionId, Long quizId) {
+        return webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/questions", id, sectionId, quizId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(questionDTO))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Long.class).returnResult().getResponseBody();
+    }
+
     private static KeycloakToken authenticateWith(
             String username, String password, WebClient webClient) {
         return webClient

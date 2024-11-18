@@ -58,6 +58,38 @@ create table lesson
     constraint fk_lesson primary key (id)
 );
 
+create table quiz
+(
+    id                    bigserial    not null,
+    course_section        bigint       not null references course_section (id) on DELETE cascade,
+    title                 varchar(255) not null,
+    description           varchar(2000),
+    after_lesson_id       bigint       not null,
+    total_score           int          not null,
+    pass_score_percentage int          not null,
+    deleted               boolean      not null,
+    constraint fk_quiz primary key (id)
+);
+
+create table question
+(
+    id      bigserial     not null,
+    quiz    bigint        not null references quiz (id) on DELETE cascade,
+    content varchar(1000) not null,
+    type    varchar(50)   not null,
+    score   int           not null,
+    constraint fk_question primary key (id)
+);
+
+create table answer_option
+(
+    id       bigserial     not null,
+    question bigint        not null references question (id) on DELETE cascade,
+    content  varchar(1000) not null,
+    correct  boolean       not null,
+    constraint fk_answer_option primary key (id)
+);
+
 create table discount
 (
     id                 bigserial   not null,
@@ -130,6 +162,28 @@ create table course_enrollment
     last_modified_by   varchar(50)  not null,
     last_modified_date timestamp    not null,
     constraint fk_course_enrollment primary key (id)
+);
+
+create table quiz_submission
+(
+    id                 bigserial not null,
+    quiz_id            bigint    not null,
+    course_enrollment  bigint    not null references course_enrollment (id) on DELETE cascade,
+    score              int       not null,
+    passed             boolean   not null,
+    submitted_date     timestamp not null,
+    last_modified_date timestamp not null,
+    constraint fk_quiz_submission primary key (id)
+);
+
+create table quiz_answer
+(
+    id                bigserial   not null,
+    quiz_submission   bigint      not null references quiz_submission (id) on DELETE cascade,
+    question_id       bigint      not null,
+    answer_option_ids bigint[] not null,
+    type              varchar(50) not null,
+    constraint fk_quiz_answer primary key (id)
 );
 
 create table certificate

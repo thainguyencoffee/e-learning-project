@@ -4,6 +4,7 @@ import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.domain.Comment;
 import com.el.course.domain.Course;
 import com.el.course.domain.Post;
+import com.el.course.domain.Quiz;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -34,5 +35,11 @@ public interface CourseQueryService {
     List<Post> findTrashedPosts(Long courseId, Pageable pageable);
 
     List<Comment> findCommentsByPostId(Long courseId, Long postId, Pageable pageable);
+
+    List<Quiz> findQuizzesByCourseIdAndSectionId(Long courseId, Long sectionId, Pageable pageable);
+
+    Quiz findQuizByCourseIdAndSectionIdAndQuizId(Long courseId, Long sectionId, Long quizId);
+
+    List<Quiz> findTrashQuizzesByCourseIdAndSectionId(Long courseId, Long sectionId, Pageable pageable);
 
 }

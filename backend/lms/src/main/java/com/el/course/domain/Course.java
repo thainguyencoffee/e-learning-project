@@ -443,6 +443,86 @@ public class Course extends AbstractAggregateRoot<Course> {
         post.addEmotion(emotion);
     }
 
+    public void addQuizToSection(Long sectionId, Quiz quiz) {
+        if (!isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot add a quiz to a published course.");
+        }
+        CourseSection section = findSectionById(sectionId);
+        section.findLessonById(quiz.getAfterLessonId());
+        section.addQuiz(quiz);
+    }
+
+    public void addQuestionToQuizInSection(Long sectionId, Long quizId, Question question) {
+        if (!isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot add a question to a published course.");
+        }
+        CourseSection section = findSectionById(sectionId);
+        section.addQuestionToQuiz(quizId, question);
+    }
+
+    public void updateQuestionInQuizInSection(Long sectionId, Long quizId, Long questionId, Question updatedQuestion) {
+        if (!isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot update a question in a published course.");
+        }
+        CourseSection section = findSectionById(sectionId);
+        section.updateQuestionInQuiz(quizId, questionId, updatedQuestion);
+    }
+
+    public void deleteQuestionFromQuizInSection(Long sectionId, Long quizId, Long questionId) {
+        if (!isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot delete a question from a published course.");
+        }
+        CourseSection section = findSectionById(sectionId);
+        section.deleteQuestionFromQuiz(quizId, questionId);
+    }
+
+    public void updateQuizInSection(Long sectionId, Long quizId, String newTitle, String newDescription, Integer newPassScorePercent) {
+        if (!isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot update a quiz in a published course.");
+        }
+        CourseSection section = findSectionById(sectionId);
+        section.updateQuiz(quizId, newTitle, newDescription, newPassScorePercent);
+    }
+
+    public void deleteQuizFromSection(Long sectionId, Long quizId) {
+        if (!isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot delete a quiz from a published course.");
+        }
+        CourseSection section = findSectionById(sectionId);
+        section.deleteQuiz(quizId);
+    }
+
+    public void restoreQuizInSection(Long sectionId, Long quizId) {
+        if (!isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot restore a quiz in a published course.");
+        }
+        CourseSection section = findSectionById(sectionId);
+        section.restoreQuiz(quizId);
+    }
+
+    public void forceDeleteQuizFromSection(Long sectionId, Long quizId) {
+        if (!isNotPublishedAndDeleted()) {
+            throw new InputInvalidException("Cannot force delete a quiz in a published course.");
+        }
+        CourseSection section = findSectionById(sectionId);
+        section.forceDeleteQuiz(quizId);
+    }
+
+    public QuizCalculationResult calculateQuiz(long quizId, Map<Long, Set<Long>> answers) {
+        Quiz quiz = findQuizById(quizId);
+        Integer score = quiz.calculateScore(answers);
+        Boolean passed = quiz.isPassed(score);
+        return new QuizCalculationResult(score, passed);
+    }
+
+    private Quiz findQuizById(Long quizId) {
+        return this.sections.stream()
+                .flatMap(section -> section.getQuizzes().stream())
+                .filter(quiz -> quiz.getId().equals(quizId))
+                .findFirst()
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
     private Post findPostById(Long postId) {
         return this.posts.stream()
                 .filter(post -> post.getId().equals(postId))
