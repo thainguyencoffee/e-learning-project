@@ -3,6 +3,7 @@ package com.el.course.application;
 import com.el.course.application.dto.*;
 import com.el.course.domain.Course;
 import com.el.course.domain.Lesson;
+import com.el.course.domain.QuizCalculationResult;
 
 import javax.money.MonetaryAmount;
 import java.util.Map;
@@ -65,5 +66,27 @@ public interface CourseService {
     void deleteComment(Long courseId, Long postId, Long commentId);
 
     Long addEmotion(Long courseId, Long postId);
+
+    Long addQuizToSection(Long courseId, Long sectionId, QuizDTO quizDTO);
+
+    void updateQuiz(Long courseId, Long sectionId, Long quizId, QuizUpdateDTO quizUpdateDTO);
+
+    void deleteQuiz(Long courseId, Long sectionId, Long quizId);
+
+    void restoreQuiz(Long courseId, Long sectionId, Long quizId);
+
+    void deleteForceQuiz(Long courseId, Long sectionId, Long quizId);
+
+    Long addQuestionToQuiz(Long courseId, Long sectionId, Long quizId, QuestionDTO questionDTO);
+
+    void updateQuestion(Long courseId, Long sectionId, Long quizId, Long questionId, QuestionDTO questionUpdateDTO);
+
+    void deleteQuestion(Long courseId, Long sectionId, Long quizId, Long questionId);
+
+    /**
+     * This method will return {@code QuizCalculationResult} with detail. <br>
+     * score: The score of {@code answers } <br>
+     * passed: Is {@code  answers } pass or not */
+    QuizCalculationResult calculateQuizScore(Long courseId, Long quizId, Map<Long, Set<Long>> answers);
 
 }

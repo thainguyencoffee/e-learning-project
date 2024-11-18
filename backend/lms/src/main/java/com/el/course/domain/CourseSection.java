@@ -21,6 +21,8 @@ public class CourseSection {
     private String title;
     @MappedCollection(idColumn = "course_section")
     private Set<Lesson> lessons = new HashSet<>();
+    @MappedCollection(idColumn = "course_section")
+    private Set<Quiz> quizzes = new HashSet<>();
     private Integer orderIndex;
 
     public CourseSection(String title) {
@@ -82,5 +84,66 @@ public class CourseSection {
     protected void setOrderIndex(int i) {
         this.orderIndex = i;
     }
+
+    public void addQuiz(Quiz quiz) {
+        if (this.quizzes.stream().anyMatch(q -> q.getTitle().equals(quiz.getTitle())))
+            throw new InputInvalidException("Duplicate quiz title.");
+
+        if (this.quizzes.stream().anyMatch(q -> /*!q.isDeleted() &&*/ q.getAfterLessonId().equals(quiz.getAfterLessonId()))) {
+            throw new InputInvalidException("There is already a quiz after the lesson.");
+        }
+
+        this.quizzes.add(quiz);
+    }
+
+    public void updateQuiz(Long quizId, String newTitle, String newDescription, Integer newPassScorePercent) {
+        Quiz quiz = findQuizById(quizId);
+
+        if (this.quizzes.stream()
+                .filter(q -> !q.getId().equals(quizId))
+                .anyMatch(q -> q.getTitle().equals(newTitle))) {
+            throw new InputInvalidException("Duplicate quiz title.");
+        }
+
+        quiz.updateInfo(newTitle, newDescription, newPassScorePercent);
+    }
+
+    public void addQuestionToQuiz(Long quizId, Question question) {
+        Quiz quiz = findQuizById(quizId);
+        quiz.addQuestion(question);
+    }
+
+    public void updateQuestionInQuiz(Long quizId, Long questionId, Question updatedQuestion) {
+        Quiz quiz = findQuizById(quizId);
+        quiz.updateQuestion(questionId, updatedQuestion);
+    }
+
+    public void deleteQuestionFromQuiz(Long quizId, Long questionId) {
+        Quiz quiz = findQuizById(quizId);
+        quiz.deleteQuestion(questionId);
+    }
+
+    private Quiz findQuizById(Long quizId) {
+        return this.quizzes.stream()
+                .filter(quiz -> quiz.getId().equals(quizId))
+                .findFirst()
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    public void deleteQuiz(Long quizId) {
+        Quiz quiz = findQuizById(quizId);
+        quiz.delete();
+    }
+
+    public void restoreQuiz(Long quizId) {
+        Quiz quiz = findQuizById(quizId);
+        quiz.restore();
+    }
+
+    public void forceDeleteQuiz(Long quizId) {
+        Quiz quiz = findQuizById(quizId);
+        this.quizzes.remove(quiz);
+    }
+
 
 }

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.money.MonetaryAmount;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -306,6 +308,75 @@ public class CourseServiceImpl implements CourseService {
         course.addEmotionToPost(postId, emotion);
         courseRepository.save(course);
         return emotion.getId();
+    }
+
+    @Override
+    public Long addQuizToSection(Long courseId, Long sectionId, QuizDTO quizDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        Quiz quiz = quizDTO.toQuiz();
+        course.addQuizToSection(sectionId, quiz);
+        courseRepository.save(course);
+        return quiz.getId();
+    }
+
+    @Override
+    public void updateQuiz(Long courseId, Long sectionId, Long quizId, QuizUpdateDTO quizUpdateDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.updateQuizInSection(sectionId, quizId,
+                quizUpdateDTO.title(),
+                quizUpdateDTO.description(),
+                quizUpdateDTO.passScorePercentage());
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void deleteQuiz(Long courseId, Long sectionId, Long quizId) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.deleteQuizFromSection(sectionId, quizId);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void restoreQuiz(Long courseId, Long sectionId, Long quizId) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.restoreQuizInSection(sectionId, quizId);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void deleteForceQuiz(Long courseId, Long sectionId, Long quizId) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.forceDeleteQuizFromSection(sectionId, quizId);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public Long addQuestionToQuiz(Long courseId, Long sectionId, Long quizId, QuestionDTO questionDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        Question question = questionDTO.toQuestion();
+        course.addQuestionToQuizInSection(sectionId, quizId, question);
+        courseRepository.save(course);
+        return question.getId();
+    }
+
+    @Override
+    public void updateQuestion(Long courseId, Long sectionId, Long quizId, Long questionId, QuestionDTO questionUpdateDTO) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.updateQuestionInQuizInSection(sectionId, quizId, questionId, questionUpdateDTO.toQuestion());
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void deleteQuestion(Long courseId, Long sectionId, Long quizId, Long questionId) {
+        Course course = courseQueryService.findCourseById(courseId);
+        course.deleteQuestionFromQuizInSection(sectionId, quizId, questionId);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public QuizCalculationResult calculateQuizScore(Long courseId, Long quizId, Map<Long, Set<Long>> answers) {
+        Course course = courseQueryService.findCourseById(courseId);
+        return course.calculateQuiz(quizId, answers);
     }
 
 }

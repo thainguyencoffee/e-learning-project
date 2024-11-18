@@ -28,6 +28,8 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     private Boolean completed;
     private LocalDateTime completedDate;
     private Certificate certificate;
+    @MappedCollection(idColumn = "course_enrollment")
+    private Set<QuizSubmission> quizSubmissions = new HashSet<>();
     @CreatedBy
     private String createdBy;
     @CreatedDate
@@ -75,7 +77,7 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     }
 
     private void checkCompleted() {
-        if (allLessonsCompleted()/* && allQuizSubmitPassed()*/) {
+        if (allLessonsCompleted() && allQuizSubmitPassed()) {
             this.completed = true;
             this.completedDate = LocalDateTime.now();
             registerEvent(new EnrolmentCompletedEvent(this.id, this.courseId, this.student));
@@ -84,6 +86,10 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
 
     private boolean allLessonsCompleted() {
         return lessonProgresses.stream().allMatch(LessonProgress::isCompleted);
+    }
+
+    private boolean allQuizSubmitPassed() {
+        return this.quizSubmissions.stream().allMatch(QuizSubmission::isPassed);
     }
 
     public Progress getProgress() {
@@ -95,6 +101,15 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     public void addLessonProgress(LessonProgress lessonProgress) {
         if (lessonProgress == null) throw new InputInvalidException("LessonProgress must not be null.");
         lessonProgresses.add(lessonProgress);
+    }
+
+    public void addQuizSubmission(QuizSubmission quizSubmission) {
+        if (quizSubmission == null) throw new InputInvalidException("QuizSubmission must not be null.");
+        if (quizSubmissions.stream().anyMatch(qs -> qs.getQuizId().equals(quizSubmission.getQuizId()))) {
+            throw new InputInvalidException("QuizSubmission for this quiz already exists.");
+        }
+        quizSubmissions.add(quizSubmission);
+        checkCompleted();
     }
 
     public LessonProgress findLessonProgressByLessonId(Long lessonId) {
