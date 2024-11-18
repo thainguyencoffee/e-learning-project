@@ -13,7 +13,7 @@ import {EnrolmentsService} from "../../../../enrolments/service/enrolments.servi
 @Component({
   selector: 'app-course-detail',
   standalone: true,
-  styleUrls:['course-detail.component.css'],
+  styleUrls: ['course-detail.component.css'],
   imports: [
     RouterLink,
     NgForOf,
@@ -22,7 +22,7 @@ import {EnrolmentsService} from "../../../../enrolments/service/enrolments.servi
   ],
   templateUrl: './course-detail.component.html',
 })
-export class CourseDetailComponent implements OnInit, OnDestroy{
+export class CourseDetailComponent implements OnInit, OnDestroy {
 
   route = inject(ActivatedRoute)
   router = inject(Router);
@@ -30,7 +30,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
   enrolmentService = inject(EnrolmentsService);
   errorHandler = inject(ErrorHandler);
   userService = inject(UserService);
-
+  selectedSection: any = null;
   currentId?: number;
   courseDto?: Course
   participantNumber?: number;
@@ -48,6 +48,10 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
 
   ngOnDestroy(): void {
     this.navigationSubscription!.unsubscribe();
+  }
+
+  selectSection(section: any) {
+    this.selectedSection = section;
   }
 
   loadData() {
@@ -72,8 +76,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
   getMessage(key: string, details?: any) {
     const messages: Record<string, string> = {
       confirm: 'Do you really want to delete this element?',
-      sectionDeleted: `Course section was removed successfully.`,
-      lessonDeleted: `Course lesson was removed successfully.`
     }
     return messages[key];
   }
@@ -82,11 +84,10 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
     if (confirm(this.getMessage('confirm'))) {
       this.courseService.deleteSection(this.currentId!, sectionId, section)
         .subscribe({
-          next: () => this.router.navigate(['/administration/courses', this.currentId], {
-            state: {
-              msgSuccess: this.getMessage('sectionDeleted')
-            }
-          }),
+          next: () => {
+            this.loadData()
+            this.selectedSection = null
+          },
           error: (error) => this.errorHandler.handleServerError(error.error)
         });
     }
@@ -97,11 +98,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy{
     if (confirm(this.getMessage('confirm'))) {
       this.courseService.deleteLesson(this.currentId!, sectionId, lessonId, lesson)
         .subscribe({
-          next: () => this.router.navigate(['/administration/courses', this.currentId], {
-            state: {
-              msgSuccess: this.getMessage('lessonDeleted')
-            }
-          }),
+          next: () => this.loadData(),
           error: (error) => this.errorHandler.handleServerError(error.error)
         });
     }

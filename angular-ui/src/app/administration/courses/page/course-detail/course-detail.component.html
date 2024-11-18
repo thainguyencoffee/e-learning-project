@@ -31,7 +31,8 @@
           </span>
           <span *ngIf="!isCreateByYou(courseDto.teacher)">{{ courseDto.teacher }}</span>
         </p>
-        <p><strong>Participant: {{participantNumber}} - <a [routerLink]="['/administration/enrolment-statistics', courseDto.id]">Enrolment statistic</a></strong></p>
+        <p><strong>Participant: {{ participantNumber }} - <a
+          [routerLink]="['/administration/enrolment-statistics', courseDto.id]">Enrolment statistic</a></strong></p>
         <p><strong>Description: </strong> {{ courseDto.description || 'No description available' }}</p>
         <p><strong>Language: </strong> <span class="fw-bold">{{ courseDto.language }}</span></p>
         <p><strong>Price: </strong> {{ courseDto.price || 'Price not available' }}</p>
@@ -72,7 +73,8 @@
           <li *ngFor="let prerequisite of courseDto?.prerequisites" class="list-group-item">
             {{ prerequisite }}
           </li>
-          <li *ngIf="!courseDto?.prerequisites?.length" class="list-group-item text-muted">No prerequisites available</li>
+          <li *ngIf="!courseDto?.prerequisites?.length" class="list-group-item text-muted">No prerequisites available
+          </li>
         </ul>
       </div>
     </div>
@@ -98,73 +100,108 @@
   </section>
   <!--Section-->
   <section id="sections" class="p-4 border rounded mb-4 bg-white">
-    <h2 class="mb-4 border-bottom pb-2">Sections</h2>
-    <!--Section-->
-  <div class="accordion mt-4" id="courseSections">
-    <div *ngFor="let section of courseDto.sections; let i = index" class="accordion-item mb-3 border rounded">
-      <!-- Accordion Header -->
-      <h2 class="accordion-header" [attr.id]="'heading' + section.id">
-        <div class="d-flex align-items-center justify-content-between px-3 py-2">
-          <!-- Title và nút collapse -->
-          <span class="badge bg-primary me-2">{{ section.lessons.length }} Lesson</span>
-          <button
-            class="accordion-button collapsed bg-light text-dark fw-bold p-0 me-3"
-            type="button"
-            data-bs-toggle="collapse"
-            [attr.data-bs-target]="'#collapse' + section.id"
-            aria-expanded="false"
-            [attr.aria-controls]="'collapse' + section.id"
-          >
-            <span>{{ section.orderIndex + '-' + section.title }}</span>
-          </button>
+    <h2 class="mb-4 border-bottom pb-2 ">Course Sections</h2>
 
-          <!-- Badge và nhóm button -->
-          <div class="d-flex align-items-center">
-            <div class="d-flex gap-2">
-              <a [routerLink]="['/administration/courses/', currentId, 'sections', section.id]"
-                 class="btn btn-secondary btn-sm custom-button">View Detail</a>
-              <a *ngIf="isEditable()"
-                 [routerLink]="['/administration/courses', currentId, 'sections', 'edit', section.id]"
-                 class="btn btn-secondary btn-sm custom-button">Edit</a>
-              <a *ngIf="isEditable()"
-                 [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'add']"
-                 class="btn btn-secondary btn-sm custom-button">Add Lesson</a>
-              <button *ngIf="isEditable()"
-                      type="button"
-                      (click)="confirmDeleteSection(section.id, section)"
-                      class="btn btn-secondary btn-sm custom-button">Delete</button>
+    <div *ngIf="courseDto.sections && courseDto.sections.length > 0; else noSections" class="d-flex">
+      <!-- Section List -->
+      <div class="card w-25 border-0 shadow">
+        <div class="card-header bg-primary text-white fw-bold">Sections</div>
+        <ul class="list-group list-group-flush">
+          <li
+            *ngFor="let section of courseDto.sections; let i = index"
+            (click)="selectSection(section)"
+            [class.active]="selectedSection?.id === section.id"
+            class="list-group-item d-flex justify-content-between align-items-center cursor-pointer">
+            <div>
+<!--                            <span class="badge bg-info me-2">{{ section.lessons.length }} Lessons</span>-->
+              <span
+                class="fw-semibold text-truncate d-inline-block"
+                style="max-width: 150px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                [title]="section.title">
+                {{ section.orderIndex }} - {{ section.title }}
+              </span>
             </div>
+            <!-- Dropdown for Actions -->
+            <div class="dropdown">
+              <button
+                class="btn btn-sm btn-light border-0"
+                type="button"
+                id="dropdownMenuButton{{ i }}"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="bi bi-three-dots"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" [attr.aria-labelledby]="'dropdownMenuButton' + i">
+                <li>
+                  <a *ngIf="isEditable()"
+                     [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'add']"
+                     class="dropdown-item">
+                    <i class="bi  me-2"></i>Add Lesson
+                  </a>
+                </li>
+                <li>
+                  <a *ngIf="isEditable()"
+                     [routerLink]="['/administration/courses', currentId, 'sections', 'edit', section.id]"
+                     class="dropdown-item">
+                    <i class="bi  me-2"></i>Edit Section
+                  </a>
+                </li>
+                <li>
+                  <button *ngIf="isEditable()"
+                          class="dropdown-item text-danger"
+                          (click)="confirmDeleteSection(section.id, section)">
+                    <i class="bi  me-2"></i>Delete Section
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Lesson List -->
+      <div class="ms-4 w-75">
+        <div *ngIf="selectedSection" class="card border-0 shadow">
+          <div class="card-header bg-primary text-white fw-bold">
+            {{ selectedSection.title }}
           </div>
-        </div>
-      </h2>
-      <!-- Accordion Content -->
-      <div
-        [attr.id]="'collapse' + section.id"
-        class="accordion-collapse collapse"
-        [attr.aria-labelledby]="'heading' + section.id"
-        data-bs-parent="#courseSections"
-      >
-        <div class="accordion-body border-top">
-          <ul class="list-group border-0">
-            <li *ngFor="let lesson of section.lessons; let j = index"
-                class="list-group-item d-flex justify-content-between align-items-center border-0">
-              <span class="fw-bold">{{ lesson.orderIndex }}. {{ lesson.title }}</span>
-              <a [href]="lesson.link" target="_blank" class="btn btn-outline-success custom-button">
-                View content
-              </a>
-              <a *ngIf="isEditable()"
-                 [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'edit', lesson.id]"
-                 class="btn btn-secondary btn-sm custom-button">Edit</a>
-              <button *ngIf="isEditable()"
-                      type="button"
-                      (click)="confirmDeleteLesson(section.id, lesson.id, lesson)"
-                      class="btn btn-secondary btn-sm custom-button">Delete</button>
+          <ul class="list-group list-group-flush">
+            <li *ngFor="let lesson of selectedSection.lessons; let j = index"
+                class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <i class="bi text-primary me-2"></i>
+                <span class="fw-semibold">{{ lesson.orderIndex }}. {{ lesson.title }}</span>
+              </div>
+              <div class="d-flex gap-2">
+                <a [href]="lesson.link" target="_blank" class="btn btn-secondary btn-sm">
+                  <i class="bi me-1"></i>View
+                </a>
+                <a *ngIf="isEditable()"
+                   [routerLink]="['/administration/courses', currentId, 'sections', selectedSection.id, 'lessons', 'edit', lesson.id]"
+                   class="btn btn-secondary btn-sm">
+                  <i class="bi me-1"></i>Edit
+                </a>
+                <button *ngIf="isEditable()"
+                        type="button"
+                        class="btn btn-secondary btn-sm"
+                        (click)="confirmDeleteLesson(selectedSection.id, lesson.id, lesson)">
+                  <i class="bi  me-1"></i>Delete
+                </button>
+              </div>
             </li>
           </ul>
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- Template to Show No Sections Found -->
+    <ng-template #noSections>
+      <div class="text-center py-4">
+        <p class="text-muted fs-5">No Sections could be found.</p>
+      </div>
+    </ng-template>
   </section>
+
 </div>
 

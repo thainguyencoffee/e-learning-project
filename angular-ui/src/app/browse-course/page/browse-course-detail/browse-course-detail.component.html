@@ -1,68 +1,94 @@
-<div class="container mt-5 p-4 border rounded shadow-sm bg-light">
-  <h1 class="mb-4 text-center text-primary">Title: {{ course?.title }}</h1>
-  <p><strong>Teacher</strong>: {{ course?.teacher }}</p>
-  <p><strong>Price</strong>:{{ course?.price}}</p>
-  <p>{{ course?.description }}</p>
-  <div class="row mb-4">
-    <div class="col-md-4">
-      <div class="p-3 border rounded bg-white">
-        <h5>Subtitles</h5>
-        <ul class="list-group">
-          <li class="list-group-item">
-            {{course?.subtitles?.join(', ') || 'N/A' }}
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="p-3 border rounded bg-white">
-        <h5>Benefits</h5>
-        <ul class="list-group">
-          <li class="list-group-item">
-            {{ course?.benefits?.join(', ') || 'N/A' }}
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="p-3 border rounded bg-white">
-        <h5>Prerequisites</h5>
-        <ul class="list-group">
-          <li class="list-group-item">
-            {{ course?.prerequisites?.join(', ') || 'N/A' }}
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <div *ngIf="!isAuthenticated; else loggedIn">
-    <div class="alert alert-info mt-4" role="alert">
-      <h4 class="alert-heading">You are not logged in!</h4>
-      <p>Please log in to access the course and other features.</p>
-      <app-login></app-login>
-    </div>
-  </div>
-  <ng-template #loggedIn>
-  <div *ngIf="enrolment" class="alert alert-success" role="alert">
-    <h4 class="alert-heading">Congratulations! You </h4>
-    <p>You can start learning right now. Here is your course information:</p>
-    <ul>
-      <li>Course Name: <strong>{{ course?.title }}</strong></li>
-      <li>Teacher: <strong>{{ course?.teacher }}</strong></li>
-    </ul>
-    <a [routerLink]="['/enrolments', enrolment.id, 'overview']" class="btn btn-primary">Start Learning</a>
-  </div>
+<div class="container mt-5 p-5 border rounded shadow-lg bg-light">
+  <!-- Tiêu đề khóa học -->
+  <h1 class="mb-4 text-center text-primary font-weight-bold"></h1>
 
-  <div *ngIf="!enrolment" class="alert alert-warning" role="alert">
-    <h4 class="alert-heading">You have not purchased this course!</h4>
-    <p>To start learning, please purchase the course now to gain valuable knowledge.</p>
-    <ul>
-      <li>Course Name: <strong>{{ course?.title }}</strong></li>
-      <li>Teacher: <strong>{{ course?.teacher }}</strong></li>
-      <li>Price: <strong>{{ course?.price }}</strong></li>
-    </ul>
-    <a [routerLink]="['/checkout', course?.id]" class="btn btn-success">Buy Now</a>
+  <!-- Phần đầu tiên -->
+  <div class="row ">
+    <h1 class="mb-4 font-weight-bold text-primary">
+      {{ course?.title }}
+    </h1>
+
+    <div class="col-md-6">
+
+
+      <p class="text-dark mb-3">{{ course?.description }}</p>
+      <p class="text-muted"><strong>Teacher:</strong> {{ course?.teacher }}</p>
+
+      <div class="mt-4">
+        <div>
+          <!-- Lợi ích -->
+          <h5 class="font-weight-bold border-bottom pb-2 mb-3 ">Benefit</h5>
+          <ul class="list-group">
+            <li class="list-group-item">
+              {{ course?.benefits?.join(', ') || 'N/A' }}
+            </li>
+          </ul>
+        </div>
+
+        <div class="mt-4">
+          <!-- Yêu cầu đầu vào -->
+          <h5 class="font-weight-bold border-bottom pb-2 mb-3 ">Prerequisites</h5>
+
+          <ul class="list-group">
+            <li class="list-group-item">
+              {{ course?.prerequisites?.join(', ') || 'N/A' }}
+            </li>
+          </ul>
+        </div>
+
+        <div class="mt-4">
+          <!-- Phụ đề -->
+          <h5 class="font-weight-bold border-bottom pb-2 mb-3 ">Subtitles</h5>
+
+          <ul class="list-group">
+            <li class="list-group-item">
+              {{ course?.subtitles?.join(', ') || 'N/A' }}
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Cột phải: Thẻ Card -->
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0 mb-4">
+        <img
+          [src]="course?.thumbnailUrl || 'https://placehold.co/600x400/000000/FFF?text=No+Image'"
+          class="card-img-top"
+          alt="Course Thumbnail"
+          style="height: 400px; object-fit: cover; border-radius: 8px;">
+        <div class="card-body">
+          <h5 class="card-title text-success font-weight-bold">
+            {{ course?.price }}
+          </h5>
+          <ng-container *ngIf="!isAuthenticated; else loggedIn">
+            <div class="alert alert-info mt-3" role="alert">
+              <h6 class="alert-heading">You are not logged in!</h6>
+              <p>Please log in to access the course and other features.</p>
+              <app-login></app-login>
+            </div>
+          </ng-container>
+
+          <ng-template #loggedIn>
+            <div *ngIf="enrolment" class="alert alert-success mt-3" role="alert">
+              <h6 class="alert-heading">Congratulations!</h6>
+              <p>You can start learning right now.</p>
+              <a [routerLink]="['/enrolments', enrolment.id, 'overview']" class="btn btn-primary btn-block">
+                Start Learning
+              </a>
+            </div>
+
+            <div *ngIf="!enrolment" class="alert alert-warning mt-3" role="alert">
+              <h6 class="alert-heading">You have not purchased this course!</h6>
+              <p>To start learning, please purchase the course.</p>
+              <a [routerLink]="['/checkout', course?.id]" class="btn btn-success btn-block">
+                Buy Now
+              </a>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
   </div>
-  </ng-template>
 </div>
-
