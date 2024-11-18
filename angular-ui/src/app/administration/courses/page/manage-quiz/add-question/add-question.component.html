@@ -1,0 +1,19 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Add Question</h1>
+  <div>
+    <a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes']"
+       class="btn btn-secondary">Back to quiz manage</a>
+  </div>
+</div>
+
+<form [formGroup]="addForm" (ngSubmit)="handleSubmit()">
+  <app-input-row [group]="addForm" field="content" label="Content" rowType="textarea" />
+  <app-input-row [group]="addForm" field="type" label="Type" rowType="select" [options]="questionTypesMap" />
+  <app-array-row [group]="addForm" field="options" label="Answer Options"
+                        [groupConfiguration]="optionGroupConfiguration"
+                        [addItem]="addAnswerOption.bind(this)"
+                        [removeItem]="removeAnswerOption.bind(this)">
+  </app-array-row>
+  <app-input-row [group]="addForm" field="score" label="Score" rowType="number" />
+  <input type="submit" value="Add Question" class="btn btn-primary mt-4" />
+</form>

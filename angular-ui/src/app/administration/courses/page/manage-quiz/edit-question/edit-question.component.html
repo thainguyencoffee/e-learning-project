@@ -1,0 +1,20 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Update Question</h1>
+  <div>
+    <a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes']"
+       class="btn btn-secondary">Back to quiz manage</a>
+  </div>
+</div>
+
+<form [formGroup]="editForm" (ngSubmit)="handleSubmit()">
+  <app-input-row [group]="editForm" field="id" label="Id" rowType="number" />
+  <app-input-row [group]="editForm" field="content" label="Content" rowType="textarea" />
+  <app-input-row [group]="editForm" field="type" label="Type" rowType="select" [options]="questionTypesMap" />
+  <app-array-row [group]="editForm" field="options" label="Answer Options"
+                        [groupConfiguration]="optionGroupConfiguration"
+                        [addItem]="addAnswerOption.bind(this)"
+                        [removeItem]="removeAnswerOption.bind(this)">
+  </app-array-row>
+  <app-input-row [group]="editForm" field="score" label="Score" rowType="number" />
+  <input type="submit" value="Update Question" class="btn btn-primary mt-4" />
+</form>

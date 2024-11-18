@@ -1,0 +1,15 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Edit Quiz</h1>
+  <div>
+    <a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes']"
+       class="btn btn-secondary">Back to quiz manage</a>
+  </div>
+</div>
+
+<form [formGroup]="editForm" (ngSubmit)="handleSubmit()">
+  <app-input-row [group]="editForm" field="id" rowType="number" label="Id"/>
+  <app-input-row [group]="editForm" field="title" label="Title" />
+  <app-input-row [group]="editForm" rowType="textarea" field="description" label="Description" />
+  <app-input-row [group]="editForm" field="passScorePercentage" label="Pass Score Percentage" rowType="number" />
+  <input type="submit" value="Update Quiz" class="btn btn-primary mt-4" />
+</form>
