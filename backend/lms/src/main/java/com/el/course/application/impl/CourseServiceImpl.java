@@ -378,9 +378,9 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public QuizCalculationResult calculateQuizScore(Long courseId, Long quizId, Map<Long, Set<Long>> answers) {
+    public QuizCalculationResult calculateQuizScore(Long courseId, Long quizId, Map<Long, Object> userAnswers) {
         Course course = courseQueryService.findCourseById(courseId);
-        return course.calculateQuiz(quizId, answers);
+        return course.calculateQuiz(quizId, userAnswers);
     }
 
     @Override

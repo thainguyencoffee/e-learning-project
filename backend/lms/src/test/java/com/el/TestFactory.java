@@ -295,7 +295,8 @@ public class TestFactory {
                 2,
                 Set.of(new AnswerOption("Answer 1", true),
                         new AnswerOption("Answer 2", false),
-                        new AnswerOption("Answer 3", false))
+                        new AnswerOption("Answer 3", false)),
+                null
         );
     }
 
@@ -319,15 +320,16 @@ public class TestFactory {
                         new AnswerOptionDTO("Answer 2", false),
                         new AnswerOptionDTO("Answer 3", false),
                         new AnswerOptionDTO("Answer 4", false)),
-                2
+                2,
+                null
         );
     }
 
     public static QuizSubmitDTO createQuizSubmitDTO() {
         return new QuizSubmitDTO(
                 1L,
-                Set.of(new QuestionSubmitDTO(QuestionType.SINGLE_CHOICE, 1L, Set.of(1L)),
-                        new QuestionSubmitDTO(QuestionType.TRUE_FALSE, 2L, Set.of(4L))
+                Set.of(new QuestionSubmitDTO(QuestionType.SINGLE_CHOICE, 1L, Set.of(1L), null),
+                        new QuestionSubmitDTO(QuestionType.TRUE_FALSE, 2L, null, true)
                 ));
     }
 

@@ -1,6 +1,7 @@
 package com.el.enrollment.application.dto;
 
 import com.el.common.ValidateMessages;
+import com.el.course.domain.QuestionType;
 import com.el.enrollment.domain.QuizAnswer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
@@ -19,9 +20,17 @@ public record QuizSubmitDTO(
 ) {
 
         @JsonIgnore
-        public Map<Long, Set<Long>> getAnswers() {
+        public Map<Long, Object> getAnswers() {
                 return questions.stream()
-                        .collect(HashMap::new, (map, question) -> map.put(question.questionId(), question.answerOptionIds()), Map::putAll);
+                        .collect(HashMap::new, (map, question) -> {
+                                if (question.type() == QuestionType.TRUE_FALSE) {
+                                        if (question.trueFalseAnswer() != null) {
+                                                map.put(question.questionId(), question.trueFalseAnswer());
+                                        }
+                                } else {
+                                        map.put(question.questionId(), question.answerOptionIds());
+                                }
+                        }, Map::putAll);
         }
 
         @JsonIgnore

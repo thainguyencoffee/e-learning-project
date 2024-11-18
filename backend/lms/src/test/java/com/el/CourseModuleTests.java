@@ -1368,11 +1368,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         assertThat(questionId).isNotNull();
 
         // Act: Update question
-        QuestionDTO updateQuestionDTO = new QuestionDTO("New content (Update)", QuestionType.TRUE_FALSE,
-                Set.of(
-                        new AnswerOptionDTO("True answer", true),
-                        new AnswerOptionDTO("False answer", false)
-                ), 3);
+        QuestionDTO updateQuestionDTO = new QuestionDTO("New content (Update)", QuestionType.TRUE_FALSE,null, 3, true);
 
         webTestClient.put().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/questions/{questionId}", course.getId(), sectionId, quizId, questionId)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
@@ -1394,7 +1390,8 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
                 .jsonPath("$.questions[0].id").isEqualTo(questionId)
                 .jsonPath("$.questions[0].content").isEqualTo(updateQuestionDTO.content())
                 .jsonPath("$.questions[0].type").isEqualTo(updateQuestionDTO.type().name())
-                .jsonPath("$.questions[0].options.length()").isEqualTo(2)
+                .jsonPath("$.questions[0].options.length()").isEqualTo(0)
+                .jsonPath("$.questions[0].trueFalseAnswer").isEqualTo(updateQuestionDTO.trueFalseAnswer())
                 .jsonPath("$.questions[0].score").isEqualTo(updateQuestionDTO.score());
     }
 

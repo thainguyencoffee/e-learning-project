@@ -1549,7 +1549,7 @@ class CourseTests {
             Question anotherQuestion = new Question(question.getContent(), QuestionType.SINGLE_CHOICE, 2,
                     Set.of(new AnswerOption("Answer 1", true),
                             new AnswerOption("Answer 2", false),
-                            new AnswerOption("Answer 3", false)));
+                            new AnswerOption("Answer 3", false)), null);
 
             course.addQuestionToQuizInSection(1L, 1L, anotherQuestion);
         }, "Should throw InputInvalidException when trying to add question with existing content.").getMessage();
@@ -1574,7 +1574,7 @@ class CourseTests {
             Question question = new Question("Question content 1", QuestionType.SINGLE_CHOICE, -1,
                     Set.of(new AnswerOption("Answer 1", true),
                             new AnswerOption("Answer 2", false),
-                            new AnswerOption("Answer 3", false)));
+                            new AnswerOption("Answer 3", false)), null);
 
             course.addQuestionToQuizInSection(1L, 1L, question);
         }, "Should throw InputInvalidException when trying to add question with invalid score.").getMessage();
@@ -1583,7 +1583,7 @@ class CourseTests {
             Question question = new Question("Question content 2", QuestionType.SINGLE_CHOICE, 6,
                     Set.of(new AnswerOption("Answer 1", true),
                             new AnswerOption("Answer 2", false),
-                            new AnswerOption("Answer 3", false)));
+                            new AnswerOption("Answer 3", false)), null);
 
             course.addQuestionToQuizInSection(1L, 1L, question);
         }, "Should throw InputInvalidException when trying to add question with invalid score.").getMessage();
@@ -1610,20 +1610,20 @@ class CourseTests {
                     Set.of(new AnswerOption("Answer 1", true),
                             new AnswerOption("Answer 2", true),
                             new AnswerOption("Answer 3", false),
-                            new AnswerOption("Answer 4", false)));
+                            new AnswerOption("Answer 4", false)), null);
 
             course.addQuestionToQuizInSection(1L, 1L, question);
         }, "Should throw InputInvalidException when trying to add question single choice but has two correct options.").getMessage();
 
         String msgForCase2 = assertThrows(InputInvalidException.class, () -> {
             Question question = new Question("Question content 2", QuestionType.SINGLE_CHOICE, 2,
-                    Set.of(new AnswerOption("Answer 1", true)));
+                    Set.of(new AnswerOption("Answer 1", true)), null);
 
             course.addQuestionToQuizInSection(1L, 1L, question);
         }, "Should throw InputInvalidException when trying to add question with one answer option.").getMessage();
 
         assertEquals("A single choice question must have exactly 1 correct option.", msgForCase1);
-        assertEquals("A single choice question must have at least 2 options.", msgForCase2);
+        assertEquals("Question must have at least 2 options.", msgForCase2);
     }
 
     @Test
@@ -1641,23 +1641,15 @@ class CourseTests {
         // Act & Assert
         String msgForCase1 = assertThrows(InputInvalidException.class, () -> {
             Question question = new Question("Question content 1", QuestionType.MULTIPLE_CHOICE, 2,
-                    Set.of(new AnswerOption("Answer 1", true),
+                    Set.of(new AnswerOption("Answer 1", false),
                             new AnswerOption("Answer 2", false),
                             new AnswerOption("Answer 3", false),
-                            new AnswerOption("Answer 4", false)));
+                            new AnswerOption("Answer 4", false)), null);
 
             course.addQuestionToQuizInSection(1L, 1L, question);
-        }, "Should throw InputInvalidException when trying to add question multiple choice but has one correct option.").getMessage();
+        }, "Should throw InputInvalidException when trying to add question multiple/single choice but has zero correct option.").getMessage();
 
-        String msgForCase2 = assertThrows(InputInvalidException.class, () -> {
-            Question question = new Question("Question content 2", QuestionType.MULTIPLE_CHOICE, 2,
-                    Set.of(new AnswerOption("Answer 1", true)));
-
-            course.addQuestionToQuizInSection(1L, 1L, question);
-        }, "Should throw InputInvalidException when trying to add question with one answer option.").getMessage();
-
-        assertEquals("A multiple choice question must have at least 2 correct options.", msgForCase1);
-        assertEquals("A multiple choice question must have at least 2 options.", msgForCase2);
+        assertEquals("Question must have at least 1 correct option.", msgForCase1);
     }
 
     @Test
@@ -1674,22 +1666,12 @@ class CourseTests {
 
         // Act & Assert
         String msgForCase1 = assertThrows(InputInvalidException.class, () -> {
-            Question question = new Question("Question content 1", QuestionType.TRUE_FALSE, 2,
-                    Set.of(new AnswerOption("True", true),
-                            new AnswerOption("False", true)));
+            Question question = new Question("Question content 1", QuestionType.TRUE_FALSE, 2, null, null);
 
             course.addQuestionToQuizInSection(1L, 1L, question);
-        }, "Should throw InputInvalidException when trying to add question true false but has two correct options.").getMessage();
+        }, "Should throw InputInvalidException when trying to add question true false but not decide true or false.").getMessage();
 
-        String msgForCase2 = assertThrows(InputInvalidException.class, () -> {
-            Question question = new Question("Question content 2", QuestionType.TRUE_FALSE, 2,
-                    Set.of(new AnswerOption("True", true)));
-
-            course.addQuestionToQuizInSection(1L, 1L, question);
-        }, "Should throw InputInvalidException when trying to add question with one answer option.").getMessage();
-
-        assertEquals("A true/false question must have exactly 1 correct option.", msgForCase1);
-        assertEquals("A true/false question must have exactly 2 options.", msgForCase2);
+        assertEquals("True/False question must define the option is true or false.", msgForCase1);
     }
 
     @Test
@@ -1717,7 +1699,7 @@ class CourseTests {
                         new AnswerOption("Answer 2", false),
                         new AnswerOption("Answer 3", true),
                         new AnswerOption("Answer 4", false),
-                        new AnswerOption("Answer 5", false)));
+                        new AnswerOption("Answer 5", false)), null);
         course.updateQuestionInQuizInSection(1L, 1L, question.getId(), updatedQuestionContent);
 
         // Assert
@@ -1758,7 +1740,7 @@ class CourseTests {
                             new AnswerOption("Answer 2", false),
                             new AnswerOption("Answer 3", true),
                             new AnswerOption("Answer 4", false),
-                            new AnswerOption("Answer 5", false)));
+                            new AnswerOption("Answer 5", false)), null);
             course.updateQuestionInQuizInSection(1L, 1L, 999L, updatedQuestionContent);
         }, "Should throw ResourceNotFoundException when question not found.");
 
@@ -1791,7 +1773,7 @@ class CourseTests {
                             new AnswerOption("Answer 2", false),
                             new AnswerOption("Answer 3", true),
                             new AnswerOption("Answer 4", false),
-                            new AnswerOption("Answer 5", false)));
+                            new AnswerOption("Answer 5", false)), null);
             course.updateQuestionInQuizInSection(1L, 1L, question.getId(), updatedQuestionContent);
         }, "Should throw InputInvalidException when trying to update question in a published course.").getMessage();
 
@@ -1831,7 +1813,7 @@ class CourseTests {
                             new AnswerOption("Answer 2", false),
                             new AnswerOption("Answer 3", true),
                             new AnswerOption("Answer 4", false),
-                            new AnswerOption("Answer 5", false)));
+                            new AnswerOption("Answer 5", false)), null);
             course.updateQuestionInQuizInSection(1L, 1L, question.getId(), updatedQuestionContent);
         }, "Should throw InputInvalidException when trying to update question with existing content.").getMessage();
 
@@ -1890,20 +1872,18 @@ class CourseTests {
         AnswerOption answerOption1 = spyAnswerOption(new AnswerOption("Answer 1", true), 1);
         AnswerOption answerOption2 = spyAnswerOption(new AnswerOption("Answer 2", false), 2);
         AnswerOption answerOption3 = spyAnswerOption(new AnswerOption("Answer 3", false), 3);
-        Question question1 = spy(new Question("Question 1", QuestionType.SINGLE_CHOICE, 2, Set.of(answerOption1, answerOption2, answerOption3)));
+        Question question1 = spy(new Question("Question 1", QuestionType.SINGLE_CHOICE, 2, Set.of(answerOption1, answerOption2, answerOption3), null));
         when(question1.getId()).thenReturn(1L);
         course.addQuestionToQuizInSection(1L, 1L, question1);
 
-        AnswerOption answerOption4 = spyAnswerOption(new AnswerOption("Answer 1", true), 4);
-        AnswerOption answerOption5 = spyAnswerOption(new AnswerOption("Answer 2", false), 5);
-        Question question2 = spy(new Question("Question 2", QuestionType.TRUE_FALSE, 3, Set.of(answerOption4, answerOption5)));
+        Question question2 = spy(new Question("Question 2", QuestionType.TRUE_FALSE, 3, null, true));
         when(question2.getId()).thenReturn(2L);
         course.addQuestionToQuizInSection(1L, 1L, question2);
 
         AnswerOption answerOption6 = spyAnswerOption(new AnswerOption("Answer 1", true), 6);
         AnswerOption answerOption7 = spyAnswerOption(new AnswerOption("Answer 2", false), 7);
         AnswerOption answerOption8 = spyAnswerOption(new AnswerOption("Answer 3", true), 8);
-        Question question3 = spy(new Question("Question 3", QuestionType.MULTIPLE_CHOICE, 4, Set.of(answerOption6, answerOption7, answerOption8)));
+        Question question3 = spy(new Question("Question 3", QuestionType.MULTIPLE_CHOICE, 4, Set.of(answerOption6, answerOption7, answerOption8), null));
         when(question3.getId()).thenReturn(3L);
         course.addQuestionToQuizInSection(1L, 1L, question3);
 
@@ -1918,7 +1898,7 @@ class CourseTests {
         QuizCalculationResult result = course.calculateQuiz(1L, new HashMap<>(
                 Map.of(
                         1L, Set.of(1L),
-                        2L, Set.of(4L),
+                        2L, true,
                         3L, Set.of(6L, 7L)
                 )
         ));
@@ -1934,7 +1914,7 @@ class CourseTests {
             course.calculateQuiz(1L, new HashMap<>(
                     Map.of(
                             1L, Set.of(1L, 2L), // question with id = 1 is single choice, but input answer has 2 answer
-                            2L, Set.of(4L),
+                            2L, true,
                             3L, Set.of(6L, 7L, 8L)
                     )
             ));
@@ -1944,14 +1924,14 @@ class CourseTests {
             course.calculateQuiz(1L, new HashMap<>(
                     Map.of(
                             1L, Set.of(1L),
-                            2L, Set.of(4L, 5L), // question with id = 2 is true false, but input answer has 2 answer
+                            2L, Set.of(4L, 5L), // question with id = 2 is true/false, but input answer is not boolean
                             3L, Set.of(6L, 7L, 8L)
                     )
             ));
         }).getMessage();
 
         assertEquals("Quiz calculation error: Single choice question must have exactly one answer.", msgCase1);
-        assertEquals("Quiz calculation error: Single choice question must have exactly one answer.", msgCase2);
+        assertEquals("Quiz calculation error: User answer for true/false must be boolean type.", msgCase2);
     }
 
     AnswerOption spyAnswerOption(AnswerOption answerOption, long id) {
