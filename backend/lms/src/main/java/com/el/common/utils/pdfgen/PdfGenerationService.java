@@ -15,7 +15,7 @@ import java.io.ByteArrayOutputStream;
 @Slf4j
 public class PdfGenerationService {
 
-    public static byte[] generatePdfFromCertificate(Certificate certificate) {
+    public static byte[] generatePdfFromCertificate(Certificate certificate, byte[] background) {
 
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             PdfWriter writer = new PdfWriter(out);
@@ -24,9 +24,8 @@ public class PdfGenerationService {
 
             document.setMargins(50, 50, 50, 50);
 
-            String imagePath = "src/main/resources/certificate-background.jpg";
-            Image bgImage = new Image(ImageDataFactory.create(imagePath)).scaleToFit(900, 300);
-            bgImage.setFixedPosition(95, 500); // Adjust the position of the background image
+            Image bgImage = new Image(ImageDataFactory.create(background)).scaleToFit(900, 300);
+            bgImage.setFixedPosition(95, 500);
             document.add(bgImage);
 
             document.add(new Paragraph(certificate.getFullName())

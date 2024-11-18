@@ -22,7 +22,9 @@
 
         @Override
         public void createCertUrl(Certificate certificate) {
-            byte[] pdfContent = PdfGenerationService.generatePdfFromCertificate(certificate);
+            String backgroundUrl = "https://bookstore-bucket.sgp1.digitaloceanspaces.com/assets/certificate-background.jpg";
+            byte[] background = awsS3UploadService.downloadFile(backgroundUrl);
+            byte[] pdfContent = PdfGenerationService.generatePdfFromCertificate(certificate, background);
             byte[] signedPdf = pdfSignerService.signPdf(pdfContent);
 
             String url = awsS3UploadService.uploadFile(signedPdf, generateFileName(certificate), "pdf", false);

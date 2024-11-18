@@ -36,7 +36,7 @@ class CertificateServiceS3StorageTests {
                 TestFactory.user, 1L, "Course Title", TestFactory.teacher);
 
         // Mock service
-        mockStatic(PdfGenerationService.class).when(() -> PdfGenerationService.generatePdfFromCertificate(any(Certificate.class)))
+        mockStatic(PdfGenerationService.class).when(() -> PdfGenerationService.generatePdfFromCertificate(any(Certificate.class), any()))
                 .thenReturn(new byte[]{1, 2, 3});
         when(pdfSignerService.signPdf(any(byte[].class))).thenReturn(new byte[]{1, 2, 3});
         // Mock AWS S3 upload
