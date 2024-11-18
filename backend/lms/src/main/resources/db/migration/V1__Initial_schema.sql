@@ -90,6 +90,16 @@ create table answer_option
     constraint fk_answer_option primary key (id)
 );
 
+create table review (
+    id          bigserial    not null,
+    course      bigint       not null references course (id) on DELETE cascade,
+    username    varchar(50)  not null,
+    rating      int          not null,
+    comment     varchar(500) not null ,
+    review_date timestamp    not null,
+    constraint fk_review primary key (id)
+);
+
 create table discount
 (
     id                 bigserial   not null,
