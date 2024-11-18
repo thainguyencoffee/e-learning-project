@@ -408,8 +408,8 @@
   "users" : [ {
     "id" : "fc23d891-5df9-4fbf-a063-6d77c11f884a",
     "username" : "boss",
-    "firstName" : "boss",
-    "lastName" : "nguyen",
+    "firstName" : "Olivia",
+    "lastName" : "Rodrigo",
     "email" : "nguyennt110320043@gmail.com",
     "emailVerified" : true,
     "createdTimestamp" : 1728052153673,
@@ -426,28 +426,6 @@
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
     "realmRoles" : [ "default-roles-keycloak101", "admin" ],
-    "notBefore" : 0,
-    "groups" : [ ]
-  }, {
-    "id" : "8ea27f15-4e84-49ab-ac04-ebdae6cad412",
-    "username" : "nguyennt11032004@gmail.com2",
-    "firstName" : "awefwef",
-    "lastName" : "awegfwaeg",
-    "email" : "nguyennt11032004@gmail.com2",
-    "emailVerified" : false,
-    "createdTimestamp" : 1731907742170,
-    "enabled" : true,
-    "totp" : false,
-    "credentials" : [ {
-      "id" : "62504ec9-0c34-477c-90ff-b6f4f17e96d4",
-      "type" : "password",
-      "createdDate" : 1731907742452,
-      "secretData" : "{\"value\":\"GNUnEVztLPjB1xjTXxwHbvvra+vqAmS0yhLG2buvZIRWOUXdLmf32cSEhC+eIphvCZYxQAaERkJyCyXQEOAivA==\",\"salt\":\"rIBb9Y/Scobc7SSP0SaMkQ==\",\"additionalParameters\":{}}",
-      "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
-    } ],
-    "disableableCredentialTypes" : [ ],
-    "requiredActions" : [ ],
-    "realmRoles" : [ "default-roles-keycloak101" ],
     "notBefore" : 0,
     "groups" : [ ]
   }, {
@@ -470,8 +448,8 @@
   }, {
     "id" : "9db2e8a4-ca81-43ca-bfb4-bef6fa9e0844",
     "username" : "teacher",
-    "firstName" : "teacher",
-    "lastName" : "nguyen",
+    "firstName" : "Céline",
+    "lastName" : "Dion",
     "email" : "nguyennt110320042@gmail.com",
     "emailVerified" : true,
     "createdTimestamp" : 1728052117146,
@@ -491,10 +469,32 @@
     "notBefore" : 0,
     "groups" : [ ]
   }, {
+    "id" : "7e9b5332-e61e-4733-8e3d-cd0579f54dad",
+    "username" : "teacher2",
+    "firstName" : "Michael",
+    "lastName" : "Jackson",
+    "email" : "nguyenntph33935@fpt.edu.vn",
+    "emailVerified" : true,
+    "createdTimestamp" : 1731914819937,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "b0b50679-d123-4aa3-ae98-866eed8a20aa",
+      "type" : "password",
+      "createdDate" : 1731915460942,
+      "secretData" : "{\"value\":\"axjiwplK7lnIcrpWS3X3qJCaCKyTIV1k/xTbFCzJ81rPJHnxKG/fiCRCj6MAxOPSgvGpECuatbRfFTWzH1o+Lw==\",\"salt\":\"Wl1UdAjkry8V05p3vdH1pA==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-keycloak101" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
     "id" : "b75ab7d9-86c7-4cce-a81b-1e4e33036b0a",
     "username" : "user",
-    "firstName" : "nguyen",
-    "lastName" : "thai",
+    "firstName" : "Britney",
+    "lastName" : "Spears",
     "email" : "nguyennt11032004@gmail.com",
     "emailVerified" : true,
     "createdTimestamp" : 1728052086709,
@@ -1319,7 +1319,24 @@
     "xXSSProtection" : "1; mode=block",
     "strictTransportSecurity" : "max-age=31536000; includeSubDomains"
   },
-  "smtpServer" : { },
+  "smtpServer" : {
+    "replyToDisplayName" : "",
+    "starttls" : "true",
+    "auth" : "true",
+    "envelopeFrom" : "",
+    "ssl" : "false",
+    "password" : "jobp bowr xqxb nlcs",
+    "port" : "587",
+    "host" : "smtp.gmail.com",
+    "replyTo" : "",
+    "from" : "nguyennt11032004@gmail.com",
+    "fromDisplayName" : "",
+    "user" : "nguyennt11032004@gmail.com"
+  },
+  "loginTheme" : "keycloak",
+  "accountTheme" : "keycloak.v3",
+  "adminTheme" : "keycloak.v2",
+  "emailTheme" : "",
   "eventsEnabled" : false,
   "eventsListeners" : [ "jboss-logging" ],
   "enabledEventTypes" : [ ],
@@ -1335,7 +1352,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-usermodel-property-mapper", "oidc-address-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-full-name-mapper", "oidc-usermodel-attribute-mapper", "saml-user-attribute-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-attribute-mapper", "oidc-full-name-mapper", "oidc-usermodel-property-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-address-mapper", "saml-user-attribute-mapper" ]
       }
     }, {
       "id" : "02c4a486-c98c-4fcd-8b86-2f38a6632506",
@@ -1362,7 +1379,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "saml-user-property-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-property-mapper", "oidc-full-name-mapper", "saml-role-list-mapper", "oidc-address-mapper", "oidc-usermodel-attribute-mapper", "saml-user-attribute-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-full-name-mapper", "oidc-address-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "saml-user-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-property-mapper" ]
       }
     }, {
       "id" : "163baea6-a403-4c7d-bee3-851d09513561",
