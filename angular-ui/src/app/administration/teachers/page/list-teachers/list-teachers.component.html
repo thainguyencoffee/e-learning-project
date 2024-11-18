@@ -16,7 +16,8 @@
         <th scope="col">Number of students</th>
         <th scope="col">Number of certificates</th>
         <th scope="col">Number of trash courses</th>
-        <th><!-- --></th>
+        <th scope="col">Status</th>
+        <th></th>
       </tr>
       </thead>
       <tbody>
@@ -31,8 +32,18 @@
             <td>{{teacherDto.count?.numberOfCertificates || 'nah'}}</td>
             <td>{{teacherDto.count?.numberOfDraftCourses || 'nah'}}</td>
             <td>
+              <p *ngIf="!teacherDto.count || isInactive(teacherDto.count); else active">
+                <span class="badge bg-warning">Inactive</span>
+              </p>
+              <ng-template #active>
+                <span class="badge bg-success">Active</span>
+              </ng-template>
+            </td>
+            <td>
               <div class="float-end text-nowrap d-flex">
                 <a [routerLink]="['/administration/teachers/', teacherDto.info.username]" class="btn btn-sm btn-secondary me-2">View</a>
+                <a *ngIf="teacherDto.count && !isInactive(teacherDto.count)"
+                   [routerLink]="['/administration/teachers/', teacherDto.info.username, 'salary']" class="btn btn-sm btn-secondary me-2">Salary</a>
               </div>
             </td>
           </tr>

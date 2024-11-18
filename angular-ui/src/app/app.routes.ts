@@ -50,6 +50,7 @@ import {
 import {RoleGuard} from "./role.guard";
 import {ListTeachersComponent} from "./administration/teachers/page/list-teachers/list-teachers.component";
 import {TeacherDetailComponent} from "./administration/teachers/page/teacher-detail/teacher-detail.component";
+import {SalaryTeacherComponent} from "./administration/teachers/page/salary-teacher/salary-teacher.component";
 
 export const routes: Routes = [
   {
@@ -203,6 +204,17 @@ export const routes: Routes = [
         title: 'Teacher detail',
         path: 'teachers/:teacher',
         component: TeacherDetailComponent
+      },
+      {
+        title: 'Teacher salary',
+        path: 'teachers/:teacher/salary',
+        component: SalaryTeacherComponent,
+        canActivate: [RoleGuard],
+        data: {
+          requiredRoles: ['ROLE_admin'],
+          errorStatus: 403,
+          errorMessage: 'Only admin can access teacher salary page'
+        },
       },
       // Course management
       {

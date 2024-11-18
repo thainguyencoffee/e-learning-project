@@ -28,7 +28,7 @@
   "enabled" : true,
   "sslRequired" : "external",
   "registrationAllowed" : true,
-  "registrationEmailAsUsername" : true,
+  "registrationEmailAsUsername" : false,
   "rememberMe" : true,
   "verifyEmail" : false,
   "loginWithEmailAllowed" : true,
@@ -79,7 +79,12 @@
       "id" : "d501bed7-160c-496b-9168-9eb8b0381641",
       "name" : "admin",
       "description" : "",
-      "composite" : false,
+      "composite" : true,
+      "composites" : {
+        "client" : {
+          "realm-management" : [ "view-users", "manage-users", "query-users" ]
+        }
+      },
       "clientRole" : false,
       "containerId" : "8ad7f486-fc61-49f0-9ef9-8156cf11f903",
       "attributes" : { }
@@ -424,6 +429,28 @@
     "notBefore" : 0,
     "groups" : [ ]
   }, {
+    "id" : "8ea27f15-4e84-49ab-ac04-ebdae6cad412",
+    "username" : "nguyennt11032004@gmail.com2",
+    "firstName" : "awefwef",
+    "lastName" : "awegfwaeg",
+    "email" : "nguyennt11032004@gmail.com2",
+    "emailVerified" : false,
+    "createdTimestamp" : 1731907742170,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "62504ec9-0c34-477c-90ff-b6f4f17e96d4",
+      "type" : "password",
+      "createdDate" : 1731907742452,
+      "secretData" : "{\"value\":\"GNUnEVztLPjB1xjTXxwHbvvra+vqAmS0yhLG2buvZIRWOUXdLmf32cSEhC+eIphvCZYxQAaERkJyCyXQEOAivA==\",\"salt\":\"rIBb9Y/Scobc7SSP0SaMkQ==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-keycloak101" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
     "id" : "4cbf38c5-ba64-4884-853d-fd0107c9ae39",
     "username" : "service-account-bff-client",
     "emailVerified" : false,
@@ -607,16 +634,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "secret",
-    "redirectUris" : [
-      "http://localhost:7080/bff/login/oauth2/code/keycloak101",
-      "http://127.0.0.1:7080/bff/login/oauth2/code/keycloak101",
-      "http://host.docker.internal:7080/bff/login/oauth2/code/keycloak101",
-      "http://LOCALHOST_NAME:7080/bff/login/oauth2/code/keycloak101",
-      "https://localhost:7080/bff/login/oauth2/code/keycloak101",
-      "https://127.0.0.1:7080/bff/login/oauth2/code/keycloak101",
-      "https://host.docker.internal:7080/bff/login/oauth2/code/keycloak101",
-      "https://LOCALHOST_NAME:7080/bff/login/oauth2/code/keycloak101"
-    ],
+    "redirectUris" : [ "https://127.0.0.1:7080/bff/login/oauth2/code/keycloak101", "https://helloworld:7080/bff/login/oauth2/code/keycloak101", "http://helloworld:7080/bff/login/oauth2/code/keycloak101", "https://host.docker.internal:7080/bff/login/oauth2/code/keycloak101", "http://127.0.0.1:7080/bff/login/oauth2/code/keycloak101", "http://host.docker.internal:7080/bff/login/oauth2/code/keycloak101", "http://localhost:7080/bff/login/oauth2/code/keycloak101", "https://localhost:7080/bff/login/oauth2/code/keycloak101" ],
     "webOrigins" : [ "+" ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -632,8 +650,8 @@
       "oidc.ciba.grant.enabled" : "false",
       "client.secret.creation.time" : "1728051978",
       "backchannel.logout.session.required" : "true",
-      "backchannel.logout.url" : "http://LOCALHOST_NAME:7080/bff/logout/connect/back-channel/keycloak101",
-      "post.logout.redirect.uris" : "http://localhost:7080/*##http://127.0.0.1:7080/*##https://localhost:7080/*##https://127.0.0.1:7080/*##http://LOCALHOST_NAME:7080/*##https://LOCALHOST_NAME:7080/*",
+      "backchannel.logout.url" : "http://helloworld:7080/bff/logout/connect/back-channel/keycloak101",
+      "post.logout.redirect.uris" : "http://localhost:7080/*##http://127.0.0.1:7080/*##https://localhost:7080/*##https://127.0.0.1:7080/*##http://helloworld:7080/*##https://helloworld:7080/*",
       "display.on.consent.screen" : "false",
       "oauth2.device.authorization.grant.enabled" : "false",
       "backchannel.logout.revoke.offline.tokens" : "false"
@@ -650,6 +668,7 @@
       "config" : {
         "user.session.note" : "client_id",
         "introspection.token.claim" : "true",
+        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "client_id",
@@ -664,6 +683,7 @@
       "config" : {
         "user.session.note" : "clientHost",
         "introspection.token.claim" : "true",
+        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "clientHost",
@@ -678,6 +698,7 @@
       "config" : {
         "user.session.note" : "clientAddress",
         "introspection.token.claim" : "true",
+        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "clientAddress",
@@ -1314,7 +1335,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-full-name-mapper", "oidc-address-mapper", "oidc-usermodel-attribute-mapper", "saml-user-attribute-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-property-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-usermodel-property-mapper", "oidc-address-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-full-name-mapper", "oidc-usermodel-attribute-mapper", "saml-user-attribute-mapper" ]
       }
     }, {
       "id" : "02c4a486-c98c-4fcd-8b86-2f38a6632506",
@@ -1341,7 +1362,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-usermodel-attribute-mapper", "oidc-address-mapper", "saml-user-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-property-mapper", "oidc-usermodel-property-mapper", "oidc-full-name-mapper", "saml-role-list-mapper" ]
+        "allowed-protocol-mapper-types" : [ "saml-user-property-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-property-mapper", "oidc-full-name-mapper", "saml-role-list-mapper", "oidc-address-mapper", "oidc-usermodel-attribute-mapper", "saml-user-attribute-mapper" ]
       }
     }, {
       "id" : "163baea6-a403-4c7d-bee3-851d09513561",

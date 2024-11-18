@@ -45,13 +45,14 @@ public class SalaryServiceImpl implements SalaryService {
     }
 
     @Override
-    @Scheduled(cron = "0 30 13 17 * ?")
+//    @Scheduled(cron = "0 30 13 17 * ?")
+    @Scheduled(cron = "0 */10 * * * ?")
     public void addSalaryRecordForAllTeachers() {
         LocalDateTime firstDayOfMonth = LocalDateTime.of(LocalDateTime.now().getYear(), LocalDateTime.now().getMonth(), 1, 0, 0);
 
         salaryRepository.findAll().forEach(salary -> {
             String teacher = salary.getTeacher();
-            int numberOfCourses = courseRepository.countCourseByTeacherAndCreatedDateAfter(teacher, firstDayOfMonth);
+            int numberOfCourses = courseRepository.countCourseByTeacherAndCreatedDateAfterAndPublished(teacher, firstDayOfMonth, true);
             int numberOfStudents = courseEnrollmentRepository.countCourseEnrollmentByTeacherAndCreatedDateAfter(teacher, firstDayOfMonth);
             salary.addSalaryRecord(numberOfCourses, numberOfStudents);
             salaryRepository.save(salary);

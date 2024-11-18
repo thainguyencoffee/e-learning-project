@@ -18,10 +18,10 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
     @Query("""
         SELECT 
             c.teacher,
-            COUNT(CASE WHEN c.published = TRUE THEN 1 END) as number_of_courses,
+            COUNT(DISTINCT CASE WHEN c.published = TRUE THEN 1 END) as number_of_courses,
             COUNT(e.id) as number_of_students,
             COUNT(CASE when e.completed = TRUE THEN 1 END) as number_of_certificates,
-            COUNT(CASE WHEN c.published = FALSE THEN 1 END) as number_of_draft_courses
+            COUNT(DISTINCT CASE WHEN c.published = FALSE THEN 1 END) as number_of_draft_courses
         FROM 
             course c
         LEFT JOIN 
@@ -118,7 +118,7 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
     """)
     Optional<CourseInfoDTO> findCourseInfoDTOByIdAndPublishedAndTeacher(long courseId, boolean published, String teacher);
 
-    int countCourseByTeacherAndCreatedDateAfter(String teacher, LocalDateTime createdDateAfter);
+    int countCourseByTeacherAndCreatedDateAfterAndPublished(String teacher, LocalDateTime createdDateAfter, Boolean published);
 
     @Query("""
         SELECT extract(MONTH from c.published_date) as month, COUNT(c.id) AS count

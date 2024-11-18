@@ -66,11 +66,11 @@ public class Salary {
     }
 
     private void adjustRank() {
-        if (nosAllTime >= 100 && nocAllTime >= 5) {
+        if (nosAllTime >= 10 && nocAllTime >= 5) {
             rank = Rank.INSTRUCTOR_III;
-        } else if (nosAllTime >= 50 && nocAllTime >= 3) {
+        } else if (nosAllTime >= 5 && nocAllTime >= 2) {
             rank = Rank.INSTRUCTOR_II;
-        } else if (nosAllTime >= 10 && nocAllTime >= 1) {
+        } else if (nosAllTime >= 2 && nocAllTime >= 1) {
             rank = Rank.INSTRUCTOR_I;
         } else {
             rank = Rank.NONE;

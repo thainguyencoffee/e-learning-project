@@ -18,12 +18,11 @@ Be sure that your JAVA_HOME environment variable points to the jdk-17 folder ext
 
 ### Check out sources
 ```bash
-https://github.com/thainguyencoffee/e-learning-project.git
+git clone https://github.com/thainguyencoffee/e-learning-project.git
+cd e-learning-project
 ```
 
 ### Compile and test; build all JARs, build image container, start docker compose
-
-> Note: Linux: `sudo chmod -R 777 e-learning-project`
 
 1. Without angular (recommend when you want to develop frontend)
 ```bash

@@ -2,17 +2,18 @@ import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
 import {TeacherService} from "../../service/teacher.service";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
-import {TeacherDto} from "../../model/teacher.dto";
+import {CountDataDto, TeacherDto} from "../../model/teacher.dto";
 import {PaginationUtils} from "../../../../common/dto/page-wrapper";
 import {Subscription} from "rxjs";
-import {NgForOf} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-list-teachers',
   standalone: true,
   imports: [
     RouterLink,
-    NgForOf
+    NgForOf,
+    NgIf
   ],
   templateUrl: './list-teachers.component.html',
 })
@@ -59,6 +60,10 @@ export class ListTeachersComponent implements OnInit, OnDestroy {
 
   getPageRange(): number[] {
     return this.paginationUtils?.getPageRange() || [];
+  }
+
+  isInactive(count: CountDataDto) {
+    return count.numberOfCourses === 0;
   }
 
 }

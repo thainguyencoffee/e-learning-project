@@ -27,9 +27,9 @@ public class SalaryController {
         return ResponseEntity.ok(salaryRepository.findAll(pageable));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Salary> getSalaryDetail(@PathVariable Long id) {
-        return ResponseEntity.ok(salaryRepository.findById(id).orElseThrow(ResourceNotFoundException::new));
+    @GetMapping("/{teacher}")
+    public ResponseEntity<Salary> getSalaryDetail(@PathVariable String teacher) {
+        return ResponseEntity.ok(salaryRepository.findByTeacher(teacher).orElseThrow(ResourceNotFoundException::new));
     }
 
 }
