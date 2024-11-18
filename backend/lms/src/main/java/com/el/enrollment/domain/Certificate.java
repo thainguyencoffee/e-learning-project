@@ -40,7 +40,7 @@ public class Certificate {
 
         // Default values
         this.certified = false;
-        this.issuedDate = null;
+        this.issuedDate = LocalDateTime.now();
     }
 
     public void markAsCertified(String url) {
@@ -48,7 +48,6 @@ public class Certificate {
         if (certified) throw new InputInvalidException("Certificate is already certified.");
         this.url = url;
         this.certified = true;
-        this.issuedDate = LocalDateTime.now();
     }
 
 }

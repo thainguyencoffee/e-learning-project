@@ -5,12 +5,9 @@ import com.el.common.auth.application.impl.KeycloakUsersManagement;
 import com.el.common.auth.web.dto.UserInfo;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.projection.MonthStats;
-import com.el.course.application.dto.teacher.CountDataDTO;
-import com.el.course.application.dto.teacher.TeacherDetailDTO;
-import com.el.course.application.dto.teacher.TeacherStatisticsDTO;
+import com.el.common.projection.RatingMonthStats;
+import com.el.course.application.dto.teacher.*;
 import com.el.course.domain.CourseRepository;
-import com.el.course.application.dto.teacher.TeacherDTO;
-import com.el.course.domain.StudentsByCourseDTO;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -59,11 +56,13 @@ public class TeacherService {
         List<MonthStats> studentsEnrolledByMonth = enrollmentRepository.statsMonthEnrolledByTeacherAndYear(teacher, year);
         List<MonthStats> draftCoursesByMonth = courseRepository.statsMonthDraftCourseByTeacherAndYear(teacher, year);
         List<StudentsByCourseDTO> studentsByCourse = enrollmentRepository.statsStudentsByCourse(teacher, page, size);
+        List<RatingMonthStats> ratingOverallByMonth = courseRepository.statsMonthRatingOverallByTeacherAndYear(teacher, year);
         return new TeacherDetailDTO(userInfo,
                 new TeacherStatisticsDTO(
                         coursesPublishedByMonth,
                         draftCoursesByMonth,
                         studentsEnrolledByMonth,
-                        studentsByCourse));
+                        studentsByCourse,
+                        ratingOverallByMonth));
     }
 }

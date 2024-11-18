@@ -3,6 +3,7 @@ package com.el.course.domain;
 import com.el.common.MoneyUtils;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.common.exception.InputInvalidException;
+import com.el.course.application.dto.QuizCalculationResult;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.ToString;
@@ -575,6 +576,10 @@ public class Course extends AbstractAggregateRoot<Course> {
                     throw new InputInvalidException("User already reviewed this course.");
                 });
         this.reviews.add(review);
+        registerEvent(new CourseReviewedEvent(this.id, review.getUsername()));
+    }
+
+    public record CourseReviewedEvent(Long courseId, String username) {
     }
 
     public double getAverageRating() {

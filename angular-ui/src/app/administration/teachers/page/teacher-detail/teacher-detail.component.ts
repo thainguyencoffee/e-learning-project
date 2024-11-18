@@ -1,7 +1,7 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
-import {MonthStats, TeacherDetailDto} from "../../model/teacher-detail.dto";
+import {MonthStats, RatingMonthStats, TeacherDetailDto} from "../../model/teacher-detail.dto";
 import {Subscription} from "rxjs";
 import {TeacherService} from "../../service/teacher.service";
 import {Chart, registerables} from "chart.js";
@@ -39,6 +39,7 @@ export class TeacherDetailComponent implements OnInit, OnDestroy {
   coursesByMonthChart: any;
   draftCoursesByMonthChart: any;
   studentsEnrolledByMonthChart: any;
+  ratingOverallByMonthChart: any;
 
   ngOnInit(): void {
     this.loadData(0);
@@ -85,6 +86,23 @@ export class TeacherDetailComponent implements OnInit, OnDestroy {
     return validMonths;
   }
 
+  private fillMissingMonthsRating(stats: RatingMonthStats[]): RatingMonthStats[] {
+    const currentMonth = new Date().getMonth() + 1; // Lấy tháng hiện tại (1-12)
+
+    const validMonths: RatingMonthStats[] = Array.from({length: currentMonth}, (_, i) => ({
+      month: i + 1,
+      rating: 0,
+    }));
+
+    stats.forEach((stat) => {
+      if (stat.month <= currentMonth) {
+        validMonths[stat.month - 1].rating = stat.rating;
+      }
+    });
+
+    return validMonths;
+  }
+
 
   private initializeCharts() {
     if (!this.teacherDetailDto) return;
@@ -95,6 +113,7 @@ export class TeacherDetailComponent implements OnInit, OnDestroy {
     const coursesByMonthData = this.fillMissingMonths(stats.coursesByMonth);
     const draftCoursesByMonthData = this.fillMissingMonths(stats.draftCoursesByMonth);
     const studentsEnrolledByMonthData = this.fillMissingMonths(stats.studentsEnrolledByMonth);
+    const ratingOverallByMonthData = this.fillMissingMonthsRating(stats.ratingOverallByMonth);
 
     // Hủy các chart cũ trước khi tạo mới
     if (this.coursesByMonthChart) {
@@ -105,6 +124,9 @@ export class TeacherDetailComponent implements OnInit, OnDestroy {
     }
     if (this.studentsEnrolledByMonthChart) {
       this.studentsEnrolledByMonthChart.destroy();
+    }
+    if (this.ratingOverallByMonthChart) {
+      this.ratingOverallByMonthChart.destroy();
     }
 
     // Biểu đồ Courses By Month
@@ -163,6 +185,29 @@ export class TeacherDetailComponent implements OnInit, OnDestroy {
           data: studentsEnrolledByMonthData.map(stat => stat.count),
           backgroundColor: 'rgba(255, 99, 132, 0.2)',
           borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 1,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+        },
+      }
+    });
+
+    // Biểu đồ Rating Overall By Month
+    this.ratingOverallByMonthChart = new Chart('ratingOverallByMonthCanvas', {
+      type: 'line',
+      data: {
+        labels: ratingOverallByMonthData.map(stat => `${this.getMonthName(stat.month)}`),
+        datasets: [{
+          label: 'Rating Overall',
+          data: ratingOverallByMonthData.map(stat => stat.rating),
+          backgroundColor: 'rgba(255, 206, 86, 0.2)',
+          borderColor: 'rgba(255, 206, 86, 1)',
           borderWidth: 1,
         }]
       },

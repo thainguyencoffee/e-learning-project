@@ -12,6 +12,8 @@ public interface CourseEnrollmentService {
 
     List<CourseEnrollmentDTO> findAllCourseEnrollments(Pageable pageable);
 
+    CourseEnrollment findCourseEnrollmentByCourseIdAndStudent(Long courseId, String student);
+
     CourseEnrollment findCourseEnrollmentById(Long id);
 
     EnrolmentWithCourseDTO findEnrolmentWithCourseById(Long id);
@@ -33,4 +35,5 @@ public interface CourseEnrollmentService {
 
     void submitQuiz(Long enrollmentId, QuizSubmitDTO quizSubmitDTO);
 
+    void markAsReviewed(Long courseId, String student);
 }

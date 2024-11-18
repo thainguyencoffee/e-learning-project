@@ -11,6 +11,8 @@ public interface UploadService {
 
     String uploadFile(byte[] fileContent, String fileName, String contentType, boolean isPrivate);
 
+    byte[] downloadFile(String url);
+
     String generatePreSignedUrl(String url);
 
     void deleteFiles(List<String> urls);

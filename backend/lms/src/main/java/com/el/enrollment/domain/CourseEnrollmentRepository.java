@@ -1,7 +1,7 @@
 package com.el.enrollment.domain;
 
 import com.el.common.projection.MonthStats;
-import com.el.course.domain.StudentsByCourseDTO;
+import com.el.course.application.dto.teacher.StudentsByCourseDTO;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.dto.CourseInfoWithEnrolmentStatisticDTO;
 import org.springframework.data.jdbc.repository.query.Query;

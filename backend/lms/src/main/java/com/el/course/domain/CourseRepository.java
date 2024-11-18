@@ -1,6 +1,7 @@
 package com.el.course.domain;
 
 import com.el.common.projection.MonthStats;
+import com.el.common.projection.RatingMonthStats;
 import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.application.dto.teacher.CountDataDTO;
 import com.el.enrollment.application.dto.CourseInfoDTO;
@@ -11,6 +12,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface CourseRepository extends CrudRepository<Course, Long> {
@@ -157,5 +159,14 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
             GROUP BY extract(MONTH from c.created_date)
     """)
     List<MonthStats> statsMonthDraftCourseByTeacherAndYear(String teacher, Integer year);
+
+    @Query("""
+        SELECT EXTRACT(MONTH from r.review_date) as month, AVG(r.rating) as rating
+           FROM review r
+                    JOIN course c ON r.course = c.id
+           WHERE c.teacher = :teacher AND extract(YEAR from r.review_date) = :year
+           GROUP BY EXTRACT(MONTH from r.review_date)
+    """)
+    List<RatingMonthStats> statsMonthRatingOverallByTeacherAndYear(String teacher, Integer year);
 
 }

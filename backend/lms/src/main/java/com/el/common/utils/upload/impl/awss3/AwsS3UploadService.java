@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -15,6 +16,7 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,22 @@ public class AwsS3UploadService implements UploadService {
     @Override
     public String uploadFile(byte[] fileContent, String fileName, String contentType, boolean isPrivate) {
         return uploadFileToS3(fileName, contentType, fileContent, isPrivate);
+    }
+
+    @Override
+    public byte[] downloadFile(String url) {
+        String key = cutURL(url);
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(awsS3Properties.bucketName())
+                .key(key)
+                .build();
+
+        try (InputStream inputStream = s3Client.getObject(getObjectRequest)) {
+            return inputStream.readAllBytes();
+        } catch (Exception e) {
+            log.error("Download media failed: {}", e.getMessage());
+            throw new AmazonServiceS3Exception("Download media failed. " + e.getMessage());
+        }
     }
 
     @Override
@@ -140,7 +158,12 @@ public class AwsS3UploadService implements UploadService {
     }
 
     private String cutURL(String url) {
-        return url.substring(url.lastIndexOf("/") + 1);
+        String prefix = "https://bookstore-bucket.sgp1.digitaloceanspaces.com/";
+        if (url.startsWith(prefix)) {
+            return url.substring(prefix.length());
+        } else {
+            throw new IllegalArgumentException("Invalid URL prefix: " + url);
+        }
     }
 
 }

@@ -29,12 +29,16 @@ class CourseEnrollmentJdbcTests {
 
     @BeforeEach
     void setUp() {
-        repository.save(TestFactory.createDefaultCourseEnrollment());
+        CourseEnrollment courseEnrollment = TestFactory.createDefaultCourseEnrollment();
+        courseEnrollment.markAsEnrolled();
+        repository.save(courseEnrollment);
     }
 
     @Test
     void testSave() {
-        CourseEnrollment courseEnrollment = repository.save(TestFactory.createDefaultCourseEnrollment());
+        CourseEnrollment courseEnrollment = TestFactory.createDefaultCourseEnrollment();
+        courseEnrollment.markAsEnrolled();
+        repository.save(courseEnrollment);
         assertNotNull(courseEnrollment.getId());
     }
 

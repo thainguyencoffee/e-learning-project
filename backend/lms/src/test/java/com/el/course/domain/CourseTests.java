@@ -4,6 +4,7 @@ import com.el.TestFactory;
 import com.el.common.Currencies;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
+import com.el.course.application.dto.QuizCalculationResult;
 import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

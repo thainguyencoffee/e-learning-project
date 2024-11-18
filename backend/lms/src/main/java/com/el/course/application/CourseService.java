@@ -3,7 +3,7 @@ package com.el.course.application;
 import com.el.course.application.dto.*;
 import com.el.course.domain.Course;
 import com.el.course.domain.Lesson;
-import com.el.course.domain.QuizCalculationResult;
+import com.el.course.application.dto.QuizCalculationResult;
 
 import javax.money.MonetaryAmount;
 import java.util.Map;

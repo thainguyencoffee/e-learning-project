@@ -5,6 +5,11 @@ export interface MonthStats {
   count: number
 }
 
+export interface RatingMonthStats {
+  month: number,
+  rating: number
+}
+
 export interface StudentsByCourseDTO {
   id: number,
   title: string,
@@ -17,7 +22,8 @@ export interface TeacherStatisticsDTO {
   coursesByMonth: MonthStats[],
   draftCoursesByMonth: MonthStats[],
   studentsEnrolledByMonth: MonthStats[],
-  studentsByCourse: StudentsByCourseDTO[]
+  studentsByCourse: StudentsByCourseDTO[],
+  ratingOverallByMonth: RatingMonthStats[]
 }
 
 export interface TeacherDetailDto {

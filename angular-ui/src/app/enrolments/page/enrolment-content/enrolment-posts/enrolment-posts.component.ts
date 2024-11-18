@@ -54,7 +54,9 @@ export class EnrolmentPostsComponent implements OnInit {
   }
 
   loadData(pageNumber: number) {
-    this.enrolmentId = +this.route.snapshot.params['id'];
+    this.route.parent?.params.subscribe(params => {
+      this.enrolmentId = +params['id'];
+    });
     const courseIdString = this.route.snapshot.queryParamMap.get('courseId');
     this.courseId = courseIdString ? +courseIdString : undefined;
 
