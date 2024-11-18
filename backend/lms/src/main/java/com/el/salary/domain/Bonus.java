@@ -23,23 +23,27 @@ public record Bonus(
     }
 
     static MonetaryAmount calculateBonus(BonusType type, Integer numberOfStudents, Integer numberOfCourses) {
+        int rate = 2;
+        int dollarPerUnitForStudent = 10;
+        int dollarPerUnitForCourse = 20;
+
         return switch (type) {
             case NUMBER_OF_STUDENTS -> {
-                int unit = numberOfStudents / 10;
-                Money amount = Money.of(10 * unit, Currencies.USD);
+                int unit = numberOfStudents / rate;
+                Money amount = Money.of(dollarPerUnitForStudent * unit, Currencies.USD);
                 MoneyUtils.checkValidPrice(amount, Currencies.USD);
                 yield amount;
             }
             case NUMBER_OF_COURSES -> {
-                int unit2 = numberOfCourses / 10;
-                Money amount = Money.of(20 * unit2, Currencies.USD);
+                int unit2 = numberOfCourses / rate;
+                Money amount = Money.of(dollarPerUnitForCourse * unit2, Currencies.USD);
                 MoneyUtils.checkValidPrice(amount, Currencies.USD);
                 yield amount;
             }
             case ALL -> {
-                int unit = numberOfStudents / 10;
-                int unit2 = numberOfCourses / 10;
-                Money amount = Money.of(10 * unit + 20 * unit2, Currencies.USD);
+                int unit = numberOfStudents / rate;
+                int unit2 = numberOfCourses / rate;
+                Money amount = Money.of(dollarPerUnitForStudent * unit + dollarPerUnitForCourse * unit2, Currencies.USD);
                 MoneyUtils.checkValidPrice(amount, Currencies.USD);
                 yield amount;
             }
