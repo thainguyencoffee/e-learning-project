@@ -2,8 +2,14 @@
   <div class="col-md-4 col-12" *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse">
     <img [src]="enrolmentWithCourse?.thumbnailUrl" class="img-thumbnail" alt="">
     <h2>{{ enrolmentWithCourse?.title }}</h2>
-    <p>{{ enrolmentWithCourse?.description }}</p>
-
+    <p class="text-muted mb-3"
+       style="font-size: 1.2rem; font-family: 'Roboto', sans-serif; line-height: 1.6; text-align: justify;">
+      {{ showFullDescription ? enrolmentWithCourse?.description : (enrolmentWithCourse?.description | slice:0:100) + '...' }}
+      <button class="btn btn-link p-0 text-primary"
+              (click)="showFullDescription = !showFullDescription">
+        {{ showFullDescription ? 'Thu gọn' : 'Xem thêm' }}
+      </button>
+    </p>
     <div class="list-group">
       <a [routerLink]="['/enrolments', enrolmentId, 'overview']" class="list-group-item list-group-item-action"
          [ngClass]="{'active': isActive('/enrolments/' + enrolmentId + '/overview')}"

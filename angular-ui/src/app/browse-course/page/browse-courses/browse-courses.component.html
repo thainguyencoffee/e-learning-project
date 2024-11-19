@@ -4,7 +4,7 @@
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4"> <!-- g-4 để giãn cách các thẻ -->
       @for (course of paginatedCourses; track course.id) {
         <div class="col">
-          <div class="card h-100 shadow border-0">
+          <div class="card h-100 shadow border-0 hover-effect">
             <a [routerLink]="['courses', course.id]">
               <img
                 [src]="course.thumbnailUrl || 'https://placehold.co/600x400/000000/FFF?text=No+Image'"
@@ -16,22 +16,25 @@
               <span class="badge bg-white text-bg-light fs-12">{{ course.language }}</span>
             </div>
             <div class="card-body d-flex flex-column">
-              <!-- Title with automatic wrapping, no truncation -->
               <h5 class="card-title" title="{{ course.title }}"
                   style="word-wrap: break-word; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">
                 {{ course.title }}
               </h5>
-
-              <!-- Teacher info -->
-              <p class="card-text text-muted" title="{{ course.teacher }}"
+              <p class="card-text text-muted"
                  style="word-wrap: break-word; white-space: normal;">
                 by {{ course.teacher }}
               </p>
-
+              <div class="d-flex align-items-center">
+                <i class="bi bi-star-fill text-warning"></i>
+                <i class="bi bi-star-fill text-warning"></i>
+                <i class="bi bi-star-fill text-warning"></i>
+                <i class="bi bi-star-fill text-warning"></i>
+                <i class="bi bi-star-half text-warning"></i>
+                <span class="text-muted ms-2">(120 reviews)</span>
+              </div>
               <div>
                 <span class="text-muted">{{ course.price }}</span>
               </div>
-
               <a [routerLink]="['checkout', course.id]" class="btn btn-primary btn-sm w-100">Buy now</a>
             </div>
           </div>
@@ -66,7 +69,18 @@
       </li>
     </ul>
   </nav>
+<style>
+  .hover-effect {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
 
+  .hover-effect:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+</style>
 
 
 

@@ -1,3 +1,4 @@
+
 <div class="container mt-5 p-5 border rounded shadow-lg bg-light">
   <!-- Tiêu đề khóa học -->
   <h1 class="mb-4 text-center text-primary font-weight-bold"></h1>
@@ -11,7 +12,10 @@
     <div class="col-md-6">
 
 
-      <p class="text-dark mb-3">{{ course?.description }}</p>
+      <p class="text-muted mb-3"
+         style="font-size: 1.2rem; font-family: 'Roboto', sans-serif; line-height: 1.6; text-align: justify;">
+        {{ course?.description }}
+      </p>
       <p class="text-muted"><strong>Teacher:</strong> {{ course?.teacher }}</p>
 
       <div class="mt-4">

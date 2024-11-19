@@ -4,7 +4,7 @@ import {Subscription} from "rxjs";
 import {ErrorHandler} from "../../../common/error-handler.injectable";
 import {PaginationUtils} from "../../../common/dto/page-wrapper";
 import {NavigationEnd, Router, RouterLink} from "@angular/router";
-import {NgForOf} from "@angular/common";
+import {NgClass, NgForOf} from "@angular/common";
 import {UserService} from "../../../common/auth/user.service";
 import {OrdersService} from "../../../orders/service/orders.service";
 import {CourseWithoutSections} from "../../model/course-without-sections";
@@ -14,7 +14,8 @@ import {CourseWithoutSections} from "../../model/course-without-sections";
   standalone: true,
   imports: [
     NgForOf,
-    RouterLink
+    RouterLink,
+    NgClass
   ],
   templateUrl: './browse-courses.component.html',
 })

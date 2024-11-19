@@ -2,7 +2,7 @@ import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from "@angular/router";
 import {CourseService} from "../../service/course.service";
 import {CourseRequest} from "../../model/view/course-request";
-import {NgIf} from "@angular/common";
+import {NgClass, NgIf} from "@angular/common";
 import {UserService} from "../../../../common/auth/user.service";
 
 @Component({
@@ -10,7 +10,8 @@ import {UserService} from "../../../../common/auth/user.service";
   standalone: true,
   imports: [
     NgIf,
-    RouterLink
+    RouterLink,
+    NgClass
   ],
   templateUrl: './request-course-detail.component.html',
 })

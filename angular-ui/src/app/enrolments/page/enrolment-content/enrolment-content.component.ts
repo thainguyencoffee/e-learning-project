@@ -4,7 +4,7 @@ import {ErrorHandler} from "../../../common/error-handler.injectable";
 import {Observable, Subscription} from "rxjs";
 import {EnrolmentsService} from "../../service/enrolments.service";
 import {EnrolmentWithCourseDto} from "../../model/enrolment-with-course-dto";
-import {AsyncPipe, NgClass, NgForOf, NgIf} from "@angular/common";
+import {AsyncPipe, NgClass, NgForOf, NgIf, SlicePipe} from "@angular/common";
 import {EnrolmentWithCourseDataService} from "./enrolment-with-course-data.service";
 
 @Component({
@@ -16,13 +16,15 @@ import {EnrolmentWithCourseDataService} from "./enrolment-with-course-data.servi
     RouterLink,
     RouterOutlet,
     NgIf,
-    AsyncPipe
+    AsyncPipe,
+    SlicePipe
   ],
   templateUrl: './enrolment-content.component.html',
 })
 export class EnrolmentContentComponent implements OnInit {
   route = inject(ActivatedRoute);
   router = inject(Router);
+  showFullDescription: boolean = false;
   enrolmentService = inject(EnrolmentsService);
   errorHandler = inject(ErrorHandler);
   enrolmentWithCourseDataService = inject(EnrolmentWithCourseDataService);
@@ -33,6 +35,8 @@ export class EnrolmentContentComponent implements OnInit {
   ngOnInit(): void {
     this.loadData();
   }
+
+
 
   loadData(): void {
     this.enrolmentId = +this.route.snapshot.params['id'];
