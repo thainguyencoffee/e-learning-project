@@ -4,6 +4,7 @@ import {PageWrapper} from "../../common/dto/page-wrapper";
 import {EnrolmentDTO} from "../model/enrolment-dto";
 import {EnrolmentWithCourseDto} from "../model/enrolment-with-course-dto";
 import {Enrolment} from "../model/enrolment";
+import {QuizDetailDto} from "../model/quiz-detail.dto";
 
 @Injectable({
   providedIn: 'root'
@@ -40,6 +41,16 @@ export class EnrolmentsService {
 
   markLessonAsIncomplete(enrollmentId: number, lessonId: number) {
     return this.http.put(`${this.resourcePath}/${enrollmentId}/lessons/${lessonId}?mark=incomplete`, null);
+  }
+
+  getQuiz(enrollmentId: number, quizId: number) {
+    return this.http.get<QuizDetailDto>(`${this.resourcePath}/${enrollmentId}/quizzes/${quizId}`);
+  }
+
+  isSubmittedQuiz(enrollmentId: number, quizId: number) {
+    return this.http.get<boolean>(`${this.resourcePath}/${enrollmentId}/is-submitted-quiz`, {
+      params: { quizId }
+    });
   }
 
 }

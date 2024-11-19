@@ -168,4 +168,11 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
     """)
     List<RatingMonthStats> statsMonthRatingOverallByTeacherAndYear(String teacher, Integer year);
 
+    @Query("""
+        select q.* from course c join course_section s on c.id = s.course
+           join quiz q on s.id = q.course_section
+           where q.id = :quizId and c.deleted = false and q.deleted = false
+    """)
+    Optional<Quiz> findQuizByQuizId(Long quizId);
+
 }

@@ -30,7 +30,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   enrolmentService = inject(EnrolmentsService);
   errorHandler = inject(ErrorHandler);
   userService = inject(UserService);
-  selectedSection: any = null;
+  selectedSection?: Section | null;
   currentId?: number;
   courseDto?: Course
   participantNumber?: number;
@@ -120,4 +120,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     return null;
   }
 
+  getQuizByLessonId(selectedSection: Section, lessonId: number) {
+    return selectedSection.quizzes?.find(quiz => quiz.afterLessonId === lessonId);
+  }
 }

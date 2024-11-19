@@ -5,6 +5,7 @@ import com.el.common.exception.ResourceNotFoundException;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
 import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
+import com.el.enrollment.application.dto.QuizDetailDTO;
 import com.el.enrollment.application.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
@@ -73,6 +74,19 @@ public class CourseEnrollmentController {
             courseEnrollmentService.markLessonAsIncomplete(enrollmentId, lessonId);
         }
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{enrollmentId}/quizzes/{quizId}")
+    public ResponseEntity<QuizDetailDTO> getQuiz(@PathVariable Long enrollmentId,
+                                        @PathVariable Long quizId) {
+        QuizDetailDTO quizDetailDTO = courseEnrollmentService.findQuizByIdAndQuizId(enrollmentId, quizId);
+        return ResponseEntity.ok(quizDetailDTO);
+    }
+
+    @GetMapping("/{enrollmentId}/is-submitted-quiz")
+    public ResponseEntity<Boolean> isSubmittedQuiz(@PathVariable Long enrollmentId,
+                                                   @RequestParam(name = "quizId") Long quizId) {
+        return ResponseEntity.ok(courseEnrollmentService.isSubmittedQuiz(enrollmentId, quizId));
     }
 
     @PostMapping("/{enrollmentId}/submit-quiz")

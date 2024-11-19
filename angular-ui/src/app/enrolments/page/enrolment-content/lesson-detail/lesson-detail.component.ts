@@ -89,22 +89,30 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
     return lessonProgresses.some(lp => lp.lessonId === lessonId && lp.completed);
   }
 
-  markLessonAsCompleted(lessonId: number, title: string) {
-    this.enrolmentService.markLessonAsCompleted(this.enrolmentId!, lessonId)
-      .subscribe({
-        next: _ => {
-          const queryParams = this.route.snapshot.queryParams;
-          this.router.navigate(['.'],
-            {
-              relativeTo: this.route,
-              queryParams: queryParams,
-              state: {
-                msgSuccess: this.getMessage('marked', {title})
-              }
-            })
+  markLessonAsCompleted(lessonId: number, title: string, sections: Section[]) {
+    const quiz = this.getQuizByLessonId(lessonId, sections);
+    this.completeLesson(lessonId, title);
+
+    if (quiz) {
+      this.enrolmentService.isSubmittedQuiz(this.enrolmentId!, quiz.id).subscribe({
+        next: isQuizSubmitted => {
+          if (!isQuizSubmitted) {
+            console.log("Quiz not submitted yet");
+            this.router.navigate(['/enrolments', this.enrolmentId, 'quiz-submit', quiz.id], {
+              queryParams: {returnUrl: this.router.url}
+            });
+          }
         },
-        error: error => this.errorHandler.handleServerError(error.error)
-      })
+        error: error => this.errorHandler.handleServerError(error.error),
+      });
+    }
+  }
+
+  private completeLesson(lessonId: number, title: string) {
+    this.enrolmentService.markLessonAsCompleted(this.enrolmentId!, lessonId).subscribe({
+      next: _ => this.loadData(),
+      error: error => this.errorHandler.handleServerError(error.error),
+    });
   }
 
   markLessonAsIncomplete(lessonId: number, title: string) {
@@ -123,6 +131,10 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
         },
         error: error => this.errorHandler.handleServerError(error.error)
       })
+  }
+
+  getQuizByLessonId(lessonId: number, sections: Section[]) {
+    return sections.flatMap(s => s.quizzes).find(q => q.afterLessonId === lessonId);
   }
 
 }

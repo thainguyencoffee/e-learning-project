@@ -1,15 +1,16 @@
-interface AnswerOption {
+export interface AnswerOption {
   id: number;
   content: string;
   correct: boolean;
 }
 
-interface Question {
+export interface Question {
   id: number;
   content: string;
   type: string;
-  options: AnswerOption[];
   score: number;
+  options?: AnswerOption[];
+  trueFalseAnswer?: boolean;
 }
 
 export interface Quiz {

@@ -9,9 +9,11 @@ import com.el.course.application.CourseService;
 import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.domain.Course;
 import com.el.course.application.dto.QuizCalculationResult;
+import com.el.course.domain.Quiz;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
 import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
+import com.el.enrollment.application.dto.QuizDetailDTO;
 import com.el.enrollment.application.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
@@ -147,6 +149,12 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     }
 
     @Override
+    public boolean isSubmittedQuiz(Long enrollmentId, Long quizId) {
+        CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        return enrollment.isSubmittedQuiz(quizId);
+    }
+
+    @Override
     public void submitQuiz(Long enrollmentId, QuizSubmitDTO quizSubmitDTO) {
         checkAccess();
         CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
@@ -160,6 +168,12 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
         CourseEnrollment enrollment = findCourseEnrollmentByCourseIdAndStudent(courseId, student);
         enrollment.markAsReviewed();
         repository.save(enrollment);
+    }
+
+    @Override
+    public QuizDetailDTO findQuizByIdAndQuizId(Long enrollmentId, Long quizId) {
+        Quiz quiz = courseQueryService.findQuizByQuizId(quizId);
+        return QuizDetailDTO.fromQuiz(quiz);
     }
 
     private String getFullName(UserRepresentation userRepresentation) {

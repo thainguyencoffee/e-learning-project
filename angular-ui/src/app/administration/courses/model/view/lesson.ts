@@ -3,6 +3,5 @@ export interface Lesson {
   title: string;
   type: string;
   link: string;
-  quiz: number;
   orderIndex : number;
 }
