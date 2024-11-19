@@ -1,32 +1,72 @@
-@if (!courseWithoutSectionsList || courseWithoutSectionsList.length === 0) {
-  <div>No course could be found.</div>
-} @else {
+  @if (!courseWithoutSectionsList || courseWithoutSectionsList.length === 0) {
+    <div>No course could be found.</div>
+  } @else {
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4"> <!-- g-4 để giãn cách các thẻ -->
+      @for (course of paginatedCourses; track course.id) {
+        <div class="col">
+          <div class="card h-100 shadow border-0">
+            <a [routerLink]="['courses', course.id]">
+              <img
+                [src]="course.thumbnailUrl || 'https://placehold.co/600x400/000000/FFF?text=No+Image'"
+                class="card-img-top"
+                alt="Course Thumbnail"
+                style="height: 200px; object-fit: cover; border-radius: 8px;">
+            </a>
+            <div class="position-absolute top-0 start-0 p-2">
+              <span class="badge bg-white text-bg-light fs-12">{{ course.language }}</span>
+            </div>
+            <div class="card-body d-flex flex-column">
+              <!-- Title with automatic wrapping, no truncation -->
+              <h5 class="card-title" title="{{ course.title }}"
+                  style="word-wrap: break-word; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">
+                {{ course.title }}
+              </h5>
 
-  @for (course of courseWithoutSectionsList; track course.id) {
-    <div class="card" style="width: 18rem;">
-      <a [routerLink]="['courses', course.id]">
-        <img [src]="course.thumbnailUrl || 'https://placehold.co/600x400/000000/FFF'" class="card-img-top" alt="...">
-      </a>
-      <div class="card-body">
-        <h5 class="card-title">{{course.title}}</h5>
-        <p class="card-text">{{course.description}}</p>
-        <a [routerLink]="['checkout', course.id]" class="btn btn-primary">Buy now</a>
-      </div>
+              <!-- Teacher info -->
+              <p class="card-text text-muted" title="{{ course.teacher }}"
+                 style="word-wrap: break-word; white-space: normal;">
+                by {{ course.teacher }}
+              </p>
+
+              <div>
+                <span class="text-muted">{{ course.price }}</span>
+              </div>
+
+              <a [routerLink]="['checkout', course.id]" class="btn btn-primary btn-sm w-100">Buy now</a>
+            </div>
+          </div>
+        </div>
+
+
+      }
     </div>
+    <br>
+
   }
 
   <nav aria-label="Page navigation example">
-    <ul class="pagination">
+    <ul class="pagination justify-content-center">
+      <!-- Previous button -->
       <li class="page-item" [class.disabled]="paginationUtils!.number === 0">
-        <button class="page-link" (click)="onPageChange(paginationUtils!.number - 1)">Previous</button>
+        <button class="page-link" (click)="onPageChange(paginationUtils!.number - 1)" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </button>
       </li>
-      <li class="page-item" *ngFor="let page of getPageRange()" [class.active]="page === paginationUtils!.number">
+
+      <!-- Page number buttons -->
+      <li *ngFor="let page of getPageRange()" class="page-item" [class.active]="page === paginationUtils!.number">
         <button class="page-link" (click)="onPageChange(page)">{{ page + 1 }}</button>
       </li>
+
+      <!-- Next button -->
       <li class="page-item" [class.disabled]="paginationUtils!.number === paginationUtils!.totalPages - 1">
-        <button class="page-link" (click)="onPageChange(paginationUtils!.number + 1)">Next</button>
+        <button class="page-link" (click)="onPageChange(paginationUtils!.number + 1)" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </button>
       </li>
     </ul>
   </nav>
 
-}
+
+
+

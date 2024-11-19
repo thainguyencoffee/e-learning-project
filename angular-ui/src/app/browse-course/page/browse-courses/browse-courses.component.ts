@@ -27,7 +27,10 @@ export class BrowseCoursesComponent implements OnInit, OnDestroy {
   router = inject(Router);
 
   courseWithoutSectionsList: CourseWithoutSections[] = [];
-  paginationUtils?: PaginationUtils
+  paginationUtils = {
+    number: 0,  // Current page
+    totalPages: 0  // Total number of pages
+  };
   navigationSubscription?: Subscription;
 
   ngOnInit(): void {
@@ -62,14 +65,26 @@ export class BrowseCoursesComponent implements OnInit, OnDestroy {
       });
   }
 
-  onPageChange(pageNumber: number): void {
-    if (pageNumber >= 0 && pageNumber < this.paginationUtils!.totalPages) {
-      this.loadData(pageNumber);
+  get paginatedCourses(): any[] {
+    const startIndex = this.paginationUtils.number * 12;
+    const endIndex = startIndex + 12;
+    return this.courseWithoutSectionsList.slice(startIndex, endIndex);
+  }
+
+  // Method to handle page changes
+  onPageChange(page: number): void {
+    if (page >= 0 && page < this.paginationUtils.totalPages) {
+      this.paginationUtils.number = page;
     }
   }
 
+  // Method to get range of page numbers for pagination buttons
   getPageRange(): number[] {
-    return this.paginationUtils?.getPageRange() || [];
+    const range = [];
+    for (let i = 0; i < this.paginationUtils.totalPages; i++) {
+      range.push(i);
+    }
+    return range;
   }
 
   ngOnDestroy(): void {
