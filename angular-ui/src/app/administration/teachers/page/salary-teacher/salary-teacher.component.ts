@@ -4,7 +4,7 @@ import {Subscription} from "rxjs";
 import {SalaryService} from "../../service/salary.service";
 import {Salary} from "../../model/salary";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
-import {DatePipe, NgIf} from "@angular/common";
+import {DatePipe, NgIf, SlicePipe} from "@angular/common";
 
 @Component({
   selector: 'app-salary-teacher',
@@ -12,7 +12,8 @@ import {DatePipe, NgIf} from "@angular/common";
   imports: [
     RouterLink,
     DatePipe,
-    NgIf
+    NgIf,
+    SlicePipe
   ],
   templateUrl: './salary-teacher.component.html',
   styleUrl: './salary-teacher.component.css'
@@ -27,7 +28,7 @@ export class SalaryTeacherComponent implements OnInit, OnDestroy {
   teacher?: string;
   salary?: Salary;
   navigationSubscription?: Subscription;
-
+  visibleRecords: number = 8;
   ngOnInit(): void {
     this.loadData();
 
@@ -45,9 +46,21 @@ export class SalaryTeacherComponent implements OnInit, OnDestroy {
       .subscribe({
         next: data => this.salary = data,
         error: error => this.errorHandler.handleServerError(error.error)
+
       })
+
+  }
+  showMore(): void {
+    this.visibleRecords = Math.min(this.visibleRecords + 4, this.salary!.records.length);
   }
 
+  showAll(): void {
+    this.visibleRecords = this.salary!.records.length;
+  }
+
+  showLess(): void {
+    this.visibleRecords -= 4;
+  }
   ngOnDestroy(): void {
     this.navigationSubscription!.unsubscribe();
   }
@@ -55,5 +68,5 @@ export class SalaryTeacherComponent implements OnInit, OnDestroy {
   someRecordNotPaid(salary: Salary) {
     return salary.records.some(record => record.status !== 'PAID');
   }
-
 }
+
