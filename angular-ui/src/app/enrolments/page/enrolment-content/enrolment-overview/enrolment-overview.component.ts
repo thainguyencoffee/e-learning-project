@@ -22,6 +22,7 @@ import {ErrorHandler} from "../../../../common/error-handler.injectable";
     InputRowComponent
   ],
   templateUrl: './enrolment-overview.component.html',
+  styleUrl: './enrolment-overview.component.css'
 })
 export class EnrolmentOverviewComponent implements OnInit{
 

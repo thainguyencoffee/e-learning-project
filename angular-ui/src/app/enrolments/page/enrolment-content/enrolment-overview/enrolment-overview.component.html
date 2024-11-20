@@ -1,55 +1,75 @@
 <div *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse">
-  <h1>Overview</h1>
+  <div class="overview-card">
+    <h1>Overview</h1>
 
-  <h3>Your Progress</h3>
-  <div class="progress" role="progressbar" aria-label="Example with label"
-       [attr.aria-valuenow]="calcProgress(enrolmentWithCourse.progress)" aria-valuemin="0" aria-valuemax="100">
-    <div class="progress-bar" [style.width]="calcProgress(enrolmentWithCourse.progress) + '%'">
-      {{ calcProgress(enrolmentWithCourse.progress) }}%
+    <div class="section-card">
+      <h3>Your Progress</h3>
+      <div class="progress" role="progressbar" aria-label="Example with label"
+           [attr.aria-valuenow]="calcProgress(enrolmentWithCourse.progress)" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" [style.width]="calcProgress(enrolmentWithCourse.progress) + '%'">
+          {{ calcProgress(enrolmentWithCourse.progress) }}%
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h3>Completed Date</h3>
+      <p>{{ enrolmentWithCourse.completedDate | date }}</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Teacher</h3>
+      <p>{{ enrolmentWithCourse.teacher }}</p>
+    </div>
+
+    <div *ngIf="enrolmentWithCourse.completed">
+      <div class="alert alert-success">
+        <h3>Completed</h3>
+        <p>Congratulations! You have completed this course. Please
+          <button class="btn btn-primary" (click)="onToggleReviewBtn()">review</button>
+          this course to help us.
+        </p>
+        @if (toggleReviewBtn) {
+          <form [formGroup]="reviewForm" (ngSubmit)="handleSubmit(enrolmentWithCourse.courseId)">
+            <app-input-row [group]="reviewForm" label="Rating" field="rating" rowType="radio"
+                           [options]="ratingOptions"/>
+            <app-input-row [group]="reviewForm" label="Comment" field="comment" rowType="textarea"/>
+            <button type="submit" class="btn btn-primary">Review</button>
+          </form>
+        }
+      </div>
+
+        <div class="section-card">
+          <h3>Certificate</h3>
+          <p>
+            <a [href]="enrolmentWithCourse.certificate.url" target="_blank">Download</a>
+          </p>
+        </div>
+    </div>
+
+    <div class="section-card">
+      <h3>Language</h3>
+      <p>{{ enrolmentWithCourse.language }}</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Subtitles</h3>
+      <p *ngFor="let subtitle of enrolmentWithCourse.subtitles">{{ subtitle }}</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Benefits</h3>
+      <p *ngFor="let benefit of enrolmentWithCourse.benefits">{{ benefit }}</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Prerequisites</h3>
+      <p *ngFor="let prerequisite of enrolmentWithCourse.prerequisites">{{ prerequisite }}</p>
     </div>
   </div>
-  <h3>Completed date: {{ enrolmentWithCourse.completedDate | date }}</h3>
-
-  <h3>Teacher</h3>
-  <p>{{ enrolmentWithCourse.teacher }}</p>
-
-  <div *ngIf="enrolmentWithCourse.completed">
-    <div class="alert alert-success">
-      <h3>Completed</h3>
-      <p>Congratulations! You have completed this course. Please
-        <button class="btn btn-primary" (click)="onToggleReviewBtn()">review</button>
-        this course to help us.</p>
-      @if (toggleReviewBtn) {
-        <form [formGroup]="reviewForm" (ngSubmit)="handleSubmit(enrolmentWithCourse.courseId)">
-          <app-input-row [group]="reviewForm" label="Rating" field="rating" rowType="radio" [options]="ratingOptions"/>
-          <app-input-row [group]="reviewForm" label="Comment" field="comment" rowType="textarea"/>
-          <button type="submit" class="btn btn-primary">Review</button>
-        </form>
-      }
-
-      <h3>Certificate</h3>
-      <p>
-        <a [href]="enrolmentWithCourse.certificate.url" target="_blank">Certificate</a>
-      </p>
-    </div>
-  </div>
-
-  <h3>Language</h3>
-  <p>{{ enrolmentWithCourse.language }}</p>
-
-  <h3>Subtitles</h3>
-  <ul>
-    <li *ngFor="let subtitle of enrolmentWithCourse.subtitles">{{ subtitle }}</li>
-  </ul>
-
-  <h3>benefits</h3>
-  <ul>
-    <li *ngFor="let benefit of enrolmentWithCourse.benefits">{{ benefit }}</li>
-  </ul>
-
-  <h3>prerequisites</h3>
-  <ul>
-    <li *ngFor="let prerequisite of enrolmentWithCourse.prerequisites">{{ prerequisite }}</li>
-  </ul>
-
 </div>
+
+<style>
+
+
+</style>

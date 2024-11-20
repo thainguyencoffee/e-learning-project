@@ -1,50 +1,73 @@
-<div class="container-fluid p-4 bg-light rounded shadow-sm" *ngIf="requestCourse">
-  <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-    <h2 class="text-primary fw-bold mb-3">Request Details</h2>
-    <a routerLink="/administration/courses" class="btn btn-outline-secondary">
-      <i class="bi bi-arrow-left"></i> Back to list
-    </a>
-  </div>
-  <div class="mb-4">
-    <div class="d-flex align-items-center mb-2">
-      <h5 class="fw-bold me-2">ID:</h5>
-      <span>{{ requestCourse.id }}</span>
-    </div>
-    <div class="d-flex align-items-center mb-2">
-      <h5 class="fw-bold me-2">Type:</h5>
-      <span>{{ requestCourse.type }}</span>
-    </div>
-    <div class="d-flex align-items-center mb-2">
-      <h5 class="fw-bold me-2">Status:</h5>
-      <span class="badge {{ requestCourse.status === 'Pending' ? 'bg-warning' : 'bg-info' }}">
-        {{ requestCourse.status }}
-      </span>
-    </div>
-    <div class="d-flex align-items-center mb-2">
-      <h5 class="fw-bold me-2">Requested By:</h5>
-      <span>{{ requestCourse.requestedBy === userService.current.name ? 'This account' : requestCourse.requestedBy }}</span>
-    </div>
-    <div class="d-flex align-items-start mb-2">
-      <h5 class="fw-bold me-2">Message:</h5>
-      <p class="mb-0">{{ requestCourse.message }}</p>
-    </div>
-    <div class="d-flex align-items-center mb-3">
-      <h5 class="fw-bold me-2">Course Ref:</h5>
-      <a [routerLink]="['/administration/courses', courseId]" class="btn btn-outline-success">
-        View Course
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+      <h2 class="text-primary fw-bold">Request Details</h2>
+      <a routerLink="/administration/courses" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back to list
       </a>
     </div>
-  </div>
+    <div *ngIf="requestCourse" class="container ">
+    <div class="card shadow-sm p-4">
+  <!-- Request Details -->
+    <div class="row gy-3">
+      <div class="col-md-6">
+        <h6 class="text-secondary fw-bold">ID:</h6>
+        <p class="text-dark mb-0">{{ requestCourse.id }}</p>
+      </div>
+      <div class="col-md-6">
+        <h6 class="text-secondary fw-bold">Type:</h6>
+        <p class="text-dark mb-0">{{ requestCourse.type }}</p>
+      </div>
+      <div class="col-md-6">
+        <h6 class="text-secondary fw-bold">Status:</h6>
+        <span
+          class="badge"
+          [ngClass]="{
+            'bg-warning text-dark': requestCourse.status === 'Pending',
+            'bg-info text-white': requestCourse.status !== 'Pending'
+          }">
+          {{ requestCourse.status }}
+        </span>
+      </div>
+      <div class="col-md-6">
+        <h6 class="text-secondary fw-bold">Requested By:</h6>
+        <p class="text-dark mb-0">
+          {{ requestCourse.requestedBy === userService.current.name ? 'This account' : requestCourse.requestedBy }}
+        </p>
+      </div>
+      <div class="col-12">
+        <h6 class="text-secondary fw-bold">Message:</h6>
+        <p class="text-dark">{{ requestCourse.message }}</p>
+      </div>
+      <div class="col-12">
+        <h6 class="text-secondary fw-bold">Course Ref:</h6>
+        <a
+          [routerLink]="['/administration/courses', courseId]"
+          class="btn btn-outline-success">
+          View Course
+        </a>
+      </div>
+    </div>
 
-  <div class="d-flex align-items-center mt-3">
-    <span *ngIf="requestCourse.resolved" class="badge bg-success px-3 py-2">Resolved</span>
+    <!-- Actions -->
+    <div class="mt-4 d-flex align-items-center">
+      <span
+        *ngIf="requestCourse.resolved"
+        class="badge bg-success px-3 py-2">
+        Resolved
+      </span>
 
-    <ng-container *ngIf="!requestCourse.resolved && canResolveRequest(requestCourse)">
-      <a [routerLink]="['/administration/courses', courseId, 'requests', 'approve', requestCourse.id]"
-         class="btn btn-success me-3">Approve</a>
-
-      <a [routerLink]="['/administration/courses', courseId, 'requests', 'reject', requestCourse.id]"
-         class="btn btn-secondary">Reject</a>
-    </ng-container>
+      <ng-container *ngIf="!requestCourse.resolved && canResolveRequest(requestCourse)">
+        <a
+          [routerLink]="['/administration/courses', courseId, 'requests', 'approve', requestCourse.id]"
+          class="btn btn-success me-3">
+          Approve
+        </a>
+        <a
+          [routerLink]="['/administration/courses', courseId, 'requests', 'reject', requestCourse.id]"
+          class="btn btn-secondary">
+          Reject
+        </a>
+      </ng-container>
+    </div>
   </div>
 </div>

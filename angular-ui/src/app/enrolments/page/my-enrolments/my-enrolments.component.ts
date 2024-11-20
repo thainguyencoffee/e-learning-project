@@ -17,6 +17,7 @@ import {DatePipe, NgForOf, NgIf} from "@angular/common";
     RouterLink
   ],
   templateUrl: './my-enrolments.component.html',
+  styleUrl: 'my-enrolments.component.css'
 })
 export class MyEnrolmentsComponent implements OnInit, OnDestroy{
 

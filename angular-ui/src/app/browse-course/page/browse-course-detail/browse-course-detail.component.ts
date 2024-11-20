@@ -2,8 +2,8 @@ import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
 import {BrowseCourseService} from "../../service/browse-course.service";
 import {ErrorHandler} from "../../../common/error-handler.injectable";
-import {Subscription} from "rxjs";
-import {NgIf} from "@angular/common";
+import {Observable, Subscription} from "rxjs";
+import {AsyncPipe, CurrencyPipe, NgIf, SlicePipe} from "@angular/common";
 import {UserService} from "../../../common/auth/user.service";
 import {EnrolmentsService} from "../../../enrolments/service/enrolments.service";
 import {Enrolment} from "../../../enrolments/model/enrolment";
@@ -16,7 +16,8 @@ import {LoginComponent} from "../../../common/auth/login.component";
   imports: [
     NgIf,
     RouterLink,
-    LoginComponent
+    LoginComponent,
+    SlicePipe
   ],
   templateUrl: './browse-course-detail.component.html',
 })
@@ -34,6 +35,7 @@ export class BrowseCourseDetailComponent implements OnInit, OnDestroy{
   course?: CourseWithoutSections;
   enrolment?: Enrolment;
   isAuthenticated= false;
+  showFullDescription: boolean = false;
 
   ngOnInit(): void {
     this.loadData()
