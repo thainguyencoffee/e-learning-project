@@ -93,5 +93,29 @@
         </div>
       </div>
     </div>
+
+    <div class="mt-5">
+      <h5 class="font-weight-bold border-bottom pb-2 mb-3">Reviews</h5>
+
+      <div *ngIf="course && course.reviews && course.reviews.length > 0; else noReviews">
+        <div *ngFor="let review of course.reviews" class="card mb-3 shadow-sm">
+          <div class="card-body">
+            <h6 class="font-weight-bold">{{ review.username }}</h6>
+            <div class="star-rating">
+              <span *ngFor="let star of getStarsIcon(course.averageRating)" [innerHTML]="star"></span>
+            </div>
+            <!-- Comment -->
+            <p class="mt-2">{{ review.comment }}</p>
+            <!-- Review date -->
+            <small class="text-muted">{{ review.reviewDate | date:'short' }}</small>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noReviews>
+        <p class="text-muted">No reviews available yet.</p>
+      </ng-template>
+    </div>
+
   </div>
 </div>

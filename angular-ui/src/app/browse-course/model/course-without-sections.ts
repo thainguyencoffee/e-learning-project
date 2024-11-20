@@ -1,3 +1,5 @@
+import {Review} from "../../administration/courses/model/view/review";
+
 export interface CourseWithoutSections {
   id: number,
   title: string,
@@ -8,5 +10,7 @@ export interface CourseWithoutSections {
   benefits?: string[],
   prerequisites?: string[],
   price: string,
-  teacher: string
+  teacher: string,
+  reviews: Review[],
+  averageRating: number,
 }

@@ -24,6 +24,8 @@ public interface CourseQueryService {
 
     Course findPublishedCourseById(Long courseId);
 
+    Page<Course> findAllPublishedCourses(Pageable pageable);
+
     List<CourseWithoutSectionsDTO> findAllCourseWithoutSectionsDTOs(Pageable pageable);
 
     CourseWithoutSectionsDTO findCourseWithoutSectionsDTOById(Long courseId);

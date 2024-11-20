@@ -51,7 +51,9 @@ class BrowseCourseControllerTests {
                 course.getBenefits(),
                 course.getPrerequisites(),
                 course.getPrice(),
-                course.getTeacher()
+                course.getTeacher(),
+                course.getReviews(),
+                course.getAverageRating()
         );
     }
 

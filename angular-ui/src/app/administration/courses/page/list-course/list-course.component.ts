@@ -68,7 +68,6 @@ export class ListCourseComponent implements OnInit, OnDestroy {
     return this.paginationUtils?.getPageRange() || [];
   }
 
-
   loadData(pageNumber: number): void {
     this.courseService.getAllCourses(pageNumber)
       .subscribe({
