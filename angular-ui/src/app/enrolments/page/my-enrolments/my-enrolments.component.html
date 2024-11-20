@@ -1,7 +1,7 @@
 @if (!enrollments || enrollments.length === 0) {
   <div>No Enrollments could be found.</div>
 } @else {
-  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4"> <!-- g-4 để giãn cách các thẻ -->
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
     @for (enrollment of enrollments; track enrollment.id) {
       <div class="col">
 
@@ -57,15 +57,3 @@
   </nav>
 
 }
-<style>
-  .hover-effect {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-  }
-
-  .hover-effect:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  }
-
-</style>

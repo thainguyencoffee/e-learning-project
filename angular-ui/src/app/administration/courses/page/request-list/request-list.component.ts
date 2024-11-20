@@ -2,7 +2,7 @@ import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from "@angular/router";
 import {CourseService} from "../../service/course.service";
 import {Course} from "../../model/view/course";
-import {NgForOf, NgIf} from "@angular/common";
+import {NgClass, NgForOf, NgIf, SlicePipe} from "@angular/common";
 import {UserService} from "../../../../common/auth/user.service";
 import {CourseRequest} from "../../model/view/course-request";
 
@@ -11,8 +11,10 @@ import {CourseRequest} from "../../model/view/course-request";
   standalone: true,
   imports: [
     RouterLink,
+    NgIf,
     NgForOf,
-    NgIf
+    SlicePipe,
+    NgClass,
   ],
   templateUrl: './request-list.component.html',
 })
@@ -24,12 +26,16 @@ export class RequestListComponent implements OnInit {
 
   courseId?: number;
   course?: Course
+  expandMessageFlags: Record<number, boolean> = {};
 
   ngOnInit(): void {
     this.courseId = this.route.snapshot.params['courseId'];
 
     this.courseService.getCourse(this.courseId!).subscribe({
-      next: data => this.course = data,
+      next: data => {
+        this.course = data;
+        this.initFlagArrayForExpandMessage(this.course?.courseRequests);
+      },
     })
   }
 
@@ -60,4 +66,11 @@ export class RequestListComponent implements OnInit {
     return false;
   }
 
+  private initFlagArrayForExpandMessage(courseRequests: CourseRequest[] | undefined) {
+    if (courseRequests) {
+      courseRequests.forEach(request => {
+        this.expandMessageFlags[request.id] = false;
+      });
+    }
+  }
 }
