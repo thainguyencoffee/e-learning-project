@@ -87,16 +87,20 @@ public class CourseQueryServiceImpl implements CourseQueryService {
     }
 
     @Override
+    public Page<Course> findAllPublishedCourses(Pageable pageable) {
+        return courseRepository.findAllByPublishedAndDeleted(true, false, pageable);
+    }
+
+    @Override
     public List<CourseWithoutSectionsDTO> findAllCourseWithoutSectionsDTOs(Pageable pageable) {
-        int page = pageable.getPageNumber();
-        int size = pageable.getPageSize();
-        return courseRepository.findAllByPublishedAndDeleted(true, false, page, size);
+        Page<Course> courses = findAllPublishedCourses(pageable);
+        return courses.getContent().stream().map(CourseWithoutSectionsDTO::fromCourse).toList();
     }
 
     @Override
     public CourseWithoutSectionsDTO findCourseWithoutSectionsDTOById(Long courseId) {
-        return courseRepository.findCourseWithoutSectionsDTOByIdAndPublishedAndDeleted(courseId, true, false)
-                .orElseThrow(ResourceNotFoundException::new);
+        Course course = findPublishedCourseById(courseId);
+        return CourseWithoutSectionsDTO.fromCourse(course);
     }
 
     @Override

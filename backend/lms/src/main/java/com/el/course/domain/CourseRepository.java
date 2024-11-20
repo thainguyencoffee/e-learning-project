@@ -2,7 +2,6 @@ package com.el.course.domain;
 
 import com.el.common.projection.MonthStats;
 import com.el.common.projection.RatingMonthStats;
-import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.application.dto.teacher.CountDataDTO;
 import com.el.enrollment.application.dto.CourseInfoDTO;
 import org.springframework.data.domain.Page;
@@ -44,32 +43,7 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
 
     Optional<Course> findByTeacherAndIdAndDeleted(String teacher, Long courseId, Boolean deleted);
 
-    @Query("""
-        SELECT c.id, c.title, c.thumbnail_url, c.description, c.language, c.subtitles, c.benefits, c.prerequisites, c.price, c.teacher
-            FROM course c
-            WHERE c.published = :published
-                AND c.deleted = :deleted
-    """)
-    List<CourseWithoutSectionsDTO> findAllByPublishedAndDeleted(Boolean published, Boolean deleted, int page, int size);
-
-    @Query("""
-        SELECT c.id, c.title, c.thumbnail_url, c.description, c.language, c.subtitles, c.benefits, c.prerequisites, c.price, c.teacher
-            FROM course c
-            WHERE c.id = :courseId
-                AND c.published = :published
-                AND c.deleted = :deleted
-    """)
-    Optional<CourseWithoutSectionsDTO> findCourseWithoutSectionsDTOByIdAndPublishedAndDeleted(Long courseId, Boolean published, Boolean deleted);
-
-    @Query("""
-        SELECT c.id, c.title, c.thumbnail_url, c.description, c.language, c.subtitles, c.benefits, c.prerequisites, c.price, c.teacher
-            FROM course c
-            WHERE c.id = :courseId
-                AND c.teacher = :teacher
-                AND c.published = :published
-                AND c.deleted = :deleted
-    """)
-    Optional<CourseWithoutSectionsDTO> findCourseWithoutSectionsDTOByIdAndPublishedAndDeleted(Long courseId, String teacher, Boolean published, Boolean deleted);
+    Page<Course> findAllByPublishedAndDeleted(Boolean published, boolean deleted, Pageable pageable);
 
     Optional<Course> findByIdAndPublishedAndDeleted(Long courseId, Boolean published, Boolean deleted);
 

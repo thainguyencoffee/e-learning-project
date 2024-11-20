@@ -4,10 +4,11 @@ import {Subscription} from "rxjs";
 import {ErrorHandler} from "../../../common/error-handler.injectable";
 import {PaginationUtils} from "../../../common/dto/page-wrapper";
 import {NavigationEnd, Router, RouterLink} from "@angular/router";
-import {NgClass, NgForOf} from "@angular/common";
+import {NgForOf} from "@angular/common";
 import {UserService} from "../../../common/auth/user.service";
 import {OrdersService} from "../../../orders/service/orders.service";
 import {CourseWithoutSections} from "../../model/course-without-sections";
+import {getStarsIcon} from "../../star-util";
 
 @Component({
   selector: 'app-browse-courses',
@@ -15,9 +16,9 @@ import {CourseWithoutSections} from "../../model/course-without-sections";
   imports: [
     NgForOf,
     RouterLink,
-    NgClass
   ],
   templateUrl: './browse-courses.component.html',
+  styleUrl: 'browse-courses.component.css'
 })
 export class BrowseCoursesComponent implements OnInit, OnDestroy {
 
@@ -28,10 +29,7 @@ export class BrowseCoursesComponent implements OnInit, OnDestroy {
   router = inject(Router);
 
   courseWithoutSectionsList: CourseWithoutSections[] = [];
-  paginationUtils = {
-    number: 0,  // Current page
-    totalPages: 0  // Total number of pages
-  };
+  paginationUtils?: PaginationUtils;
   navigationSubscription?: Subscription;
 
   ngOnInit(): void {
@@ -47,7 +45,7 @@ export class BrowseCoursesComponent implements OnInit, OnDestroy {
     this.browseCourseService.getAllPublishedCourses(pageNumber)
       .subscribe({
         next: (pageWrapper) => {
-
+          this.paginationUtils = new PaginationUtils(pageWrapper.page);
           if (this.userService.current.isAuthenticated) {
             this.orderService.getAllCourseIdsHasPurchased().subscribe({
               next: (purchasedCourses) => {
@@ -58,38 +56,24 @@ export class BrowseCoursesComponent implements OnInit, OnDestroy {
           } else {
             this.courseWithoutSectionsList = pageWrapper.content as CourseWithoutSections[];
           }
-
-          this.paginationUtils = new PaginationUtils(pageWrapper.page);
-
         },
         error: (error) => this.errorHandler.handleServerError(error.error)
       });
   }
 
-  get paginatedCourses(): any[] {
-    const startIndex = this.paginationUtils.number * 12;
-    const endIndex = startIndex + 12;
-    return this.courseWithoutSectionsList.slice(startIndex, endIndex);
-  }
-
-  // Method to handle page changes
-  onPageChange(page: number): void {
-    if (page >= 0 && page < this.paginationUtils.totalPages) {
-      this.paginationUtils.number = page;
+  onPageChange(pageNumber: number): void {
+    if (pageNumber >= 0 && pageNumber < this.paginationUtils!.totalPages) {
+      this.loadData(pageNumber);
     }
   }
 
-  // Method to get range of page numbers for pagination buttons
   getPageRange(): number[] {
-    const range = [];
-    for (let i = 0; i < this.paginationUtils.totalPages; i++) {
-      range.push(i);
-    }
-    return range;
+    return this.paginationUtils?.getPageRange() || [];
   }
 
   ngOnDestroy(): void {
     this.navigationSubscription?.unsubscribe();
   }
 
+  protected readonly getStarsIcon = getStarsIcon;
 }
