@@ -377,6 +377,9 @@ public class CourseServiceImpl implements CourseService {
         courseRepository.save(course);
     }
 
+    /**
+     * @param userAnswers with three overloads for different types of questions
+     * */
     @Override
     public QuizCalculationResult calculateQuizScore(Long courseId, Long quizId, Map<Long, Object> userAnswers) {
         Course course = courseQueryService.findPublishedCourseById(courseId);

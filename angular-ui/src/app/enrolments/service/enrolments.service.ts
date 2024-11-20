@@ -62,4 +62,8 @@ export class EnrolmentsService {
   getQuizSubmission(enrolmentId: number, quizId: number) {
     return this.http.get<QuizSubmission>(`${this.resourcePath}/${enrolmentId}/quizzes/${quizId}/submission`);
   }
+
+  deleteSubmission(enrolmentId: number, quizId: number) {
+    return this.http.delete(`${this.resourcePath}/${enrolmentId}/quizzes/${quizId}/submission`);
+  }
 }

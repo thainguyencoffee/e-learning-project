@@ -1,12 +1,11 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
-import {map, Subscription, switchMap} from "rxjs";
-import {QuizDetailDto} from "../../../model/quiz-detail.dto";
+import {Subscription, switchMap} from "rxjs";
+import {QuestionDto, QuizDetailDto} from "../../../model/quiz-detail.dto";
 import {EnrolmentsService} from "../../../service/enrolments.service";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
-import {AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
-import {NgForOf, NgIf} from "@angular/common";
-import {AddCourseDto} from "../../../../administration/courses/model/add-course.dto";
+import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
+import {DatePipe, JsonPipe, NgForOf, NgIf, NgTemplateOutlet} from "@angular/common";
 import {QuizSubmitDto} from "../../../model/quiz-submit.dto";
 import {QuizSubmission} from "../../../model/quiz-submission";
 
@@ -17,6 +16,8 @@ import {QuizSubmission} from "../../../model/quiz-submission";
     ReactiveFormsModule,
     NgForOf,
     NgIf,
+    DatePipe,
+    NgTemplateOutlet,
     RouterLink,
   ],
   templateUrl: './quiz-submit.component.html',
@@ -35,8 +36,10 @@ export class QuizSubmitComponent implements OnInit, OnDestroy {
   enrolmentId?: number;
   returnUrl?: string;
   isSubmitted?: boolean;
+  toggleResubmit = false;
 
   quizDetail?: QuizDetailDto;
+  quizSubmission?: QuizSubmission;
 
   ngOnInit(): void {
     this.loadData();
@@ -61,49 +64,50 @@ export class QuizSubmitComponent implements OnInit, OnDestroy {
     this.quizId = this.route.snapshot.params['quizId'];
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'];
 
-    this.enrolmentService.isSubmittedQuiz(this.enrolmentId!, this.quizId!)
+    this.enrolmentService.getQuiz(this.enrolmentId!, this.quizId!)
       .pipe(
+        switchMap(quizDetail => {
+          // initialize form all the time
+          this.quizDetail = quizDetail;
+          this.initForm(this.quizDetail!);
+
+          return this.enrolmentService.isSubmittedQuiz(this.enrolmentId!, this.quizId!);
+        }),
         switchMap(isSubmitted => {
           this.isSubmitted = isSubmitted;
           if (isSubmitted) {
             return this.enrolmentService.getQuizSubmission(this.enrolmentId!, this.quizId!);
           } else {
-            return this.enrolmentService.getQuiz(this.enrolmentId!, this.quizId!).pipe(
-              map(quizDetail => ({ quizDetail }))
-            );
+            return []; // when return [] it will not trigger next
           }
         })
       ).subscribe({
-        next: result => {
-          if (this.isSubmitted) {
-            const quizSubmission = result as QuizSubmission;
-            this.initFormFromSubmission(quizSubmission);
-          } else {
-            const { quizDetail } = result as { quizDetail: QuizDetailDto };
-            this.quizDetail = quizDetail;
-            this.initForm(quizDetail);
-          }
-        },
-        error: error => this.errorHandler.handleServerError(error.error)
-      });
-  }
-
-  private initFormFromSubmission(quizSubmission: QuizSubmission) {
-    this.submitQuizForm = this.fb.group({
-      quizId: [quizSubmission.quizId],
-      questions: this.fb.array(quizSubmission.answers.map(answer => {
-        return this.fb.group({
-          type: [answer.type],
-          questionId: [answer.questionId],
-          answerOptionIds: answer.type === 'MULTIPLE_CHOICE' ?
-            this.fb.array(answer.answerOptionIds?.map(id => this.fb.control(id)) || []) :
-            [null],
-          trueFalseAnswer: [answer.trueFalseAnswer ?? null],
-          singleChoiceAnswer: [answer.singleChoiceAnswer ?? null]
-        });
-      }))
+      next: result => {
+        if (this.isSubmitted) {
+          this.quizSubmission = result as QuizSubmission;
+          // this.initFormFromSubmission(this.quizSubmission);
+        }
+      },
+      error: error => this.errorHandler.handleServerError(error.error)
     });
   }
+
+  // private initFormFromSubmission(quizSubmission: QuizSubmission) {
+  //   this.submitQuizForm = this.fb.group({
+  //     quizId: [quizSubmission.quizId],
+  //     questions: this.fb.array(quizSubmission.answers.map(answer => {
+  //       return this.fb.group({
+  //         type: [answer.type],
+  //         questionId: [answer.questionId],
+  //         answerOptionIds: answer.type === 'MULTIPLE_CHOICE' ?
+  //           this.fb.array(answer.answerOptionIds?.map(id => this.fb.control(id)) || []) :
+  //           [null],
+  //         trueFalseAnswer: [answer.trueFalseAnswer ?? null],
+  //         singleChoiceAnswer: [answer.singleChoiceAnswer ?? null]
+  //       });
+  //     }))
+  //   });
+  // }
 
   private initForm(quizDetail: QuizDetailDto) {
     this.submitQuizForm = this.fb.group({
@@ -137,7 +141,6 @@ export class QuizSubmitComponent implements OnInit, OnDestroy {
     return messages[key];
   }
 
-
   handleSubmit() {
     window.scrollTo(0, 0);
     this.submitQuizForm!.markAllAsTouched();
@@ -145,22 +148,47 @@ export class QuizSubmitComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const data = new QuizSubmitDto(this.submitQuizForm!.value);
+    const submission = {
+      ...this.submitQuizForm!.value,
+      questions: this.submitQuizForm!.value.questions.map((question: any, index: number) => {
+        if (question.type === 'MULTIPLE_CHOICE') {
+          const selectedIds = question.answerOptionIds
+            .map((checked: boolean, optionIndex: number) =>
+              checked ? this.quizDetail!.questions[index].options[optionIndex].id : null
+            )
+            .filter((id: number | null) => id !== null);
+          return { ...question, answerOptionIds: selectedIds };
+        }
+        return question;
+      })
+    };
+
+    const data = new QuizSubmitDto(submission);
+
     this.enrolmentService.submitQuiz(this.enrolmentId!, data)
       .subscribe({
-        next: quizId => {
-          if (this.returnUrl) {
-            this.router.navigateByUrl(this.returnUrl);
-          } else {
-            this.router.navigate(['.'], {
-              relativeTo: this.route,
-              state: {
-                msgSuccess: this.getMessage('submitted')
-              }
-            });
-          }
-        }
+        next: _ => {
+          this.router.navigate(['.'], {
+            relativeTo: this.route,
+            state: {
+              msgSuccess: this.getMessage('submitted')
+            }
+          });
+        },
+        error: error => this.errorHandler.handleServerError(error.error)
       })
+  }
+
+  getQuestionById(questionId: number, questions: QuestionDto[]) {
+    return questions.find(q => q.id === questionId);
+  }
+
+  getAnswerOptionById(answerOptionId: number, question: QuestionDto) {
+    return question.options.find(o => o.id === answerOptionId);
+  }
+
+  getAnswerOptionsByIds(answerOptionIds: number[], question: QuestionDto) {
+    return question.options.filter(o => answerOptionIds.includes(o.id));
   }
 
 }

@@ -185,6 +185,13 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
         return QuizDetailDTO.fromQuiz(quiz);
     }
 
+    @Override
+    public void deleteQuizSubmission(Long enrollmentId, Long quizId) {
+        CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        enrollment.deleteQuizSubmission(quizId);
+        repository.save(enrollment);
+    }
+
     private String getFullName(UserRepresentation userRepresentation) {
         return userRepresentation.getFirstName() + " " + userRepresentation.getLastName();
     }

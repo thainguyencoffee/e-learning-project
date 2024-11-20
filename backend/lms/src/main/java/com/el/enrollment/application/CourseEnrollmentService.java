@@ -44,4 +44,7 @@ public interface CourseEnrollmentService {
     void markAsReviewed(Long courseId, String student);
 
     QuizDetailDTO findQuizByIdAndQuizId(Long enrollmentId, Long quizId);
+
+    void deleteQuizSubmission(Long enrollmentId, Long quizId);
+
 }

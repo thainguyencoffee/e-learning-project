@@ -151,6 +151,11 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
+    public void deleteQuizSubmission(Long quizId) {
+        QuizSubmission quizSubmission = getQuizSubmission(quizId);
+        quizSubmissions.remove(quizSubmission);
+    }
+
     public record EnrolmentCompletedEvent(Long id, Long courseId, String student) {}
     public record EnrolmentCreatedEvent(String teacher) {}
 

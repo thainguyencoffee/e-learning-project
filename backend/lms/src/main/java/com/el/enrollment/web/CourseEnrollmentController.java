@@ -2,7 +2,6 @@ package com.el.enrollment.web;
 
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
-import com.el.course.application.dto.QuizCalculationResult;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
 import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
@@ -95,6 +94,13 @@ public class CourseEnrollmentController {
     public ResponseEntity<QuizSubmission> getQuizSubmission(@PathVariable Long enrollmentId,
                                                            @PathVariable Long quizId) {
         return ResponseEntity.ok(courseEnrollmentService.getQuizSubmission(enrollmentId, quizId));
+    }
+
+    @DeleteMapping("/{enrollmentId}/quizzes/{quizId}/submission")
+    public ResponseEntity<Void> deleteQuizSubmission(@PathVariable Long enrollmentId,
+                                                     @PathVariable Long quizId) {
+        courseEnrollmentService.deleteQuizSubmission(enrollmentId, quizId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{enrollmentId}/submit-quiz")

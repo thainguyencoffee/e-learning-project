@@ -1897,7 +1897,7 @@ class CourseTests {
         // calculate quiz
         QuizCalculationResult result = course.calculateQuiz(1L, new HashMap<>(
                 Map.of(
-                        1L, Set.of(1L),
+                        1L, 1L,
                         2L, true,
                         3L, Set.of(6L, 7L)
                 )
@@ -1923,7 +1923,7 @@ class CourseTests {
         String msgCase2 = assertThrows(InputInvalidException.class, () -> {
             course.calculateQuiz(1L, new HashMap<>(
                     Map.of(
-                            1L, Set.of(1L),
+                            1L, 1L,
                             2L, Set.of(4L, 5L), // question with id = 2 is true/false, but input answer is not boolean
                             3L, Set.of(6L, 7L, 8L)
                     )
