@@ -6,7 +6,6 @@ import {CourseInfoWithEnrolmentsDto} from "../../model/course-info-with-enrolmen
 import {Subscription} from "rxjs";
 import {DatePipe, NgForOf, NgIf} from "@angular/common";
 import {UserService} from "../../../../common/auth/user.service";
-import {Section} from "../../../courses/model/view/section";
 import {EnrolmentsService} from "../../../../enrolments/service/enrolments.service";
 
 @Component({
@@ -68,9 +67,9 @@ export class EnrolmentStatisticDetailComponent implements OnInit, OnDestroy{
     return messages[key];
   }
 
-  deleteQuizSubmission(enrolmentId: number, quizId: number) {
+  deleteQuizSubmission(enrolmentId: number, quizSubmissionId: number) {
     if (confirm(this.getMessage('confirm'))) {
-      this.enrolmentService.deleteSubmission(enrolmentId, quizId)
+      this.enrolmentService.deleteSubmission(enrolmentId, quizSubmissionId)
         .subscribe({
           next: () => {
             this.router.navigate(['.'], {

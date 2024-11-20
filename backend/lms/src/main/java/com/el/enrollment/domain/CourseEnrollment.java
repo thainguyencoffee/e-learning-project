@@ -22,6 +22,8 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     private String student;
     private Long courseId;
     private String teacher;
+    private Integer totalQuizzes;
+    private Integer totalLessons;
     private LocalDateTime enrollmentDate;
     @MappedCollection(idColumn = "course_enrollment")
     private Set<LessonProgress> lessonProgresses = new HashSet<>();
@@ -40,17 +42,21 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
-    public CourseEnrollment(String student, Long courseId, String teacher, Set<LessonProgress> lessonProgresses) {
+    public CourseEnrollment(String student, Long courseId, String teacher, Set<LessonProgress> lessonProgresses, Integer totalQuizzes) {
         if (student == null) throw new InputInvalidException("Student must not be null.");
         if (courseId == null) throw new InputInvalidException("CourseId must not be null.");
         if (teacher == null) throw new InputInvalidException("Teacher must not be null.");
         if (lessonProgresses == null || lessonProgresses.isEmpty())
             throw new InputInvalidException("LessonProgresses must not be null or empty.");
+        if (totalQuizzes == null || totalQuizzes < 0)
+            throw new InputInvalidException("TotalQuizzes must be a non-negative integer.");
 
         this.student = student;
         this.courseId = courseId;
         this.teacher = teacher;
         this.completed = false;
+        this.totalQuizzes = totalQuizzes;
+        this.totalLessons = 0;
 
         lessonProgresses.forEach(this::addLessonProgress);
     }
@@ -84,11 +90,13 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     }
 
     private boolean allLessonsCompleted() {
-        return lessonProgresses.stream().allMatch(LessonProgress::isCompleted);
+        long completedLesson = this.lessonProgresses.stream().filter(LessonProgress::isCompleted).count();
+        return completedLesson == this.totalLessons;
     }
 
     private boolean allQuizSubmitPassed() {
-        return this.quizSubmissions.stream().allMatch(QuizSubmission::isPassed);
+        long passedQuizzes = this.quizSubmissions.stream().filter(QuizSubmission::isPassed).count();
+        return passedQuizzes == this.totalQuizzes;
     }
 
     public Progress getProgress() {
@@ -100,6 +108,7 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     public void addLessonProgress(LessonProgress lessonProgress) {
         if (lessonProgress == null) throw new InputInvalidException("LessonProgress must not be null.");
         lessonProgresses.add(lessonProgress);
+        this.totalLessons ++;
     }
 
     public void addQuizSubmission(QuizSubmission quizSubmission) {
@@ -144,9 +153,9 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
         reviewed = true;
     }
 
-    public QuizSubmission getQuizSubmission(Long quizId) {
+    public QuizSubmission getQuizSubmission(Long quizSubmissionId) {
         return quizSubmissions.stream()
-                .filter(qs -> qs.getQuizId().equals(quizId))
+                .filter(qs -> qs.getId().equals(quizSubmissionId))
                 .findFirst()
                 .orElseThrow(ResourceNotFoundException::new);
     }

@@ -6,6 +6,7 @@ create table course
     published          boolean      not null,
     published_date     timestamp,
     unpublished        boolean      not null,
+    unpublished_date   timestamp,
     description        varchar(2000),
     price              varchar(50),
     teacher            varchar(50),
@@ -43,6 +44,7 @@ create table course_section
     id          bigserial    not null,
     title       varchar(255) not null,
     order_index int          not null,
+    published   boolean      not null,
     course      bigint       not null references course (id) on DELETE cascade,
     constraint fk_course_section primary key (id)
 );
@@ -165,6 +167,8 @@ create table course_enrollment
     id                 bigserial    not null,
     course_id          bigint       not null,
     teacher            varchar(255) not null,
+    total_quizzes      int          not null,
+    total_lessons      int          not null,
     student            varchar(255) not null,
     enrollment_date    timestamp,
     reviewed           boolean      not null,

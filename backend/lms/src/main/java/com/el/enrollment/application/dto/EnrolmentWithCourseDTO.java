@@ -28,7 +28,8 @@ public record EnrolmentWithCourseDTO(
         Boolean completed,
         LocalDateTime completedDate,
         Certificate certificate,
-        Progress progress
+        Progress progress,
+        Set<QuizSubmission> quizSubmissions
 ) {
     public static EnrolmentWithCourseDTO of(CourseEnrollment enrolment, Course course) {
         return new EnrolmentWithCourseDTO(
@@ -41,7 +42,7 @@ public record EnrolmentWithCourseDTO(
                 course.getSubtitles(),
                 course.getBenefits(),
                 course.getPrerequisites(),
-                course.getSections(),
+                course.getSectionForPublished(),
                 course.getTeacher(),
                 // Enrolment fields
                 enrolment.getId(),
@@ -50,7 +51,8 @@ public record EnrolmentWithCourseDTO(
                 enrolment.getCompleted(),
                 enrolment.getCompletedDate(),
                 enrolment.getCertificate(),
-                enrolment.getProgress()
+                enrolment.getProgress(),
+                enrolment.getQuizSubmissions()
         );
     }
 }

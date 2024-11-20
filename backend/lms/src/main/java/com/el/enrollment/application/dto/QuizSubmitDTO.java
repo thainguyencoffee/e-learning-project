@@ -19,27 +19,29 @@ public record QuizSubmitDTO(
         Set<QuestionSubmitDTO> questions
 ) {
 
-        @JsonIgnore
-        public Map<Long, Object> getAnswers() {
-                return questions.stream()
-                        .collect(HashMap::new, (map, question) -> {
-                                if (question.type() == QuestionType.TRUE_FALSE) {
-                                        if (question.trueFalseAnswer() != null) {
-                                                map.put(question.questionId(), question.trueFalseAnswer());
-                                        }
-                                } else if (question.type() == QuestionType.MULTIPLE_CHOICE) {
-                                        map.put(question.questionId(), question.answerOptionIds());
-                                } else {
-                                        map.put(question.questionId(), question.singleChoiceAnswer());
-                                }
-                        }, Map::putAll);
-        }
+    // This method used to prepare data to calculate
+    @JsonIgnore
+    public Map<Long, Object> getAnswers() {
+        return questions.stream()
+                .collect(HashMap::new, (map, question) -> {
+                    if (question.type() == QuestionType.TRUE_FALSE) {
+                        if (question.trueFalseAnswer() != null) {
+                            map.put(question.questionId(), question.trueFalseAnswer());
+                        }
+                    } else if (question.type() == QuestionType.MULTIPLE_CHOICE) {
+                        map.put(question.questionId(), question.answerOptionIds());
+                    } else {
+                        map.put(question.questionId(), question.singleChoiceAnswer());
+                    }
+                }, Map::putAll);
+    }
 
-        @JsonIgnore
-        public Set<QuizAnswer> toQuizAnswers() {
-                return questions.stream()
-                        .map(QuestionSubmitDTO::toQuizAnswer)
-                        .collect(Collectors.toSet());
-        }
+    // This method used to prepare data to save in database
+    @JsonIgnore
+    public Set<QuizAnswer> toQuizAnswers() {
+        return questions.stream()
+                .map(QuestionSubmitDTO::toQuizAnswer)
+                .collect(Collectors.toSet());
+    }
 
 }

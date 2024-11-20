@@ -94,6 +94,7 @@ public class Quiz {
         this.deleted = false;
     }
 
+    // All answers must be provided, no optional
     public int calculateScore(Map<Long, Object> answers) {
         int score = 0;
 

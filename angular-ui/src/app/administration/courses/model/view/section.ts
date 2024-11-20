@@ -6,6 +6,7 @@ export interface Section {
   title : string;
   orderIndex : number;
   lessons: Lesson[],
-  quizzes: Quiz[]
+  quizzes: Quiz[],
+  published: boolean;
 }
 

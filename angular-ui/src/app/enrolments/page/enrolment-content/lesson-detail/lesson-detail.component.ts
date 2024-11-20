@@ -9,6 +9,7 @@ import {EnrolmentsService} from "../../../service/enrolments.service";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
 import {VideoPlayerComponent} from "../../../../common/video-player/video-player.component";
 import {LessonProgress} from "../../../model/lesson-progress";
+import {QuizSubmission} from "../../../model/enrolment";
 
 @Component({
   selector: 'app-lesson-detail',
@@ -89,22 +90,19 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
     return lessonProgresses.some(lp => lp.lessonId === lessonId && lp.completed);
   }
 
-  markLessonAsCompleted(lessonId: number, title: string, sections: Section[]) {
+  markLessonAsCompleted(lessonId: number, title: string, sections: Section[], quizSubmissions: QuizSubmission[]) {
     const quiz = this.getQuizByLessonId(lessonId, sections);
     this.completeLesson(lessonId, title);
 
     if (quiz) {
-      this.enrolmentService.isSubmittedQuiz(this.enrolmentId!, quiz.id).subscribe({
-        next: isQuizSubmitted => {
-          if (!isQuizSubmitted) {
-            console.log("Quiz not submitted yet");
-            this.router.navigate(['/enrolments', this.enrolmentId, 'quiz-submit', quiz.id], {
-              queryParams: {returnUrl: this.router.url}
-            });
+      const quizSubmission = this.getQuizSubmissionByLessonId(lessonId, sections, quizSubmissions);
+      if (!quizSubmission) {
+        this.router.navigate(['/enrolments', this.enrolmentId, 'quiz-submit', quiz.id], {
+          queryParams: {
+            returnUrl: this.router.url
           }
-        },
-        error: error => this.errorHandler.handleServerError(error.error),
-      });
+        });
+      }
     }
   }
 
@@ -135,6 +133,11 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
 
   getQuizByLessonId(lessonId: number, sections: Section[]) {
     return sections.flatMap(s => s.quizzes).find(q => q.afterLessonId === lessonId);
+  }
+
+  getQuizSubmissionByLessonId(lessonId: number, sections: Section[], quizSubmissions: QuizSubmission[]) {
+    const quiz = sections.flatMap(s => s.quizzes).find(q => q.afterLessonId === lessonId);
+    return quizSubmissions.find(qs => qs.quizId === quiz!.id);
   }
 
 }

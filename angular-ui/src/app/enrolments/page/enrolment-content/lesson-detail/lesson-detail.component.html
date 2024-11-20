@@ -21,12 +21,13 @@
     <div class="d-flex justify-content-between mb-4">
       <div>
         <button *ngIf="!lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)"
-                (click)="markLessonAsCompleted(lessonDetail.id, lessonDetail.title, enrolmentWithCourse.sections)"
+                (click)="markLessonAsCompleted(lessonDetail.id, lessonDetail.title, enrolmentWithCourse.sections, enrolmentWithCourse.quizSubmissions)"
                 class="btn btn-success me-2">Mark as Completed</button>
+
         <a *ngIf="lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)
-        && getQuizByLessonId(lessonDetail.id, enrolmentWithCourse.sections) as quiz"
-           [routerLink]="['/enrolments', this.enrolmentId, 'quiz-submit', quiz.id]"
-           class="btn btn-success me-2">Quiz</a>
+        && getQuizSubmissionByLessonId(lessonDetail.id, enrolmentWithCourse.sections, enrolmentWithCourse.quizSubmissions) as quizSubmission"
+           [routerLink]="['/enrolments', this.enrolmentId, 'quiz-submit', quizSubmission.quizId]" [queryParams]="{quizSubmissionId: quizSubmission.id}"
+           class="btn btn-success me-2">Quiz Submission</a>
 
         @if(!enrolmentWithCourse.completed) {
           <button *ngIf="lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)" (click)="markLessonAsIncomplete(lessonDetail.id, lessonDetail.title)"

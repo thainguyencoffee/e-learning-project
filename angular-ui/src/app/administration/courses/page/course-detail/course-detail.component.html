@@ -113,16 +113,16 @@
             [class.active]="selectedSection?.id === section.id"
             class="list-group-item d-flex justify-content-between align-items-center cursor-pointer">
             <div>
-<!--                            <span class="badge bg-info me-2">{{ section.lessons.length }} Lessons</span>-->
               <span
                 class="fw-semibold text-truncate d-inline-block"
                 style="max-width: 150px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                [ngClass]="{ 'text-secondary': section.published }"
                 [title]="section.title">
                 {{ section.orderIndex }} - {{ section.title }}
               </span>
             </div>
             <!-- Dropdown for Actions -->
-            <div class="dropdown">
+            <div class="dropdown" *ngIf="!section.published">
               <button
                 class="btn btn-sm btn-light border-0"
                 type="button"
@@ -132,24 +132,21 @@
               >
                 <i class="bi bi-three-dots"></i>
               </button>
-              <ul class="dropdown-menu dropdown-menu-end" [attr.aria-labelledby]="'dropdownMenuButton' + i">
+              <ul *ngIf="!section.published" class="dropdown-menu dropdown-menu-end" [attr.aria-labelledby]="'dropdownMenuButton' + i">
                 <li>
-                  <a *ngIf="isEditable()"
-                     [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'add']"
+                  <a [routerLink]="['/administration/courses', currentId, 'sections', section.id, 'lessons', 'add']"
                      class="dropdown-item">
                     <i class="bi  me-2"></i>Add Lesson
                   </a>
                 </li>
                 <li>
-                  <a *ngIf="isEditable()"
-                     [routerLink]="['/administration/courses', currentId, 'sections', 'edit', section.id]"
+                  <a [routerLink]="['/administration/courses', currentId, 'sections', 'edit', section.id]"
                      class="dropdown-item">
                     <i class="bi  me-2"></i>Edit Section
                   </a>
                 </li>
                 <li>
-                  <button *ngIf="isEditable()"
-                          class="dropdown-item text-danger"
+                  <button class="dropdown-item text-danger"
                           (click)="confirmDeleteSection(section.id, section)">
                     <i class="bi  me-2"></i>Delete Section
                   </button>
@@ -171,7 +168,7 @@
                 class="list-group-item d-flex justify-content-between align-items-center">
               <div>
                 <i class="bi text-primary me-2"></i>
-                <span class="fw-semibold">{{ lesson.orderIndex }}. {{ lesson.title }}</span>
+                <span class="fw-semibold" [ngClass]="{ 'text-secondary': selectedSection.published }">{{ lesson.orderIndex }}. {{ lesson.title }}</span>
                 <span class="fw-semibold" *ngIf="getQuizByLessonId(selectedSection, lesson.id) as quiz">
                   <span class="badge bg-info ms-2">{{ '1 quiz with ' + quiz.questions.length + ' questions'}}</span>
                 </span>
@@ -180,15 +177,15 @@
                 <a [href]="lesson.link" target="_blank" class="btn btn-secondary btn-sm">
                   <i class="bi me-1"></i>View
                 </a>
-                <a *ngIf="isEditable()"
+                <a *ngIf="!selectedSection.published"
                    [routerLink]="['/administration/courses', currentId, 'sections', selectedSection.id, 'lessons', lesson.id, 'quizzes']"
                    class="btn btn-secondary btn-sm">Manage quiz</a>
-                <a *ngIf="isEditable()"
+                <a *ngIf="!selectedSection.published"
                    [routerLink]="['/administration/courses', currentId, 'sections', selectedSection.id, 'lessons', 'edit', lesson.id]"
                    class="btn btn-secondary btn-sm">
                   <i class="bi me-1"></i>Edit
                 </a>
-                <button *ngIf="isEditable()"
+                <button *ngIf="!selectedSection.published"
                         type="button"
                         class="btn btn-secondary btn-sm"
                         (click)="confirmDeleteLesson(selectedSection.id, lesson.id, lesson)">

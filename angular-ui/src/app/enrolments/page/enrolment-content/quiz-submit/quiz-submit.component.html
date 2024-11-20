@@ -13,9 +13,10 @@
       </p>
       <div class="alert alert-danger" *ngIf="!quizSubmission?.passed">
         <p><strong>Failed!</strong> You need to score at least {{ quizDetail.passScorePercentage }}% to pass the quiz.</p>
-        <div *ngIf="!quizSubmission?.passed">
-          <button class="btn btn-sm btn-primary" (click)="toggleResubmit = !toggleResubmit">Retake Quiz</button>
-        </div>
+      </div>
+      <!--Can retake quiz even if quiz-submission passed-->
+      <div>
+        <button class="btn btn-sm btn-primary" (click)="toggleResubmit = !toggleResubmit">Retake Quiz</button>
       </div>
       <p><strong>Submitted at:</strong> {{ quizSubmission?.submittedDate | date }}</p>
       <h3>Answers:</h3>

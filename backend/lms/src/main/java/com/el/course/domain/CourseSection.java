@@ -24,11 +24,13 @@ public class CourseSection {
     @MappedCollection(idColumn = "course_section")
     private Set<Quiz> quizzes = new HashSet<>();
     private Integer orderIndex;
+    private Boolean published;
 
     public CourseSection(String title) {
         Assert.hasText(title, "Title must not be empty.");
 
         this.title = title;
+        this.published = true;
     }
 
     public void updateInfo(String newTitle) {
@@ -145,5 +147,14 @@ public class CourseSection {
         this.quizzes.remove(quiz);
     }
 
+
+    // Special case called by Course when Course unpublished mode
+    public void markAsSectionUnpublished() {
+        this.published = false;
+    }
+
+    public void markAsSectionPublished() {
+        this.published = true;
+    }
 
 }

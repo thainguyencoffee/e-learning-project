@@ -1,6 +1,6 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
-import {Subscription, switchMap} from "rxjs";
+import {of, Subscription, switchMap} from "rxjs";
 import {QuestionDto, QuizDetailDto} from "../../../model/quiz-detail.dto";
 import {EnrolmentsService} from "../../../service/enrolments.service";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
@@ -35,6 +35,7 @@ export class QuizSubmitComponent implements OnInit, OnDestroy {
   quizId?: number;
   enrolmentId?: number;
   returnUrl?: string;
+  quizSubmissionId?: number;
   isSubmitted?: boolean;
   toggleResubmit = false;
 
@@ -63,6 +64,7 @@ export class QuizSubmitComponent implements OnInit, OnDestroy {
     });
     this.quizId = this.route.snapshot.params['quizId'];
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'];
+    this.quizSubmissionId = this.route.snapshot.queryParams['quizSubmissionId'];
 
     this.enrolmentService.getQuiz(this.enrolmentId!, this.quizId!)
       .pipe(
@@ -71,12 +73,12 @@ export class QuizSubmitComponent implements OnInit, OnDestroy {
           this.quizDetail = quizDetail;
           this.initForm(this.quizDetail!);
 
-          return this.enrolmentService.isSubmittedQuiz(this.enrolmentId!, this.quizId!);
+          return of(!!this.quizSubmissionId);
         }),
         switchMap(isSubmitted => {
           this.isSubmitted = isSubmitted;
           if (isSubmitted) {
-            return this.enrolmentService.getQuizSubmission(this.enrolmentId!, this.quizId!);
+            return this.enrolmentService.getQuizSubmission(this.enrolmentId!, this.quizSubmissionId!);
           } else {
             return []; // when return [] it will not trigger next
           }
@@ -170,6 +172,9 @@ export class QuizSubmitComponent implements OnInit, OnDestroy {
         next: _ => {
           this.router.navigate(['.'], {
             relativeTo: this.route,
+            queryParams: {
+              returnUrl: this.returnUrl
+            },
             state: {
               msgSuccess: this.getMessage('submitted')
             }

@@ -90,16 +90,16 @@ public class CourseEnrollmentController {
         return ResponseEntity.ok(courseEnrollmentService.isSubmittedQuiz(enrollmentId, quizId));
     }
 
-    @GetMapping("/{enrollmentId}/quizzes/{quizId}/submission")
+    @GetMapping("/{enrollmentId}/quizzes/{quizSubmissionId}/submission")
     public ResponseEntity<QuizSubmission> getQuizSubmission(@PathVariable Long enrollmentId,
-                                                           @PathVariable Long quizId) {
-        return ResponseEntity.ok(courseEnrollmentService.getQuizSubmission(enrollmentId, quizId));
+                                                           @PathVariable Long quizSubmissionId) {
+        return ResponseEntity.ok(courseEnrollmentService.getQuizSubmission(enrollmentId, quizSubmissionId));
     }
 
-    @DeleteMapping("/{enrollmentId}/quizzes/{quizId}/submission")
+    @DeleteMapping("/{enrollmentId}/quizzes/{quizSubmissionId}/submission")
     public ResponseEntity<Void> deleteQuizSubmission(@PathVariable Long enrollmentId,
-                                                     @PathVariable Long quizId) {
-        courseEnrollmentService.deleteQuizSubmission(enrollmentId, quizId);
+                                                     @PathVariable Long quizSubmissionId) {
+        courseEnrollmentService.deleteQuizSubmission(enrollmentId, quizSubmissionId);
         return ResponseEntity.noContent().build();
     }
 

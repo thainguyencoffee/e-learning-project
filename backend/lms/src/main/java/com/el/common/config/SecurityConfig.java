@@ -51,7 +51,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/published-courses/**").permitAll()
 //                        .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
 
-                        .requestMatchers(HttpMethod.DELETE, "/enrollments/{enrollmentId}/quizzes/{quizId}/submission").hasAnyRole("admin", "teacher")
+                        .requestMatchers(HttpMethod.DELETE, "/enrollments/{enrollmentId}/quizzes/{quizSubmissionId}/submission").hasAnyRole("admin", "teacher")
                         .requestMatchers("/enrollments/statistics/**").hasAnyRole("admin", "teacher")
                         .requestMatchers("/enrollments/**").authenticated()
 

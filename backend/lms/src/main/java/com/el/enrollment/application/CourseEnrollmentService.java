@@ -37,7 +37,7 @@ public interface CourseEnrollmentService {
 
     boolean isSubmittedQuiz(Long enrollmentId, Long quizId);
 
-    QuizSubmission getQuizSubmission(Long enrollmentId, Long quizId);
+    QuizSubmission getQuizSubmission(Long enrollmentId, Long quizSubmissionId);
 
     Long submitQuiz(Long enrollmentId, QuizSubmitDTO quizSubmitDTO);
 
@@ -45,6 +45,6 @@ public interface CourseEnrollmentService {
 
     QuizDetailDTO findQuizByIdAndQuizId(Long enrollmentId, Long quizId);
 
-    void deleteQuizSubmission(Long enrollmentId, Long quizId);
+    void deleteQuizSubmission(Long enrollmentId, Long quizSubmissionId);
 
 }

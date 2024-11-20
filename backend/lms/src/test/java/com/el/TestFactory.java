@@ -232,11 +232,11 @@ public class TestFactory {
 
     public static CourseEnrollment createDefaultCourseEnrollment() {
         return new CourseEnrollment(user, 1L, teacher, Set.of(
-                new LessonProgress("Course Lesson 1", 1L), new LessonProgress("Course Lesson 2", 2L)));
+                new LessonProgress("Course Lesson 1", 1L), new LessonProgress("Course Lesson 2", 2L)), 2);
     }
 
     public static CourseEnrollment createCourseEnrollmentWithEmptyLessonProgress() {
-        return new CourseEnrollment(user, 1L, teacher, Set.of());
+        return new CourseEnrollment(user, 1L, teacher, Set.of(), 2);
     }
 
     public static Post createDefaultPost() {

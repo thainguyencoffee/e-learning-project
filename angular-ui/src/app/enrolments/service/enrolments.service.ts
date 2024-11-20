@@ -59,11 +59,11 @@ export class EnrolmentsService {
     return this.http.post<number>(`${this.resourcePath}/${enrolmentId}/submit-quiz`, data);
   }
 
-  getQuizSubmission(enrolmentId: number, quizId: number) {
-    return this.http.get<QuizSubmission>(`${this.resourcePath}/${enrolmentId}/quizzes/${quizId}/submission`);
+  getQuizSubmission(enrolmentId: number, quizSubmissionId: number) {
+    return this.http.get<QuizSubmission>(`${this.resourcePath}/${enrolmentId}/quizzes/${quizSubmissionId}/submission`);
   }
 
-  deleteSubmission(enrolmentId: number, quizId: number) {
-    return this.http.delete(`${this.resourcePath}/${enrolmentId}/quizzes/${quizId}/submission`);
+  deleteSubmission(enrolmentId: number, quizSubmissionId: number) {
+    return this.http.delete(`${this.resourcePath}/${enrolmentId}/quizzes/${quizSubmissionId}/submission`);
   }
 }

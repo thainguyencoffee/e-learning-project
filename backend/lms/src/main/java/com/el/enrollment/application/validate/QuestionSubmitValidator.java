@@ -34,11 +34,11 @@ public class QuestionSubmitValidator implements ConstraintValidator<QuestionSubm
                 return false;
             }
         } else if (questionSubmitDTO.type() == QuestionType.MULTIPLE_CHOICE) {
-            boolean multipleAnswer = questionSubmitDTO.answerOptionIds().size() > 1;
+            boolean multipleAnswerEmpty = questionSubmitDTO.answerOptionIds().isEmpty();
 
-            if (!multipleAnswer) {
+            if (multipleAnswerEmpty) {
                 constraintValidatorContext.disableDefaultConstraintViolation();
-                constraintValidatorContext.buildConstraintViolationWithTemplate("Multiple choice question must have more than one answer")
+                constraintValidatorContext.buildConstraintViolationWithTemplate("Multiple choice question must provide answer")
                         .addPropertyNode("answerOptionIds")
                         .addConstraintViolation();
                 return false;

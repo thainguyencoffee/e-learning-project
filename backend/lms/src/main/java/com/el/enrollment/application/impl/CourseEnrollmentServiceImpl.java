@@ -105,12 +105,12 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
     public void enrollment(String student, Long courseId) {
         Course course = courseQueryService.findPublishedCourseById(courseId);
-        Set<LessonProgress> lessonProgresses = course.getLessonIds().entrySet()
+        Set<LessonProgress> lessonProgresses = course.getLessonIdAndTitleMap().entrySet()
                 .stream()
                 .map(entry -> new LessonProgress(entry.getValue(), entry.getKey()))
                 .collect(Collectors.toSet());
 
-        CourseEnrollment enrollment = new CourseEnrollment(student, courseId, course.getTeacher(), lessonProgresses);
+        CourseEnrollment enrollment = new CourseEnrollment(student, courseId, course.getTeacher(), lessonProgresses, course.getNumberOfQuizzes());
         enrollment.markAsEnrolled();
         repository.save(enrollment);
     }
@@ -155,9 +155,9 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     }
 
     @Override
-    public QuizSubmission getQuizSubmission(Long enrollmentId, Long quizId) {
+    public QuizSubmission getQuizSubmission(Long enrollmentId, Long quizSubmissionId) {
         CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
-        return enrollment.getQuizSubmission(quizId);
+        return enrollment.getQuizSubmission(quizSubmissionId);
     }
 
     @Override
@@ -186,9 +186,9 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     }
 
     @Override
-    public void deleteQuizSubmission(Long enrollmentId, Long quizId) {
+    public void deleteQuizSubmission(Long enrollmentId, Long quizSubmissionId) {
         CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
-        enrollment.deleteQuizSubmission(quizId);
+        enrollment.deleteQuizSubmission(quizSubmissionId);
         repository.save(enrollment);
     }
 

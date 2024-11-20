@@ -36,7 +36,7 @@
   <!-- Type -->
   <div class="mb-3">
     <label for="type" class="form-label fw-bold">Type</label>
-    <select id="type" formControlName="type" class="form-select" (click)="onChangeType()">
+    <select id="type" formControlName="type" class="form-select" (change)="onChangeType()">
       <option [ngValue]="null">Please select</option>
       @for (option of typeOptions | keyvalue; track option.key) {
         <option [ngValue]="option.key">{{option.value}}</option>
