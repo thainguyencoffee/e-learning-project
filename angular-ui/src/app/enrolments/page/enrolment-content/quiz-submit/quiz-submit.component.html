@@ -1,0 +1,141 @@
+<div *ngIf="quizDetail && submitQuizForm">
+  <div *ngIf="isSubmitted; else noSubmitted">
+    <section id="result" *ngIf="!toggleResubmit">
+      <div class="return-url">
+        <a *ngIf="returnUrl" [routerLink]="returnUrl" class="btn btn-link">Back to previous page</a>
+      </div>
+
+      <h2>Quiz Submission Details</h2>
+      <p><strong>Score: </strong>
+        <span *ngIf="!quizSubmission?.passed" class="text-danger">{{ quizSubmission?.score }}</span>
+        <span *ngIf="quizSubmission?.passed" class="text-success">{{ quizSubmission?.score }}</span>
+        / {{ quizDetail.totalScore }}
+      </p>
+      <div class="alert alert-danger" *ngIf="!quizSubmission?.passed">
+        <p><strong>Failed!</strong> You need to score at least {{ quizDetail.passScorePercentage }}% to pass the quiz.</p>
+        <div *ngIf="!quizSubmission?.passed">
+          <button class="btn btn-sm btn-primary" (click)="toggleResubmit = !toggleResubmit">Retake Quiz</button>
+        </div>
+      </div>
+      <p><strong>Submitted at:</strong> {{ quizSubmission?.submittedDate | date }}</p>
+      <h3>Answers:</h3>
+      <ul>
+        <li *ngFor="let answer of quizSubmission?.answers">
+          <div *ngIf="getQuestionById(answer.questionId, quizDetail.questions) as questionDetail">
+            {{questionDetail.content}}
+
+            <ng-container *ngIf="answer.type === 'MULTIPLE_CHOICE'">
+              <ul *ngIf="getAnswerOptionsByIds(answer.answerOptionIds!, questionDetail) as answerOptions; else noAnswer">
+                <li *ngFor="let answerOption of answerOptions">
+                  <strong>{{ answerOption.content }}</strong>
+                </li>
+              </ul>
+              <ng-template #noAnswer>
+                <li>No answer</li>
+              </ng-template>
+            </ng-container>
+
+            <ng-container *ngIf="answer.type === 'TRUE_FALSE'">
+              <strong>{{ answer.trueFalseAnswer === true ? 'True' : 'False' }}</strong>
+            </ng-container>
+
+            <ng-container *ngIf="answer.type === 'SINGLE_CHOICE'">
+              <strong>{{ getAnswerOptionById(answer.singleChoiceAnswer!, questionDetail)?.content || 'No answer' }}</strong>
+            </ng-container>
+          </div>
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <ng-template #noSubmitted>
+    <ng-container *ngTemplateOutlet="quizForm"></ng-container>
+  </ng-template>
+
+  <div *ngIf="toggleResubmit">
+    <ng-container *ngTemplateOutlet="quizForm"></ng-container>
+  </div>
+</div>
+
+<ng-template #quizForm>
+  <div *ngIf="quizDetail && submitQuizForm">
+    <form [formGroup]="submitQuizForm" (ngSubmit)="handleSubmit()">
+      <!-- Quiz Title -->
+      <div class="mb-4">
+        <h2>{{ quizDetail.title }}</h2>
+        <p class="text-muted">{{ quizDetail.description }}</p>
+      </div>
+
+      <!-- Questions -->
+      <div formArrayName="questions" class="mb-4">
+        <div *ngFor="let question of questions.controls; let i = index" [formGroupName]="i" class="mb-3">
+          <div class="card">
+            <div class="card-body">
+              <p class="fw-bold">{{ i + 1 }}. {{ quizDetail.questions[i].content }}</p>
+
+              <!-- MULTIPLE_CHOICE -->
+              <div *ngIf="question.get('type')?.value === 'MULTIPLE_CHOICE'" formArrayName="answerOptionIds">
+                <div *ngFor="let answerOption of getAnswerOptionIds(i).controls; let j = index" class="form-check">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [formControlName]="j"
+                    id="multipleChoice-{{i}}-{{j}}">
+                  <label
+                    class="form-check-label"
+                    for="multipleChoice-{{i}}-{{j}}">
+                    {{ quizDetail.questions[i].options[j].content }}
+                  </label>
+                </div>
+              </div>
+
+              <!-- SINGLE_CHOICE -->
+              <div *ngIf="question.get('type')?.value === 'SINGLE_CHOICE'">
+                <div *ngFor="let answerOption of quizDetail.questions[i]?.options; let j = index" class="form-check">
+                  <input
+                    type="radio"
+                    class="form-check-input"
+                    [formControlName]="'singleChoiceAnswer'"
+                    [value]="answerOption.id"
+                    id="singleChoice-{{i}}-{{j}}">
+                  <label
+                    class="form-check-label"
+                    for="singleChoice-{{i}}-{{j}}">
+                    {{ answerOption.content }}
+                  </label>
+                </div>
+              </div>
+
+              <!-- TRUE_FALSE -->
+              <div *ngIf="question.get('type')?.value === 'TRUE_FALSE'">
+                <div class="form-check">
+                  <input
+                    type="radio"
+                    class="form-check-input"
+                    formControlName="trueFalseAnswer"
+                    value="true"
+                    id="trueFalse-{{i}}-true">
+                  <label class="form-check-label" for="trueFalse-{{i}}-true">True</label>
+                </div>
+                <div class="form-check">
+                  <input
+                    type="radio"
+                    class="form-check-input"
+                    formControlName="trueFalseAnswer"
+                    value="false"
+                    id="trueFalse-{{i}}-false">
+                  <label class="form-check-label" for="trueFalse-{{i}}-false">False</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary mt-4">Submit</button>
+      </div>
+    </form>
+  </div>
+</ng-template>

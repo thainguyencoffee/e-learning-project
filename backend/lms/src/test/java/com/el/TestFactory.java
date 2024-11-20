@@ -328,8 +328,8 @@ public class TestFactory {
     public static QuizSubmitDTO createQuizSubmitDTO() {
         return new QuizSubmitDTO(
                 1L,
-                Set.of(new QuestionSubmitDTO(QuestionType.SINGLE_CHOICE, 1L, Set.of(1L), null),
-                        new QuestionSubmitDTO(QuestionType.TRUE_FALSE, 2L, null, true)
+                Set.of(new QuestionSubmitDTO(QuestionType.SINGLE_CHOICE, 1L, null, null, 1L),
+                        new QuestionSubmitDTO(QuestionType.TRUE_FALSE, 2L, null, true, null)
                 ));
     }
 

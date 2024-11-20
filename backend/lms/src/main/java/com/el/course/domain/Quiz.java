@@ -106,28 +106,35 @@ public class Quiz {
                 } else {
                     throw new InputInvalidException("Quiz calculation error: User answer for true/false must be boolean type.");
                 }
-            } else {
+            } else if (question.getType() == QuestionType.SINGLE_CHOICE) {
+                if (userAnswer instanceof Long singleChoiceAnswerId) {
+                    if (question.getOptions().stream()
+                            .filter(AnswerOption::getCorrect)
+                            .map(AnswerOption::getId)
+                            .findFirst()
+                            .orElseThrow(ResourceNotFoundException::new)
+                            .equals(singleChoiceAnswerId)) {
+                        score += question.getScore();
+                    }
+                } else {
+                    throw new InputInvalidException("Quiz calculation error: Single choice question must have exactly one answer.");
+                }
+            } else if (question.getType() == QuestionType.MULTIPLE_CHOICE) {
                 if (userAnswer instanceof Set<?> userAnswerOptions) {
-                    if (question.getType() == QuestionType.SINGLE_CHOICE && userAnswerOptions.size() != 1)
-                        throw new InputInvalidException("Quiz calculation error: Single choice question must have exactly one answer.");
-
                     Set<Long> correctOptionIds = question.getOptions().stream()
                             .filter(AnswerOption::getCorrect)
                             .map(AnswerOption::getId)
                             .collect(Collectors.toSet());
 
-                    if (question.getType() == QuestionType.SINGLE_CHOICE) {
-                        if (correctOptionIds.equals(userAnswerOptions)) {
-                            score += question.getScore();
-                        }
-                    } else {
-                        long selectedCorrectAnswers = userAnswerOptions.stream()
-                                .filter(correctOptionIds::contains)
-                                .count();
-
-                        score += (int) ((double) selectedCorrectAnswers / correctOptionIds.size() * question.getScore());
-                    }
+                    long selectedCorrectAnswers = userAnswerOptions.stream()
+                            .filter(correctOptionIds::contains)
+                            .count();
+                    score += (int) ((double) selectedCorrectAnswers / correctOptionIds.size() * question.getScore());
+                } else {
+                    throw new InputInvalidException("Quiz calculation error: Multiple choice question must have multiple answers.");
                 }
+            } else {
+                throw new InputInvalidException("Quiz calculation error: Unknown question type.");
             }
         }
         return score;

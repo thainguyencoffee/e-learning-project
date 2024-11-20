@@ -27,8 +27,10 @@ public record QuizSubmitDTO(
                                         if (question.trueFalseAnswer() != null) {
                                                 map.put(question.questionId(), question.trueFalseAnswer());
                                         }
-                                } else {
+                                } else if (question.type() == QuestionType.MULTIPLE_CHOICE) {
                                         map.put(question.questionId(), question.answerOptionIds());
+                                } else {
+                                        map.put(question.questionId(), question.singleChoiceAnswer());
                                 }
                         }, Map::putAll);
         }

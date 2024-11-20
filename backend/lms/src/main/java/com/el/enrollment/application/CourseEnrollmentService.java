@@ -2,8 +2,10 @@ package com.el.enrollment.application;
 
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
+import com.el.enrollment.application.dto.QuizDetailDTO;
 import com.el.enrollment.application.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.CourseEnrollment;
+import com.el.enrollment.domain.QuizSubmission;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -33,7 +35,16 @@ public interface CourseEnrollmentService {
 
     void createCertificate(Long id, String student, Long courseId);
 
-    void submitQuiz(Long enrollmentId, QuizSubmitDTO quizSubmitDTO);
+    boolean isSubmittedQuiz(Long enrollmentId, Long quizId);
+
+    QuizSubmission getQuizSubmission(Long enrollmentId, Long quizId);
+
+    Long submitQuiz(Long enrollmentId, QuizSubmitDTO quizSubmitDTO);
 
     void markAsReviewed(Long courseId, String student);
+
+    QuizDetailDTO findQuizByIdAndQuizId(Long enrollmentId, Long quizId);
+
+    void deleteQuizSubmission(Long enrollmentId, Long quizId);
+
 }

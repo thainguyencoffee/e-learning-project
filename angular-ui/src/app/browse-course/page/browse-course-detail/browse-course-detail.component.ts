@@ -2,8 +2,8 @@ import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
 import {BrowseCourseService} from "../../service/browse-course.service";
 import {ErrorHandler} from "../../../common/error-handler.injectable";
-import {Observable, Subscription} from "rxjs";
-import {AsyncPipe, CurrencyPipe, NgIf} from "@angular/common";
+import {Subscription} from "rxjs";
+import {NgIf} from "@angular/common";
 import {UserService} from "../../../common/auth/user.service";
 import {EnrolmentsService} from "../../../enrolments/service/enrolments.service";
 import {Enrolment} from "../../../enrolments/model/enrolment";
@@ -15,8 +15,6 @@ import {LoginComponent} from "../../../common/auth/login.component";
   standalone: true,
   imports: [
     NgIf,
-    AsyncPipe,
-    CurrencyPipe,
     RouterLink,
     LoginComponent
   ],

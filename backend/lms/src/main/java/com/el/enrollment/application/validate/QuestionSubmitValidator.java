@@ -24,12 +24,12 @@ public class QuestionSubmitValidator implements ConstraintValidator<QuestionSubm
                 return false;
             }
         } else if (questionSubmitDTO.type() == QuestionType.SINGLE_CHOICE) {
-            boolean oneAnswer = questionSubmitDTO.answerOptionIds().size() == 1;
+            boolean oneAnswerNull = questionSubmitDTO.singleChoiceAnswer() == null;
 
-            if (!oneAnswer) {
+            if (oneAnswerNull) {
                 constraintValidatorContext.disableDefaultConstraintViolation();
-                constraintValidatorContext.buildConstraintViolationWithTemplate("Single choice question must have exactly one answer")
-                        .addPropertyNode("answerOptionIds")
+                constraintValidatorContext.buildConstraintViolationWithTemplate("Single choice question must have an answer")
+                        .addPropertyNode("singleChoiceAnswer")
                         .addConstraintViolation();
                 return false;
             }

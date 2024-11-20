@@ -57,6 +57,7 @@ import {RoleGuard} from "./role.guard";
 import {ListTeachersComponent} from "./administration/teachers/page/list-teachers/list-teachers.component";
 import {TeacherDetailComponent} from "./administration/teachers/page/teacher-detail/teacher-detail.component";
 import {SalaryTeacherComponent} from "./administration/teachers/page/salary-teacher/salary-teacher.component";
+import {QuizSubmitComponent} from "./enrolments/page/enrolment-content/quiz-submit/quiz-submit.component";
 
 export const routes: Routes = [
   {
@@ -111,6 +112,11 @@ export const routes: Routes = [
         title: 'Enrolment posts',
         path: 'posts',
         component: EnrolmentPostsComponent
+      },
+      {
+        title: 'Submit quiz page',
+        path: 'quiz-submit/:quizId',
+        component: QuizSubmitComponent
       }
     ]
   },
