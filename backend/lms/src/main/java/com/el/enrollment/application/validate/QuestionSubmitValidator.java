@@ -13,20 +13,29 @@ public class QuestionSubmitValidator implements ConstraintValidator<QuestionSubm
     public boolean isValid(QuestionSubmitDTO questionSubmitDTO, ConstraintValidatorContext constraintValidatorContext) {
         if (questionSubmitDTO == null) return true;
 
-        boolean oneAnswer = questionSubmitDTO.answerOptionIds().size() == 1;
-        boolean multipleAnswer = questionSubmitDTO.answerOptionIds().size() > 1;
+        boolean trueFalseAnswerNull = questionSubmitDTO.trueFalseAnswer() == null;
 
-        if (questionSubmitDTO.type() == QuestionType.SINGLE_CHOICE || questionSubmitDTO.type() == QuestionType.TRUE_FALSE) {
-            log.info("oneAnswer: " + oneAnswer);
-            log.info("answerOptionIds: " + questionSubmitDTO.answerOptionIds());
-            if (!oneAnswer) {
+        if (questionSubmitDTO.type() == QuestionType.TRUE_FALSE) {
+            if (trueFalseAnswerNull) {
                 constraintValidatorContext.disableDefaultConstraintViolation();
-                constraintValidatorContext.buildConstraintViolationWithTemplate("Single choice question must have exactly one answer")
-                        .addPropertyNode("answerOptionIds")
+                constraintValidatorContext.buildConstraintViolationWithTemplate("True false question must have an answer")
+                        .addPropertyNode("trueFalseAnswer")
+                        .addConstraintViolation();
+                return false;
+            }
+        } else if (questionSubmitDTO.type() == QuestionType.SINGLE_CHOICE) {
+            boolean oneAnswerNull = questionSubmitDTO.singleChoiceAnswer() == null;
+
+            if (oneAnswerNull) {
+                constraintValidatorContext.disableDefaultConstraintViolation();
+                constraintValidatorContext.buildConstraintViolationWithTemplate("Single choice question must have an answer")
+                        .addPropertyNode("singleChoiceAnswer")
                         .addConstraintViolation();
                 return false;
             }
         } else if (questionSubmitDTO.type() == QuestionType.MULTIPLE_CHOICE) {
+            boolean multipleAnswer = questionSubmitDTO.answerOptionIds().size() > 1;
+
             if (!multipleAnswer) {
                 constraintValidatorContext.disableDefaultConstraintViolation();
                 constraintValidatorContext.buildConstraintViolationWithTemplate("Multiple choice question must have more than one answer")

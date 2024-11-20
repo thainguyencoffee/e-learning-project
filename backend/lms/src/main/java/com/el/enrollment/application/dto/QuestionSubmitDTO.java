@@ -4,7 +4,6 @@ import com.el.common.ValidateMessages;
 import com.el.course.domain.QuestionType;
 import com.el.enrollment.application.validate.QuestionSubmitConstraint;
 import com.el.enrollment.domain.QuizAnswer;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Set;
@@ -15,14 +14,18 @@ public record QuestionSubmitDTO(
         QuestionType type,
         @NotNull(message = ValidateMessages.NOT_NULL)
         Long questionId,
-        @NotNull(message = ValidateMessages.NOT_NULL)
-        @NotEmpty
-        Set<Long> answerOptionIds
+        Set<Long> answerOptionIds,
+        Boolean trueFalseAnswer,
+        Long singleChoiceAnswer
 ) {
-        public QuizAnswer toQuizAnswer() {
-                if (type == QuestionType.TRUE_FALSE || type == QuestionType.SINGLE_CHOICE) {
-                        return new QuizAnswer(questionId(), answerOptionIds().iterator().next(), type());
-                }
-                return new QuizAnswer(questionId(), answerOptionIds(), type());
+    public QuizAnswer toQuizAnswer() {
+        if (type == QuestionType.TRUE_FALSE) {
+            return new QuizAnswer(questionId(), trueFalseAnswer(), type());
         }
+        if (type == QuestionType.SINGLE_CHOICE) {
+            return new QuizAnswer(questionId(), singleChoiceAnswer, type());
+        } else {
+            return new QuizAnswer(questionId(), answerOptionIds(), type());
+        }
+    }
 }

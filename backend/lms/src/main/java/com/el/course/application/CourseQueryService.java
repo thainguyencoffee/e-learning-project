@@ -42,4 +42,6 @@ public interface CourseQueryService {
 
     List<Quiz> findTrashQuizzesByCourseIdAndSectionId(Long courseId, Long sectionId, Pageable pageable);
 
+    Quiz findQuizByQuizId(Long quizId);
+
 }

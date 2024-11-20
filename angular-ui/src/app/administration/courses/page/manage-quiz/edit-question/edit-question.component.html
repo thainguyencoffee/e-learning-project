@@ -6,15 +6,87 @@
   </div>
 </div>
 
-<form [formGroup]="editForm" (ngSubmit)="handleSubmit()">
-  <app-input-row [group]="editForm" field="id" label="Id" rowType="number" />
-  <app-input-row [group]="editForm" field="content" label="Content" rowType="textarea" />
-  <app-input-row [group]="editForm" field="type" label="Type" rowType="select" [options]="questionTypesMap" />
-  <app-array-row [group]="editForm" field="options" label="Answer Options"
-                        [groupConfiguration]="optionGroupConfiguration"
-                        [addItem]="addAnswerOption.bind(this)"
-                        [removeItem]="removeAnswerOption.bind(this)">
-  </app-array-row>
-  <app-input-row [group]="editForm" field="score" label="Score" rowType="number" />
-  <input type="submit" value="Update Question" class="btn btn-primary mt-4" />
+<form [formGroup]="editForm" (ngSubmit)="handleSubmit()" class="container p-4 border rounded shadow bg-light">
+  <h3 class="text-center mb-4">Update Question</h3>
+
+  <!-- Content -->
+  <div class="mb-3">
+    <label for="content" class="form-label fw-bold">Content</label>
+    <input
+      id="content"
+      formControlName="content"
+      type="text"
+      class="form-control"
+      placeholder="Enter content of question"
+    />
+  </div>
+
+  <!-- Score -->
+  <div class="mb-3">
+    <label for="score" class="form-label fw-bold">Score</label>
+    <input
+      id="score"
+      formControlName="score"
+      type="number"
+      class="form-control"
+      placeholder="Enter score of question"
+    />
+  </div>
+
+  <!-- Type -->
+  <div class="mb-3">
+    <label for="type" class="form-label fw-bold">Type</label>
+    <select id="type" formControlName="type" class="form-select" (click)="onChangeType()">
+      <option [ngValue]="null">Please select</option>
+      @for (option of typeOptions | keyvalue; track option.key) {
+        <option [ngValue]="option.key">{{option.value}}</option>
+      }
+    </select>
+  </div>
+
+  <!-- Options (Dynamic by Type) -->
+  <div *ngIf="isMultipleChoice() || isSingleChoice()" formArrayName="options" class="mb-4">
+    <label class="form-label fw-bold">Options</label>
+    <div *ngFor="let option of options.controls; let i = index" [formGroupName]="i" class="d-flex align-items-center mb-2">
+      <input
+        formControlName="content"
+        type="text"
+        class="form-control me-3"
+        placeholder="Option {{ i + 1 }}"
+      />
+      <input *ngIf="isMultipleChoice()" type="checkbox" formControlName="correct" class="form-check-input me-2" />
+      <input *ngIf="isSingleChoice()" type="checkbox" formControlName="correct" class="form-check-input me-2" (click)="handleSingleChoice(i)">
+      <button type="button" class="btn btn-danger btn-sm" (click)="removeAnswerOption(i)">Remove</button>
+    </div>
+    <button type="button" class="btn btn-primary" (click)="addAnswerOption()">Add Option</button>
+  </div>
+
+  <div *ngIf="isTrueFalse()" class="mb-4">
+    <label class="form-label fw-bold">Answer</label>
+    <div class="form-check">
+      <input
+        id="true-option"
+        type="radio"
+        class="form-check-input"
+        [value]="true"
+        formControlName="trueFalseAnswer"
+      />
+      <label for="true-option" class="form-check-label">True</label>
+    </div>
+    <div class="form-check">
+      <input
+        id="false-option"
+        type="radio"
+        class="form-check-input"
+        [value]="false"
+        formControlName="trueFalseAnswer"
+      />
+      <label for="false-option" class="form-check-label">False</label>
+    </div>
+  </div>
+
+  <!-- Submit -->
+  <button type="submit" class="btn btn-success w-100" [disabled]="editForm.invalid">
+    Submit
+  </button>
 </form>

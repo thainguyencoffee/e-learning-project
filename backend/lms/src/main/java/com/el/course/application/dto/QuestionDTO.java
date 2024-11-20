@@ -22,14 +22,20 @@ public record QuestionDTO(
         @Valid
         Set<AnswerOptionDTO> options,
         @NotNull(message = ValidateMessages.NOT_NULL)
-        Integer score
+        Integer score,
+        Boolean trueFalseAnswer
 ) {
 
     public Question toQuestion() {
-        return new Question(content, type, score,
-                options.stream()
-                        .map(AnswerOptionDTO::toAnswerOption)
-                        .collect(Collectors.toSet()));
+        if (type() != QuestionType.TRUE_FALSE) {
+            return new Question(content(), type(), score(),
+                    options.stream()
+                            .map(AnswerOptionDTO::toAnswerOption)
+                            .collect(Collectors.toSet()), null);
+        } else {
+            return new Question(content(), type(), score(), null, trueFalseAnswer());
+        }
+
     }
 
     public record AnswerOptionDTO(
@@ -41,7 +47,7 @@ public record QuestionDTO(
     ) {
 
         public AnswerOption toAnswerOption() {
-            return new AnswerOption(content, correct);
+            return new AnswerOption(content(), correct());
         }
     }
 

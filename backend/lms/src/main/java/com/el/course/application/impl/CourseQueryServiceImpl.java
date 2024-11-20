@@ -228,6 +228,12 @@ public class CourseQueryServiceImpl implements CourseQueryService {
         throw new AccessDeniedException("Access denied");
     }
 
+    @Override
+    public Quiz findQuizByQuizId(Long quizId) {
+        return courseRepository.findQuizByQuizId(quizId)
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
     private boolean isUserEnrolled(Long courseId, String username) {
         return courseEnrollmentRepository.findByCourseIdAndStudent(courseId, username).isPresent();
     }

@@ -5,9 +5,11 @@ import com.el.common.exception.ResourceNotFoundException;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
 import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
+import com.el.enrollment.application.dto.QuizDetailDTO;
 import com.el.enrollment.application.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
+import com.el.enrollment.domain.QuizSubmission;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -75,11 +77,36 @@ public class CourseEnrollmentController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{enrollmentId}/quizzes/{quizId}")
+    public ResponseEntity<QuizDetailDTO> getQuiz(@PathVariable Long enrollmentId,
+                                        @PathVariable Long quizId) {
+        QuizDetailDTO quizDetailDTO = courseEnrollmentService.findQuizByIdAndQuizId(enrollmentId, quizId);
+        return ResponseEntity.ok(quizDetailDTO);
+    }
+
+    @GetMapping("/{enrollmentId}/is-submitted-quiz")
+    public ResponseEntity<Boolean> isSubmittedQuiz(@PathVariable Long enrollmentId,
+                                                   @RequestParam(name = "quizId") Long quizId) {
+        return ResponseEntity.ok(courseEnrollmentService.isSubmittedQuiz(enrollmentId, quizId));
+    }
+
+    @GetMapping("/{enrollmentId}/quizzes/{quizId}/submission")
+    public ResponseEntity<QuizSubmission> getQuizSubmission(@PathVariable Long enrollmentId,
+                                                           @PathVariable Long quizId) {
+        return ResponseEntity.ok(courseEnrollmentService.getQuizSubmission(enrollmentId, quizId));
+    }
+
+    @DeleteMapping("/{enrollmentId}/quizzes/{quizId}/submission")
+    public ResponseEntity<Void> deleteQuizSubmission(@PathVariable Long enrollmentId,
+                                                     @PathVariable Long quizId) {
+        courseEnrollmentService.deleteQuizSubmission(enrollmentId, quizId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/{enrollmentId}/submit-quiz")
-    public ResponseEntity<Void> submitQuiz(@PathVariable Long enrollmentId,
-                                           @Valid @RequestBody QuizSubmitDTO quizSubmitDTO) {
-        courseEnrollmentService.submitQuiz(enrollmentId, quizSubmitDTO);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Long> submitQuiz(@PathVariable Long enrollmentId,
+                                                            @Valid @RequestBody QuizSubmitDTO quizSubmitDTO) {
+        return ResponseEntity.ok(courseEnrollmentService.submitQuiz(enrollmentId, quizSubmitDTO));
     }
 
 

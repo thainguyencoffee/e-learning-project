@@ -6,6 +6,8 @@ import {CourseInfoWithEnrolmentsDto} from "../../model/course-info-with-enrolmen
 import {Subscription} from "rxjs";
 import {DatePipe, NgForOf, NgIf} from "@angular/common";
 import {UserService} from "../../../../common/auth/user.service";
+import {Section} from "../../../courses/model/view/section";
+import {EnrolmentsService} from "../../../../enrolments/service/enrolments.service";
 
 @Component({
   selector: 'app-enrolment-statistic-detail',
@@ -23,6 +25,7 @@ export class EnrolmentStatisticDetailComponent implements OnInit, OnDestroy{
   route = inject(ActivatedRoute);
   router = inject(Router);
   enrolmentStatisticService = inject(EnrolmentStatisticService);
+  enrolmentService = inject(EnrolmentsService);
   errorHandler = inject(ErrorHandler);
   userService = inject(UserService);
 
@@ -55,6 +58,31 @@ export class EnrolmentStatisticDetailComponent implements OnInit, OnDestroy{
 
   isCreateByYou(teacher: string) {
     return teacher === this.userService.current.name;
+  }
+
+  getMessage(key: string, details?: any) {
+    const messages: Record<string, string> = {
+      confirm: 'Are you sure you want to delete this quiz submission?. Students will lose their progress. This action cannot be undone.',
+      deleted: 'Quiz submission has been deleted successfully.',
+    }
+    return messages[key];
+  }
+
+  deleteQuizSubmission(enrolmentId: number, quizId: number) {
+    if (confirm(this.getMessage('confirm'))) {
+      this.enrolmentService.deleteSubmission(enrolmentId, quizId)
+        .subscribe({
+          next: () => {
+            this.router.navigate(['.'], {
+              relativeTo: this.route,
+              state: {
+                msgSuccess: this.getMessage('deleted')
+              }
+            })
+          },
+          error: error => this.errorHandler.handleServerError(error.error)
+        });
+    }
   }
 
 }

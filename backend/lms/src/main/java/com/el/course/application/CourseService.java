@@ -87,7 +87,7 @@ public interface CourseService {
      * This method will return {@code QuizCalculationResult} with detail. <br>
      * score: The score of {@code answers } <br>
      * passed: Is {@code  answers } pass or not */
-    QuizCalculationResult calculateQuizScore(Long courseId, Long quizId, Map<Long, Set<Long>> answers);
+    QuizCalculationResult calculateQuizScore(Long courseId, Long quizId, Map<Long, Object> userAnswers);
 
     Long addReview(Long courseId, Long enrollmentId, ReviewDTO reviewDTO);
 

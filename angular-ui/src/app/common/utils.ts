@@ -67,3 +67,12 @@ export function calcDifference(price1: string, price2: string): string | null {
 
   return `${currency1}${difference.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
+
+export function minFormArrayLength(min: number): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (control instanceof FormArray && control.length < min) {
+      return { minLength: { requiredLength: min, actualLength: control.length } };
+    }
+    return null;
+  };
+}

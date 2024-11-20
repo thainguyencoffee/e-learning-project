@@ -15,8 +15,6 @@ import {LoginComponent} from "../../../common/auth/login.component";
   standalone: true,
   imports: [
     NgIf,
-    AsyncPipe,
-    CurrencyPipe,
     RouterLink,
     LoginComponent,
     SlicePipe

@@ -8,9 +8,9 @@ import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Table("quiz")
 @Getter
@@ -94,38 +94,50 @@ public class Quiz {
         this.deleted = false;
     }
 
-    public int calculateScore(Map<Long, Set<Long>> answers) {
-        return answers.keySet().stream()
-                .mapToInt(questionId -> {
-                    Question question = findQuestionById(questionId);
-                    Set<Long> answerOptionIds = answers.get(questionId);
+    public int calculateScore(Map<Long, Object> answers) {
+        int score = 0;
 
-                    if (answerOptionIds.isEmpty()) {
-                        throw new InputInvalidException("Quiz calculation error: Answer must not be empty.");
+        for (Question question : questions) {
+            Object userAnswer = answers.get(question.getId());
+            if (question.getType() == QuestionType.TRUE_FALSE) {
+                if (userAnswer instanceof Boolean userTrueFalseAnswer) {
+                    if (userTrueFalseAnswer.equals(question.getTrueFalseAnswer()))
+                        score += question.getScore();
+                } else {
+                    throw new InputInvalidException("Quiz calculation error: User answer for true/false must be boolean type.");
+                }
+            } else if (question.getType() == QuestionType.SINGLE_CHOICE) {
+                if (userAnswer instanceof Long singleChoiceAnswerId) {
+                    if (question.getOptions().stream()
+                            .filter(AnswerOption::getCorrect)
+                            .map(AnswerOption::getId)
+                            .findFirst()
+                            .orElseThrow(ResourceNotFoundException::new)
+                            .equals(singleChoiceAnswerId)) {
+                        score += question.getScore();
                     }
+                } else {
+                    throw new InputInvalidException("Quiz calculation error: Single choice question must have exactly one answer.");
+                }
+            } else if (question.getType() == QuestionType.MULTIPLE_CHOICE) {
+                if (userAnswer instanceof Set<?> userAnswerOptions) {
+                    Set<Long> correctOptionIds = question.getOptions().stream()
+                            .filter(AnswerOption::getCorrect)
+                            .map(AnswerOption::getId)
+                            .collect(Collectors.toSet());
 
-                    if ((question.getType() == QuestionType.SINGLE_CHOICE || question.getType() == QuestionType.TRUE_FALSE) && answerOptionIds.size() != 1) {
-                        throw new InputInvalidException("Quiz calculation error: Single choice question must have exactly one answer.");
-                    }
-
-                    if (question.getType() == QuestionType.SINGLE_CHOICE || question.getType() == QuestionType.TRUE_FALSE) {
-                        return question.getOptions().stream()
-                                .filter(option -> answerOptionIds.contains(option.getId()))
-                                .mapToInt(option -> option.getCorrect() ? question.getScore() : 0)
-                                .sum();
-                    } else {
-                        long correctAnswers = question.getOptions().stream()
-                                .filter(AnswerOption::getCorrect)
-                                .count();
-
-                        long selectedCorrectAnswers = answerOptionIds.stream()
-                                .filter(id -> question.getOptions().stream().anyMatch(option -> option.getId().equals(id) && option.getCorrect()))
-                                .count();
-
-                        return (int) ((double) selectedCorrectAnswers / correctAnswers * question.getScore());
-                    }
-                })
-                .sum();
+                    long selectedCorrectAnswers = userAnswerOptions.stream()
+                            .filter(correctOptionIds::contains)
+                            .count();
+                    score += (int) ((double) selectedCorrectAnswers / correctOptionIds.size() * question.getScore());
+                } else {
+                    throw new InputInvalidException("Quiz calculation error: Multiple choice question must have multiple answers.");
+                }
+            } else {
+                throw new InputInvalidException("Quiz calculation error: Unknown question type.");
+            }
+        }
+        return score;
     }
 
 

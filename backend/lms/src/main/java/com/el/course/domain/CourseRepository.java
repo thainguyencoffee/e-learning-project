@@ -12,7 +12,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public interface CourseRepository extends CrudRepository<Course, Long> {
@@ -20,10 +19,10 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
     @Query("""
         SELECT 
             c.teacher,
-            COUNT(DISTINCT CASE WHEN c.published = TRUE THEN 1 END) as number_of_courses,
+            COUNT(DISTINCT CASE WHEN c.published = TRUE THEN c.id END) as number_of_courses,
             COUNT(e.id) as number_of_students,
             COUNT(CASE when e.completed = TRUE THEN 1 END) as number_of_certificates,
-            COUNT(DISTINCT CASE WHEN c.published = FALSE THEN 1 END) as number_of_draft_courses
+            COUNT(DISTINCT CASE WHEN c.published = FALSE THEN c.id END) as number_of_draft_courses
         FROM 
             course c
         LEFT JOIN 
@@ -168,5 +167,12 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
            GROUP BY EXTRACT(MONTH from r.review_date)
     """)
     List<RatingMonthStats> statsMonthRatingOverallByTeacherAndYear(String teacher, Integer year);
+
+    @Query("""
+        select q.* from course c join course_section s on c.id = s.course
+           join quiz q on s.id = q.course_section
+           where q.id = :quizId and c.deleted = false and q.deleted = false
+    """)
+    Optional<Quiz> findQuizByQuizId(Long quizId);
 
 }
