@@ -2,6 +2,7 @@ package com.el.enrollment.web;
 
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
+import com.el.course.application.dto.QuizCalculationResult;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
 import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
@@ -9,6 +10,7 @@ import com.el.enrollment.application.dto.QuizDetailDTO;
 import com.el.enrollment.application.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
+import com.el.enrollment.domain.QuizSubmission;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -89,11 +91,16 @@ public class CourseEnrollmentController {
         return ResponseEntity.ok(courseEnrollmentService.isSubmittedQuiz(enrollmentId, quizId));
     }
 
+    @GetMapping("/{enrollmentId}/quizzes/{quizId}/submission")
+    public ResponseEntity<QuizSubmission> getQuizSubmission(@PathVariable Long enrollmentId,
+                                                           @PathVariable Long quizId) {
+        return ResponseEntity.ok(courseEnrollmentService.getQuizSubmission(enrollmentId, quizId));
+    }
+
     @PostMapping("/{enrollmentId}/submit-quiz")
-    public ResponseEntity<Void> submitQuiz(@PathVariable Long enrollmentId,
-                                           @Valid @RequestBody QuizSubmitDTO quizSubmitDTO) {
-        courseEnrollmentService.submitQuiz(enrollmentId, quizSubmitDTO);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Long> submitQuiz(@PathVariable Long enrollmentId,
+                                                            @Valid @RequestBody QuizSubmitDTO quizSubmitDTO) {
+        return ResponseEntity.ok(courseEnrollmentService.submitQuiz(enrollmentId, quizSubmitDTO));
     }
 
 

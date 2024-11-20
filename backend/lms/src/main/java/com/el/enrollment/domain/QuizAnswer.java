@@ -17,6 +17,7 @@ public class QuizAnswer {
     private Long questionId;
     private Set<Long> answerOptionIds = new HashSet<>();
     private Boolean trueFalseAnswer;
+    private Long singleChoiceAnswer;
     private QuestionType type;
 
     public QuizAnswer(Long questionId, Boolean trueFalseAnswer, QuestionType type) {
@@ -29,13 +30,14 @@ public class QuizAnswer {
         this.trueFalseAnswer = trueFalseAnswer;
     }
 
-    public QuizAnswer(Long questionId, Long answerOptionId, QuestionType type) {
+    public QuizAnswer(Long questionId, Long singleChoiceAnswer, QuestionType type) {
         validateQuestionId(questionId);
         if (type == null) {
             throw new InputInvalidException("Question type cannot be null.");
         }
         this.type = type;
-        addSingleAnswer(questionId, answerOptionId);
+        this.questionId = questionId;
+        this.singleChoiceAnswer = singleChoiceAnswer;
     }
 
     public QuizAnswer(Long questionId, Set<Long> answerOptionIds, QuestionType type) {
@@ -52,11 +54,7 @@ public class QuizAnswer {
         this.answerOptionIds.addAll(answerOptionIds);
     }
 
-
-    private void addSingleAnswer(Long optionId, Long answerOptionId) {
-        validateAnswerOptionIds(Set.of(answerOptionId));
-        this.questionId = optionId;
-        answerOptionIds.add(answerOptionId);
+    public QuizAnswer() {
     }
 
     private void validateQuestionId(Long questionId) {

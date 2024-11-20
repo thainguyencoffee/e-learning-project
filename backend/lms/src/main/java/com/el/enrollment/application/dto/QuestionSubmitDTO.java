@@ -15,15 +15,17 @@ public record QuestionSubmitDTO(
         @NotNull(message = ValidateMessages.NOT_NULL)
         Long questionId,
         Set<Long> answerOptionIds,
-        Boolean trueFalseAnswer
+        Boolean trueFalseAnswer,
+        Long singleChoiceAnswer
 ) {
-        public QuizAnswer toQuizAnswer() {
-                if (type == QuestionType.TRUE_FALSE) {
-                        return new QuizAnswer(questionId(), trueFalseAnswer(), type());
-                }
-                if (type == QuestionType.SINGLE_CHOICE) {
-                        return new QuizAnswer(questionId(), answerOptionIds().iterator().next(), type());
-                }
-                return new QuizAnswer(questionId(), answerOptionIds(), type());
+    public QuizAnswer toQuizAnswer() {
+        if (type == QuestionType.TRUE_FALSE) {
+            return new QuizAnswer(questionId(), trueFalseAnswer(), type());
         }
+        if (type == QuestionType.SINGLE_CHOICE) {
+            return new QuizAnswer(questionId(), singleChoiceAnswer, type());
+        } else {
+            return new QuizAnswer(questionId(), answerOptionIds(), type());
+        }
+    }
 }

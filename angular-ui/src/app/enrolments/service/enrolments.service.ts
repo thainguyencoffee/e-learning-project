@@ -5,6 +5,8 @@ import {EnrolmentDTO} from "../model/enrolment-dto";
 import {EnrolmentWithCourseDto} from "../model/enrolment-with-course-dto";
 import {Enrolment} from "../model/enrolment";
 import {QuizDetailDto} from "../model/quiz-detail.dto";
+import {QuizSubmitDto} from "../model/quiz-submit.dto";
+import {QuizSubmission} from "../model/quiz-submission";
 
 @Injectable({
   providedIn: 'root'
@@ -53,4 +55,11 @@ export class EnrolmentsService {
     });
   }
 
+  submitQuiz(enrolmentId: number, data: QuizSubmitDto) {
+    return this.http.post<number>(`${this.resourcePath}/${enrolmentId}/submit-quiz`, data);
+  }
+
+  getQuizSubmission(enrolmentId: number, quizId: number) {
+    return this.http.get<QuizSubmission>(`${this.resourcePath}/${enrolmentId}/quizzes/${quizId}/submission`);
+  }
 }

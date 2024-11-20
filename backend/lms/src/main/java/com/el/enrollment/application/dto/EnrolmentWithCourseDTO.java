@@ -3,10 +3,7 @@ package com.el.enrollment.application.dto;
 import com.el.course.domain.Course;
 import com.el.course.domain.CourseSection;
 import com.el.course.domain.Language;
-import com.el.enrollment.domain.Certificate;
-import com.el.enrollment.domain.CourseEnrollment;
-import com.el.enrollment.domain.LessonProgress;
-import com.el.enrollment.domain.Progress;
+import com.el.enrollment.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.Set;

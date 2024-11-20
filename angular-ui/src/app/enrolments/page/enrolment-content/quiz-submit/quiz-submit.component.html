@@ -1,5 +1,58 @@
-<p>quiz-submit works!</p>
-{{quizId}}
-{{enrolmentId}}
-{{returnUrl}}
-{{JSON.stringify(quizDetail)}}
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Take a quiz</h1>
+  <div>
+    <a routerLink="/administration/courses" class="btn btn-secondary">Back to list</a>
+  </div>
+</div>
+
+<div *ngIf="isSubmitted">
+  <div class="alert alert-success">You have submitted successful</div>
+</div>
+
+@if (quizDetail && submitQuizForm) {
+
+  <form [formGroup]="submitQuizForm" (ngSubmit)="handleSubmit()">
+    <div>
+      {{ quizDetail.title }}
+    </div>
+    <div formArrayName="questions">
+      <div *ngFor="let question of questions.controls; let i = index" [formGroupName]="i">
+        <p>{{ quizDetail.questions[i].content }}</p>
+        <div *ngIf="question.get('type')?.value === 'MULTIPLE_CHOICE'" formArrayName="answerOptionIds">
+          <!--MULTIPLE_CHOICE-->
+          <div *ngFor="let answerOption of getAnswerOptionIds(i).controls; let j = index">
+            <input type="checkbox" [formControlName]="j">
+            {{ quizDetail.questions[i].options[j].content }}
+          </div>
+        </div>
+
+        <!-- Phần SINGLE_CHOICE -->
+        <div *ngIf="question.get('type')?.value === 'SINGLE_CHOICE'">
+          <div *ngFor="let answerOption of quizDetail.questions[i]?.options; let j = index">
+            <label>
+              <input
+                type="radio"
+                [formControlName]="'singleChoiceAnswer'"
+                [value]="answerOption.id"/>
+              {{ answerOption.content }}
+            </label>
+          </div>
+        </div>
+
+        <div *ngIf="question.get('type')?.value === 'TRUE_FALSE'">
+          <div>
+            <input type="radio" formControlName="trueFalseAnswer" value="true"> True
+          </div>
+          <div>
+            <input type="radio" formControlName="trueFalseAnswer" value="false"> False
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="submit" value="Submit" class="btn btn-primary mt-4" />
+  </form>
+
+}
+
+

@@ -144,6 +144,13 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
         reviewed = true;
     }
 
+    public QuizSubmission getQuizSubmission(Long quizId) {
+        return quizSubmissions.stream()
+                .filter(qs -> qs.getQuizId().equals(quizId))
+                .findFirst()
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
     public record EnrolmentCompletedEvent(Long id, Long courseId, String student) {}
     public record EnrolmentCreatedEvent(String teacher) {}
 

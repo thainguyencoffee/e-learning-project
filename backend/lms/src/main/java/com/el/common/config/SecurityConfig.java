@@ -52,10 +52,10 @@ public class SecurityConfig {
 //                        .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
 
                         .requestMatchers("/enrollments/statistics/**").hasAnyRole("admin", "teacher")
+                        .requestMatchers("/enrollments/**").authenticated()
 
                         .requestMatchers("/orders/**").authenticated()
                         .requestMatchers("/payments/**").authenticated()
-                        .requestMatchers("/enrollments/**").authenticated()
 
                         .requestMatchers(HttpMethod.PUT, "/courses/{courseId}/update-price").hasRole("admin")
                         .requestMatchers(HttpMethod.PUT, "/courses/{courseId}/assign-teacher").hasRole("admin")

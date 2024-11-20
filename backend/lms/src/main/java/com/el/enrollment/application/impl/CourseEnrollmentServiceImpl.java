@@ -155,12 +155,21 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     }
 
     @Override
-    public void submitQuiz(Long enrollmentId, QuizSubmitDTO quizSubmitDTO) {
-        checkAccess();
+    public QuizSubmission getQuizSubmission(Long enrollmentId, Long quizId) {
         CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        return enrollment.getQuizSubmission(quizId);
+    }
+
+    @Override
+    public Long submitQuiz(Long enrollmentId, QuizSubmitDTO quizSubmitDTO) {
+        CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        log.info("Found enrollment: {}", enrollment);
         QuizCalculationResult calculationResult = courseService.calculateQuizScore(enrollment.getCourseId(), quizSubmitDTO.quizId(), quizSubmitDTO.getAnswers());
-        enrollment.addQuizSubmission(new QuizSubmission(quizSubmitDTO.quizId(), quizSubmitDTO.toQuizAnswers(), calculationResult.score(), calculationResult.passed()));
+        log.info("Calculation result: {}", calculationResult);
+        QuizSubmission quizSubmission = new QuizSubmission(quizSubmitDTO.quizId(), quizSubmitDTO.toQuizAnswers(), calculationResult.score(), calculationResult.passed());
+        enrollment.addQuizSubmission(quizSubmission);
         repository.save(enrollment);
+        return quizSubmission.getId();
     }
 
     @Override

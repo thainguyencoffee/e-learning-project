@@ -196,6 +196,7 @@ create table quiz_answer
     question_id       bigint      not null,
     answer_option_ids bigint[],
     true_false_answer boolean,
+    single_choice_answer bigint,
     type              varchar(50) not null,
     constraint fk_quiz_answer primary key (id)
 );
