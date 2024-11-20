@@ -12,10 +12,16 @@
     <!--Content-->
     <!--display video-->
     <div class="w-100 mb-4">
-      <div class="video-container">
+      <div *ngIf="lessonType === 'video'" class="video-container">
         <app-video-player [videoLink]="lessonDetail.link"></app-video-player>
       </div>
+
+      <div *ngIf="lessonType === 'docx'" class="document-container">
+        <app-document-viewer [documentLink]="lessonDetail.link"></app-document-viewer>
+      </div>
+
     </div>
+
 
     <!--Action Buttons-->
     <div class="d-flex justify-content-between mb-4">
