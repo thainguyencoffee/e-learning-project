@@ -104,11 +104,15 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
 
     public void addQuizSubmission(QuizSubmission quizSubmission) {
         if (quizSubmission == null) throw new InputInvalidException("QuizSubmission must not be null.");
-        if (quizSubmissions.stream().anyMatch(qs -> qs.getQuizId().equals(quizSubmission.getQuizId()))) {
+        if (isSubmittedQuiz(quizSubmission.getQuizId())) {
             throw new InputInvalidException("QuizSubmission for this quiz already exists.");
         }
         quizSubmissions.add(quizSubmission);
         checkCompleted();
+    }
+
+    public boolean isSubmittedQuiz(Long quizId) {
+        return quizSubmissions.stream().anyMatch(qs -> qs.getQuizId().equals(quizId));
     }
 
     public LessonProgress findLessonProgressByLessonId(Long lessonId) {
@@ -138,6 +142,18 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
             throw new InputInvalidException("Course enrollment is already reviewed.");
         }
         reviewed = true;
+    }
+
+    public QuizSubmission getQuizSubmission(Long quizId) {
+        return quizSubmissions.stream()
+                .filter(qs -> qs.getQuizId().equals(quizId))
+                .findFirst()
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    public void deleteQuizSubmission(Long quizId) {
+        QuizSubmission quizSubmission = getQuizSubmission(quizId);
+        quizSubmissions.remove(quizSubmission);
     }
 
     public record EnrolmentCompletedEvent(Long id, Long courseId, String student) {}

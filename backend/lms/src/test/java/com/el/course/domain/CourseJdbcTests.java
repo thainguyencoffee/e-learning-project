@@ -183,7 +183,7 @@ class CourseJdbcTests {
 
         // Test add question to quiz
         Question question = new Question("Question 1", QuestionType.SINGLE_CHOICE, 2,
-                Set.of(new AnswerOption("Answer 1", true), new AnswerOption("Answer 2", false)));
+                Set.of(new AnswerOption("Answer 1", true), new AnswerOption("Answer 2", false)), null);
         quiz.addQuestion(question);
         courseRepository.save(savedCourse);
 

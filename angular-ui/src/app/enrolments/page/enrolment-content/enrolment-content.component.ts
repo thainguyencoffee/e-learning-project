@@ -1,17 +1,16 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute, NavigationEnd, Router, RouterLink, RouterOutlet} from "@angular/router";
+import {Component, inject, OnInit} from '@angular/core';
+import {ActivatedRoute, Router, RouterLink, RouterOutlet} from "@angular/router";
 import {ErrorHandler} from "../../../common/error-handler.injectable";
-import {Observable, Subscription} from "rxjs";
+import {Observable} from "rxjs";
 import {EnrolmentsService} from "../../service/enrolments.service";
 import {EnrolmentWithCourseDto} from "../../model/enrolment-with-course-dto";
-import {AsyncPipe, NgClass, NgForOf, NgIf, SlicePipe} from "@angular/common";
+import {AsyncPipe, NgClass, NgIf, SlicePipe} from "@angular/common";
 import {EnrolmentWithCourseDataService} from "./enrolment-with-course-data.service";
 
 @Component({
   selector: 'app-enrolment-content',
   standalone: true,
   imports: [
-    NgForOf,
     NgClass,
     RouterLink,
     RouterOutlet,
@@ -24,7 +23,6 @@ import {EnrolmentWithCourseDataService} from "./enrolment-with-course-data.servi
 export class EnrolmentContentComponent implements OnInit {
   route = inject(ActivatedRoute);
   router = inject(Router);
-  showFullDescription: boolean = false;
   enrolmentService = inject(EnrolmentsService);
   errorHandler = inject(ErrorHandler);
   enrolmentWithCourseDataService = inject(EnrolmentWithCourseDataService);
@@ -32,11 +30,11 @@ export class EnrolmentContentComponent implements OnInit {
   enrolmentId?: number;
   enrolmentWithCourse$!: Observable<EnrolmentWithCourseDto | null>;
 
+  showFullDescription: boolean = false;
+
   ngOnInit(): void {
     this.loadData();
   }
-
-
 
   loadData(): void {
     this.enrolmentId = +this.route.snapshot.params['id'];

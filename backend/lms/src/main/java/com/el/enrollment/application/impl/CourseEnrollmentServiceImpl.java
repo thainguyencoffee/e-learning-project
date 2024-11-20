@@ -9,9 +9,11 @@ import com.el.course.application.CourseService;
 import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.domain.Course;
 import com.el.course.application.dto.QuizCalculationResult;
+import com.el.course.domain.Quiz;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
 import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
+import com.el.enrollment.application.dto.QuizDetailDTO;
 import com.el.enrollment.application.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
@@ -147,18 +149,46 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     }
 
     @Override
-    public void submitQuiz(Long enrollmentId, QuizSubmitDTO quizSubmitDTO) {
-        checkAccess();
+    public boolean isSubmittedQuiz(Long enrollmentId, Long quizId) {
         CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        return enrollment.isSubmittedQuiz(quizId);
+    }
+
+    @Override
+    public QuizSubmission getQuizSubmission(Long enrollmentId, Long quizId) {
+        CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        return enrollment.getQuizSubmission(quizId);
+    }
+
+    @Override
+    public Long submitQuiz(Long enrollmentId, QuizSubmitDTO quizSubmitDTO) {
+        CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        log.info("Found enrollment: {}", enrollment);
         QuizCalculationResult calculationResult = courseService.calculateQuizScore(enrollment.getCourseId(), quizSubmitDTO.quizId(), quizSubmitDTO.getAnswers());
-        enrollment.addQuizSubmission(new QuizSubmission(quizSubmitDTO.quizId(), quizSubmitDTO.toQuizAnswers(), calculationResult.score(), calculationResult.passed()));
+        log.info("Calculation result: {}", calculationResult);
+        QuizSubmission quizSubmission = new QuizSubmission(quizSubmitDTO.quizId(), quizSubmitDTO.toQuizAnswers(), calculationResult.score(), calculationResult.passed());
+        enrollment.addQuizSubmission(quizSubmission);
         repository.save(enrollment);
+        return quizSubmission.getId();
     }
 
     @Override
     public void markAsReviewed(Long courseId, String student) {
         CourseEnrollment enrollment = findCourseEnrollmentByCourseIdAndStudent(courseId, student);
         enrollment.markAsReviewed();
+        repository.save(enrollment);
+    }
+
+    @Override
+    public QuizDetailDTO findQuizByIdAndQuizId(Long enrollmentId, Long quizId) {
+        Quiz quiz = courseQueryService.findQuizByQuizId(quizId);
+        return QuizDetailDTO.fromQuiz(quiz);
+    }
+
+    @Override
+    public void deleteQuizSubmission(Long enrollmentId, Long quizId) {
+        CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        enrollment.deleteQuizSubmission(quizId);
         repository.save(enrollment);
     }
 

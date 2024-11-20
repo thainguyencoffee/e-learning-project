@@ -3,20 +3,20 @@ import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 import {CourseService} from "../../../service/course.service";
 import {ErrorHandler} from "../../../../../common/error-handler.injectable";
 import {FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import { updateFormAdvanced} from "../../../../../common/utils";
+import {minFormArrayLength, updateFormAdvanced} from "../../../../../common/utils";
 import {QuestionDto} from "../../../model/question.dto";
-import {InputRowComponent} from "../../../../../common/input-row/input-row.component";
-import {FieldConfiguration} from "../../../../../common/input-row/field-configuration";
-import {ArrayRowComponent} from "../../../../../common/input-row/array/array-row.component";
+import {KeyValuePipe, NgForOf, NgIf} from "@angular/common";
+import {onChangeQuestionType} from "../question-utils";
 
 @Component({
   selector: 'app-edit-question',
   standalone: true,
   imports: [
-    InputRowComponent,
     ReactiveFormsModule,
     RouterLink,
-    ArrayRowComponent
+    KeyValuePipe,
+    NgForOf,
+    NgIf
   ],
   templateUrl: './edit-question.component.html',
 })
@@ -33,6 +33,23 @@ export class EditQuestionComponent implements OnInit {
   quizId?: number;
   questionId?: number;
 
+  ngOnInit(): void {
+    this.courseId = +this.route.snapshot.params['courseId'];
+    this.sectionId = +this.route.snapshot.params['sectionId'];
+    this.lessonId = +this.route.snapshot.params['lessonId'];
+    this.quizId = +this.route.snapshot.params['quizId'];
+    this.questionId = +this.route.snapshot.params['questionId'];
+
+    this.courseService.getQuiz(this.courseId, this.sectionId)
+      .subscribe({
+        next: data => {
+          const question = data.content.find(quiz => quiz.afterLessonId === this.lessonId)
+            ?.questions?.find(question => question.id === this.questionId) || undefined;
+          updateFormAdvanced(this.editForm, question, this.createAnswerOption);
+        }
+      })
+  }
+
   getMessage(key: string, details?: any) {
     const messages: Record<string, string> = {
       updated: `Question was updated successfully.`
@@ -40,35 +57,19 @@ export class EditQuestionComponent implements OnInit {
     return messages[key];
   }
 
-  questionTypesMap: Record<string, string> = {
+  typeOptions: Record<string, string> = {
     MULTIPLE_CHOICE: 'Multiple Choice',
     SINGLE_CHOICE: 'Single Choice',
     TRUE_FALSE: 'True/False',
   }
 
-  optionGroupConfiguration: FieldConfiguration[] = [
-    {
-      name: 'content',
-      type: 'textarea',
-      label: 'Content',
-    },
-    {
-      name: 'correct',
-      type: 'radio',
-      label: 'Correct',
-      options: {
-        true: 'true',
-        false: 'false'
-      }
-    }
-  ]
-
   editForm = new FormGroup({
     id: new FormControl({value: null, disabled: true}),
     content: new FormControl(null, [Validators.required, Validators.minLength(10), Validators.maxLength(1000)]),
     type: new FormControl(null, [Validators.required]),
-    options: new FormArray([this.createAnswerOption()]),
-    score: new FormControl(null, [Validators.required, Validators.min(1), Validators.max(5)])
+    options: new FormArray([], [minFormArrayLength(2)]),
+    score: new FormControl<number|null>(null, [Validators.required, Validators.min(1), Validators.max(5)]),
+    trueFalseAnswer: new FormControl<boolean | null>(null),
   })
 
   get options(): FormArray {
@@ -78,7 +79,7 @@ export class EditQuestionComponent implements OnInit {
   createAnswerOption(): FormGroup {
     return new FormGroup({
       content: new FormControl(null, [Validators.required, Validators.minLength(1), Validators.maxLength(1000)]),
-      correct: new FormControl(null, [Validators.required])
+      correct: new FormControl(false, [Validators.required])
     })
   }
 
@@ -113,21 +114,42 @@ export class EditQuestionComponent implements OnInit {
       })
   }
 
-  ngOnInit(): void {
-    this.courseId = +this.route.snapshot.params['courseId'];
-    this.sectionId = +this.route.snapshot.params['sectionId'];
-    this.lessonId = +this.route.snapshot.params['lessonId'];
-    this.quizId = +this.route.snapshot.params['quizId'];
-    this.questionId = +this.route.snapshot.params['questionId'];
-
-    this.courseService.getQuiz(this.courseId, this.sectionId)
-      .subscribe({
-        next: data => {
-          const question = data.content.find(quiz => quiz.afterLessonId === this.lessonId)
-            ?.questions?.find(question => question.id === this.questionId) || undefined;
-          updateFormAdvanced(this.editForm, question, this.createAnswerOption);
-        }
-      })
+  isMultipleChoice() {
+    const type = this.editForm.get('type') as FormControl;
+    return type.value === 'MULTIPLE_CHOICE';
   }
+
+  isSingleChoice() {
+    const type = this.editForm.get('type') as FormControl;
+    return type.value === 'SINGLE_CHOICE';
+  }
+
+  isTrueFalse() {
+    const type = this.editForm.get('type') as FormControl;
+    return type.value === 'TRUE_FALSE';
+  }
+
+  handleSingleChoice(i: number) {
+    const optionsArray = this.options;
+    optionsArray.controls.forEach((control, index) => {
+      if (index !== i) {
+        control.get('correct')?.setValue(false, { emitEvent: false });
+      } else {
+        control.get('correct')?.setValue(true, { emitEvent: false });
+      }
+    });
+  }
+
+  onChangeType() {
+    const type = this.editForm.get('type') as FormControl;
+
+    onChangeQuestionType(type, this.editForm.get('trueFalseAnswer') as FormControl, this.options);
+    if (type.value === 'SINGLE_CHOICE') {
+      if (this.options.length > 0) {
+        this.handleSingleChoice(0);
+      }
+    }
+  }
+
 
 }

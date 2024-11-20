@@ -24,6 +24,8 @@ public interface CourseQueryService {
 
     Course findPublishedCourseById(Long courseId);
 
+    Page<Course> findAllPublishedCourses(Pageable pageable);
+
     List<CourseWithoutSectionsDTO> findAllCourseWithoutSectionsDTOs(Pageable pageable);
 
     CourseWithoutSectionsDTO findCourseWithoutSectionsDTOById(Long courseId);
@@ -41,5 +43,7 @@ public interface CourseQueryService {
     Quiz findQuizByCourseIdAndSectionIdAndQuizId(Long courseId, Long sectionId, Long quizId);
 
     List<Quiz> findTrashQuizzesByCourseIdAndSectionId(Long courseId, Long sectionId, Pageable pageable);
+
+    Quiz findQuizByQuizId(Long quizId);
 
 }

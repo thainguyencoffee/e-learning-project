@@ -4,8 +4,12 @@
     <a *ngIf="course && canRequestPublish(course)" [routerLink]="['/administration/courses/request-publish', courseId]"
        class="btn btn-primary ms-2">Request publish
     </a>
-    <a *ngIf="course && canRequestUnPublish(course)" [routerLink]="['/administration/courses/request-unpublish', courseId]"
+    <a *ngIf="course && canRequestUnPublish(course)"
+       [routerLink]="['/administration/courses/request-unpublish', courseId]"
        class="btn btn-primary ms-2">Request unpublish
+    </a>
+    <a [routerLink]="['/administration/courses', courseId]"
+       class="btn btn-primary ms-2">Course View
     </a>
     <a routerLink="/administration/courses"
        class="btn btn-secondary ms-2">Back to list
@@ -25,35 +29,40 @@
         <th scope="col">Status</th>
         <th scope="col">RequestBy</th>
         <th scope="col">Message</th>
-        <th scope="col">Course Ref</th>
         <th><!-- --></th>
       </tr>
       </thead>
       <tbody>
-        @for (request of course?.courseRequests; track request.id) {
-          <tr>
-            <td>{{request.id}}</td>
-            <td>{{request.type}}</td>
-            <td>{{request.status}}</td>
-            <td>{{request.requestedBy === userService.current.name ? 'This account': request.requestedBy}}</td>
-            <td>{{request.message}}</td>
-            <td>
-              <a [routerLink]="['/administration/courses', courseId]" class="btn btn-outline-primary">Course ref
-              </a>
-            </td>
-            <td>
-              @if(request.resolved) {
-                <span class="badge bg-success">Resolved</span>
-              } @else {
-                <a [routerLink]="['/administration/courses', courseId, 'requests', 'approve', request.id]" class="btn btn-success ms-2"
-                   *ngIf="canResolveRequest(request)">Approve</a>
-                <a [routerLink]="['/administration/courses', courseId, 'requests', 'reject', request.id]" class="btn btn-secondary ms-2"
-                   *ngIf="canResolveRequest(request)">Reject</a>
-              }
-            </td>
-          </tr>
-        }
+      <tr *ngFor="let request of course?.courseRequests; let i = index"
+          [ngClass]="{ 'table-success': request.resolved }">
+        <td>{{ request.id }}</td>
+        <td>{{ request.type }}</td>
+        <td>{{ request.status }}</td>
+        <td>{{ request.requestedBy === userService.current.name ? 'This account' : request.requestedBy }}</td>
+        <td>
+          <p class="mb-3">
+            {{ expandMessageFlags[request.id] ? request.message : (request.message | slice: 0: 50) + '...' }}
+            <ng-container *ngIf="request.message.length > 50">
+              <button class="btn btn-link p-0 text-primary"
+                      (click)="expandMessageFlags[request.id] = !expandMessageFlags[request.id]">
+                {{ expandMessageFlags[request.id] ? 'Collapse' : 'Expand' }}
+              </button>
+            </ng-container>
+          </p>
+        </td>
+        <td>
+          <ng-container *ngIf="!request.resolved">
+            <a [routerLink]="['/administration/courses', courseId, 'requests', 'approve', request.id]"
+               class="btn btn-sm btn-success ms-2"
+               *ngIf="canResolveRequest(request)">Approve</a>
+            <a [routerLink]="['/administration/courses', courseId, 'requests', 'reject', request.id]"
+               class="btn btn-sm btn-secondary ms-2"
+               *ngIf="canResolveRequest(request)">Reject</a>
+          </ng-container>
+        </td>
+      </tr>
       </tbody>
     </table>
   </div>
+
 }

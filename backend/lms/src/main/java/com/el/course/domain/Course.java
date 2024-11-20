@@ -512,9 +512,9 @@ public class Course extends AbstractAggregateRoot<Course> {
         section.forceDeleteQuiz(quizId);
     }
 
-    public QuizCalculationResult calculateQuiz(long quizId, Map<Long, Set<Long>> answers) {
+    public QuizCalculationResult calculateQuiz(long quizId, Map<Long, Object> userAnswers) {
         Quiz quiz = findQuizById(quizId);
-        Integer score = quiz.calculateScore(answers);
+        Integer score = quiz.calculateScore(userAnswers);
         Boolean passed = quiz.isPassed(score);
         return new QuizCalculationResult(score, passed);
     }

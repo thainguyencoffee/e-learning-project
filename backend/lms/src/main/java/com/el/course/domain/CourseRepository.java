@@ -2,7 +2,6 @@ package com.el.course.domain;
 
 import com.el.common.projection.MonthStats;
 import com.el.common.projection.RatingMonthStats;
-import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.application.dto.teacher.CountDataDTO;
 import com.el.enrollment.application.dto.CourseInfoDTO;
 import org.springframework.data.domain.Page;
@@ -12,7 +11,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public interface CourseRepository extends CrudRepository<Course, Long> {
@@ -20,10 +18,10 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
     @Query("""
         SELECT 
             c.teacher,
-            COUNT(DISTINCT CASE WHEN c.published = TRUE THEN 1 END) as number_of_courses,
+            COUNT(DISTINCT CASE WHEN c.published = TRUE THEN c.id END) as number_of_courses,
             COUNT(e.id) as number_of_students,
             COUNT(CASE when e.completed = TRUE THEN 1 END) as number_of_certificates,
-            COUNT(DISTINCT CASE WHEN c.published = FALSE THEN 1 END) as number_of_draft_courses
+            COUNT(DISTINCT CASE WHEN c.published = FALSE THEN c.id END) as number_of_draft_courses
         FROM 
             course c
         LEFT JOIN 
@@ -45,32 +43,7 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
 
     Optional<Course> findByTeacherAndIdAndDeleted(String teacher, Long courseId, Boolean deleted);
 
-    @Query("""
-        SELECT c.id, c.title, c.thumbnail_url, c.description, c.language, c.subtitles, c.benefits, c.prerequisites, c.price, c.teacher
-            FROM course c
-            WHERE c.published = :published
-                AND c.deleted = :deleted
-    """)
-    List<CourseWithoutSectionsDTO> findAllByPublishedAndDeleted(Boolean published, Boolean deleted, int page, int size);
-
-    @Query("""
-        SELECT c.id, c.title, c.thumbnail_url, c.description, c.language, c.subtitles, c.benefits, c.prerequisites, c.price, c.teacher
-            FROM course c
-            WHERE c.id = :courseId
-                AND c.published = :published
-                AND c.deleted = :deleted
-    """)
-    Optional<CourseWithoutSectionsDTO> findCourseWithoutSectionsDTOByIdAndPublishedAndDeleted(Long courseId, Boolean published, Boolean deleted);
-
-    @Query("""
-        SELECT c.id, c.title, c.thumbnail_url, c.description, c.language, c.subtitles, c.benefits, c.prerequisites, c.price, c.teacher
-            FROM course c
-            WHERE c.id = :courseId
-                AND c.teacher = :teacher
-                AND c.published = :published
-                AND c.deleted = :deleted
-    """)
-    Optional<CourseWithoutSectionsDTO> findCourseWithoutSectionsDTOByIdAndPublishedAndDeleted(Long courseId, String teacher, Boolean published, Boolean deleted);
+    Page<Course> findAllByPublishedAndDeleted(Boolean published, boolean deleted, Pageable pageable);
 
     Optional<Course> findByIdAndPublishedAndDeleted(Long courseId, Boolean published, Boolean deleted);
 
@@ -168,5 +141,12 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
            GROUP BY EXTRACT(MONTH from r.review_date)
     """)
     List<RatingMonthStats> statsMonthRatingOverallByTeacherAndYear(String teacher, Integer year);
+
+    @Query("""
+        select q.* from course c join course_section s on c.id = s.course
+           join quiz q on s.id = q.course_section
+           where q.id = :quizId and c.deleted = false and q.deleted = false
+    """)
+    Optional<Quiz> findQuizByQuizId(Long quizId);
 
 }

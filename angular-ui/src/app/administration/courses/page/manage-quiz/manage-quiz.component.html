@@ -31,7 +31,7 @@
           <th scope="col">Id</th>
           <th scope="col">Content</th>
           <th scope="col">Type</th>
-          <th scope="col">Options</th>
+          <th scope="col">Correct option</th>
           <th scope="col">Score</th>
           <th><!-- --></th>
         </tr>
@@ -42,7 +42,17 @@
               <td>{{question.id}}</td>
               <td>{{question.content}}</td>
               <td>{{question.type}}</td>
-              <td>{{question.options | json}}</td>
+              <td>
+                @if (question.type === 'SINGLE_CHOICE') {
+                  {{getCorrectOption(question.options!)[0].content}}
+                } @else if (question.type === 'MULTIPLE_CHOICE'){
+                  <ul *ngFor="let correctOption of getCorrectOption(question.options!)">
+                    <li>{{correctOption.content}}</li>
+                  </ul>
+                } @else {
+                  {{question.trueFalseAnswer}}
+                }
+              </td>
               <td>{{question.score}}</td>
               <td>
                 <a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', quizDetail.id, 'edit-question', question.id]"

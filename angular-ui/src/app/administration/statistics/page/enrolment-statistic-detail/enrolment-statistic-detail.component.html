@@ -5,6 +5,11 @@
   </a>
 </div>
 
+<div class="alert alert-warning">
+Quiz submissions are not included lesson information. Fix it later.
+  <a href="https://github.com/thainguyencoffee/e-learning-project/issues/152">Issue 152</a>
+</div>
+
 <div class="container-fluid bg-light p-4 rounded shadow-sm" *ngIf="courseInfoWithEnrolments">
   <section id="basic" class="p-4 border rounded mb-4 bg-white">
     <h2 class="mb-4 border-bottom pb-2">Basic Information</h2>
@@ -31,7 +36,7 @@
 
   <section id="enrolments" class="p-4 border rounded mb-4 bg-white">
     <h2 class="mb-4 border-bottom pb-2">Students</h2>
-    <!--Section-->
+    <!-- Section -->
     <div class="accordion mt-4" id="courseSections">
       <div *ngFor="let enrolment of courseInfoWithEnrolments.enrolments; let i = index" class="accordion-item mb-3 border rounded">
         <!-- Accordion Header -->
@@ -68,20 +73,42 @@
             <ul class="list-group border-0">
               <li *ngFor="let lessonProgress of enrolment.lessonProgresses; let j = index"
                   class="list-group-item d-flex justify-content-between align-items-center border-0">
-                <!--Title-->
+                <!-- Lesson Title -->
                 <span class="fw-bold">{{ lessonProgress.lessonTitle }}</span>
-                <!--Completed-->
-                @if (lessonProgress.completed) {
-                  <span class="badge bg-success">Completed - {{lessonProgress.completedDate | date }}</span>
-                } @else {
-                  <span class="badge bg-warning">In progress</span>
-                }
+                <!-- Completed Status -->
+                <span *ngIf="lessonProgress.completed" class="badge bg-success">
+                Completed - {{lessonProgress.completedDate | date }}
+              </span>
+                <span *ngIf="!lessonProgress.completed" class="badge bg-warning">In progress</span>
               </li>
             </ul>
+
+            <!-- Quiz Submissions -->
+            <div *ngIf="enrolment.quizSubmissions && enrolment.quizSubmissions.length > 0" class="mt-4">
+              <h5>Quiz Submissions</h5>
+              <ul class="list-group">
+                <li *ngFor="let quizSubmission of enrolment.quizSubmissions" class="list-group-item d-flex justify-content-between align-items-center">
+                  <!-- Quiz Information -->
+                  <div>
+                    <p><strong>ID:</strong> {{ quizSubmission.id }}</p>
+                    <p><strong>Quiz ID:</strong> {{ quizSubmission.quizId }}</p>
+                    <p><strong>Score:</strong> {{ quizSubmission.score }}</p>
+                    <p><strong>Status:</strong> {{ quizSubmission.passed ? 'Passed' : 'Failed' }}</p>
+                    <p><strong>Submitted On:</strong> {{ quizSubmission.submittedDate | date }}</p>
+                  </div>
+
+                  <!-- Delete Button -->
+                  <button (click)="deleteQuizSubmission(enrolment.id, quizSubmission.id)" class="btn btn-danger btn-sm">
+                    Delete
+                  </button>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
+
 
 </div>

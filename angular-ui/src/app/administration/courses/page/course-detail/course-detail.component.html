@@ -172,11 +172,17 @@
               <div>
                 <i class="bi text-primary me-2"></i>
                 <span class="fw-semibold">{{ lesson.orderIndex }}. {{ lesson.title }}</span>
+                <span class="fw-semibold" *ngIf="getQuizByLessonId(selectedSection, lesson.id) as quiz">
+                  <span class="badge bg-info ms-2">{{ '1 quiz with ' + quiz.questions.length + ' questions'}}</span>
+                </span>
               </div>
               <div class="d-flex gap-2">
                 <a [href]="lesson.link" target="_blank" class="btn btn-secondary btn-sm">
                   <i class="bi me-1"></i>View
                 </a>
+                <a *ngIf="isEditable()"
+                   [routerLink]="['/administration/courses', currentId, 'sections', selectedSection.id, 'lessons', lesson.id, 'quizzes']"
+                   class="btn btn-secondary btn-sm">Manage quiz</a>
                 <a *ngIf="isEditable()"
                    [routerLink]="['/administration/courses', currentId, 'sections', selectedSection.id, 'lessons', 'edit', lesson.id]"
                    class="btn btn-secondary btn-sm">

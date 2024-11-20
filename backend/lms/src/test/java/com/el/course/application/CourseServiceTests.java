@@ -1191,7 +1191,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(spy);
 
         QuestionDTO questionDTO = new QuestionDTO("Question content", QuestionType.SINGLE_CHOICE,
-                Set.of(new AnswerOptionDTO("Option 1", true), new AnswerOptionDTO("Option 2", false)), 1);
+                Set.of(new AnswerOptionDTO("Option 1", true), new AnswerOptionDTO("Option 2", false)), 1, null);
         courseService.addQuestionToQuiz(1L, 1L, 1L, questionDTO);
 
         verify(courseRepository, times(1)).save(spy);
@@ -1202,7 +1202,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
 
         QuestionDTO questionDTO = new QuestionDTO("Question content", QuestionType.SINGLE_CHOICE,
-                Set.of(new AnswerOptionDTO("Option 1", true), new AnswerOptionDTO("Option 2", false)), 1);
+                Set.of(new AnswerOptionDTO("Option 1", true), new AnswerOptionDTO("Option 2", false)), 1, null);
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.addQuestionToQuiz(1L, 1L, 1L, questionDTO));
         verify(courseRepository, never()).save(any(Course.class));
@@ -1216,7 +1216,7 @@ class CourseServiceTests {
         doNothing().when(course).updateQuestionInQuizInSection(anyLong(), anyLong(), any(), any(Question.class));
 
         QuestionDTO questionDTO = new QuestionDTO("Question content", QuestionType.SINGLE_CHOICE,
-                Set.of(new AnswerOptionDTO("Option 1", true), new AnswerOptionDTO("Option 2", false)), 1);
+                Set.of(new AnswerOptionDTO("Option 1", true), new AnswerOptionDTO("Option 2", false)), 1, null);
 
         courseService.updateQuestion(1L, 2L, 3L, 4L, questionDTO);
 
@@ -1229,7 +1229,7 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
 
         QuestionDTO questionDTO = new QuestionDTO("Question content", QuestionType.SINGLE_CHOICE,
-                Set.of(new AnswerOptionDTO("Option 1", true), new AnswerOptionDTO("Option 2", false)), 1);
+                Set.of(new AnswerOptionDTO("Option 1", true), new AnswerOptionDTO("Option 2", false)), 1, null);
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.updateQuestion(1L, 2L, 3L, 4L, questionDTO));
         verify(courseRepository, never()).save(any(Course.class));

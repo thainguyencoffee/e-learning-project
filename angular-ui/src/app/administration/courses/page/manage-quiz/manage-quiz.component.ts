@@ -3,8 +3,8 @@ import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router
 import {Subscription} from "rxjs";
 import {CourseService} from "../../service/course.service";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
-import {JsonPipe, NgIf} from "@angular/common";
-import {Quiz} from "../../model/view/quiz";
+import {JsonPipe, NgForOf, NgIf} from "@angular/common";
+import {AnswerOption, Quiz} from "../../model/view/quiz";
 
 @Component({
   selector: 'app-manage-quiz',
@@ -12,7 +12,7 @@ import {Quiz} from "../../model/view/quiz";
   imports: [
     RouterLink,
     NgIf,
-    JsonPipe
+    NgForOf,
   ],
   templateUrl: './manage-quiz.component.html',
 })
@@ -98,4 +98,7 @@ export class ManageQuizComponent implements OnInit, OnDestroy{
     }
   }
 
+  getCorrectOption(options: AnswerOption[]) {
+    return options.filter(option => option.correct);
+  }
 }

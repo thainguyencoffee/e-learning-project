@@ -3,19 +3,20 @@ import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 import {CourseService} from "../../../service/course.service";
 import {ErrorHandler} from "../../../../../common/error-handler.injectable";
 import {FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {InputRowComponent} from "../../../../../common/input-row/input-row.component";
-import {ArrayRowComponent} from "../../../../../common/input-row/array/array-row.component";
-import {FieldConfiguration} from "../../../../../common/input-row/field-configuration";
 import {QuestionDto} from "../../../model/question.dto";
+import {minFormArrayLength} from "../../../../../common/utils";
+import {KeyValuePipe, NgForOf, NgIf} from "@angular/common";
+import {onChangeQuestionType} from "../question-utils";
 
 @Component({
   selector: 'app-add-question',
   standalone: true,
   imports: [
     RouterLink,
-    InputRowComponent,
     ReactiveFormsModule,
-    ArrayRowComponent
+    KeyValuePipe,
+    NgForOf,
+    NgIf
   ],
   templateUrl: './add-question.component.html',
 })
@@ -31,6 +32,14 @@ export class AddQuestionComponent implements OnInit {
   lessonId?: number;
   quizId?: number;
 
+  ngOnInit(): void {
+    this.courseId = +this.route.snapshot.params['courseId'];
+    this.sectionId = +this.route.snapshot.params['sectionId'];
+    this.lessonId = +this.route.snapshot.params['lessonId'];
+    this.quizId = +this.route.snapshot.params['quizId'];
+
+  }
+
   getMessage(key: string, details?: any) {
     const messages: Record<string, string> = {
       added: `Question was added successfully.`
@@ -38,49 +47,29 @@ export class AddQuestionComponent implements OnInit {
     return messages[key];
   }
 
-  questionTypesMap: Record<string, string> = {
-    'MULTIPLE_CHOICE': 'Multiple Choice',
-    'SINGLE_CHOICE': 'Single Choice',
-    'TRUE_FALSE': 'True/False',
+  typeOptions: Record<string, string> = {
+    MULTIPLE_CHOICE: 'Multiple Choice',
+    SINGLE_CHOICE: 'Single Choice',
+    TRUE_FALSE: 'True/False',
   }
 
-  optionGroupConfiguration: FieldConfiguration[] = [
-    {
-      name: 'content',
-      type: 'textarea',
-      label: 'Content',
-    },
-    {
-      name: 'correct',
-      type: 'radio',
-      label: 'Correct',
-      options: {
-        'true': 'true',
-        'false': 'false'
-      }
-    }
-  ]
-
-  addForm = new FormGroup({
+  questionForm = new FormGroup({
     content: new FormControl(null, [Validators.required, Validators.minLength(10), Validators.maxLength(1000)]),
     type: new FormControl(null, [Validators.required]),
-    options: new FormArray([this.createAnswerOption()]),
-    score: new FormControl(null, [Validators.required, Validators.min(1), Validators.max(5)])
+    score: new FormControl<number|null>(null, [Validators.required, Validators.min(1), Validators.max(5)]),
+    options: new FormArray([], [minFormArrayLength(2)]),
+    trueFalseAnswer: new FormControl<boolean | null>(null),
   })
 
-  get options(): FormArray {
-    return this.addForm.get('options') as FormArray;
-  }
-
-  createAnswerOption(): FormGroup {
-    return new FormGroup({
-      content: new FormControl(null, [Validators.required, Validators.minLength(1), Validators.maxLength(1000)]),
-      correct: new FormControl(null, [Validators.required])
-    })
+  get options() {
+    return this.questionForm.get('options') as FormArray;
   }
 
   addAnswerOption() {
-    this.options.push(this.createAnswerOption());
+    this.options.push(new FormGroup({
+      content: new FormControl(null, [Validators.required, Validators.minLength(1), Validators.maxLength(1000)]),
+      correct: new FormControl(false, [Validators.required])
+    }));
   }
 
   removeAnswerOption(index: number) {
@@ -89,11 +78,11 @@ export class AddQuestionComponent implements OnInit {
 
   handleSubmit() {
     window.scrollTo(0, 0);
-    this.addForm.markAllAsTouched();
-    if (this.addForm.invalid) {
+    this.questionForm.markAllAsTouched();
+    if (this.questionForm.invalid) {
       return;
     }
-    const data = new QuestionDto(this.addForm.value);
+    const data = new QuestionDto(this.questionForm.value);
 
     this.courseService.addQuestionToQuiz(this.courseId!, this.sectionId!, this.quizId!, data)
       .subscribe({
@@ -109,12 +98,41 @@ export class AddQuestionComponent implements OnInit {
       })
   }
 
-  ngOnInit(): void {
-    this.courseId = +this.route.snapshot.params['courseId'];
-    this.sectionId = +this.route.snapshot.params['sectionId'];
-    this.lessonId = +this.route.snapshot.params['lessonId'];
-    this.quizId = +this.route.snapshot.params['quizId'];
+  isMultipleChoice() {
+    const type = this.questionForm.get('type') as FormControl;
+    return type.value === 'MULTIPLE_CHOICE';
+  }
 
+  isSingleChoice() {
+    const type = this.questionForm.get('type') as FormControl;
+    return type.value === 'SINGLE_CHOICE';
+  }
+
+  isTrueFalse() {
+    const type = this.questionForm.get('type') as FormControl;
+    return type.value === 'TRUE_FALSE';
+  }
+
+  handleSingleChoice(i: number) {
+    const optionsArray = this.options;
+    optionsArray.controls.forEach((control, index) => {
+      if (index !== i) {
+        control.get('correct')?.setValue(false, { emitEvent: false });
+      } else {
+        control.get('correct')?.setValue(true, { emitEvent: false });
+      }
+    });
+  }
+
+  onChangeType() {
+    const type = this.questionForm.get('type') as FormControl;
+
+    onChangeQuestionType(type, this.questionForm.get('trueFalseAnswer') as FormControl, this.options);
+    if (type.value === 'SINGLE_CHOICE') {
+      if (this.options.length > 0) {
+        this.handleSingleChoice(0);
+      }
+    }
   }
 
 }

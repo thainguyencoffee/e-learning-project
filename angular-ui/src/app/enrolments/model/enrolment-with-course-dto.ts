@@ -22,8 +22,8 @@ export interface Certificate {
 export interface EnrolmentWithCourseDto {
   courseId: number,
   title: string,
-  thumbnailUrl: string,
-  description: string,
+  thumbnailUrl?: string,
+  description?: string,
   language: string,
   subtitles: string[],
   benefits: string[],
