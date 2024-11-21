@@ -48,7 +48,7 @@ class CourseEnrollmentServiceTests {
         // Tạo một Course giả lập với lessonIds
         Course mockCourse = Mockito.mock(Course.class);
         Map<Long, String> lessonTitles = Map.of(1L, "Course Lesson 1", 2L, "Course Lesson 2");
-        when(mockCourse.getLessonIds()).thenReturn(lessonTitles);
+        when(mockCourse.getLessonIdAndTitleMap()).thenReturn(lessonTitles);
         when(mockCourse.getTeacher()).thenReturn(TestFactory.teacher);
         when(courseQueryService.findPublishedCourseById(courseId)).thenReturn(mockCourse);
 
@@ -81,7 +81,7 @@ class CourseEnrollmentServiceTests {
 
         Course mockCourse = Mockito.mock(Course.class);
         when(courseQueryService.findPublishedCourseById(courseId)).thenReturn(mockCourse);
-        when(mockCourse.getLessonIds()).thenReturn(new HashMap<>());
+        when(mockCourse.getLessonIdAndTitleMap()).thenReturn(new HashMap<>());
 
         // Act and Assert
         Assertions.assertThrows(InputInvalidException.class, () ->

@@ -60,8 +60,21 @@ class CourseEnrollmentTests {
         enrollment.markLessonAsCompleted(1L);
         enrollment.markLessonAsCompleted(2L);
 
-        // Update: enrollment.getCompleted() return true when all lessons are completed and all quizzes are submitted
-        // this return true because all lessons are completed and no quizzes created yet
+        // Just need to mark all lessons as completed to complete the enrollment, quizzes don't need
+        long quizId1 = 1L;
+        Set<QuizAnswer> answers1 = Set.of(
+                new QuizAnswer(1L, 1L, QuestionType.SINGLE_CHOICE),
+                new QuizAnswer(2L, 2L, QuestionType.SINGLE_CHOICE));
+        QuizSubmission quizSubmission1 = new QuizSubmission(quizId1, answers1, 5, true);
+        enrollment.addQuizSubmission(quizSubmission1);
+
+        long quizId2 = 2L;
+        Set<QuizAnswer> answers2 = Set.of(
+                new QuizAnswer(1L, 1L, QuestionType.SINGLE_CHOICE),
+                new QuizAnswer(2L, 2L, QuestionType.SINGLE_CHOICE));
+        QuizSubmission quizSubmission2 = new QuizSubmission(quizId2, answers2, 4, true);
+        enrollment.addQuizSubmission(quizSubmission2);
+
         assertTrue(enrollment.getCompleted());
         assertEquals(2, enrollment.getProgress().totalLessons());
         assertEquals(2, enrollment.getProgress().completedLessons());

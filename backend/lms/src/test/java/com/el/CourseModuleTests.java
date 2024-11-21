@@ -2,7 +2,6 @@ package com.el;
 
 import com.el.common.Currencies;
 import com.el.course.application.dto.*;
-import com.el.course.application.dto.QuestionDTO.AnswerOptionDTO;
 import com.el.course.domain.*;
 import com.el.course.web.dto.AssignTeacherDTO;
 import com.el.course.web.dto.CourseRequestApproveDTO;
@@ -383,7 +382,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         course = courseRepository.findById(course.getId()).get();
         assertThat(course.getCourseRequests().size()).isEqualTo(1);
         assertThat(course.getCourseRequests().iterator().next().getStatus()).isEqualTo(RequestStatus.APPROVED);
-        assertThat(course.isPublishedAndNotDeleted()).isTrue();
+        assertThat(course.isPublishedAndNotUnpublishedOrDelete()).isTrue();
     }
 
     @Test
@@ -451,9 +450,9 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         course = courseRepository.findById(course.getId()).get();
         assertThat(course.getCourseRequests().size()).isEqualTo(2);
         assertThat(course.getCourseRequests().stream().anyMatch(request -> request.getStatus() == RequestStatus.APPROVED)).isTrue();
-        assertThat(course.isNotPublishedAndDeleted()).isTrue();
+        assertThat(course.getPublished()).isTrue();
         assertThat(course.getUnpublished()).isTrue();
-        assertThat(course.isPublishedAndNotDeleted()).isFalse();
+        assertThat(course.isPublishedAndNotUnpublishedOrDelete()).isFalse();
     }
 
     @Test
@@ -482,7 +481,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         course = courseRepository.findById(course.getId()).get();
         assertThat(course.getCourseRequests().size()).isEqualTo(1);
         assertThat(course.getCourseRequests().stream().anyMatch(request -> request.getStatus() == RequestStatus.REJECTED)).isTrue();
-        assertThat(course.isPublishedAndNotDeleted()).isFalse();
+        assertThat(course.isPublishedAndNotUnpublishedOrDelete()).isFalse();
     }
 
 

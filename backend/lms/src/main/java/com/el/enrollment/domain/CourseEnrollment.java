@@ -96,7 +96,8 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
 
     private boolean allQuizSubmitPassed() {
         long passedQuizzes = this.quizSubmissions.stream().filter(QuizSubmission::isPassed).count();
-        return passedQuizzes == this.totalQuizzes;
+        // https://github.com/thainguyencoffee/e-learning-project/issues/157
+        return passedQuizzes >= this.totalQuizzes;
     }
 
     public Progress getProgress() {

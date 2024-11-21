@@ -15,6 +15,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import javax.money.MonetaryAmount;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Table("course")
@@ -36,6 +37,7 @@ public class Course extends AbstractAggregateRoot<Course> {
     private Boolean published;
     private LocalDateTime publishedDate;
     private Boolean unpublished;
+    private LocalDateTime unpublishedDate;
     private String teacher;
     private String approvedBy;
     private Set<CourseRequest> courseRequests = new HashSet<>();
@@ -103,7 +105,7 @@ public class Course extends AbstractAggregateRoot<Course> {
             Set<String> prerequisites,
             Set<Language> subtitles
     ) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot update a published course.");
         }
 
@@ -124,7 +126,7 @@ public class Course extends AbstractAggregateRoot<Course> {
     }
 
     public void changePrice(MonetaryAmount newPrice) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot change price of a published course.");
         }
         if (validSections()) {
@@ -135,12 +137,11 @@ public class Course extends AbstractAggregateRoot<Course> {
     }
 
     private boolean validSections() {
-        return this.sections.isEmpty() || !this.sections.stream().allMatch(CourseSection::hasLessons);
+        return this.sections.isEmpty() || !this.sections.stream().allMatch(CourseSection::hasLessons); // update later
     }
 
-
     public void assignTeacher(String teacher) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot assign a teacher to a published course.");
         }
 
@@ -153,7 +154,7 @@ public class Course extends AbstractAggregateRoot<Course> {
 
     public void requestPublish(CourseRequest courseRequest) {
         // if this course is already published, throw exception
-        if (isPublishedAndNotDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot request publish for a published course.");
         }
         if (validSections() || this.getTeacher() == null) {
@@ -176,7 +177,7 @@ public class Course extends AbstractAggregateRoot<Course> {
         if (approveMessage.isBlank()) {
             throw new InputInvalidException("Approve message must not be blank.");
         }
-        if (isPublishedAndNotDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot approve publish for a published course.");
         }
         if (isTeacherRequestingSelfApproval(approvedBy)) {
@@ -192,17 +193,17 @@ public class Course extends AbstractAggregateRoot<Course> {
         this.publishedDate = LocalDateTime.now();
         this.unpublished = false;
 
-        registerEvent(new CoursePublishedEvent(this.id, this.teacher));
-    }
+        // All old students paid for this course can see the new sections, but it's optional
+        this.sections.stream().filter(section -> !section.getPublished()).forEach(CourseSection::markAsSectionPublished);
 
-    public record CoursePublishedEvent(Long courseId, String teacher) {
+        registerEvent(new CoursePublishedEvent(this.id, this.teacher));
     }
 
     public void rejectPublish(Long courseRequestId, String rejectedBy, String rejectReason) {
         if (rejectReason.isBlank()) {
             throw new InputInvalidException("Reject reason must not be blank.");
         }
-        if (isPublishedAndNotDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot reject publish for a published course.");
         }
         if (isTeacherRequestingSelfApproval(rejectedBy)) {
@@ -216,7 +217,7 @@ public class Course extends AbstractAggregateRoot<Course> {
     }
 
     public void requestUnpublish(CourseRequest courseRequest) {
-        if (isNotPublishedAndDeleted()) {
+        if (!isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot request unpublish for an unpublished course.");
         }
         if (courseRequest.getType() != RequestType.UNPUBLISH) {
@@ -236,7 +237,7 @@ public class Course extends AbstractAggregateRoot<Course> {
         if (approveMessage.isBlank()) {
             throw new InputInvalidException("Approve message must not be blank.");
         }
-        if (isNotPublishedAndDeleted()) {
+        if (!isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot approve unpublish for a published course.");
         }
         if (isTeacherRequestingSelfApproval(approvedBy)) {
@@ -251,15 +252,16 @@ public class Course extends AbstractAggregateRoot<Course> {
                     return unresolvedRequest;
                 }).orElseThrow(ResourceNotFoundException::new);
         this.approvedBy = approvedBy;
-        this.published = false;
+//        this.published = false;
         this.unpublished = true;
+        this.unpublishedDate = LocalDateTime.now();
     }
 
     public void rejectUnpublish(Long courseRequestId, String rejectedBy, String rejectReason) {
         if (rejectReason.isBlank()) {
             throw new InputInvalidException("Reject reason must not be blank.");
         }
-        if (isNotPublishedAndDeleted()) {
+        if (!isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot reject unpublish for an unpublished course.");
         }
         if (isTeacherRequestingSelfApproval(rejectedBy)) {
@@ -285,7 +287,7 @@ public class Course extends AbstractAggregateRoot<Course> {
 
 
     public void addSection(CourseSection section) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot add a section to a published course.");
         }
 
@@ -308,11 +310,18 @@ public class Course extends AbstractAggregateRoot<Course> {
             orderIndexLast = this.sections.stream().mapToInt(CourseSection::getOrderIndex).max().getAsInt() + 1;
         }
         section.setOrderIndex(orderIndexLast);
-        this.sections.add(section);
+
+        if (unpublished) {
+            // add Section in unpublished mode
+            section.markAsSectionUnpublished();
+            this.sections.add(section);
+        } else {
+            this.sections.add(section);
+        }
     }
 
     public void updateSection(Long sectionId, String title) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot update a section in a published course.");
         }
 
@@ -321,44 +330,49 @@ public class Course extends AbstractAggregateRoot<Course> {
         if (this.sections.stream().anyMatch(section -> section.getTitle().equals(title))) {
             throw new InputInvalidException("A section with the same title already exists.");
         }
+        checkConflictBetweenUnpublishedAndPublishedForSection(existingSection);
 
         existingSection.updateInfo(title);
     }
 
     public void removeSection(Long sectionId) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot remove a section from a published course.");
         }
         CourseSection courseSection = findSectionById(sectionId);
+        checkConflictBetweenUnpublishedAndPublishedForSection(courseSection);
         this.sections.remove(courseSection);
     }
 
     public void addLessonToSection(Long sectionId, Lesson lesson) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot add a lesson to a published course.");
         }
         CourseSection section = findSectionById(sectionId);
+        checkConflictBetweenUnpublishedAndPublishedForSection(section);
         section.addLesson(lesson);
     }
 
     public void updateLessonInSection(Long sectionId, Long lessonId, Lesson updatedLesson) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot add a lesson to a published course.");
         }
         CourseSection section = findSectionById(sectionId);
+        checkConflictBetweenUnpublishedAndPublishedForSection(section);
         section.updateLesson(lessonId, updatedLesson);
     }
 
     public void removeLessonFromSection(Long sectionId, Long lessonId) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot add a lesson to a published course.");
         }
         CourseSection section = findSectionById(sectionId);
+        checkConflictBetweenUnpublishedAndPublishedForSection(section);
         section.removeLesson(lessonId);
     }
 
     public void delete() {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot delete a published course.");
         }
         if (this.deleted) {
@@ -381,7 +395,7 @@ public class Course extends AbstractAggregateRoot<Course> {
     }
 
     public void addPost(Post post) {
-        if (isNotPublishedAndDeleted()) {
+        if (isNotPublishedOrDeleted()) {
             throw new InputInvalidException("Cannot add a post to an unpublished course.");
         }
 
@@ -389,7 +403,7 @@ public class Course extends AbstractAggregateRoot<Course> {
     }
 
     public void updatePost(Long postId, String newContent, Set<String> newAttachmentUrls) {
-        if (isNotPublishedAndDeleted()) {
+        if (isNotPublishedOrDeleted()) {
             throw new InputInvalidException("Cannot update a post in an unpublished course.");
         }
 
@@ -398,7 +412,7 @@ public class Course extends AbstractAggregateRoot<Course> {
     }
 
     public void deletePost(Long postId) {
-        if (isNotPublishedAndDeleted()) {
+        if (isNotPublishedOrDeleted()) {
             throw new InputInvalidException("Cannot remove a post from an unpublished course.");
         }
         Post post = findPostById(postId);
@@ -406,7 +420,7 @@ public class Course extends AbstractAggregateRoot<Course> {
     }
 
     public void restorePost(Long postId) {
-        if (isNotPublishedAndDeleted()) {
+        if (isNotPublishedOrDeleted()) {
             throw new InputInvalidException("Cannot restore a post in an unpublished course.");
         }
         Post post = findPostById(postId);
@@ -414,7 +428,7 @@ public class Course extends AbstractAggregateRoot<Course> {
     }
 
     public void forceDeletePost(Long postId) {
-        if (isNotPublishedAndDeleted()) {
+        if (isNotPublishedOrDeleted()) {
             throw new InputInvalidException("Cannot force delete a post in an unpublished course.");
         }
         Post post = findPostById(postId);
@@ -424,15 +438,23 @@ public class Course extends AbstractAggregateRoot<Course> {
     }
 
     public void addCommentToPost(Long postId, Comment comment) {
-        if (isNotPublishedAndDeleted()) {
+        if (isNotPublishedOrDeleted()) {
             throw new InputInvalidException("Cannot add a comment to an unpublished course.");
         }
         Post post = findPostById(postId);
         post.addComment(comment);
     }
 
+    public void updateComment(Long postId, Long commentId, String content, Set<String> strings) {
+        if (isNotPublishedOrDeleted()) {
+            throw new InputInvalidException("Cannot update a comment in an unpublished course.");
+        }
+        Post post = findPostById(postId);
+        post.updateComment(commentId, content, strings);
+    }
+
     public void deleteCommentFromPost(Long postId, Long commentId, String username) {
-        if (isNotPublishedAndDeleted()) {
+        if (isNotPublishedOrDeleted()) {
             throw new InputInvalidException("Cannot delete a comment from an unpublished course.");
         }
         Post post = findPostById(postId);
@@ -440,7 +462,7 @@ public class Course extends AbstractAggregateRoot<Course> {
     }
 
     public void addEmotionToPost(Long postId, Emotion emotion) {
-        if (isNotPublishedAndDeleted()) {
+        if (isNotPublishedOrDeleted()) {
             throw new InputInvalidException("Cannot add an emotion to an unpublished course.");
         }
         Post post = findPostById(postId);
@@ -448,64 +470,71 @@ public class Course extends AbstractAggregateRoot<Course> {
     }
 
     public void addQuizToSection(Long sectionId, Quiz quiz) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot add a quiz to a published course.");
         }
         CourseSection section = findSectionById(sectionId);
+        checkConflictBetweenUnpublishedAndPublishedForSection(section);
         section.findLessonById(quiz.getAfterLessonId());
         section.addQuiz(quiz);
     }
 
     public void addQuestionToQuizInSection(Long sectionId, Long quizId, Question question) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot add a question to a published course.");
         }
         CourseSection section = findSectionById(sectionId);
+        checkConflictBetweenUnpublishedAndPublishedForSection(section);
         section.addQuestionToQuiz(quizId, question);
     }
 
     public void updateQuestionInQuizInSection(Long sectionId, Long quizId, Long questionId, Question updatedQuestion) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot update a question in a published course.");
         }
         CourseSection section = findSectionById(sectionId);
+        checkConflictBetweenUnpublishedAndPublishedForSection(section);
         section.updateQuestionInQuiz(quizId, questionId, updatedQuestion);
     }
 
     public void deleteQuestionFromQuizInSection(Long sectionId, Long quizId, Long questionId) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot delete a question from a published course.");
         }
         CourseSection section = findSectionById(sectionId);
+        checkConflictBetweenUnpublishedAndPublishedForSection(section);
         section.deleteQuestionFromQuiz(quizId, questionId);
     }
 
     public void updateQuizInSection(Long sectionId, Long quizId, String newTitle, String newDescription, Integer newPassScorePercent) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot update a quiz in a published course.");
         }
         CourseSection section = findSectionById(sectionId);
+        checkConflictBetweenUnpublishedAndPublishedForSection(section);
         section.updateQuiz(quizId, newTitle, newDescription, newPassScorePercent);
     }
 
     public void deleteQuizFromSection(Long sectionId, Long quizId) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot delete a quiz from a published course.");
         }
         CourseSection section = findSectionById(sectionId);
+        checkConflictBetweenUnpublishedAndPublishedForSection(section);
         section.deleteQuiz(quizId);
     }
 
     public void restoreQuizInSection(Long sectionId, Long quizId) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot restore a quiz in a published course.");
         }
         CourseSection section = findSectionById(sectionId);
+        checkConflictBetweenUnpublishedAndPublishedForSection(section);
         section.restoreQuiz(quizId);
     }
 
     public void forceDeleteQuizFromSection(Long sectionId, Long quizId) {
-        if (!isNotPublishedAndDeleted()) {
+        if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot force delete a quiz in a published course.");
         }
         CourseSection section = findSectionById(sectionId);
@@ -519,6 +548,53 @@ public class Course extends AbstractAggregateRoot<Course> {
         return new QuizCalculationResult(score, passed);
     }
 
+    public void addReview(Review review) {
+        if (isNotPublishedOrDeleted()) {
+            throw new InputInvalidException("Cannot add a review to an unpublished course.");
+        }
+        this.reviews.stream()
+                .filter(r -> r.getUsername().equals(review.getUsername()))
+                .findFirst()
+                .ifPresent(r -> {
+                    throw new InputInvalidException("User already reviewed this course.");
+                });
+        this.reviews.add(review);
+        registerEvent(new CourseReviewedEvent(this.id, review.getUsername()));
+    }
+
+    public double getAverageRating() {
+        if (this.reviews.isEmpty()) {
+            return 0;
+        }
+        return this.reviews.stream().mapToDouble(Review::getRating).sum() / this.reviews.size();
+    }
+
+    public Set<CourseSection> getSectionForPublished() {
+        return this.sections.stream().filter(CourseSection::getPublished).collect(Collectors.toSet());
+    }
+
+    public Integer getNumberOfQuizzes() {
+        return this.sections.stream()
+                .mapToInt(section -> section.getQuizzes().size())
+                .sum();
+    }
+
+    /*Condition methods*/
+
+    private void checkConflictBetweenUnpublishedAndPublishedForSection(CourseSection courseSection) {
+        if (unpublished && courseSection.getPublished())
+            throw new InputInvalidException("You cannot update old section in unpublished mode.");
+    }
+
+    public boolean isNotPublishedOrDeleted() {
+        return !published || deleted;
+    }
+
+    public boolean isPublishedAndNotUnpublishedOrDelete() {
+        return published && !unpublished || deleted;
+    }
+
+    /*Read methods*/
     private Quiz findQuizById(Long quizId) {
         return this.sections.stream()
                 .flatMap(section -> section.getQuizzes().stream())
@@ -534,15 +610,6 @@ public class Course extends AbstractAggregateRoot<Course> {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
-
-    public boolean isNotPublishedAndDeleted() {
-        return !published && !deleted;
-    }
-
-    public boolean isPublishedAndNotDeleted() {
-        return published && !deleted;
-    }
-
     private CourseSection findSectionById(Long sectionId) {
         return this.sections.stream()
                 .filter(section -> section.getId().equals(sectionId))
@@ -550,43 +617,15 @@ public class Course extends AbstractAggregateRoot<Course> {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
-    public Map<Long, String> getLessonIds() {
+    public Map<Long, String> getLessonIdAndTitleMap() {
         return this.sections.stream()
                 .flatMap(section -> section.getLessons().stream())
                 .collect(HashMap::new, (map, lesson) -> map.put(lesson.getId(), lesson.getTitle()), Map::putAll);
     }
 
+    /*Events*/
+    public record CoursePublishedEvent(Long courseId, String teacher) {}
 
-    public void updateComment(Long postId, Long commentId, String content, Set<String> strings) {
-        if (isNotPublishedAndDeleted()) {
-            throw new InputInvalidException("Cannot update a comment in an unpublished course.");
-        }
-        Post post = findPostById(postId);
-        post.updateComment(commentId, content, strings);
-    }
-
-    public void addReview(Review review) {
-        if (isNotPublishedAndDeleted()) {
-            throw new InputInvalidException("Cannot add a review to an unpublished course.");
-        }
-        this.reviews.stream()
-                .filter(r -> r.getUsername().equals(review.getUsername()))
-                .findFirst()
-                .ifPresent(r -> {
-                    throw new InputInvalidException("User already reviewed this course.");
-                });
-        this.reviews.add(review);
-        registerEvent(new CourseReviewedEvent(this.id, review.getUsername()));
-    }
-
-    public record CourseReviewedEvent(Long courseId, String username) {
-    }
-
-    public double getAverageRating() {
-        if (this.reviews.isEmpty()) {
-            return 0;
-        }
-        return this.reviews.stream().mapToDouble(Review::getRating).sum() / this.reviews.size();
-    }
+    public record CourseReviewedEvent(Long courseId, String username) {}
 
 }

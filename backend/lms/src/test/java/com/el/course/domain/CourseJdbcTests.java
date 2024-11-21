@@ -89,7 +89,7 @@ class CourseJdbcTests {
                 new UserInfo("thai", "nguyen", "user"),
                 Set.of("http://placekitten.com/1", "http://placekitten.com/2"));
 
-        when(savedCourse.isNotPublishedAndDeleted()).thenReturn(false);
+        when(savedCourse.isNotPublishedOrDeleted()).thenReturn(false);
 
         savedCourse.addPost(post);
         courseRepository.save(savedCourse);
@@ -117,7 +117,7 @@ class CourseJdbcTests {
                 new UserInfo("thai", "nguyen", "user"),
                 Set.of("http://placekitten.com/1", "http://placekitten.com/2"));
 
-        when(savedCourse.isNotPublishedAndDeleted()).thenReturn(false);
+        when(savedCourse.isNotPublishedOrDeleted()).thenReturn(false);
 
         savedCourse.addPost(post);
         courseRepository.save(savedCourse);
@@ -146,7 +146,7 @@ class CourseJdbcTests {
                 new UserInfo("thai", "nguyen", "user"),
                 Set.of("http://placekitten.com/1", "http://placekitten.com/2"));
 
-        when(savedCourse.isNotPublishedAndDeleted()).thenReturn(false);
+        when(savedCourse.isNotPublishedOrDeleted()).thenReturn(false);
 
         savedCourse.addPost(post);
         courseRepository.save(savedCourse);
@@ -171,7 +171,7 @@ class CourseJdbcTests {
 
         Quiz quiz = new Quiz("Quiz 1", "Quiz description", lessonId, 100);
 
-        when(savedCourse.isNotPublishedAndDeleted()).thenReturn(true);
+        when(savedCourse.isNotPublishedOrDeleted()).thenReturn(true);
 
         savedCourse.addQuizToSection(section.getId(), quiz);
         courseRepository.save(savedCourse);

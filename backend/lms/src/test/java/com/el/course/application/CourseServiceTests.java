@@ -149,7 +149,8 @@ class CourseServiceTests {
         // Mock
         Course courseMock = spy(course);
         when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
-        doReturn(false).when(courseMock).isNotPublishedAndDeleted();
+        doReturn(true).when(courseMock).isPublishedAndNotUnpublishedOrDelete();
+//        doReturn(false).when(courseMock).isNotPublishedOrDeleted();
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
@@ -200,7 +201,8 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        doReturn(false).when(courseMock).isNotPublishedAndDeleted();
+//        doReturn(false).when(courseMock).isNotPublishedOrDeleted();
+        doReturn(true).when(courseMock).isPublishedAndNotUnpublishedOrDelete();
 
         assertThrows(InputInvalidException.class, () -> courseService.deleteCourse(1L));
         verify(courseRepository, never()).save(any(Course.class));
@@ -249,7 +251,7 @@ class CourseServiceTests {
     void updatePrice_CoursePublished_ThrowsException() {
         Course courseMock = spy(course);
         when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
-        doReturn(false).when(courseMock).isNotPublishedAndDeleted();
+        doReturn(false).when(courseMock).isNotPublishedOrDeleted();
 
         MonetaryAmount newPrice = Money.of(100, Currencies.VND);
         assertThrows(InputInvalidException.class, () -> courseService.updatePrice(1L, newPrice));
@@ -286,7 +288,8 @@ class CourseServiceTests {
         Course courseMock = spy(course);
         when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
 
-        doReturn(false).when(courseMock).isNotPublishedAndDeleted();
+//        doReturn(false).when(courseMock).isNotPublishedOrDeleted();
+        doReturn(true).when(courseMock).isPublishedAndNotUnpublishedOrDelete();
 
         assertThrows(InputInvalidException.class, () -> courseService.assignTeacher(1L, "NewTeacher"));
         verify(courseRepository, never()).save(any(Course.class));
@@ -387,7 +390,8 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        doReturn(false).when(courseMock).isNotPublishedAndDeleted();
+//        doReturn(false).when(courseMock).isNotPublishedOrDeleted();
+        doReturn(true).when(courseMock).isPublishedAndNotUnpublishedOrDelete();
 
         // Act & Assert: Assert
         assertThrows(InputInvalidException.class, () -> {
@@ -459,7 +463,8 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        doReturn(false).when(course).isNotPublishedAndDeleted();
+        doReturn(true).when(course).isPublishedAndNotUnpublishedOrDelete();
+//        doReturn(false).when(course).isNotPublishedOrDeleted();
 
         assertThrows(InputInvalidException.class, () -> courseService.removeSection(1L, 2L));
 
@@ -526,7 +531,8 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        doReturn(false).when(course).isNotPublishedAndDeleted();
+//        doReturn(false).when(course).isNotPublishedOrDeleted();
+        doReturn(true).when(course).isPublishedAndNotUnpublishedOrDelete();
         Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com");
 
         assertThrows(InputInvalidException.class, () -> courseService.addLesson(1L, 2L, lesson));
@@ -660,7 +666,8 @@ class CourseServiceTests {
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        doReturn(false).when(course).isNotPublishedAndDeleted();
+        doReturn(true).when(course).isPublishedAndNotUnpublishedOrDelete();
+//        doReturn(false).when(course).isNotPublishedOrDeleted();
 
         assertThrows(InputInvalidException.class, () -> courseService.removeLesson(1L, 2L, 3L));
 
@@ -1037,7 +1044,8 @@ class CourseServiceTests {
     @Test
     void addQuizToSection_PublishedCourse_ThrowsException() {
         Course spy = spy(course);
-        doReturn(false).when(spy).isNotPublishedAndDeleted();
+//        doReturn(false).when(spy).isNotPublishedOrDeleted();
+        doReturn(true).when(spy).isPublishedAndNotUnpublishedOrDelete();
         when(courseQueryService.findCourseById(1L)).thenReturn(spy);
 
         QuizDTO quizDTO = new QuizDTO("Quiz Title", "Quiz Description", 1L, 50);
@@ -1104,7 +1112,7 @@ class CourseServiceTests {
         QuizUpdateDTO quizUpdateDTO = new QuizUpdateDTO("Updated Title", "Updated Description", 85);
 
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        doReturn(false).when(course).isNotPublishedAndDeleted();
+        doReturn(true).when(course).isPublishedAndNotUnpublishedOrDelete();
 
         assertThrows(InputInvalidException.class, () -> courseService.updateQuiz(1L, 2L, 3L, quizUpdateDTO));
         verify(courseRepository, never()).save(any(Course.class));
@@ -1136,7 +1144,8 @@ class CourseServiceTests {
     void deleteQuiz_PublishedCourse_ThrowsException() {
         Course course = spy(this.course);
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
-        doReturn(false).when(course).isNotPublishedAndDeleted();
+        doReturn(true).when(course).isPublishedAndNotUnpublishedOrDelete();
+//        doReturn(false).when(course).isNotPublishedOrDeleted();
 
         assertThrows(InputInvalidException.class, () -> courseService.deleteQuiz(1L, 2L, 3L));
         verify(courseRepository, never()).save(any(Course.class));

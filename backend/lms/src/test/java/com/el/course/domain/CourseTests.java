@@ -113,7 +113,7 @@ class CourseTests {
         Course course = spy(courseNoSections);
 
         // Giả lập trạng thái đã publish bằng cách mock canEdit trả về false
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
 
         // Tạo dữ liệu để cập nhật
         Set<String> newBenefits = new HashSet<>(Arrays.asList("NewBenefit1", "NewBenefit2"));
@@ -148,9 +148,9 @@ class CourseTests {
 
     @Test
     void delete_PublishedCourse_ThrowsException() {
-        Course courseMock = spy(courseNoSections);
-        when(courseMock.isNotPublishedAndDeleted()).thenReturn(false);
-        assertThrows(InputInvalidException.class, courseMock::delete);
+        Course course = spy(courseNoSections);
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
+        assertThrows(InputInvalidException.class, course::delete);
     }
 
     @Test
@@ -194,7 +194,7 @@ class CourseTests {
     @Test
     void changePrice_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
+        when(course.isNotPublishedOrDeleted()).thenReturn(false);
         MonetaryAmount newPrice = Money.of(100, Currencies.VND);
         assertThrows(InputInvalidException.class, () -> course.changePrice(newPrice));
     }
@@ -213,10 +213,9 @@ class CourseTests {
     @Test
     void assignTeacher_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
         assertThrows(InputInvalidException.class, () -> course.assignTeacher("NewTeacher"));
     }
-
 
     @Test
     void addSection_FirstSection_ShouldSetOrderIndexToOne() {
@@ -258,7 +257,7 @@ class CourseTests {
     @Test
     void addSection_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
-        when(course.isNotPublishedAndDeleted()).thenReturn(false); // Giả lập khóa học đã publish
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
 
         CourseSection section = new CourseSection("SectionTitle");
         assertThrows(InputInvalidException.class, () -> course.addSection(section));
@@ -296,7 +295,7 @@ class CourseTests {
     @Test
     void testUpdateSection_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
-        when(course.isNotPublishedAndDeleted()).thenReturn(false); // Giả lập khóa học đã publish
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
 
         CourseSection section = new CourseSection("SectionTitle");
         assertThrows(InputInvalidException.class, () -> course.addSection(section));
@@ -354,7 +353,7 @@ class CourseTests {
     @Test
     void removeSection_PublishedCourse_ThrowsException() {
         Course course = spy(courseWithSections);
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
 
         assertThrows(InputInvalidException.class, () -> course.removeSection(1L));
     }
@@ -485,7 +484,7 @@ class CourseTests {
     @Test
     void addLessonToSection_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
 
         assertThrows(InputInvalidException.class, () -> course.addLessonToSection(1L, new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com")));
     }
@@ -560,7 +559,7 @@ class CourseTests {
     @Test
     void updateLessonInSection_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
 
         assertThrows(InputInvalidException.class, () -> course.updateLessonInSection(1L, 1L, new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com")));
     }
@@ -620,14 +619,14 @@ class CourseTests {
     @Test
     void removeLessonFromSection_PublishedCourse_ThrowsException() {
         Course course = spy(courseNoSections);
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
 
         assertThrows(InputInvalidException.class, () -> course.removeLessonFromSection(1L, 1L));
     }
 
     @Test
     void requestPublish_shouldAddRequest_whenValidRequest() {
-        assertFalse(courseNoSections.isPublishedAndNotDeleted());
+        assertFalse(courseNoSections.isPublishedAndNotUnpublishedOrDelete());
         assertNotNull(courseWithSections.getPrice());
         assertNotNull(courseWithSections.getTeacher());
         assertFalse(courseWithSections.getSections().isEmpty());
@@ -641,7 +640,7 @@ class CourseTests {
 
     @Test
     void requestPublish_shouldThrowException_whenCourseAlreadyPublished() {
-        assertFalse(courseNoSections.isPublishedAndNotDeleted());
+        assertFalse(courseNoSections.isPublishedAndNotUnpublishedOrDelete());
         assertNotNull(courseWithSections.getPrice());
         assertNotNull(courseWithSections.getTeacher());
         assertFalse(courseWithSections.getSections().isEmpty());
@@ -657,7 +656,7 @@ class CourseTests {
 
     @Test
     void requestPublish_shouldThrowException_whenCourseWithoutSections() {
-        assertFalse(courseNoSections.isPublishedAndNotDeleted());
+        assertFalse(courseNoSections.isPublishedAndNotUnpublishedOrDelete());
         assertFalse(courseNoSections.getTeacher().isBlank());
         assertNull(courseNoSections.getPrice());
         assertTrue(courseNoSections.getSections().isEmpty());
@@ -669,7 +668,7 @@ class CourseTests {
 
     @Test
     void requestPublish_shouldThrowException_whenRequestTypeInvalid() {
-        assertFalse(courseNoSections.isPublishedAndNotDeleted());
+        assertFalse(courseNoSections.isPublishedAndNotUnpublishedOrDelete());
         assertNotNull(courseWithSections.getPrice());
         assertNotNull(courseWithSections.getTeacher());
         assertFalse(courseWithSections.getSections().isEmpty());
@@ -680,7 +679,7 @@ class CourseTests {
 
     @Test
     void requestPublish_shouldThrowException_whenUnresolvedRequestsExist() {
-        assertFalse(courseNoSections.isPublishedAndNotDeleted());
+        assertFalse(courseNoSections.isPublishedAndNotUnpublishedOrDelete());
         assertNotNull(courseWithSections.getPrice());
         assertNotNull(courseWithSections.getTeacher());
         assertFalse(courseWithSections.getSections().isEmpty());
@@ -704,7 +703,7 @@ class CourseTests {
         courseWithSections.requestPublish(courseRequest);
         courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
 
-        assertTrue(courseWithSections.isPublishedAndNotDeleted());
+        assertTrue(courseWithSections.isPublishedAndNotUnpublishedOrDelete());
         assertFalse(courseWithSections.getUnpublished());
         assertEquals("admin", courseWithSections.getApprovedBy());
     }
@@ -749,7 +748,7 @@ class CourseTests {
         courseWithSections.requestPublish(courseRequest);
         courseWithSections.rejectPublish(courseRequest.getId(), "admin", "Not good!");
 
-        assertFalse(courseWithSections.isPublishedAndNotDeleted());
+        assertFalse(courseWithSections.isPublishedAndNotUnpublishedOrDelete());
         assertNull(courseWithSections.getApprovedBy());
         assertEquals(1, courseWithSections.getCourseRequests().size());
         assertEquals(RequestStatus.REJECTED, courseRequest.getStatus());
@@ -798,7 +797,7 @@ class CourseTests {
         courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
 
         assertEquals("admin", courseWithSections.getApprovedBy());
-        assertFalse(courseWithSections.isNotPublishedAndDeleted());
+        assertFalse(courseWithSections.isNotPublishedOrDeleted());
 
         CourseRequest courseRequestUnPublish = TestFactory.createDefaultCourseRequestUnPublish();
 
@@ -809,7 +808,7 @@ class CourseTests {
 
     @Test
     void requestUnpublish_shouldThrowException_whenCourseNotPublished() {
-        assertFalse(courseNoSections.isPublishedAndNotDeleted());
+        assertFalse(courseNoSections.isPublishedAndNotUnpublishedOrDelete());
 
         CourseRequest courseRequestUnPublish = TestFactory.createDefaultCourseRequestUnPublish();
 
@@ -826,7 +825,7 @@ class CourseTests {
 
         assertEquals("admin", courseWithSections.getApprovedBy());
         assertTrue(courseWithSections.getCourseRequests().contains(courseRequest));
-        assertTrue(courseWithSections.isPublishedAndNotDeleted());
+        assertTrue(courseWithSections.isPublishedAndNotUnpublishedOrDelete());
 
         CourseRequest courseRequestUnPublish = TestFactory.createDefaultCourseRequestPublish();
         assertThrows(InputInvalidException.class, () -> courseWithSections.requestUnpublish(courseRequestUnPublish));
@@ -840,7 +839,7 @@ class CourseTests {
         courseWithSections.requestPublish(courseRequest); // ain't be approved yet
 
         assertTrue(courseWithSections.getCourseRequests().contains(courseRequest));
-        assertTrue(courseWithSections.isNotPublishedAndDeleted());
+        assertTrue(courseWithSections.isNotPublishedOrDeleted());
 
         // Tạo một request khác
         assertThrows(InputInvalidException.class, () -> courseNoSections.requestUnpublish(
@@ -861,14 +860,14 @@ class CourseTests {
         courseWithSections.requestUnpublish(courseRequestUnPublish);
         courseWithSections.approveUnpublish(courseRequestUnPublish.getId(), "admin", "Looks not good!");
 
-        assertTrue(courseWithSections.isNotPublishedAndDeleted());
+        assertTrue(courseWithSections.getPublished());
         assertTrue(courseWithSections.getUnpublished());
         assertEquals("admin", courseWithSections.getApprovedBy());
     }
 
     @Test
     void approveUnpublish_shouldThrowException_whenCourseNotPublished() {
-        assertFalse(courseNoSections.isPublishedAndNotDeleted());
+        assertFalse(courseNoSections.isPublishedAndNotUnpublishedOrDelete());
 
         assertThrows(InputInvalidException.class, () -> courseNoSections.approveUnpublish(999L, "admin", "Looks not good!"),
                 "Cannot approve unpublish for a published course.");
@@ -932,7 +931,7 @@ class CourseTests {
         courseWithSections.requestUnpublish(courseRequestUnPublish);
         courseWithSections.rejectUnpublish(courseRequestUnPublish.getId(), "admin", "Not good!");
 
-        assertTrue(courseWithSections.isPublishedAndNotDeleted());
+        assertTrue(courseWithSections.isPublishedAndNotUnpublishedOrDelete());
         assertNotNull(courseWithSections.getApprovedBy()); // err
         assertEquals(2, courseWithSections.getCourseRequests().size());
         assertEquals(RequestStatus.REJECTED, courseRequestUnPublish.getStatus());
@@ -941,7 +940,7 @@ class CourseTests {
 
     @Test
     void rejectUnpublish_shouldThrowException_whenCourseNotPublished() {
-        assertTrue(courseWithSections.isNotPublishedAndDeleted());
+        assertTrue(courseWithSections.isNotPublishedOrDeleted());
 
         assertThrows(InputInvalidException.class, () -> courseNoSections.rejectUnpublish(999L, "admin", "Not good!"),
                 "Cannot reject unpublish for a course that is not published.");
@@ -954,7 +953,7 @@ class CourseTests {
         when(courseRequest.getId()).thenReturn(1L);
         courseWithSections.requestPublish(courseRequest);
         courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
-        assertTrue(courseWithSections.isPublishedAndNotDeleted());
+        assertTrue(courseWithSections.isPublishedAndNotUnpublishedOrDelete());
 
         CourseRequest courseRequestUnPublish = spy(TestFactory.createDefaultCourseRequestUnPublish());
         when(courseRequestUnPublish.getId()).thenReturn(2L);
@@ -971,7 +970,7 @@ class CourseTests {
         when(courseRequest.getId()).thenReturn(1L);
         courseWithSections.requestPublish(courseRequest);
         courseWithSections.approvePublish(courseRequest.getId(), "admin", "Looks good!");
-        assertTrue(courseWithSections.isPublishedAndNotDeleted());
+        assertTrue(courseWithSections.isPublishedAndNotUnpublishedOrDelete());
 
         assertThrows(ResourceNotFoundException.class, () ->
                 courseWithSections.rejectUnpublish(999L, "admin", "Not good!")
@@ -982,7 +981,7 @@ class CourseTests {
     @Test
     void addPost_ValidPost_AddsPost() {
         Course coursePublished = spy(TestFactory.createDefaultCourse());
-        when(coursePublished.isNotPublishedAndDeleted()).thenReturn(false);
+        when(coursePublished.isNotPublishedOrDeleted()).thenReturn(false);
         Post postTemplate = TestFactory.createDefaultPost();
 
         UserInfo info = postTemplate.getInfo();
@@ -1006,7 +1005,7 @@ class CourseTests {
     @Test
     void updatePost_ValidPost_UpdatesPost() {
         Course coursePublished = spy(TestFactory.createDefaultCourse());
-        when(coursePublished.isNotPublishedAndDeleted()).thenReturn(false);
+        when(coursePublished.isNotPublishedOrDeleted()).thenReturn(false);
         Post postTemplate = spy(TestFactory.createDefaultPost());
         when(postTemplate.getId()).thenReturn(1L);
 
@@ -1040,7 +1039,7 @@ class CourseTests {
     @Test
     void updatePost_PostNotFound_ThrowsException() {
         Course coursePublished = spy(TestFactory.createDefaultCourse());
-        when(coursePublished.isNotPublishedAndDeleted()).thenReturn(false);
+        when(coursePublished.isNotPublishedOrDeleted()).thenReturn(false);
 
         assertThrows(ResourceNotFoundException.class, () -> coursePublished.updatePost(1L,
                 "Updated content", Set.of("http://example.com/1", "http://example.com/2")));
@@ -1049,7 +1048,7 @@ class CourseTests {
     @Test
     void deletePost_ValidPost_DeletesPost() {
         Course coursePublished = spy(TestFactory.createDefaultCourse());
-        when(coursePublished.isNotPublishedAndDeleted()).thenReturn(false);
+        when(coursePublished.isNotPublishedOrDeleted()).thenReturn(false);
         Post postTemplate = spy(TestFactory.createDefaultPost());
         when(postTemplate.getId()).thenReturn(1L);
 
@@ -1068,7 +1067,7 @@ class CourseTests {
     @Test
     void restorePost_DeletedPost_RestoresPost() {
         Course coursePublished = spy(TestFactory.createDefaultCourse());
-        when(coursePublished.isNotPublishedAndDeleted()).thenReturn(false);
+        when(coursePublished.isNotPublishedOrDeleted()).thenReturn(false);
         Post postTemplate = spy(TestFactory.createDefaultPost());
         when(postTemplate.getId()).thenReturn(1L);
 
@@ -1085,7 +1084,7 @@ class CourseTests {
     @Test
     void forceDeletePost_DeletedPost_ForceDeletesPost() {
         Course coursePublished = spy(TestFactory.createDefaultCourse());
-        when(coursePublished.isNotPublishedAndDeleted()).thenReturn(false);
+        when(coursePublished.isNotPublishedOrDeleted()).thenReturn(false);
         Post postTemplate = spy(TestFactory.createDefaultPost());
         when(postTemplate.getId()).thenReturn(1L);
 
@@ -1164,7 +1163,7 @@ class CourseTests {
         // Arrange
         Quiz quiz = TestFactory.createDefaultQuiz(1L);
         Course course = prepareSectionInCourseForQuiz(quiz);
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
 
         // Act & Assert
         String msg = assertThrows(InputInvalidException.class, () -> {
@@ -1315,7 +1314,7 @@ class CourseTests {
         CourseSection section = course.getSections().iterator().next();
         assertEquals(1, section.getQuizzes().size());
 
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
 
         // Act & Assert
         String msg = assertThrows(InputInvalidException.class, () -> {
@@ -1359,7 +1358,7 @@ class CourseTests {
         CourseSection section = course.getSections().iterator().next();
         assertEquals(1, section.getQuizzes().size());
 
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
 
         // Act & Assert
         String msg = assertThrows(InputInvalidException.class, () -> {
@@ -1406,7 +1405,7 @@ class CourseTests {
         course.deleteQuizFromSection(1L, 1L);
         assertTrue(quiz1.isDeleted());
 
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
 
         // Act & Assert
         String msg = assertThrows(InputInvalidException.class, () -> {
@@ -1453,7 +1452,7 @@ class CourseTests {
         course.deleteQuizFromSection(1L, 1L);
         assertTrue(quiz1.isDeleted());
 
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
 
         // Act & Assert
         String msg = assertThrows(InputInvalidException.class, () -> {
@@ -1517,7 +1516,7 @@ class CourseTests {
         CourseSection section = course.getSections().iterator().next();
         assertEquals(1, section.getQuizzes().size());
 
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
 
         // Act & Assert
         String msg = assertThrows(InputInvalidException.class, () -> {
@@ -1764,7 +1763,7 @@ class CourseTests {
         when(question.getId()).thenReturn(1L);
         course.addQuestionToQuizInSection(1L, 1L, question);
 
-        when(course.isNotPublishedAndDeleted()).thenReturn(false);
+        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
 
         // Act & Assert
         String msg = assertThrows(InputInvalidException.class, () -> {
