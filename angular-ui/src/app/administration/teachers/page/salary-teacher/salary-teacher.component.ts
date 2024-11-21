@@ -29,6 +29,7 @@ export class SalaryTeacherComponent implements OnInit, OnDestroy {
   salary?: Salary;
   navigationSubscription?: Subscription;
   visibleRecords: number = 8;
+
   ngOnInit(): void {
     this.loadData();
 
@@ -59,8 +60,9 @@ export class SalaryTeacherComponent implements OnInit, OnDestroy {
   }
 
   showLess(): void {
-    this.visibleRecords -= 4;
+    this.visibleRecords = Math.max(this.visibleRecords - 4, 8);
   }
+
   ngOnDestroy(): void {
     this.navigationSubscription!.unsubscribe();
   }

@@ -2,11 +2,12 @@ import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 import {CourseService} from "../../../service/course.service";
 import {ErrorHandler} from "../../../../../common/error-handler.injectable";
-import {FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {minFormArrayLength, updateFormAdvanced} from "../../../../../common/utils";
 import {QuestionDto} from "../../../model/question.dto";
 import {KeyValuePipe, NgForOf, NgIf} from "@angular/common";
 import {onChangeQuestionType} from "../question-utils";
+import {InputErrorsComponent} from "../../../../../common/input-row/error/input-errors.component";
 
 @Component({
   selector: 'app-edit-question',
@@ -16,7 +17,8 @@ import {onChangeQuestionType} from "../question-utils";
     RouterLink,
     KeyValuePipe,
     NgForOf,
-    NgIf
+    NgIf,
+    InputErrorsComponent
   ],
   templateUrl: './edit-question.component.html',
 })
@@ -74,8 +76,12 @@ export class EditQuestionComponent implements OnInit {
     trueFalseAnswer: new FormControl<boolean | null>(null),
   })
 
-  get options(): FormArray {
-    return this.editForm.get('options') as FormArray;
+  get content() { return this.editForm.get('content') as FormControl; }
+  get type() { return this.editForm.get('type') as FormControl; }
+  get score() { return this.editForm.get('score') as FormControl;}
+  get options() { return this.editForm.get('options') as FormArray; }
+  getContentControl(option: AbstractControl<any>) {
+    return option.get('content') as FormControl;
   }
 
   createAnswerOption(): FormGroup {
@@ -153,5 +159,16 @@ export class EditQuestionComponent implements OnInit {
     }
   }
 
+  isRequired(field: string) {
+    return this.editForm.get(field)?.hasValidator(Validators.required);
+  }
+
+  getInputClasses(field: string) {
+    return `${this.hasErrors(field) ? 'is-invalid ' : ''}`;
+  }
+
+  hasErrors(field: string) {
+    return this.editForm.get(field)?.invalid && (this.editForm.get(field)?.dirty || this.editForm.get(field)?.touched);
+  }
 
 }

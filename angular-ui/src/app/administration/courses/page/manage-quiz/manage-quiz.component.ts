@@ -29,6 +29,8 @@ export class ManageQuizComponent implements OnInit, OnDestroy{
   quizDto?: Quiz
   navigationSubscription?: Subscription;
 
+  quizResource?: string;
+
   getMessage(key: string, details?: any) {
     const messages: Record<string, string> = {
       confirmDeleteQuestion: 'Do you really want to delete this question?',
@@ -52,6 +54,7 @@ export class ManageQuizComponent implements OnInit, OnDestroy{
     this.courseId = +this.route.snapshot.params['courseId'];
     this.sectionId = +this.route.snapshot.params['sectionId'];
     this.lessonId = +this.route.snapshot.params['lessonId'];
+    this.quizResource = `/administration/courses/${this.courseId}/sections/${this.sectionId}/lessons/${this.lessonId}/quizzes`
 
     this.courseService.getQuiz(this.courseId, this.sectionId)
       .subscribe({

@@ -63,9 +63,9 @@
       <div class="card-header bg-info text-white">
         <h5 class="mb-0"><i class="bi bi-credit-card me-2"></i> Salary Records</h5>
       </div>
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
         @for (record of salary.records | slice:0:visibleRecords; track record.id) {
-          <div class="card border shadow-sm h-100">
+          <div class="card border shadow-sm">
             <div class="card-body">
               <p class="fw-bold">Record for {{ record.createdDate | date: 'MMMM yyyy' }}</p>
               <p><strong>Record ID:</strong> {{ record.id }}</p>
@@ -118,16 +118,4 @@
     </div>
   </div>
 </div>
-<style>
-  .card {
-    max-width: 100%;
-    overflow: hidden;
-    word-wrap: break-word;
-  }
-
-  .card-body p {
-    margin-bottom: 1rem;
-  }
-
-</style>
 

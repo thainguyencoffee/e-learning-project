@@ -2,11 +2,12 @@ import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 import {CourseService} from "../../../service/course.service";
 import {ErrorHandler} from "../../../../../common/error-handler.injectable";
-import {FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {QuestionDto} from "../../../model/question.dto";
 import {minFormArrayLength} from "../../../../../common/utils";
 import {KeyValuePipe, NgForOf, NgIf} from "@angular/common";
 import {onChangeQuestionType} from "../question-utils";
+import {InputErrorsComponent} from "../../../../../common/input-row/error/input-errors.component";
 
 @Component({
   selector: 'app-add-question',
@@ -16,7 +17,8 @@ import {onChangeQuestionType} from "../question-utils";
     ReactiveFormsModule,
     KeyValuePipe,
     NgForOf,
-    NgIf
+    NgIf,
+    InputErrorsComponent
   ],
   templateUrl: './add-question.component.html',
 })
@@ -61,8 +63,12 @@ export class AddQuestionComponent implements OnInit {
     trueFalseAnswer: new FormControl<boolean | null>(null),
   })
 
-  get options() {
-    return this.questionForm.get('options') as FormArray;
+  get content() { return this.questionForm.get('content') as FormControl; }
+  get type() { return this.questionForm.get('type') as FormControl; }
+  get score() { return this.questionForm.get('score') as FormControl;}
+  get options() { return this.questionForm.get('options') as FormArray; }
+  getContentControl(option: AbstractControl<any>) {
+    return option.get('content') as FormControl;
   }
 
   addAnswerOption() {
@@ -133,6 +139,18 @@ export class AddQuestionComponent implements OnInit {
         this.handleSingleChoice(0);
       }
     }
+  }
+
+  isRequired(field: string) {
+    return this.questionForm.get(field)?.hasValidator(Validators.required);
+  }
+
+  getInputClasses(field: string) {
+    return `${this.hasErrors(field) ? 'is-invalid ' : ''}`;
+  }
+
+  hasErrors(field: string) {
+    return this.questionForm.get(field)?.invalid && (this.questionForm.get(field)?.dirty || this.questionForm.get(field)?.touched);
   }
 
 }
