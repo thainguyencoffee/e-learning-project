@@ -4,7 +4,7 @@ import {UploadService} from "../../upload/upload.service";
 import {ErrorHandler} from "../../error-handler.injectable";
 import {NgIf} from "@angular/common";
 import {VideoPlayerComponent} from "../../video-player/video-player.component";
-import {DocumentViewerComponent} from "../../DocumentViewer/document-viewer.component";
+import {DocumentViewerComponent} from "../../document-viewer/document-viewer.component";
 
 @Component({
   selector: 'app-file-row',
