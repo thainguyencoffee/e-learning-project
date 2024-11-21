@@ -19,7 +19,7 @@ import {
 import {ErrorHandler} from "../../error-handler.injectable";
 import {Router} from "@angular/router";
 import flatpickr from 'flatpickr';
-import {InputErrorsComponent} from "../error/input-errors.component";
+import {InputErrorsComponent} from "../input-errors.component";
 import {FileRowComponent} from "../shared/file-row.component";
 
 

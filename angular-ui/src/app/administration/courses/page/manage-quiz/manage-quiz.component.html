@@ -46,7 +46,7 @@
           <td>{{question.type}}</td>
           <td>
             <ng-container *ngIf="question.type === 'SINGLE_CHOICE'; else multipleOrBoolean">
-              {{getCorrectOption(question.options!)[0]?.content}}
+              {{getCorrectOption(question.options!)[0].content}}
             </ng-container>
             <ng-template #multipleOrBoolean>
               <ng-container *ngIf="question.type === 'MULTIPLE_CHOICE'; else booleanAnswer">

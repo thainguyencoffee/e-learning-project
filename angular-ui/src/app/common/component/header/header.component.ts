@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import {RouterLink} from "@angular/router";
-import {UserService} from "../auth/user.service";
-import {LoginComponent} from "../auth/login.component";
-import {LogoutComponent} from "../auth/logout.component";
+import {UserService} from "../../auth/user.service";
+import {LoginComponent} from "../../auth/login.component";
+import {LogoutComponent} from "../../auth/logout.component";
 import {NgIf} from "@angular/common";
-import {reverseProxyUri} from "../../app.config";
+import {reverseProxyUri} from "../../../app.config";
 
 @Component({
   selector: 'app-header',

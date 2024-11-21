@@ -7,7 +7,7 @@ import {minFormArrayLength, updateFormAdvanced} from "../../../../../common/util
 import {QuestionDto} from "../../../model/question.dto";
 import {KeyValuePipe, NgForOf, NgIf} from "@angular/common";
 import {onChangeQuestionType} from "../question-utils";
-import {InputErrorsComponent} from "../../../../../common/input-row/error/input-errors.component";
+import {InputErrorsComponent} from "../../../../../common/input-row/input-errors.component";
 
 @Component({
   selector: 'app-edit-question',

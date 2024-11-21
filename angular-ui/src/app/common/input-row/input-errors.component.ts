@@ -1,7 +1,7 @@
 import { KeyValuePipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
-import {getGlobalErrorMessage} from "../../error-handler.injectable";
+import {getGlobalErrorMessage} from "../error-handler.injectable";
 
 
 @Component({

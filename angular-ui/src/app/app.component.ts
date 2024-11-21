@@ -1,7 +1,7 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
-import {HeaderComponent} from "./common/header/header.component";
-import {FooterComponent} from "./common/footer/footer.component";
+import {HeaderComponent} from "./common/component/header/header.component";
+import {FooterComponent} from "./common/component/footer/footer.component";
 import {AuthenticationComponent} from "./common/auth/authentication.component";
 
 @Component({

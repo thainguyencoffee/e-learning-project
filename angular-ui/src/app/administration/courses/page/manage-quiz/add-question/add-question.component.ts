@@ -7,7 +7,7 @@ import {QuestionDto} from "../../../model/question.dto";
 import {minFormArrayLength} from "../../../../../common/utils";
 import {KeyValuePipe, NgForOf, NgIf} from "@angular/common";
 import {onChangeQuestionType} from "../question-utils";
-import {InputErrorsComponent} from "../../../../../common/input-row/error/input-errors.component";
+import {InputErrorsComponent} from "../../../../../common/input-row/input-errors.component";
 
 @Component({
   selector: 'app-add-question',
