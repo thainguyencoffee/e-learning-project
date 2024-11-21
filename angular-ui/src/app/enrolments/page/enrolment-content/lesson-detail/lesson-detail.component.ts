@@ -1,4 +1,3 @@
-import { DocumentViewerComponent } from '../../../../common/DocumentViewer/document-viewer.component';
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
 import {EnrolmentWithCourseDataService} from "../enrolment-with-course-data.service";
@@ -11,6 +10,7 @@ import {ErrorHandler} from "../../../../common/error-handler.injectable";
 import {VideoPlayerComponent} from "../../../../common/video-player/video-player.component";
 import {LessonProgress} from "../../../model/lesson-progress";
 import {QuizSubmission} from "../../../model/enrolment";
+import {DocumentViewerComponent} from "../../../../common/DocumentViewer/document-viewer.component";
 
 @Component({
   selector: 'app-lesson-detail',

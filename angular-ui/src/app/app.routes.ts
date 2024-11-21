@@ -3,7 +3,6 @@ import {BrowseCoursesComponent} from "./browse-course/page/browse-courses/browse
 import {DashboardComponent} from "./administration/dashboard/dashboard.component";
 import {ListCourseComponent} from "./administration/courses/page/list-course/list-course.component";
 import {AddCourseComponent} from "./administration/courses/page/add-course/add-course.component";
-import {ErrorComponent} from "./common/error/error.component";
 import {EditCourseComponent} from "./administration/courses/page/edit-course/edit-course.component";
 import { AddSectionComponent } from './administration/courses/page/add-section/add-section.component';
 import {EditSectionComponent} from "./administration/courses/page/edit-section/edit-section.component";
@@ -28,8 +27,6 @@ import {MyOrdersComponent} from "./orders/page/my-orders/my-orders.component";
 import {MyOrderDetailComponent} from "./orders/page/my-order-detail/my-order-detail.component";
 import {MyEnrolmentsComponent} from "./enrolments/page/my-enrolments/my-enrolments.component";
 import {BrowseCourseDetailComponent} from "./browse-course/page/browse-course-detail/browse-course-detail.component";
-import {UsageComponent} from "./common/usage/usage.component";
-import {AboutUnpublishComponent} from "./common/usage/about-unpublish/about-unpublish.component";
 import {EnrolmentContentComponent} from "./enrolments/page/enrolment-content/enrolment-content.component";
 import {CourseDetailComponent} from "./administration/courses/page/course-detail/course-detail.component";
 import {EnrolmentOverviewComponent} from "./enrolments/page/enrolment-content/enrolment-overview/enrolment-overview.component";
@@ -58,6 +55,9 @@ import {ListTeachersComponent} from "./administration/teachers/page/list-teacher
 import {TeacherDetailComponent} from "./administration/teachers/page/teacher-detail/teacher-detail.component";
 import {SalaryTeacherComponent} from "./administration/teachers/page/salary-teacher/salary-teacher.component";
 import {QuizSubmitComponent} from "./enrolments/page/enrolment-content/quiz-submit/quiz-submit.component";
+import {UsageComponent} from "./usage/usage.component";
+import {AboutUnpublishComponent} from "./usage/about-unpublish/about-unpublish.component";
+import {ErrorComponent} from "./error/error.component";
 
 export const routes: Routes = [
   {
