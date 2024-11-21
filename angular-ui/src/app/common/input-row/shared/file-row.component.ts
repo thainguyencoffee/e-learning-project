@@ -1,15 +1,19 @@
-import {Component, ElementRef, inject, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, inject, Input, OnInit} from '@angular/core';
 import {AbstractControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {UploadService} from "../../upload/upload.service";
 import {ErrorHandler} from "../../error-handler.injectable";
 import {NgIf} from "@angular/common";
+import {VideoPlayerComponent} from "../../video-player/video-player.component";
+import {DocumentViewerComponent} from "../../DocumentViewer/document-viewer.component";
 
 @Component({
   selector: 'app-file-row',
   standalone: true,
   imports: [
     NgIf,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    VideoPlayerComponent,
+    DocumentViewerComponent
   ],
   template: `
     @if (rowType === 'imageFile') {
@@ -21,15 +25,17 @@ import {NgIf} from "@angular/common";
     @else if (rowType === 'videoFile') {
       <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}"
              accept=".mp4"/>
-      <video *ngIf="previewUrl" #videoPlayer id="myVideo" controls width="100%">
-        <source [src]="previewUrl" type="video/mp4">
-      </video>
+      <app-video-player *ngIf="previewUrl" [videoLink]="previewUrl"></app-video-player>
+<!--      <video *ngIf="previewUrl" #videoPlayer id="myVideo" controls width="100%">-->
+<!--        <source [src]="previewUrl" type="video/mp4">-->
+<!--      </video>-->
     }
 
     @else if (rowType === 'docFile') {
       <input type="file" (change)="onFileSelected($event)" class="form-control {{ getInputClasses() }}"
              accept=".pdf, .doc, .docx"/>
-      <p *ngIf="previewUrl">Your document was uploaded: {{ previewUrl }}</p>
+<!--      <p *ngIf="previewUrl">Your document was uploaded: {{ previewUrl }}</p>-->
+      <app-document-viewer *ngIf="previewUrl" [documentLink]="previewUrl"></app-document-viewer>
     }
 
   `,
@@ -44,7 +50,7 @@ export class FileRowComponent implements OnInit {
   @Input({required: true}) control?: AbstractControl;
   @Input() group?: FormGroup;
 
-  @ViewChild('videoPlayer') videoPlayer: ElementRef | undefined;
+  // @ViewChild('videoPlayer') videoPlayer: ElementRef | undefined;
   previewUrl: string | null = null;
   previousUrl: string | null = null;
 
@@ -85,7 +91,7 @@ export class FileRowComponent implements OnInit {
         this.previewUrl = response.url;
         this.previousUrl = response.url;
         // reload native element
-        this.videoPlayer?.nativeElement.load();
+        // this.videoPlayer?.nativeElement.load();
       },
       error: (error) => this.errorHandler.handleServerError(error.error, this.group)
     })
