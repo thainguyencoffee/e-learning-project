@@ -56,7 +56,7 @@
             <td>
               <div class="float-end text-nowrap d-flex">
                 <a [routerLink]="['/administration/courses/', course.id]" class="btn btn-sm btn-secondary me-2">View</a>
-                <a *ngIf="!isEditable(course)" [routerLink]="['/administration/courses', course.id, 'posts']"
+                <a *ngIf="course.published" [routerLink]="['/administration/courses', course.id, 'posts']"
                    class="btn btn-sm btn-secondary me-2">
                   Post List
                 </a>
@@ -64,7 +64,7 @@
                    class="btn btn-sm btn-secondary me-2">Add Section</a>
                 <a *ngIf="isEditable(course)" [routerLink]="['/administration/courses/edit', course.id]"
                    class="btn btn-sm btn-secondary me-2">Edit</a>
-                <a *ngIf="isPublished(course)" [routerLink]="['/administration/enrolment-statistics', course.id]"
+                <a *ngIf="course.published" [routerLink]="['/administration/enrolment-statistics', course.id]"
                    class="btn btn-sm btn-secondary me-2">Enrolment statistic</a>
                 @if (isEditable(course) && isAdminCourseOwner(course.teacher)) {
                   <a *ngIf="isAdminCourseOwner(course.teacher)"

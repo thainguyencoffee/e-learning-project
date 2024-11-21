@@ -43,14 +43,20 @@ export class RequestListComponent implements OnInit {
     return this.userService.current.hasAnyRole('ROLE_admin') && !request.resolved
   }
 
+  //public boolean isPublishedAndNotUnpublishedOrDelete() {
+  //   return published && !unpublished || deleted;
+  //}
   canRequestPublish(course: Course) {
     return this.userService.current.hasAnyRole('ROLE_teacher')
-      && this.isTitleBlue(course) && !course.published;
+      && this.isTitleBlue(course) && (!course.published || course.unpublished);
   }
 
+  // public boolean isPublishedAndNotUnpublishedOrDelete() {
+  //   return published && !unpublished || deleted;
+  // }
   canRequestUnPublish(course: Course) {
     return this.userService.current.hasAnyRole('ROLE_teacher')
-      && this.isTitleGreen(course) && course.published;
+      && this.isTitleGreen(course) && course.published && !course.unpublished;
   }
 
   private isTitleGreen(course: Course) {

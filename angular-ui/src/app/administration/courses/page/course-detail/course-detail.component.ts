@@ -122,4 +122,12 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   getQuizByLessonId(selectedSection: Section, lessonId: number) {
     return selectedSection.quizzes?.find(quiz => quiz.afterLessonId === lessonId);
   }
+
+  isUnpublishedMode(course: Course, section: Section) {
+    return course.unpublished && section.published
+  }
+
+  isEdit(courseDto: Course, selectedSection: Section) {
+    return !courseDto.published || (courseDto.unpublished && !selectedSection.published);
+  }
 }

@@ -97,11 +97,7 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
     if (quiz) {
       const quizSubmission = this.getQuizSubmissionByLessonId(lessonId, sections, quizSubmissions);
       if (!quizSubmission) {
-        this.router.navigate(['/enrolments', this.enrolmentId, 'quiz-submit', quiz.id], {
-          queryParams: {
-            returnUrl: this.router.url
-          }
-        });
+        this.router.navigate(['/enrolments', this.enrolmentId, 'quiz-submit', quiz.id]);
       }
     }
   }
@@ -137,6 +133,9 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
 
   getQuizSubmissionByLessonId(lessonId: number, sections: Section[], quizSubmissions: QuizSubmission[]) {
     const quiz = sections.flatMap(s => s.quizzes).find(q => q.afterLessonId === lessonId);
+    if (!quiz) {
+      return null;
+    }
     return quizSubmissions.find(qs => qs.quizId === quiz!.id);
   }
 

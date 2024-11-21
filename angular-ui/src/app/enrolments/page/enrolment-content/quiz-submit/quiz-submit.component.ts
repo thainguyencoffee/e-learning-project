@@ -8,6 +8,7 @@ import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/f
 import {DatePipe, JsonPipe, NgForOf, NgIf, NgTemplateOutlet} from "@angular/common";
 import {QuizSubmitDto} from "../../../model/quiz-submit.dto";
 import {QuizSubmission} from "../../../model/quiz-submission";
+import {EnrolmentWithCourseDataService} from "../enrolment-with-course-data.service";
 
 @Component({
   selector: 'app-quiz-submit',
@@ -18,7 +19,6 @@ import {QuizSubmission} from "../../../model/quiz-submission";
     NgIf,
     DatePipe,
     NgTemplateOutlet,
-    RouterLink,
   ],
   templateUrl: './quiz-submit.component.html',
   styleUrl: './quiz-submit.component.css'
@@ -28,13 +28,13 @@ export class QuizSubmitComponent implements OnInit, OnDestroy {
   route = inject(ActivatedRoute);
   router = inject(Router);
   enrolmentService = inject(EnrolmentsService);
+  enrolmentWithCourseDataService = inject(EnrolmentWithCourseDataService);
   errorHandler = inject(ErrorHandler);
   fb = inject(FormBuilder);
 
   navigationSubscription?: Subscription;
   quizId?: number;
   enrolmentId?: number;
-  returnUrl?: string;
   quizSubmissionId?: number;
   isSubmitted?: boolean;
   toggleResubmit = false;
@@ -63,7 +63,6 @@ export class QuizSubmitComponent implements OnInit, OnDestroy {
       this.enrolmentId = params['id'];
     });
     this.quizId = this.route.snapshot.params['quizId'];
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'];
     this.quizSubmissionId = this.route.snapshot.queryParams['quizSubmissionId'];
 
     this.enrolmentService.getQuiz(this.enrolmentId!, this.quizId!)
@@ -93,23 +92,6 @@ export class QuizSubmitComponent implements OnInit, OnDestroy {
       error: error => this.errorHandler.handleServerError(error.error)
     });
   }
-
-  // private initFormFromSubmission(quizSubmission: QuizSubmission) {
-  //   this.submitQuizForm = this.fb.group({
-  //     quizId: [quizSubmission.quizId],
-  //     questions: this.fb.array(quizSubmission.answers.map(answer => {
-  //       return this.fb.group({
-  //         type: [answer.type],
-  //         questionId: [answer.questionId],
-  //         answerOptionIds: answer.type === 'MULTIPLE_CHOICE' ?
-  //           this.fb.array(answer.answerOptionIds?.map(id => this.fb.control(id)) || []) :
-  //           [null],
-  //         trueFalseAnswer: [answer.trueFalseAnswer ?? null],
-  //         singleChoiceAnswer: [answer.singleChoiceAnswer ?? null]
-  //       });
-  //     }))
-  //   });
-  // }
 
   private initForm(quizDetail: QuizDetailDto) {
     this.submitQuizForm = this.fb.group({
@@ -169,11 +151,11 @@ export class QuizSubmitComponent implements OnInit, OnDestroy {
 
     this.enrolmentService.submitQuiz(this.enrolmentId!, data)
       .subscribe({
-        next: _ => {
+        next: submissionId => {
           this.router.navigate(['.'], {
             relativeTo: this.route,
             queryParams: {
-              returnUrl: this.returnUrl
+              quizSubmissionId: submissionId,
             },
             state: {
               msgSuccess: this.getMessage('submitted')

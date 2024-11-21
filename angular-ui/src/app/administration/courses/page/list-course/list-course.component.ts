@@ -117,12 +117,11 @@ export class ListCourseComponent implements OnInit, OnDestroy {
     return this.isTitleBlue(course) && course.price;
   }
 
+  //public boolean isPublishedAndNotUnpublishedOrDelete() {
+  //         return published && !unpublished || deleted;
+  //     }
   isEditable(course: Course) {
     return !course.published || course.unpublished;
-  }
-
-  isPublished(course: Course) {
-    return course.published;
   }
 
   unassignCurrentTeacher(courseId: number) {

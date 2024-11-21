@@ -46,6 +46,8 @@ export class EditQuestionComponent implements OnInit {
           const question = data.content.find(quiz => quiz.afterLessonId === this.lessonId)
             ?.questions?.find(question => question.id === this.questionId) || undefined;
           updateFormAdvanced(this.editForm, question, this.createAnswerOption);
+          const type = this.editForm.get('type') as FormControl;
+          onChangeQuestionType(type, this.editForm.get('trueFalseAnswer') as FormControl, this.options);
         }
       })
   }

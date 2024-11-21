@@ -3,7 +3,7 @@
 
     <!--Header-->
     <div class="d-flex flex-wrap mb-4">
-      <h1 class="flex-grow-1">{{lessonDetail.title}}</h1>
+      <h1 class="flex-grow-1">{{ lessonDetail.title }}</h1>
       <div>
         <a [routerLink]="['/enrolments', enrolmentId, 'lessons']" class="btn btn-secondary">Back to lessons</a>
       </div>
@@ -22,18 +22,24 @@
       <div>
         <button *ngIf="!lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)"
                 (click)="markLessonAsCompleted(lessonDetail.id, lessonDetail.title, enrolmentWithCourse.sections, enrolmentWithCourse.quizSubmissions)"
-                class="btn btn-success me-2">Mark as Completed</button>
+                class="btn btn-success me-2">Mark as Completed
+        </button>
 
         <a *ngIf="lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)
         && getQuizSubmissionByLessonId(lessonDetail.id, enrolmentWithCourse.sections, enrolmentWithCourse.quizSubmissions) as quizSubmission"
-           [routerLink]="['/enrolments', this.enrolmentId, 'quiz-submit', quizSubmission.quizId]" [queryParams]="{quizSubmissionId: quizSubmission.id}"
+           [routerLink]="['/enrolments', this.enrolmentId, 'quiz-submit', quizSubmission.quizId]"
+           [queryParams]="{quizSubmissionId: quizSubmission.id}"
            class="btn btn-success me-2">Quiz Submission</a>
 
-        @if(!enrolmentWithCourse.completed) {
-          <button *ngIf="lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)" (click)="markLessonAsIncomplete(lessonDetail.id, lessonDetail.title)"
-                  class="btn btn-warning">Unmark as Incomplete</button>
+        @if (!enrolmentWithCourse.completed) {
+          <button *ngIf="lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)"
+                  (click)="markLessonAsIncomplete(lessonDetail.id, lessonDetail.title)"
+                  class="btn btn-warning">Unmark as Incomplete
+          </button>
         } @else {
-          <button *ngIf="lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)" disabled class="btn btn-warning">Unmark as Incomplete</button>
+          <button *ngIf="lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)" disabled
+                  class="btn btn-warning">Unmark as Incomplete
+          </button>
         }
       </div>
       <div>
