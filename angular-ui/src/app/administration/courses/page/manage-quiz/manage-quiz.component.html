@@ -1,21 +1,24 @@
 <div class="d-flex flex-wrap mb-4">
   <h1 class="flex-grow-1">Quiz Detail</h1>
   <div>
-    <a [routerLink]="['/administration/courses', courseId]" class="btn btn-secondary">Back to course detail</a>
+    <ng-container *ngIf="quizDto; else createQuizButton">
+      <a [routerLink]="[quizResource, 'edit', quizDto.id]"
+         class="btn btn-secondary ms-2">Edit Quiz</a>
+      <a [routerLink]="[quizResource, 'add-question', quizDto.id]"
+         class="btn btn-secondary ms-2">Add Question</a>
+      <button type="button" (click)="confirmDeleteQuiz(quizDto.id)" class="btn btn-secondary ms-2">
+        Delete
+      </button>
+    </ng-container>
+    <ng-template #createQuizButton>
+      <a [routerLink]="[quizResource, 'add']"
+         class="btn btn-primary ms-2">Create Quiz</a>
+    </ng-template>
+    <a [routerLink]="['/administration/courses', courseId]" class="btn btn-secondary ms-2">Back to course detail</a>
   </div>
 </div>
 
-<a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', 'trash']"
-   class="btn btn-secondary btn-sm custom-button">Go to trash</a>
-
 <ng-container *ngIf="quizDto as quizDetail; else quizNo">
-  <a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', 'edit', quizDetail.id]"
-     class="btn btn-secondary btn-sm custom-button">Edit Quiz</a>
-  <a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', 'add-question', quizDetail.id]"
-     class="btn btn-secondary btn-sm custom-button">Add Question</a>
-  <button type="button" (click)="confirmDeleteQuiz(quizDetail.id)" class="btn btn-sm btn-secondary me-2">
-    Delete
-  </button>
 
   <h3>Title: {{quizDetail.title}}</h3>
   <p>Description: {{quizDetail.description}}</p>
@@ -37,32 +40,36 @@
         </tr>
         </thead>
         <tbody>
-          @for (question of quizDetail.questions; track question.id) {
-            <tr>
-              <td>{{question.id}}</td>
-              <td>{{question.content}}</td>
-              <td>{{question.type}}</td>
-              <td>
-                @if (question.type === 'SINGLE_CHOICE') {
-                  {{getCorrectOption(question.options!)[0].content}}
-                } @else if (question.type === 'MULTIPLE_CHOICE'){
-                  <ul *ngFor="let correctOption of getCorrectOption(question.options!)">
-                    <li>{{correctOption.content}}</li>
-                  </ul>
-                } @else {
-                  {{question.trueFalseAnswer}}
-                }
-              </td>
-              <td>{{question.score}}</td>
-              <td>
-                <a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', quizDetail.id, 'edit-question', question.id]"
-                   class="btn btn-secondary btn-sm custom-button">Edit</a>
-                <button type="button" (click)="confirmDeleteQuestion(quizDetail.id, question.id)" class="btn btn-sm btn-secondary me-2">
-                  Delete
-                </button>
-              </td>
-            </tr>
-          }
+        <tr *ngFor="let question of quizDetail.questions">
+          <td>{{question.id}}</td>
+          <td>{{question.content}}</td>
+          <td>{{question.type}}</td>
+          <td>
+            <ng-container *ngIf="question.type === 'SINGLE_CHOICE'; else multipleOrBoolean">
+              {{getCorrectOption(question.options!)[0]?.content}}
+            </ng-container>
+            <ng-template #multipleOrBoolean>
+              <ng-container *ngIf="question.type === 'MULTIPLE_CHOICE'; else booleanAnswer">
+                <ul>
+                  <li *ngFor="let correctOption of getCorrectOption(question.options!)">
+                    {{correctOption.content}}
+                  </li>
+                </ul>
+              </ng-container>
+              <ng-template #booleanAnswer>
+                {{question.trueFalseAnswer}}
+              </ng-template>
+            </ng-template>
+          </td>
+          <td>{{question.score}}</td>
+          <td>
+            <a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', quizDetail.id, 'edit-question', question.id]"
+               class="btn btn-secondary btn-sm">Edit</a>
+            <button type="button" (click)="confirmDeleteQuestion(quizDetail.id, question.id)" class="btn btn-sm btn-secondary ms-3">
+              Delete
+            </button>
+          </td>
+        </tr>
         </tbody>
       </table>
     </div>
@@ -71,12 +78,11 @@
   <ng-template #noQuestions>
     <h1>No question could be found.</h1>
   </ng-template>
-
 </ng-container>
 
 <ng-template #quizNo>
   <div>No Quiz could be found.</div>
-  <a
-     [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', 'add']"
-     class="btn btn-secondary btn-sm custom-button">Create Quiz</a>
 </ng-template>
+
+<a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', 'trash']"
+   class="btn btn-primary">Go to trash</a>

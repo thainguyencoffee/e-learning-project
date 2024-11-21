@@ -11,58 +11,74 @@
 
   <!-- Content -->
   <div class="mb-3">
-    <label for="content" class="form-label fw-bold">Content</label>
+    <label for="content" class="col-md-2 col-form-label">
+      Content <span class='text-danger' *ngIf="isRequired('content')">*</span>
+    </label>
     <input
       id="content"
       formControlName="content"
       type="text"
-      class="form-control"
+      class="form-control {{ getInputClasses('content') }}"
       placeholder="Enter content of question"
     />
+    <app-input-errors [control]="content"/>
   </div>
 
   <!-- Score -->
   <div class="mb-3">
-    <label for="score" class="form-label fw-bold">Score</label>
+    <label for="score" class="col-md-2 col-form-label">
+      Score <span class='text-danger' *ngIf="isRequired('score')">*</span>
+    </label>
     <input
       id="score"
       formControlName="score"
       type="number"
-      class="form-control"
+      class="form-control {{ getInputClasses('score') }}"
       placeholder="Enter score of question"
     />
+    <app-input-errors [control]="score"/>
   </div>
 
   <!-- Type -->
   <div class="mb-3">
-    <label for="type" class="form-label fw-bold">Type</label>
-    <select id="type" formControlName="type" class="form-select" (click)="onChangeType()">
+    <label for="type" class="col-md-2 col-form-label">
+      Type <span class='text-danger' *ngIf="isRequired('type')">*</span>
+    </label>
+    <select id="type" formControlName="type" class="form-select {{ getInputClasses('type') }}" (click)="onChangeType()">
       <option [ngValue]="null">Please select</option>
       @for (option of typeOptions | keyvalue; track option.key) {
         <option [ngValue]="option.key">{{option.value}}</option>
       }
     </select>
+    <app-input-errors [control]="type"/>
   </div>
 
   <!-- Options (Dynamic by Type) -->
   <div *ngIf="isMultipleChoice() || isSingleChoice()" formArrayName="options" class="mb-4">
-    <label class="form-label fw-bold">Options</label>
-    <div *ngFor="let option of options.controls; let i = index" [formGroupName]="i" class="d-flex align-items-center mb-2">
-      <input
-        formControlName="content"
-        type="text"
-        class="form-control me-3"
-        placeholder="Option {{ i + 1 }}"
-      />
-      <input *ngIf="isMultipleChoice()" type="checkbox" formControlName="correct" class="form-check-input me-2" />
-      <input *ngIf="isSingleChoice()" type="checkbox" formControlName="correct" class="form-check-input me-2" (click)="handleSingleChoice(i)">
-      <button type="button" class="btn btn-danger btn-sm" (click)="removeAnswerOption(i)">Remove</button>
+    <label class="col-md-2 col-form-label d-flex">Options</label>
+    <div *ngFor="let option of options.controls; let i = index" [formGroupName]="i" class="mb-3">
+      <div class="d-flex align-items-center">
+        <input
+          formControlName="content"
+          type="text"
+          class="form-control me-3"
+          placeholder="Option {{ i + 1 }}"
+        />
+        <input *ngIf="isMultipleChoice()" type="checkbox" formControlName="correct" class="form-check-input me-2" />
+        <input *ngIf="isSingleChoice()" type="checkbox" formControlName="correct" class="form-check-input me-2" (click)="handleSingleChoice(i)">
+        <button type="button" class="btn btn-danger btn-sm" (click)="removeAnswerOption(i)">Remove</button>
+      </div>
+      <div class="mt-1">
+        <app-input-errors [control]="getContentControl(option)"></app-input-errors>
+      </div>
     </div>
     <button type="button" class="btn btn-primary" (click)="addAnswerOption()">Add Option</button>
   </div>
 
   <div *ngIf="isTrueFalse()" class="mb-4">
-    <label class="form-label fw-bold">Answer</label>
+    <label for="type" class="col-md-2 col-form-label">
+      Answer <span class='text-danger' *ngIf="isRequired('trueFalseAnswer')">*</span>
+    </label>
     <div class="form-check">
       <input
         id="true-option"
@@ -86,7 +102,7 @@
   </div>
 
   <!-- Submit -->
-  <button type="submit" class="btn btn-success w-100" [disabled]="editForm.invalid">
+  <button type="submit" class="btn btn-success w-100" >
     Submit
   </button>
 </form>
