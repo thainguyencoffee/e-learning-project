@@ -1,21 +1,28 @@
 <div class="d-flex flex-wrap mb-4">
   <h1 class="flex-grow-1">Quiz Detail</h1>
   <div>
-    <a [routerLink]="['/administration/courses', courseId]" class="btn btn-secondary">Back to course detail</a>
+    <ng-template #quizNo>
+      <div>No Quiz could be found.</div>
+    </ng-template>
+    <a
+      [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', 'add']"
+      class="btn btn-primary ms-2">Create Quiz</a>
+    <a [routerLink]="['/administration/courses', courseId]" class="btn btn-secondary ms-2">Back to course detail</a>
   </div>
 </div>
 
-<a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', 'trash']"
-   class="btn btn-secondary btn-sm custom-button">Go to trash</a>
+
 
 <ng-container *ngIf="quizDto as quizDetail; else quizNo">
+  <div class="d-flex flex-wrap gap-2">
   <a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', 'edit', quizDetail.id]"
-     class="btn btn-secondary btn-sm custom-button">Edit Quiz</a>
+     class="btn btn-secondary  ">Edit Quiz</a>
   <a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', 'add-question', quizDetail.id]"
-     class="btn btn-secondary btn-sm custom-button">Add Question</a>
-  <button type="button" (click)="confirmDeleteQuiz(quizDetail.id)" class="btn btn-sm btn-secondary me-2">
+     class="btn btn-secondary  ">Add Question</a>
+  <button type="button" (click)="confirmDeleteQuiz(quizDetail.id)" class="btn  btn-secondary me-2">
     Delete
   </button>
+  </div>
 
   <h3>Title: {{quizDetail.title}}</h3>
   <p>Description: {{quizDetail.description}}</p>
@@ -73,10 +80,5 @@
   </ng-template>
 
 </ng-container>
-
-<ng-template #quizNo>
-  <div>No Quiz could be found.</div>
-  <a
-     [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', 'add']"
-     class="btn btn-secondary btn-sm custom-button">Create Quiz</a>
-</ng-template>
+<a [routerLink]="['/administration/courses', courseId, 'sections', sectionId, 'lessons', lessonId, 'quizzes', 'trash']"
+   class="btn btn-primary">Go to trash</a>

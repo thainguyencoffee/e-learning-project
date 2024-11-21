@@ -1,7 +1,6 @@
 <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
   <h1 class="text-primary fw-bold">Teacher Salary</h1>
-  <a [routerLink]="['/administration/teachers']"
-     class="btn btn-outline-secondary">
+  <a [routerLink]="['/administration/teachers']" class="btn btn-outline-secondary">
     <i class="bi bi-arrow-left"></i> Back to list
   </a>
 </div>
@@ -10,117 +9,125 @@
   <div class="alert alert-warning" *ngIf="someRecordNotPaid(salary)">
     There are some records that have not been paid yet.
   </div>
-  <!-- Order Details Section -->
-  <div class="col-lg-6 d-flex">
-    <div class="card shadow-lg border-0 flex-fill">
+  <!-- Salary Info Section -->
+  <div class="col-12">
+    <div class="card shadow-lg border-0">
       <div class="card-header bg-dark text-white">
-        <h5 class="mb-0">Salary info</h5>
+        <h5 class="mb-0">Salary Info</h5>
       </div>
       <div class="card-body">
-        <div class="d-flex justify-content-between">
-          <p><strong>Salary ID:</strong></p>
-          <p>{{ salary.id }}</p>
-        </div>
-        <div class="d-flex justify-content-between">
-          <p><strong>Teacher:</strong></p>
-          <p>{{ salary.teacher }}</p>
-        </div>
-        <div class="d-flex justify-content-between">
-          <p><strong>Rank:</strong></p>
-          <p>
-            <span *ngIf="salary.rank === 'NONE'" class="badge bg-secondary">None</span>
-            <span *ngIf="salary.rank === 'INSTRUCTOR_I'" class="badge bg-primary">Instructor I</span>
-            <span *ngIf="salary.rank === 'INSTRUCTOR_II'" class="badge bg-primary">Instructor II</span>
-            <span *ngIf="salary.rank === 'INSTRUCTOR_III'" class="badge bg-primary">Instructor III</span>
-          </p>
-        </div>
-        <div class="d-flex justify-content-between">
-          <p><strong>Number of students:</strong></p>
-          <p>{{ salary.nosAllTime }}</p>
-        </div>
-        <div class="d-flex justify-content-between">
-          <p><strong>Number of courses:</strong></p>
-          <p>{{ salary.nocAllTime }}</p>
-        </div>
-        <div class="d-flex justify-content-between">
-          <p><strong>Base amount:</strong></p>
-          <p>{{ salary.baseSalary }}</p>
-        </div>
-        <div class="d-flex justify-content-between">
-          <p><strong>Created date:</strong></p>
-          <p>{{ salary.createdDate | date:'yyyy-MM-dd HH:mm:ss' }}</p>
-        </div>
-        <div class="d-flex justify-content-between">
-          <p><strong>Last modified date:</strong></p>
-          <p>{{ salary.lastModifiedDate | date:'yyyy-MM-dd HH:mm:ss' }}</p>
+        <div class="row">
+          <div class="col-md-6 d-flex justify-content-between">
+            <p><strong>Salary ID:</strong></p>
+            <p>{{ salary.id }}</p>
+          </div>
+          <div class="col-md-6 d-flex justify-content-between">
+            <p><strong>Teacher:</strong></p>
+            <p>{{ salary.teacher }}</p>
+          </div>
+          <div class="col-md-6 d-flex justify-content-between">
+            <p><strong>Rank:</strong></p>
+            <p>
+              <span *ngIf="salary.rank === 'NONE'" class="badge bg-secondary">None</span>
+              <span *ngIf="salary.rank === 'INSTRUCTOR_I'" class="badge bg-primary">Instructor I</span>
+              <span *ngIf="salary.rank === 'INSTRUCTOR_II'" class="badge bg-primary">Instructor II</span>
+              <span *ngIf="salary.rank === 'INSTRUCTOR_III'" class="badge bg-primary">Instructor III</span>
+            </p>
+          </div>
+          <div class="col-md-6 d-flex justify-content-between">
+            <p><strong>Number of students:</strong></p>
+            <p>{{ salary.nosAllTime }}</p>
+          </div>
+          <div class="col-md-6 d-flex justify-content-between">
+            <p><strong>Number of courses:</strong></p>
+            <p>{{ salary.nocAllTime }}</p>
+          </div>
+          <div class="col-md-6 d-flex justify-content-between">
+            <p><strong>Base amount:</strong></p>
+            <p>{{ salary.baseSalary }}</p>
+          </div>
+          <div class="col-md-6 d-flex justify-content-between">
+            <p><strong>Created date:</strong></p>
+            <p>{{ salary.createdDate | date: 'yyyy-MM-dd HH:mm:ss' }}</p>
+          </div>
+          <div class="col-md-6 d-flex justify-content-between">
+            <p><strong>Last modified date:</strong></p>
+            <p>{{ salary.lastModifiedDate | date: 'yyyy-MM-dd HH:mm:ss' }}</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- Salary Records Section -->
-  <div class="col-lg-6 d-flex" *ngIf="salary.records && salary.records.length > 0">
-    <div class="card shadow-lg border-0 flex-fill">
+  <div class="col-12">
+    <div class="card shadow-lg border-0">
       <div class="card-header bg-info text-white">
         <h5 class="mb-0"><i class="bi bi-credit-card me-2"></i> Salary Records</h5>
       </div>
-      <div class="card-body">
-        @for (record of salary.records; track record.id) {
-          <hr>
-          <div class="d-flex justify-content-between">
-            <p>
-              <strong>
-                This record is for {{ record.createdDate | date:'MMMM yyyy' }}
-              </strong>
-            </p>
-          </div>
-          <div class="d-flex justify-content-between">
-            <p><strong>Record ID:</strong></p>
-            <p>{{ record.id }}</p>
-          </div>
-          <div class="d-flex justify-content-between">
-            <p><strong>Created date:</strong></p>
-            <p>{{ record.createdDate | date:'yyyy-MM-dd HH:mm:ss' }}</p>
-          </div>
-          <div class="d-flex justify-content-between" *ngIf="record.status === 'PAID'">
-            <p><strong>Paid date:</strong></p>
-            <p>{{ record.paidDate | date:'yyyy-MM-dd HH:mm:ss' }}</p>
-          </div>
-          <div class="d-flex justify-content-between">
-            <p><strong>Number of courses:</strong></p>
-            <p class="text-primary">{{ record.nocByMonth }}</p>
-          </div>
-          <div class="d-flex justify-content-between">
-            <p><strong>Number of students:</strong></p>
-            <p class="text-primary">{{ record.nosByMonth }}</p>
-          </div>
-          <div class="d-flex justify-content-between">
-            <p><strong>Bonus type</strong></p>
-            <p class="text-primary">{{ record.bonus.type }}</p>
-          </div>
-          <div class="d-flex justify-content-between">
-            <p><strong>Bonus amount</strong></p>
-            <p class="text-primary">{{ record.bonus.amount }}</p>
-          </div>
-          <div class="d-flex justify-content-between">
-            <p><strong>Total amount:</strong></p>
-            <p class="fw-bold text-success">{{ record.totalAmount }}</p>
-          </div>
-          <div class="d-flex justify-content-between">
-            <p><strong>Status:</strong></p>
-            <p>
-              <span *ngIf="record.status === 'PAID'" class="badge bg-success">{{ record.status }}</span>
-              <span *ngIf="record.status === 'PENDING'" class="badge bg-warning">{{ record.status }}</span>
-              <span *ngIf="record.status === 'FAILED'" class="badge bg-danger">{{ record.status }}</span>
-            </p>
-          </div>
-          <div *ngIf="record.status === 'FAILED'">
-            <div class="alert alert-danger">
-              {{ record.failureReason }}.
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+        @for (record of salary.records | slice:0:visibleRecords; track record.id) {
+          <div class="card border shadow-sm h-100">
+            <div class="card-body">
+              <p class="fw-bold">Record for {{ record.createdDate | date: 'MMMM yyyy' }}</p>
+              <p><strong>Record ID:</strong> {{ record.id }}</p>
+              <p><strong>Created date:</strong> {{ record.createdDate | date: 'yyyy-MM-dd HH:mm:ss' }}</p>
+              <p *ngIf="record.status === 'PAID'">
+                <strong>Paid date:</strong> {{ record.paidDate | date: 'yyyy-MM-dd HH:mm:ss' }}
+              </p>
+              <p><strong>Number of courses:</strong> <span class="text-primary">{{ record.nocByMonth }}</span></p>
+              <p><strong>Number of students:</strong> <span class="text-primary">{{ record.nosByMonth }}</span></p>
+              <p><strong>Bonus type:</strong> <span class="text-primary">{{ record.bonus.type }}</span></p>
+              <p><strong>Bonus amount:</strong> <span class="text-primary">{{ record.bonus.amount }}</span></p>
+              <p><strong>Total amount:</strong>
+                <span class="fw-bold text-success fs-4 bg-light p-1 rounded">{{ record.totalAmount }}</span>
+              </p>
+              <p><strong>Status:</strong>
+                <span *ngIf="record.status === 'PAID'" class="badge bg-success">{{ record.status }}</span>
+                <span *ngIf="record.status === 'PENDING'" class="badge bg-warning">{{ record.status }}</span>
+                <span *ngIf="record.status === 'FAILED'" class="badge bg-danger">{{ record.status }}</span>
+              </p>
+              <div *ngIf="record.status === 'FAILED'" class="alert alert-danger mt-2">
+                {{ record.failureReason }}.
+              </div>
             </div>
           </div>
         }
       </div>
+      <div class="text-center mt-3">
+        <button
+          class="btn btn-secondary btn-sm"
+          style="margin-right: 8px; padding: 5px 12px; border-radius: 20px;"
+          *ngIf="visibleRecords < salary.records.length"
+          (click)="showMore()">
+          Show More
+        </button>
+        <button
+          class="btn btn-secondary btn-sm"
+          style="padding: 5px 12px; margin-right: 8px; border-radius: 20px;"
+          (click)="showLess()">
+          Show Less
+        </button>
+        <button
+          class="btn btn-primary btn-sm"
+          style="margin-right: 8px; padding: 5px 12px; border-radius: 20px;"
+          *ngIf="visibleRecords < salary.records.length"
+          (click)="showAll()">
+          Show All
+        </button>
+      </div>
+
     </div>
   </div>
 </div>
+<style>
+  .card {
+    max-width: 100%;
+    overflow: hidden;
+    word-wrap: break-word;
+  }
+
+  .card-body p {
+    margin-bottom: 1rem;
+  }
+
+</style>
+

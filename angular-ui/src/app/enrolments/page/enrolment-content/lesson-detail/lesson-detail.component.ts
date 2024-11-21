@@ -1,3 +1,4 @@
+import { DocumentViewerComponent } from '../../../../common/DocumentViewer/document-viewer.component';
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
 import {EnrolmentWithCourseDataService} from "../enrolment-with-course-data.service";
@@ -15,10 +16,11 @@ import {QuizSubmission} from "../../../model/enrolment";
   selector: 'app-lesson-detail',
   standalone: true,
   imports: [
-    RouterLink,
     AsyncPipe,
     NgIf,
-    VideoPlayerComponent
+    VideoPlayerComponent,
+    DocumentViewerComponent,
+    RouterLink
   ],
   templateUrl: './lesson-detail.component.html',
 })
@@ -36,14 +38,7 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
   enrolmentId?: number;
   enrolmentWithCourse$!: Observable<EnrolmentWithCourseDto | null>;
   navigationSubscription?: Subscription;
-
-  getMessage(key: string, details?: any) {
-    const messages: Record<string, string> = {
-      marked: `Lesson ${details.title} marked as completed successfully`,
-      unmark: `Lesson ${details.title} marked as incomplete successfully`,
-    };
-    return messages[key];
-  }
+  lessonType: 'video' | 'docx' = 'video';
 
   ngOnInit(): void {
     this.loadData();
@@ -52,15 +47,14 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
       if (event instanceof NavigationEnd) {
         this.loadData();
       }
-    })
-
+    });
   }
 
   ngOnDestroy(): void {
-    this.navigationSubscription!.unsubscribe();
+    this.navigationSubscription?.unsubscribe();
   }
 
-  loadData() {
+  loadData(): void {
     this.enrolmentId = +this.route.snapshot.params['enrolmentId'];
     this.lessonId = +this.route.snapshot.params['lessonId'];
 
@@ -72,12 +66,17 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
     this.enrolmentService.getEnrolmentWithCourseByEnrollmentId(this.enrolmentId)
       .subscribe({
         next: (data) => {
-          this.enrolmentWithCourseDataService.setEnrolmentWithCourse(
-            this.enrolmentWithCourseDataService.sortSectionAndLessons(data)
-          );
+          const sortedData = this.enrolmentWithCourseDataService.sortSectionAndLessons(data);
+          this.enrolmentWithCourseDataService.setEnrolmentWithCourse(sortedData);
+
+          // Lấy link bài học từ dữ liệu trả về và xác định loại tài liệu
+          const lesson = this.getLessonById(this.lessonId!, sortedData.sections);
+          if (lesson && lesson.link) {
+            this.setLessonType(lesson.link);  // Gọi setLessonType ở đây
+          }
         },
         error: (error) => this.errorHandler.handleServerError(error.error)
-      })
+      });
 
     this.enrolmentWithCourse$ = this.enrolmentWithCourseDataService.enrolmentWithCourse$;
   }
@@ -109,28 +108,44 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  markLessonAsIncomplete(lessonId: number, title: string) {
+  markLessonAsIncomplete(lessonId: number, title: string): void {
     this.enrolmentService.markLessonAsIncomplete(this.enrolmentId!, lessonId)
       .subscribe({
         next: _ => {
           const queryParams = this.route.snapshot.queryParams;
-          this.router.navigate(['.'],
-            {
-              relativeTo: this.route,
-              queryParams: queryParams,
-              state: {
-                msgSuccess: this.getMessage('unmark', {title})
-              }
-            })
+          this.router.navigate(['.'], {
+            relativeTo: this.route,
+            queryParams: queryParams,
+            state: { msgSuccess: this.getMessage('unmark', { title }) }
+          });
         },
         error: error => this.errorHandler.handleServerError(error.error)
-      })
+      });
   }
 
   getQuizByLessonId(lessonId: number, sections: Section[]) {
     return sections.flatMap(s => s.quizzes).find(q => q.afterLessonId === lessonId);
   }
 
+  getMessage(key: string, details?: any): string {
+    const messages: Record<string, string> = {
+      marked: `Lesson ${details.title} marked as completed successfully`,
+      unmark: `Lesson ${details.title} marked as incomplete successfully`,
+    };
+    return messages[key];
+  }
+
+  // Kiểm tra kiểu tài liệu là video hay docx
+  setLessonType(lessonLink: string): void {
+    const normalizedLink = lessonLink.trim().toLowerCase();  // Chuyển tất cả về chữ thường và loại bỏ khoảng trắng dư thừa
+    if (normalizedLink.endsWith('.mp4') || normalizedLink.endsWith('.avi') || normalizedLink.endsWith('.mkv')) {
+      this.lessonType = 'video'; // Video
+    } else if (normalizedLink.endsWith('.docx')) {
+      this.lessonType = 'docx'; // DOCX
+    } else {
+      console.warn('Unknown lesson type for link:', lessonLink);
+    }
+  }
   getQuizSubmissionByLessonId(lessonId: number, sections: Section[], quizSubmissions: QuizSubmission[]) {
     const quiz = sections.flatMap(s => s.quizzes).find(q => q.afterLessonId === lessonId);
     if (!quiz) {
