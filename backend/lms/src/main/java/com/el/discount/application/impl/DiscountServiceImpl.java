@@ -3,7 +3,7 @@ package com.el.discount.application.impl;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.discount.application.DiscountService;
-import com.el.discount.application.dto.DiscountDTO;
+import com.el.discount.web.dto.DiscountDTO;
 import com.el.discount.application.dto.DiscountSearchDTO;
 import com.el.discount.domain.Discount;
 import com.el.discount.domain.DiscountRepository;

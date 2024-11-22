@@ -1,14 +1,14 @@
 package com.el;
 
 import com.el.common.Currencies;
-import com.el.course.application.dto.CourseSectionDTO;
+import com.el.course.web.dto.CourseSectionDTO;
 import com.el.course.domain.Course;
-import com.el.discount.application.dto.DiscountDTO;
+import com.el.discount.web.dto.DiscountDTO;
 import com.el.discount.domain.Discount;
-import com.el.order.application.dto.OrderItemDTO;
-import com.el.order.application.dto.OrderRequestDTO;
+import com.el.order.web.dto.OrderItemDTO;
+import com.el.order.web.dto.OrderRequestDTO;
 import com.el.order.domain.Status;
-import com.el.payment.application.PaymentRequest;
+import com.el.payment.web.dto.PaymentRequest;
 import com.el.payment.domain.PaymentMethod;
 import com.el.payment.domain.PaymentStatus;
 import org.javamoney.moneta.Money;

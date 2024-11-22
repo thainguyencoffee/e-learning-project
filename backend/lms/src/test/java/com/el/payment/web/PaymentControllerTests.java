@@ -4,7 +4,7 @@ import com.el.common.Currencies;
 import com.el.common.config.CustomAuthenticationEntryPoint;
 import com.el.common.config.jackson.JacksonCustomizations;
 import com.el.common.config.SecurityConfig;
-import com.el.payment.application.PaymentRequest;
+import com.el.payment.web.dto.PaymentRequest;
 import com.el.payment.application.PaymentService;
 import com.el.payment.domain.Payment;
 import com.el.payment.domain.PaymentMethod;

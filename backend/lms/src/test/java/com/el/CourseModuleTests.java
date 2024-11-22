@@ -1,12 +1,8 @@
 package com.el;
 
 import com.el.common.Currencies;
-import com.el.course.application.dto.*;
 import com.el.course.domain.*;
-import com.el.course.web.dto.AssignTeacherDTO;
-import com.el.course.web.dto.CourseRequestApproveDTO;
-import com.el.course.web.dto.UpdatePriceDTO;
-import com.el.course.web.dto.UpdateSectionDTO;
+import com.el.course.web.dto.*;
 import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;

@@ -1,7 +1,6 @@
 package com.el.course.web;
 
 import com.el.course.application.*;
-import com.el.course.application.dto.*;
 import com.el.course.domain.Course;
 import com.el.course.domain.RequestType;
 import com.el.course.web.dto.*;

@@ -14,7 +14,7 @@ import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
 import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
 import com.el.enrollment.application.dto.QuizDetailDTO;
-import com.el.enrollment.application.dto.QuizSubmitDTO;
+import com.el.enrollment.web.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
 import com.el.enrollment.domain.LessonProgress;

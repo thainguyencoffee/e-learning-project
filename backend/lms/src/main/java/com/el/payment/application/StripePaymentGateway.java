@@ -1,6 +1,7 @@
 package com.el.payment.application;
 
 import com.el.common.Currencies;
+import com.el.payment.web.dto.PaymentRequest;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;

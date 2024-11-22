@@ -2,8 +2,8 @@ package com.el.course.web;
 
 import com.el.course.application.CourseQueryService;
 import com.el.course.application.CourseService;
-import com.el.course.application.dto.CommentDTO;
-import com.el.course.application.dto.CoursePostDTO;
+import com.el.course.web.dto.CommentDTO;
+import com.el.course.web.dto.CoursePostDTO;
 import com.el.course.domain.Comment;
 import com.el.course.domain.Post;
 import jakarta.validation.Valid;

@@ -6,9 +6,9 @@ import com.el.common.RolesBaseUtil;
 import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
-import com.el.course.application.dto.*;
 import com.el.course.application.impl.CourseServiceImpl;
 import com.el.course.domain.*;
+import com.el.course.web.dto.*;
 import com.el.discount.application.DiscountService;
 import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.el.course.application.dto.QuestionDTO.AnswerOptionDTO;
+import com.el.course.web.dto.QuestionDTO.AnswerOptionDTO;
 
 import javax.money.MonetaryAmount;
 

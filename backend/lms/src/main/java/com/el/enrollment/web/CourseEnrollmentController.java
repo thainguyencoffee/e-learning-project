@@ -8,6 +8,7 @@ import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
 import com.el.enrollment.domain.QuizSubmission;
 import com.el.enrollment.web.dto.LessonMarkRequest;
+import com.el.enrollment.web.dto.QuizSubmitDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

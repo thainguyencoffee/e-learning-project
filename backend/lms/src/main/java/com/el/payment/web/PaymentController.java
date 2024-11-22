@@ -1,6 +1,6 @@
 package com.el.payment.web;
 
-import com.el.payment.application.PaymentRequest;
+import com.el.payment.web.dto.PaymentRequest;
 import com.el.payment.application.PaymentService;
 import com.el.payment.domain.Payment;
 import jakarta.validation.Valid;

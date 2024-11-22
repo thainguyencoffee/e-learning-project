@@ -2,9 +2,9 @@ package com.el.course.web;
 
 import com.el.course.application.CourseQueryService;
 import com.el.course.application.CourseService;
-import com.el.course.application.dto.QuestionDTO;
-import com.el.course.application.dto.QuizDTO;
-import com.el.course.application.dto.QuizUpdateDTO;
+import com.el.course.web.dto.QuestionDTO;
+import com.el.course.web.dto.QuizDTO;
+import com.el.course.web.dto.QuizUpdateDTO;
 import com.el.course.domain.Quiz;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;

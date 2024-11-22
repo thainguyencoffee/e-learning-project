@@ -5,8 +5,9 @@ import com.el.common.exception.AccessDeniedException;
 import com.el.course.application.CourseQueryService;
 import com.el.course.application.CourseService;
 import com.el.course.application.EnsureEnrolmentCompleted;
-import com.el.course.application.dto.*;
+//import com.el.course.application.dto.*;
 import com.el.course.domain.*;
+import com.el.course.web.dto.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -183,15 +184,6 @@ public class CourseServiceImpl implements CourseService {
         course.changePrice(newPrice);
 
         return courseRepository.save(course);
-    }
-
-    private boolean cannotUpdateCourse(Course course) {
-        if (rolesBaseUtil.isAdmin()) {
-            return false;
-        }
-
-        String currentUserId = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
-        return !course.getTeacher().equals(currentUserId);
     }
 
     @Override
@@ -408,6 +400,15 @@ public class CourseServiceImpl implements CourseService {
         course.deleteReview(student);
         courseRepository.save(course);
 
+    }
+
+    private boolean cannotUpdateCourse(Course course) {
+        if (rolesBaseUtil.isAdmin()) {
+            return false;
+        }
+
+        String currentUserId = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+        return !course.getTeacher().equals(currentUserId);
     }
 
 }

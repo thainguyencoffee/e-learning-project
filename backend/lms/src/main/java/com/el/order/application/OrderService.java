@@ -1,6 +1,6 @@
 package com.el.order.application;
 
-import com.el.order.application.dto.OrderRequestDTO;
+import com.el.order.web.dto.OrderRequestDTO;
 import com.el.order.domain.Order;
 import org.springframework.data.domain.Pageable;
 
