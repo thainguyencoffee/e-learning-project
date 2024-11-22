@@ -15,6 +15,7 @@ public class LessonProgress {
     private Long id;
     private Long lessonId;
     private String lessonTitle;
+    private boolean bonus;
     private boolean completed;
     private LocalDateTime completedDate;
 
@@ -24,7 +25,16 @@ public class LessonProgress {
         this.lessonId = lessonId;
         this.lessonTitle = lessonTitle;
         this.completed = false;
+        this.bonus = false;
         completedDate = null;
+    }
+
+    public void markAsBonus() {
+        if (this.bonus) {
+            throw new InputInvalidException("LessonProgress is already be bonus.");
+        }
+
+        this.bonus = true;
     }
 
     public void markAsCompleted() {

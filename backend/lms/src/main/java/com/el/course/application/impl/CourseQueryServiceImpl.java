@@ -238,6 +238,12 @@ public class CourseQueryServiceImpl implements CourseQueryService {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
+    @Override
+    public Lesson findLessonByCourseIdAndLessonId(Long courseId, Long lessonId) {
+        Course course = findPublishedCourseById(courseId);
+        return course.getLessonInSectionForPublishedById(lessonId);
+    }
+
     private boolean isUserEnrolled(Long courseId, String username) {
         return courseEnrollmentRepository.findByCourseIdAndStudent(courseId, username).isPresent();
     }

@@ -16,7 +16,8 @@ public class QuizSubmission {
     @Id
     private Long id;
     private Long quizId;
-//    private Long afterLessonId;
+    private Long afterLessonId;
+    private boolean bonus;
     @MappedCollection(idColumn = "quiz_submission")
     private Set<QuizAnswer> answers = new HashSet<>();
     private Integer score;
@@ -24,18 +25,28 @@ public class QuizSubmission {
     private Instant lastModifiedDate;
     private boolean passed;
 
-    public QuizSubmission(Long quizId, Set<QuizAnswer> answers, Integer score, Boolean passed) {
+    public QuizSubmission(Long quizId, Long afterLessonId, Set<QuizAnswer> answers, Integer score, Boolean passed) {
         if (quizId == null) throw new InputInvalidException("QuizId must not be null.");
+        if (afterLessonId == null) throw new InputInvalidException("AfterLessonId must not be null.");
         if (answers == null || answers.isEmpty()) throw new InputInvalidException("Answers must not be null or empty.");
         if (score == null || score < 0) throw new InputInvalidException("Score must be a non-negative integer.");
         if (passed == null) throw new InputInvalidException("Passed must not be null.");
 
         this.quizId = quizId;
+        this.afterLessonId = afterLessonId;
         this.score = score;
         this.passed = passed;
         answers.forEach(this::addAnswer);
         this.submittedDate = Instant.now();
         this.lastModifiedDate = Instant.now();
+        bonus = false;
+    }
+
+    public void markAsBonus() {
+        if (bonus) {
+            throw new InputInvalidException("This quiz submission is already marked as bonus.");
+        }
+        bonus = true;
     }
 
     public void reSubmit(Set<QuizAnswer> answers, Integer score, Boolean passed) {

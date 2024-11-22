@@ -22,7 +22,7 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     private String student;
     private Long courseId;
     private String teacher;
-    private Integer totalQuizzes;
+    private Set<Long> quizIds;
     private Integer totalLessons;
     private LocalDateTime enrollmentDate;
     @MappedCollection(idColumn = "course_enrollment")
@@ -42,30 +42,36 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
-    public CourseEnrollment(String student, Long courseId, String teacher, Set<LessonProgress> lessonProgresses, Integer totalQuizzes) {
+    public CourseEnrollment(String student, Long courseId, String teacher, Set<LessonProgress> lessonProgresses, Set<Long> quizIds) {
         if (student == null) throw new InputInvalidException("Student must not be null.");
         if (courseId == null) throw new InputInvalidException("CourseId must not be null.");
         if (teacher == null) throw new InputInvalidException("Teacher must not be null.");
         if (lessonProgresses == null || lessonProgresses.isEmpty())
             throw new InputInvalidException("LessonProgresses must not be null or empty.");
-        if (totalQuizzes == null || totalQuizzes < 0)
-            throw new InputInvalidException("TotalQuizzes must be a non-negative integer.");
+        if (quizIds == null || quizIds.isEmpty())
+            throw new InputInvalidException("QuizIds must not be null or empty.");
 
         this.student = student;
         this.courseId = courseId;
         this.teacher = teacher;
         this.completed = false;
-        this.totalQuizzes = totalQuizzes;
+        this.quizIds = quizIds;
         this.totalLessons = 0;
 
         lessonProgresses.forEach(this::addLessonProgress);
     }
 
-    public void markLessonAsCompleted(Long lessonId) {
+    public void markLessonAsCompleted(Long lessonId, String lessonTitle) {
         LessonProgress lessonProgress = lessonProgresses.stream()
                 .filter(lp -> lp.getLessonId().equals(lessonId))
                 .findFirst()
-                .orElseThrow(ResourceNotFoundException::new);
+                .orElseGet(() -> {
+                    LessonProgress newLessonProgress = new LessonProgress(lessonTitle, lessonId);
+                    newLessonProgress.markAsBonus();
+                    lessonProgresses.add(newLessonProgress);
+                    return newLessonProgress;
+                });
+
         lessonProgress.markAsCompleted();
         checkCompleted();
     }
@@ -90,32 +96,47 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     }
 
     private boolean allLessonsCompleted() {
-        long completedLesson = this.lessonProgresses.stream().filter(LessonProgress::isCompleted).count();
-        return completedLesson == this.totalLessons;
+        long completedLessons = this.lessonProgresses.stream()
+                .filter(lessonProgress -> lessonProgress.isCompleted() && !lessonProgress.isBonus()).count();
+        return completedLessons == this.totalLessons;
     }
 
     private boolean allQuizSubmitPassed() {
-        long passedQuizzes = this.quizSubmissions.stream().filter(QuizSubmission::isPassed).count();
+        long passedQuizzes = this.quizSubmissions.stream()
+                .filter(quizSubmission -> quizSubmission.isPassed() && !quizSubmission.isBonus()).count();
         // https://github.com/thainguyencoffee/e-learning-project/issues/157
-        return passedQuizzes >= this.totalQuizzes;
+        return passedQuizzes == this.quizIds.size();
     }
 
     public Progress getProgress() {
-        int totalLessons = this.lessonProgresses.size();
-        int completedLessons = (int) this.lessonProgresses.stream().filter(LessonProgress::isCompleted).count();
-        return new Progress(totalLessons, completedLessons);
+        int totalLessons = this.totalLessons;
+        int completedLessons = (int) this.lessonProgresses.stream()
+                .filter(lessonProgress -> lessonProgress.isCompleted() && !lessonProgress.isBonus()).count();
+        int totalQuizzes = this.quizIds.size();
+        int passedQuizzes = (int) this.quizSubmissions.stream()
+                .filter(quizSubmission -> quizSubmission.isPassed() && !quizSubmission.isBonus()).count();
+        int lessonBonus = (int) this.lessonProgresses.stream()
+                .filter(LessonProgress::isBonus).count();
+        int quizBonus = (int) this.quizSubmissions.stream()
+                .filter(QuizSubmission::isBonus).count();
+        double progressPercentage = (completedLessons + passedQuizzes) * 100.0 / (totalLessons + totalQuizzes);
+        return new Progress(totalLessons, completedLessons, totalQuizzes, passedQuizzes, lessonBonus, quizBonus, progressPercentage);
     }
 
     public void addLessonProgress(LessonProgress lessonProgress) {
         if (lessonProgress == null) throw new InputInvalidException("LessonProgress must not be null.");
         lessonProgresses.add(lessonProgress);
-        this.totalLessons ++;
+        this.totalLessons++;
     }
 
     public void addQuizSubmission(QuizSubmission quizSubmission) {
         if (quizSubmission == null) throw new InputInvalidException("QuizSubmission must not be null.");
         if (isSubmittedQuiz(quizSubmission.getQuizId())) {
             throw new InputInvalidException("QuizSubmission for this quiz already exists.");
+        }
+        boolean isNotBonusQuiz = quizIds.contains(quizSubmission.getQuizId());
+        if (!isNotBonusQuiz) {
+            quizSubmission.markAsBonus();
         }
         quizSubmissions.add(quizSubmission);
         checkCompleted();
@@ -163,10 +184,32 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
 
     public void deleteQuizSubmission(Long quizId) {
         QuizSubmission quizSubmission = getQuizSubmission(quizId);
+        if (!quizSubmission.isBonus() && completed) {
+            revocationCertificate();
+        }
         quizSubmissions.remove(quizSubmission);
     }
 
-    public record EnrolmentCompletedEvent(Long id, Long courseId, String student) {}
-    public record EnrolmentCreatedEvent(String teacher) {}
+    private void revocationCertificate() {
+        // Revoke certificate
+        if (!completed) {
+            throw new InputInvalidException("You can't revoke certificate for an incomplete enrollment.");
+        }
+        String certificateUrl = this.certificate.getUrl();
+        completed = false;
+        completedDate = null;
+        certificate = null;
+        reviewed = false;
+        registerEvent(new EnrolmentIncompleteEvent(this.id, this.courseId, this.student, certificateUrl));
+    }
+
+    public record EnrolmentCompletedEvent(Long id, Long courseId, String student) {
+    }
+
+    public record EnrolmentIncompleteEvent(Long id, Long courseId, String student, String certificateUrl) {
+    }
+
+    public record EnrolmentCreatedEvent(String teacher) {
+    }
 
 }

@@ -110,21 +110,23 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
                 .map(entry -> new LessonProgress(entry.getValue(), entry.getKey()))
                 .collect(Collectors.toSet());
 
-        CourseEnrollment enrollment = new CourseEnrollment(student, courseId, course.getTeacher(), lessonProgresses, course.getNumberOfQuizzes());
+        CourseEnrollment enrollment = new CourseEnrollment(student, courseId, course.getTeacher(), lessonProgresses, course.getQuizIds());
         enrollment.markAsEnrolled();
         repository.save(enrollment);
     }
 
     @Override
-    public void markLessonAsCompleted(Long enrollmentId, Long lessonId) {
+    public void markLessonAsCompleted(Long enrollmentId, Long courseId, Long lessonId) {
         checkAccess();
+        var lesson = courseQueryService.findLessonByCourseIdAndLessonId(courseId, lessonId);
+
         CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
-        enrollment.markLessonAsCompleted(lessonId);
+        enrollment.markLessonAsCompleted(lesson.getId(), lesson.getTitle());
         repository.save(enrollment);
     }
 
     @Override
-    public void markLessonAsIncomplete(Long enrollmentId, Long lessonId) {
+    public void markLessonAsIncomplete(Long enrollmentId, Long courseId, Long lessonId) {
         checkAccess();
         CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
         enrollment.markLessonAsIncomplete(lessonId);
@@ -166,7 +168,9 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
         log.info("Found enrollment: {}", enrollment);
         QuizCalculationResult calculationResult = courseService.calculateQuizScore(enrollment.getCourseId(), quizSubmitDTO.quizId(), quizSubmitDTO.getAnswers());
         log.info("Calculation result: {}", calculationResult);
-        QuizSubmission quizSubmission = new QuizSubmission(quizSubmitDTO.quizId(), quizSubmitDTO.toQuizAnswers(), calculationResult.score(), calculationResult.passed());
+        QuizSubmission quizSubmission = new QuizSubmission(quizSubmitDTO.quizId(), calculationResult.afterLessonId(),
+                quizSubmitDTO.toQuizAnswers(), calculationResult.score(), calculationResult.passed());
+
         enrollment.addQuizSubmission(quizSubmission);
         repository.save(enrollment);
         return quizSubmission.getId();

@@ -402,4 +402,13 @@ public class CourseServiceImpl implements CourseService {
         return review.getId();
     }
 
+    @Override
+    public void deleteReview(Long courseId, String student) {
+        Course course = courseQueryService.findPublishedCourseById(courseId);
+
+        course.deleteReview(student);
+        courseRepository.save(course);
+
+    }
+
 }

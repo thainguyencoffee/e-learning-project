@@ -91,4 +91,6 @@ public interface CourseService {
 
     Long addReview(Long courseId, Long enrollmentId, ReviewDTO reviewDTO);
 
+    void deleteReview(Long courseId, String student);
+
 }

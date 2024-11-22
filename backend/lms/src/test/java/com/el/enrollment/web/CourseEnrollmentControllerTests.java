@@ -12,6 +12,8 @@ import com.el.enrollment.application.dto.QuizSubmitDTO;
 import com.el.enrollment.application.impl.CourseEnrollmentServiceImpl;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
+import com.el.enrollment.domain.LessonProgress;
+import com.el.enrollment.web.dto.LessonMarkRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +57,10 @@ class CourseEnrollmentControllerTests {
     void getAllEnrollments_ValidRequest_ReturnsAllEnrollments() throws Exception {
         Pageable pageable = PageRequest.of(0, 10);
 
-        CourseEnrollment enrollment = TestFactory.createDefaultCourseEnrollment();
+        CourseEnrollment enrollment = new CourseEnrollment("user", 1L, "teacher", Set.of(
+                new LessonProgress("Course Lesson 1", 1L),
+                new LessonProgress("Course Lesson 2", 2L)),
+                Set.of(1L, 2L));
         CourseEnrollmentDTO enrollmentDTO = new CourseEnrollmentDTO(
                 enrollment.getId(),
                 enrollment.getStudent(),
@@ -71,80 +76,107 @@ class CourseEnrollmentControllerTests {
         mockMvc.perform(get("/enrollments")
                         .param("page", "0")
                         .param("size", "10")
-                .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)));
     }
 
     @Test
     void getEnrollmentById_ValidRequest_ReturnsEnrollment() throws Exception {
-        CourseEnrollment enrollment = TestFactory.createDefaultCourseEnrollment();
+        CourseEnrollment enrollment = new CourseEnrollment("user", 1L, "teacher", Set.of(
+                new LessonProgress("Course Lesson 1", 1L),
+                new LessonProgress("Course Lesson 2", 2L)),
+                Set.of(1L, 2L));
         when(courseEnrollmentService.findCourseEnrollmentById(any())).thenReturn(enrollment);
 
         mockMvc.perform(get("/enrollments/{enrollmentId}", 1L)
-                .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.courseId").value(enrollment.getCourseId().toString()));
     }
 
     @Test
     void markLessonAsCompleted_ValidRequest_MarksLessonAsCompleted() throws Exception {
-        doNothing().when(courseEnrollmentService).markLessonAsCompleted(any(), any());
+        doNothing().when(courseEnrollmentService).markLessonAsCompleted(any(), any(), any());
 
-        mockMvc.perform(put("/enrollments/{enrollmentId}/lessons/{lessonId}", 1L, 1L)
-                .param("mark", "completed")
+        var lessonMark = new LessonMarkRequest(LessonMarkRequest.MarkType.COMPLETED, 1L, 1L);
+
+        mockMvc.perform(put("/enrollments/{enrollmentId}/mark-lesson", 1L)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(lessonMark))
                 .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user")))
         ).andExpect(status().isOk());
     }
 
     @Test
     void markLessonAsCompleted_InvalidRequest_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(put("/enrollments/{enrollmentId}/lessons/{lessonId}", 1L, 1L)
-                .param("mark", "invalid")
+        var lessonMarkJson = """
+                {
+                    "mark": "invalid",
+                    "courseId": 1,
+                    "lessonId": 1
+                }
+                """;
+
+        mockMvc.perform(put("/enrollments/{enrollmentId}/mark-lesson", 1L)
+                .contentType("application/json")
+                .content(lessonMarkJson)
                 .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user")))
         ).andExpect(status().isBadRequest());
     }
 
     @Test
     void markLessonAsCompleted_NotAuthorized_ReturnsForbidden() throws Exception {
-        mockMvc.perform(put("/enrollments/{enrollmentId}/lessons/{lessonId}", 1L, 1L)
-                .param("mark", "completed")
+        var lessonMark = new LessonMarkRequest(LessonMarkRequest.MarkType.COMPLETED, 1L, 1L);
+
+        mockMvc.perform(put("/enrollments/{enrollmentId}/mark-lesson", 1L)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(lessonMark))
         ).andExpect(status().isUnauthorized());
     }
 
     @Test
     void markLessonAsCompleted_NotFound_ReturnsNotFound() throws Exception {
-        doThrow(ResourceNotFoundException.class).when(courseEnrollmentService).markLessonAsCompleted(any(), any());
+        doThrow(ResourceNotFoundException.class).when(courseEnrollmentService).markLessonAsCompleted(any(), any(), any());
+        var lessonMark = new LessonMarkRequest(LessonMarkRequest.MarkType.COMPLETED, 1L, 1L);
 
-        mockMvc.perform(put("/enrollments/{enrollmentId}/lessons/{lessonId}", 1L, 1L)
-                .param("mark", "completed")
+        mockMvc.perform(put("/enrollments/{enrollmentId}/mark-lesson", 1L)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(lessonMark))
                 .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user")))
         ).andExpect(status().isNotFound());
     }
 
     @Test
     void markLessonAsIncomplete_ValidRequest_MarksLessonAsIncomplete() throws Exception {
-        doNothing().when(courseEnrollmentService).markLessonAsIncomplete(any(), any());
+        doNothing().when(courseEnrollmentService).markLessonAsIncomplete(any(), any(), any());
+        var lessonMark = new LessonMarkRequest(LessonMarkRequest.MarkType.INCOMPLETE, 1L, 1L);
 
-        mockMvc.perform(put("/enrollments/{enrollmentId}/lessons/{lessonId}", 1L, 1L)
-                .param("mark", "incomplete")
+        mockMvc.perform(put("/enrollments/{enrollmentId}/mark-lesson", 1L)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(lessonMark))
                 .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user")))
         ).andExpect(status().isOk());
     }
 
     @Test
     void markLessonAsIncomplete_NotAuthorized_ReturnsForbidden() throws Exception {
-        mockMvc.perform(put("/enrollments/{enrollmentId}/lessons/{lessonId}", 1L, 1L)
-                .param("mark", "incomplete")
+        var lessonMark = new LessonMarkRequest(LessonMarkRequest.MarkType.INCOMPLETE, 1L, 1L);
+
+        mockMvc.perform(put("/enrollments/{enrollmentId}/mark-lesson", 1L)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(lessonMark))
         ).andExpect(status().isUnauthorized());
     }
 
     @Test
     void markLessonAsIncomplete_NotFound_ReturnsNotFound() throws Exception {
-        doThrow(ResourceNotFoundException.class).when(courseEnrollmentService).markLessonAsIncomplete(any(), any());
+        doThrow(ResourceNotFoundException.class).when(courseEnrollmentService).markLessonAsIncomplete(any(), any(), any());
+        var lessonMark = new LessonMarkRequest(LessonMarkRequest.MarkType.INCOMPLETE, 1L, 1L);
 
-        mockMvc.perform(put("/enrollments/{enrollmentId}/lessons/{lessonId}", 1L, 1L)
-                .param("mark", "incomplete")
+        mockMvc.perform(put("/enrollments/{enrollmentId}/mark-lesson", 1L)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(lessonMark))
                 .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user")))
         ).andExpect(status().isNotFound());
     }

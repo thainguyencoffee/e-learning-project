@@ -4,10 +4,16 @@
 
     <div class="section-card">
       <h3>Your Progress</h3>
+      <p>Total lessons: {{enrolmentWithCourse.progress.totalLessons }}</p>
+      <p>Total quizzes: {{enrolmentWithCourse.progress.totalQuizzes }}</p>
+      <p>Total completed lessons: {{enrolmentWithCourse.progress.completedLessons }}</p>
+      <p>Total passed quizzes: {{enrolmentWithCourse.progress.passedQuizzes }}</p>
+      <p>You're done: {{enrolmentWithCourse.progress.totalLessonBonus }} lesson bonus</p>
+      <p>You're done: {{enrolmentWithCourse.progress.totalQuizBonus }} quiz bonus</p>
       <div class="progress" role="progressbar" aria-label="Example with label"
-           [attr.aria-valuenow]="calcProgress(enrolmentWithCourse.progress)" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-bar" [style.width]="calcProgress(enrolmentWithCourse.progress) + '%'">
-          {{ calcProgress(enrolmentWithCourse.progress) }}%
+           [attr.aria-valuenow]="enrolmentWithCourse.progress.progressPercentage" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" [style.width]="enrolmentWithCourse.progress.progressPercentage + '%'">
+          {{ enrolmentWithCourse.progress.progressPercentage | number:'1.0-2' }}%
         </div>
       </div>
     </div>
@@ -25,9 +31,11 @@
     <div *ngIf="enrolmentWithCourse.completed">
       <div class="alert alert-success">
         <h3>Completed</h3>
-        <p>Congratulations! You have completed this course. Please
-          <button class="btn btn-primary" (click)="onToggleReviewBtn()">review</button>
+        <p>Congratulations! You have completed this course.
+          <span *ngIf="!enrolmentWithCourse.reviewed">
+            Please <button class="btn btn-primary" (click)="onToggleReviewBtn()">review</button>
           this course to help us.
+          </span>
         </p>
         @if (toggleReviewBtn) {
           <form [formGroup]="reviewForm" (ngSubmit)="handleSubmit(enrolmentWithCourse.courseId)">
@@ -68,8 +76,3 @@
     </div>
   </div>
 </div>
-
-<style>
-
-
-</style>

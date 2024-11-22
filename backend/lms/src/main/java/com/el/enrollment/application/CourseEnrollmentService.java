@@ -29,9 +29,9 @@ public interface CourseEnrollmentService {
     * */
     void enrollment(String student, Long courseId);
 
-    void markLessonAsCompleted(Long enrollmentId, Long lessonId);
+    void markLessonAsCompleted(Long enrollmentId, Long courseId, Long lessonId);
 
-    void markLessonAsIncomplete(Long enrollmentId, Long lessonId);
+    void markLessonAsIncomplete(Long enrollmentId, Long courseId, Long lessonId);
 
     void createCertificate(Long id, String student, Long courseId);
 

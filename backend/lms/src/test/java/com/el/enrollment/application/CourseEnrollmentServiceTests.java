@@ -7,6 +7,7 @@ import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
 import com.el.course.domain.Course;
+import com.el.course.domain.Lesson;
 import com.el.enrollment.application.impl.CourseEnrollmentServiceImpl;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
@@ -49,6 +50,7 @@ class CourseEnrollmentServiceTests {
         Course mockCourse = Mockito.mock(Course.class);
         Map<Long, String> lessonTitles = Map.of(1L, "Course Lesson 1", 2L, "Course Lesson 2");
         when(mockCourse.getLessonIdAndTitleMap()).thenReturn(lessonTitles);
+        when(mockCourse.getQuizIds()).thenReturn(Set.of(1L, 2L));
         when(mockCourse.getTeacher()).thenReturn(TestFactory.teacher);
         when(courseQueryService.findPublishedCourseById(courseId)).thenReturn(mockCourse);
 
@@ -95,6 +97,7 @@ class CourseEnrollmentServiceTests {
     void markLessonAsCompleted_Admin_Throws() {
         // Arrange
         Long enrollmentId = 1L;
+        Long courseId = 1L;
         Long lessonId = 1L;
 
         CourseEnrollment mockCourseEnrollment = Mockito.mock(CourseEnrollment.class);
@@ -102,10 +105,10 @@ class CourseEnrollmentServiceTests {
 
         // Act
         assertThrows(AccessDeniedException.class, () ->
-                courseEnrollmentService.markLessonAsCompleted(enrollmentId, lessonId));
+                courseEnrollmentService.markLessonAsCompleted(enrollmentId, courseId, lessonId));
 
         // Assert
-        verify(mockCourseEnrollment, never()).markLessonAsCompleted(lessonId);
+        verify(mockCourseEnrollment, never()).markLessonAsCompleted(lessonId, "Lesson Title");
         verify(courseEnrollmentRepository, never()).save(mockCourseEnrollment);
     }
 
@@ -113,6 +116,7 @@ class CourseEnrollmentServiceTests {
     void markLessonAsCompleted_RoleUser_MarksLessonAsCompleted() {
         // Arrange
         Long enrollmentId = 1L;
+        Long courseId = 1L;
         Long lessonId = 1L;
 
         CourseEnrollment mockCourseEnrollment = Mockito.mock(CourseEnrollment.class);
@@ -122,11 +126,17 @@ class CourseEnrollmentServiceTests {
         when(courseEnrollmentRepository.findByIdAndStudent(enrollmentId, "student"))
                 .thenReturn(Optional.of(mockCourseEnrollment));
 
+        // Update
+        Lesson lesson = spy(new Lesson("Lesson Title", Lesson.Type.VIDEO, "https://www.youtube.com/watch?v=123"));
+        when(lesson.getTitle()).thenReturn("Lesson Title");
+        when(lesson.getId()).thenReturn(lessonId);
+        when(courseQueryService.findLessonByCourseIdAndLessonId(courseId, lessonId)).thenReturn(lesson);
+
         // Act
-        courseEnrollmentService.markLessonAsCompleted(enrollmentId, lessonId);
+        courseEnrollmentService.markLessonAsCompleted(enrollmentId, courseId, lessonId);
 
         // Assert
-        verify(mockCourseEnrollment, times(1)).markLessonAsCompleted(lessonId);
+        verify(mockCourseEnrollment, times(1)).markLessonAsCompleted(lessonId, "Lesson Title");
         verify(courseEnrollmentRepository, times(1)).save(mockCourseEnrollment);
     }
 
@@ -134,6 +144,7 @@ class CourseEnrollmentServiceTests {
     void markLessonAsCompleted_AccessDenied_ThrowsException() {
         // Arrange
         Long enrollmentId = 1L;
+        Long courseId = 1L;
         Long lessonId = 1L;
 
         CourseEnrollment mockCourseEnrollment = Mockito.mock(CourseEnrollment.class);
@@ -145,7 +156,7 @@ class CourseEnrollmentServiceTests {
 
         // Act and Assert
         assertThrows(ResourceNotFoundException.class, () ->
-                courseEnrollmentService.markLessonAsCompleted(enrollmentId, lessonId));
+                courseEnrollmentService.markLessonAsCompleted(enrollmentId, courseId, lessonId));
 
         // Verify
         verify(courseEnrollmentRepository, never()).save(any(CourseEnrollment.class));
@@ -155,6 +166,7 @@ class CourseEnrollmentServiceTests {
     void markLessonAsIncomplete_Teacher_Throws() {
         // Arrange
         Long enrollmentId = 1L;
+        Long courseId = 1L;
         Long lessonId = 1L;
 
         CourseEnrollment mockCourseEnrollment = Mockito.mock(CourseEnrollment.class);
@@ -162,7 +174,7 @@ class CourseEnrollmentServiceTests {
 
         // Act
         assertThrows(AccessDeniedException.class, () ->
-                courseEnrollmentService.markLessonAsIncomplete(enrollmentId, lessonId));
+                courseEnrollmentService.markLessonAsIncomplete(enrollmentId, courseId, lessonId));
 
         // Assert
         verify(mockCourseEnrollment, never()).markLessonAsIncomplete(lessonId);
@@ -173,6 +185,7 @@ class CourseEnrollmentServiceTests {
     void markLessonAsIncomplete_RoleUser_MarksLessonAsIncomplete() {
         // Arrange
         Long enrollmentId = 1L;
+        Long courseId = 1L;
         Long lessonId = 1L;
 
         CourseEnrollment mockCourseEnrollment = Mockito.mock(CourseEnrollment.class);
@@ -183,7 +196,7 @@ class CourseEnrollmentServiceTests {
                 .thenReturn(Optional.of(mockCourseEnrollment));
 
         // Act
-        courseEnrollmentService.markLessonAsIncomplete(enrollmentId, lessonId);
+        courseEnrollmentService.markLessonAsIncomplete(enrollmentId, courseId, lessonId);
 
         // Assert
         verify(mockCourseEnrollment, times(1)).markLessonAsIncomplete(lessonId);
@@ -194,6 +207,7 @@ class CourseEnrollmentServiceTests {
     void markLessonAsIncomplete_AccessDenied_ThrowsException() {
         // Arrange
         Long enrollmentId = 1L;
+        Long courseId = 1L;
         Long lessonId = 1L;
 
         CourseEnrollment mockCourseEnrollment = Mockito.mock(CourseEnrollment.class);
@@ -205,7 +219,7 @@ class CourseEnrollmentServiceTests {
 
         // Act and Assert
         assertThrows(ResourceNotFoundException.class, () ->
-                courseEnrollmentService.markLessonAsIncomplete(enrollmentId, lessonId));
+                courseEnrollmentService.markLessonAsIncomplete(enrollmentId, courseId, lessonId));
 
         // Verify
         verify(courseEnrollmentRepository, never()).save(any(CourseEnrollment.class));

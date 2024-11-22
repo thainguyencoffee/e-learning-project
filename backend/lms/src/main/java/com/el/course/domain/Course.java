@@ -545,7 +545,7 @@ public class Course extends AbstractAggregateRoot<Course> {
         Quiz quiz = findQuizById(quizId);
         Integer score = quiz.calculateScore(userAnswers);
         Boolean passed = quiz.isPassed(score);
-        return new QuizCalculationResult(score, passed);
+        return new QuizCalculationResult(quiz.getId(), quiz.getAfterLessonId(), score, passed);
     }
 
     public void addReview(Review review) {
@@ -562,6 +562,14 @@ public class Course extends AbstractAggregateRoot<Course> {
         registerEvent(new CourseReviewedEvent(this.id, review.getUsername()));
     }
 
+    public void deleteReview(String student) {
+        Review review = this.reviews.stream()
+                .filter(r -> r.getUsername().equals(student))
+                .findFirst()
+                .orElseThrow(ResourceNotFoundException::new);
+        this.reviews.remove(review);
+    }
+
     public double getAverageRating() {
         if (this.reviews.isEmpty()) {
             return 0;
@@ -573,10 +581,21 @@ public class Course extends AbstractAggregateRoot<Course> {
         return this.sections.stream().filter(CourseSection::getPublished).collect(Collectors.toSet());
     }
 
-    public Integer getNumberOfQuizzes() {
+    public Lesson getLessonInSectionForPublishedById(Long lessonId) {
+        return this.getSectionForPublished()
+                .stream()
+                .flatMap(section -> section.getLessons().stream())
+                .filter(lesson -> lesson.getId().equals(lessonId))
+                .findFirst()
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+
+    public Set<Long> getQuizIds() {
         return this.sections.stream()
-                .mapToInt(section -> section.getQuizzes().size())
-                .sum();
+                .flatMap(section -> section.getQuizzes().stream())
+                .map(Quiz::getId)
+                .collect(Collectors.toSet());
     }
 
     /*Condition methods*/
