@@ -1,4 +1,4 @@
-package com.el.course.application.dto;
+package com.el.course.domain;
 
 public record QuizCalculationResult(
         Long quizId,
