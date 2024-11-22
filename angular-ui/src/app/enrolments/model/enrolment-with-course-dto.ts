@@ -1,11 +1,7 @@
 import {LessonProgress} from "./lesson-progress";
 import {Section} from "../../administration/courses/model/view/section";
-import {QuizSubmission} from "./enrolment";
-
-export interface Progress {
-  totalLessons: number,
-  completedLessons: number,
-}
+import {QuizSubmission} from "./quiz-submission";
+import {Progress} from "./progress";
 
 export interface Certificate {
   id: number,
@@ -33,8 +29,10 @@ export interface EnrolmentWithCourseDto {
   teacher: string,
   enrollmentId: number,
   student: string,
+  enrollmentDate: string,
   lessonProgresses: LessonProgress[],
   completed: boolean,
+  reviewed: boolean,
   completedDate: string,
   certificate: Certificate,
   progress: Progress,

@@ -4,7 +4,7 @@ import {ErrorHandler} from "../../../common/error-handler.injectable";
 import {Observable} from "rxjs";
 import {EnrolmentsService} from "../../service/enrolments.service";
 import {EnrolmentWithCourseDto} from "../../model/enrolment-with-course-dto";
-import {AsyncPipe, NgClass, NgIf, SlicePipe} from "@angular/common";
+import {AsyncPipe, DatePipe, NgClass, NgIf, SlicePipe} from "@angular/common";
 import {EnrolmentWithCourseDataService} from "./enrolment-with-course-data.service";
 
 @Component({
@@ -16,7 +16,8 @@ import {EnrolmentWithCourseDataService} from "./enrolment-with-course-data.servi
     RouterOutlet,
     NgIf,
     AsyncPipe,
-    SlicePipe
+    SlicePipe,
+    DatePipe
   ],
   templateUrl: './enrolment-content.component.html',
 })

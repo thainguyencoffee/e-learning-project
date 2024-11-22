@@ -5,7 +5,6 @@ import {Observable} from "rxjs";
 import {EnrolmentWithCourseDto} from "../../../model/enrolment-with-course-dto";
 import {AsyncPipe, NgClass, NgForOf, NgIf} from "@angular/common";
 import {LessonProgress} from "../../../model/lesson-progress";
-import {Section} from "../../../../administration/courses/model/view/section";
 
 @Component({
   selector: 'app-enrolment-lessons',
@@ -37,6 +36,10 @@ export class EnrolmentLessonsComponent implements OnInit {
 
   isCompleted(lessonId: number, lessonProgresses: LessonProgress[]) {
     return lessonProgresses.find(lp => lp.lessonId === lessonId)?.completed;
+  }
+
+  isLessonBonus(lessonId: number, lessonProgresses: LessonProgress[]) {
+    return lessonProgresses.find(lp => lp.lessonId === lessonId)?.bonus;
   }
 
 }

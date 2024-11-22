@@ -8,9 +8,9 @@ import {Section} from "../../../../administration/courses/model/view/section";
 import {EnrolmentsService} from "../../../service/enrolments.service";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
 import {VideoPlayerComponent} from "../../../../common/video-player/video-player.component";
-import {LessonProgress} from "../../../model/lesson-progress";
-import {QuizSubmission} from "../../../model/enrolment";
 import {DocumentViewerComponent} from "../../../../common/document-viewer/document-viewer.component";
+import {LessonProgress} from "../../../model/lesson-progress";
+import {QuizSubmission} from "../../../model/quiz-submission";
 
 @Component({
   selector: 'app-lesson-detail',
@@ -89,9 +89,17 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
     return lessonProgresses.some(lp => lp.lessonId === lessonId && lp.completed);
   }
 
-  markLessonAsCompleted(lessonId: number, title: string, sections: Section[], quizSubmissions: QuizSubmission[]) {
+  isLessonRequire(lessonId: number, lessonProgresses: LessonProgress[]) {
+    const lessonProgress = lessonProgresses.find(lp => lp.lessonId === lessonId);
+    if (lessonProgress) {
+      return !lessonProgress.bonus;
+    }
+    return false;
+  }
+
+  markLessonAsCompleted(courseId: number, lessonId: number, sections: Section[], quizSubmissions: QuizSubmission[]) {
     const quiz = this.getQuizByLessonId(lessonId, sections);
-    this.completeLesson(lessonId, title);
+    this.completeLesson(courseId, lessonId);
 
     if (quiz) {
       const quizSubmission = this.getQuizSubmissionByLessonId(lessonId, sections, quizSubmissions);
@@ -101,15 +109,15 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  private completeLesson(lessonId: number, title: string) {
-    this.enrolmentService.markLessonAsCompleted(this.enrolmentId!, lessonId).subscribe({
+  private completeLesson(courseId: number, lessonId: number) {
+    this.enrolmentService.markLessonAsCompleted(this.enrolmentId!, courseId, lessonId).subscribe({
       next: _ => this.loadData(),
       error: error => this.errorHandler.handleServerError(error.error),
     });
   }
 
-  markLessonAsIncomplete(lessonId: number, title: string): void {
-    this.enrolmentService.markLessonAsIncomplete(this.enrolmentId!, lessonId)
+  markLessonAsIncomplete(courseId: number, lessonId: number, title: string): void {
+    this.enrolmentService.markLessonAsIncomplete(this.enrolmentId!, courseId, lessonId)
       .subscribe({
         next: _ => {
           const queryParams = this.route.snapshot.queryParams;
@@ -135,7 +143,6 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
     return messages[key];
   }
 
-  // Kiểm tra kiểu tài liệu là video hay docx
   setLessonType(lessonLink: string): void {
     const normalizedLink = lessonLink.trim().toLowerCase();  // Chuyển tất cả về chữ thường và loại bỏ khoảng trắng dư thừa
     if (normalizedLink.endsWith('.mp4') || normalizedLink.endsWith('.avi') || normalizedLink.endsWith('.mkv')) {
@@ -146,6 +153,7 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
       console.warn('Unknown lesson type for link:', lessonLink);
     }
   }
+
   getQuizSubmissionByLessonId(lessonId: number, sections: Section[], quizSubmissions: QuizSubmission[]) {
     const quiz = sections.flatMap(s => s.quizzes).find(q => q.afterLessonId === lessonId);
     if (!quiz) {

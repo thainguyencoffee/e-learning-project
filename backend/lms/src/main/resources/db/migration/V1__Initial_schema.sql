@@ -167,7 +167,7 @@ create table course_enrollment
     id                 bigserial    not null,
     course_id          bigint       not null,
     teacher            varchar(255) not null,
-    total_quizzes      int          not null,
+    quiz_ids           bigint[],
     total_lessons      int          not null,
     student            varchar(255) not null,
     enrollment_date    timestamp,
@@ -185,9 +185,11 @@ create table quiz_submission
 (
     id                 bigserial not null,
     quiz_id            bigint    not null,
+    after_lesson_id    bigint    not null,
     course_enrollment  bigint    not null references course_enrollment (id) on DELETE cascade,
     score              int       not null,
     passed             boolean   not null,
+    bonus              boolean   not null,
     submitted_date     timestamp not null,
     last_modified_date timestamp not null,
     constraint fk_quiz_submission primary key (id)
@@ -228,6 +230,7 @@ create table lesson_progress
     lesson_id         bigint    not null,
     lesson_title      varchar(255),
     completed         boolean   not null,
+    bonus             boolean   not null,
     completed_date    timestamp,
     constraint fk_lesson_progress primary key (id)
 );

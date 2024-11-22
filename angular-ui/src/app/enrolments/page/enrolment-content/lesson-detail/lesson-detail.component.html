@@ -2,10 +2,22 @@
   <div *ngIf="getLessonById(lessonId!, enrolmentWithCourse.sections) as lessonDetail">
 
     <!--Header-->
-    <div class="d-flex flex-wrap mb-4">
-      <h1 class="flex-grow-1">{{ lessonDetail.title }}</h1>
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+      <div class="w-100 mb-3" *ngIf="!isLessonRequire(lessonDetail.id, enrolmentWithCourse.lessonProgresses)">
+        <p class="alert alert-info text-center mb-0">
+          This lesson is not required to complete the course.
+        </p>
+      </div>
+
+      <h1 class="flex-grow-1 mb-0 text-primary fw-bold">
+        {{ lessonDetail.title }}
+      </h1>
+
       <div>
-        <a [routerLink]="['/enrolments', enrolmentId, 'lessons']" class="btn btn-secondary">Back to lessons</a>
+        <a [routerLink]="['/enrolments', enrolmentId, 'lessons']"
+           class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Back to lessons
+        </a>
       </div>
     </div>
 
@@ -27,24 +39,35 @@
     <div class="d-flex justify-content-between mb-4">
       <div>
         <button *ngIf="!lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)"
-                (click)="markLessonAsCompleted(lessonDetail.id, lessonDetail.title, enrolmentWithCourse.sections, enrolmentWithCourse.quizSubmissions)"
+                (click)="markLessonAsCompleted(enrolmentWithCourse.courseId, lessonDetail.id, enrolmentWithCourse.sections, enrolmentWithCourse.quizSubmissions)"
                 class="btn btn-success me-2">Mark as Completed
         </button>
 
-        <a *ngIf="lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)
-        && getQuizSubmissionByLessonId(lessonDetail.id, enrolmentWithCourse.sections, enrolmentWithCourse.quizSubmissions) as quizSubmission"
-           [routerLink]="['/enrolments', this.enrolmentId, 'quiz-submit', quizSubmission.quizId]"
-           [queryParams]="{quizSubmissionId: quizSubmission.id}"
-           class="btn btn-success me-2">Quiz Submission</a>
+        <div *ngIf="lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses) && getQuizByLessonId(lessonDetail.id, enrolmentWithCourse.sections) as quiz">
+          <div class="w-100 mb-3" *ngIf="!isLessonRequire(lessonDetail.id, enrolmentWithCourse.lessonProgresses)">
+            <p class="alert alert-info text-center mb-0">
+              This quiz is not required to complete the course.
+            </p>
+          </div>
+          <div *ngIf="getQuizSubmissionByLessonId(lessonDetail.id, enrolmentWithCourse.sections, enrolmentWithCourse.quizSubmissions) as quizSubmission; else haveNotSubmittedYet">
+            <a [routerLink]="['/enrolments', this.enrolmentId, 'quiz-submit', quiz.id]"
+               [queryParams]="{quizSubmissionId: quizSubmission.id}"
+               class="btn btn-success me-2">View Quiz submission</a>
+          </div>
+          <ng-template #haveNotSubmittedYet>
+            <a [routerLink]="['/enrolments', this.enrolmentId, 'quiz-submit', quiz.id]"
+               class="btn btn-success me-2">Take quiz now</a>
+          </ng-template>
+        </div>
 
         @if (!enrolmentWithCourse.completed) {
           <button *ngIf="lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)"
-                  (click)="markLessonAsIncomplete(lessonDetail.id, lessonDetail.title)"
-                  class="btn btn-warning">Unmark as Incomplete
+                  (click)="markLessonAsIncomplete(enrolmentWithCourse.courseId, lessonDetail.id, lessonDetail.title)"
+                  class="btn btn-warning">Mark as Incomplete
           </button>
         } @else {
           <button *ngIf="lessonIsCompleted(lessonDetail.id, enrolmentWithCourse.lessonProgresses)" disabled
-                  class="btn btn-warning">Unmark as Incomplete
+                  class="btn btn-warning">Mark as Incomplete
           </button>
         }
       </div>

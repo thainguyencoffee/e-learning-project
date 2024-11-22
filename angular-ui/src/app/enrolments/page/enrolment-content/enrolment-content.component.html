@@ -2,6 +2,7 @@
   <div class="col-md-4 col-12" *ngIf="enrolmentWithCourse$ | async as enrolmentWithCourse">
     <img [src]="enrolmentWithCourse?.thumbnailUrl" class="img-thumbnail" alt="">
     <h2>{{ enrolmentWithCourse?.title }}</h2>
+    <p>{{enrolmentWithCourse.enrollmentDate | date: 'yyyy-MM-dd HH:mm:ss'}}</p>
 
     <p class="mb-3">
       <ng-container *ngIf="enrolmentWithCourse?.description as description">

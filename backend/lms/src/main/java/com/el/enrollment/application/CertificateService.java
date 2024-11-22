@@ -6,4 +6,5 @@ public interface CertificateService {
 
     void createCertUrl(Certificate certificate);
 
+    void revocationCertificate(String certificateUrl);
 }

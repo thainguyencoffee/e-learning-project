@@ -7,6 +7,7 @@ import {Enrolment} from "../model/enrolment";
 import {QuizDetailDto} from "../model/quiz-detail.dto";
 import {QuizSubmitDto} from "../model/quiz-submit.dto";
 import {QuizSubmission} from "../model/quiz-submission";
+import {LessonMarkRequest, MarkType} from "../model/lesson-mark-request";
 
 @Injectable({
   providedIn: 'root'
@@ -37,12 +38,22 @@ export class EnrolmentsService {
     return this.http.get<number>(`${this.resourcePath}/count`, {params: {courseId: courseId.toString()}});
   }
 
-  markLessonAsCompleted(enrollmentId: number, lessonId: number) {
-    return this.http.put(`${this.resourcePath}/${enrollmentId}/lessons/${lessonId}?mark=completed`, null);
+  markLessonAsCompleted(enrollmentId: number, courseId: number, lessonId: number) {
+    const lessonMarkRequest: LessonMarkRequest = {
+      mark: MarkType.COMPLETED,
+      courseId,
+      lessonId
+    }
+    return this.http.put(`${this.resourcePath}/${enrollmentId}/mark-lesson`, lessonMarkRequest);
   }
 
-  markLessonAsIncomplete(enrollmentId: number, lessonId: number) {
-    return this.http.put(`${this.resourcePath}/${enrollmentId}/lessons/${lessonId}?mark=incomplete`, null);
+  markLessonAsIncomplete(enrollmentId: number, courseId: number, lessonId: number) {
+    const lessonMarkRequest: LessonMarkRequest = {
+      mark: MarkType.INCOMPLETE,
+      courseId,
+      lessonId
+    }
+    return this.http.put(`${this.resourcePath}/${enrollmentId}/mark-lesson`, lessonMarkRequest);
   }
 
   getQuiz(enrollmentId: number, quizId: number) {

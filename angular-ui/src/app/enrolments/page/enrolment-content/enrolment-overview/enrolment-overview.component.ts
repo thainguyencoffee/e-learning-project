@@ -1,9 +1,9 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {EnrolmentWithCourseDataService} from "../enrolment-with-course-data.service";
 import {Observable} from "rxjs";
-import {EnrolmentWithCourseDto, Progress} from "../../../model/enrolment-with-course-dto";
+import {EnrolmentWithCourseDto} from "../../../model/enrolment-with-course-dto";
 import {ActivatedRoute, Router} from "@angular/router";
-import {AsyncPipe, DatePipe, NgForOf, NgIf} from "@angular/common";
+import {AsyncPipe, DatePipe, DecimalPipe, NgForOf, NgIf} from "@angular/common";
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {InputRowComponent} from "../../../../common/input-row/input-row.component";
 import {ReviewDto} from "../../../../administration/courses/model/review.dto";
@@ -19,7 +19,8 @@ import {ErrorHandler} from "../../../../common/error-handler.injectable";
     NgForOf,
     DatePipe,
     ReactiveFormsModule,
-    InputRowComponent
+    InputRowComponent,
+    DecimalPipe
   ],
   templateUrl: './enrolment-overview.component.html',
   styleUrl: './enrolment-overview.component.css'
@@ -63,10 +64,6 @@ export class EnrolmentOverviewComponent implements OnInit{
     });
 
     this.enrolmentWithCourse$ = this.enrolmentWithCourseDataService.enrolmentWithCourse$;
-  }
-
-  calcProgress(progress: Progress) {
-    return Math.round(progress.completedLessons / progress.totalLessons * 100);
   }
 
   onToggleReviewBtn() {

@@ -1,10 +1,7 @@
 package com.el.course.application;
 
 import com.el.course.application.dto.CourseWithoutSectionsDTO;
-import com.el.course.domain.Comment;
-import com.el.course.domain.Course;
-import com.el.course.domain.Post;
-import com.el.course.domain.Quiz;
+import com.el.course.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -46,4 +43,5 @@ public interface CourseQueryService {
 
     Quiz findQuizByQuizId(Long quizId);
 
+    Lesson findLessonByCourseIdAndLessonId(Long courseId, Long lessonId);
 }

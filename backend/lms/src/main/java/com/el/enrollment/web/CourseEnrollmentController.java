@@ -2,14 +2,12 @@ package com.el.enrollment.web;
 
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
-import com.el.enrollment.application.dto.CourseEnrollmentDTO;
+import com.el.enrollment.application.dto.*;
 import com.el.enrollment.application.CourseEnrollmentService;
-import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
-import com.el.enrollment.application.dto.QuizDetailDTO;
-import com.el.enrollment.application.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
 import com.el.enrollment.domain.QuizSubmission;
+import com.el.enrollment.web.dto.LessonMarkRequest;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -62,17 +60,16 @@ public class CourseEnrollmentController {
         return ResponseEntity.ok(courseEnrollmentService.findEnrolmentWithCourseById(enrollmentId));
     }
 
-    @PutMapping("/{enrollmentId}/lessons/{lessonId}")
+    @PutMapping("/{enrollmentId}/mark-lesson")
     public ResponseEntity<Void> markLessonAsCompleted(@PathVariable Long enrollmentId,
-                                                      @PathVariable Long lessonId,
-                                                      @RequestParam(name = "mark") String mark) {
-        if (!"completed".equals(mark) && !"incomplete".equals(mark)) {
+                                                      @RequestBody LessonMarkRequest lessonMarkRequest) {
+        if (!LessonMarkRequest.MarkType.COMPLETED.equals(lessonMarkRequest.mark()) && !LessonMarkRequest.MarkType.INCOMPLETE.equals(lessonMarkRequest.mark())) {
             throw new InputInvalidException("Mark value must be 'completed' or 'incomplete' only.");
         }
-        if ("completed".equals(mark)) {
-            courseEnrollmentService.markLessonAsCompleted(enrollmentId, lessonId);
+        if (LessonMarkRequest.MarkType.COMPLETED.equals(lessonMarkRequest.mark())) {
+            courseEnrollmentService.markLessonAsCompleted(enrollmentId, lessonMarkRequest.courseId(), lessonMarkRequest.lessonId());
         } else {
-            courseEnrollmentService.markLessonAsIncomplete(enrollmentId, lessonId);
+            courseEnrollmentService.markLessonAsIncomplete(enrollmentId, lessonMarkRequest.courseId(), lessonMarkRequest.lessonId());
         }
         return ResponseEntity.ok().build();
     }

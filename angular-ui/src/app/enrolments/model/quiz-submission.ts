@@ -10,6 +10,8 @@ export interface QuizAnswer {
 export interface QuizSubmission {
     id: number;
     quizId: number;
+    afterLessonId: number;
+    bonus: boolean;
     answers: QuizAnswer[];
     score: number;
     submittedDate: string;
