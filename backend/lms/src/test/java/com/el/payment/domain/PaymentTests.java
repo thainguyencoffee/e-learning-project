@@ -22,7 +22,7 @@ class PaymentTests {
 
         assertEquals(orderId, payment.getOrderId());
         assertNull(payment.getPaymentDate());
-        assertEquals(amount, payment.getAmount());
+        assertEquals(amount, payment.getPrice());
         assertEquals(paymentMethod, payment.getPaymentMethod());
         assertEquals(PaymentStatus.PENDING, payment.getStatus());
     }

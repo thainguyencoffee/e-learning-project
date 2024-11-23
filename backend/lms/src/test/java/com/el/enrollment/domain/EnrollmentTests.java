@@ -11,11 +11,11 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CourseEnrollmentTests {
+class EnrollmentTests {
 
     @Test
     void courseEnrollmentConstructor_ShouldCreatedEnrollmentWhenValid() {
-        CourseEnrollment enrollment = new CourseEnrollment("user", 1L, "teacher", Set.of(
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
                 new LessonProgress("Course Lesson 1", 1L), 
                 new LessonProgress("Course Lesson 2", 2L)), 
                 Set.of(1L, 2L));
@@ -34,7 +34,7 @@ class CourseEnrollmentTests {
     @Test
     void courseEnrollmentConstructor_ShouldThrowException_WhenLessonProgressesIsEmpty() {
         assertThrows(InputInvalidException.class, () -> {
-            new CourseEnrollment("user",
+            new Enrollment("user",
                     1L,
                     "teacher",
                     Set.of(), // Empty lesson progresses
@@ -45,7 +45,7 @@ class CourseEnrollmentTests {
     @Test
     void courseEnrollmentConstructor_ShouldThrowException_WhenQuizIdsIsEmpty() {
         assertThrows(InputInvalidException.class, () -> {
-            new CourseEnrollment("user",
+            new Enrollment("user",
                     1L,
                     "teacher",
                     Set.of(new LessonProgress("Course Lesson 1", 1L), new LessonProgress("Course Lesson 2", 2L)),
@@ -55,7 +55,7 @@ class CourseEnrollmentTests {
 
     @Test
     void markLessonAsCompleted_ShouldMarkLessonAsCompleted_WhenLessonExists() {
-        CourseEnrollment enrollment = new CourseEnrollment("user", 1L, "teacher", Set.of(
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
                 new LessonProgress("Course Lesson 1", 1L), 
                 new LessonProgress("Course Lesson 2", 2L)), 
                 Set.of(1L, 2L));
@@ -74,7 +74,7 @@ class CourseEnrollmentTests {
 
     @Test
     void markLessonAsCompleted_ShouldMarkLessonAsCompleted_AndBonusWhenLessonIdNotContainInLessonProgresses() {
-        CourseEnrollment enrollment = new CourseEnrollment("user", 1L, "teacher",
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher",
                 Set.of(new LessonProgress("Course Lesson 1", 1L)),
                 Set.of(1L, 2L)); // quizIds
 
@@ -91,7 +91,7 @@ class CourseEnrollmentTests {
 
     @Test
     void markLessonAsCompleted_ShouldThrowException_WhenLessonAlreadyCompleted() {
-        CourseEnrollment enrollment = new CourseEnrollment("user", 1L, "teacher", Set.of(
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
                 new LessonProgress("Course Lesson 1", 1L), 
                 new LessonProgress("Course Lesson 2", 2L)), 
                 Set.of(1L, 2L));
@@ -103,7 +103,7 @@ class CourseEnrollmentTests {
 
     @Test
     void markAllLessonsAsCompleted_ShouldOK() {
-        CourseEnrollment enrollment = new CourseEnrollment("user", 1L, "teacher", Set.of(
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
                 new LessonProgress("Course Lesson 1", 1L), 
                 new LessonProgress("Course Lesson 2", 2L)), 
                 Set.of(1L, 2L));
@@ -150,7 +150,7 @@ class CourseEnrollmentTests {
 
     @Test
     void markLessonAsIncomplete_ShouldMarkLessonAsIncomplete_WhenLessonExists() {
-        CourseEnrollment enrollment = new CourseEnrollment("user", 1L, "teacher", Set.of(
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
                 new LessonProgress("Course Lesson 1", 1L), 
                 new LessonProgress("Course Lesson 2", 2L)), 
                 Set.of(1L, 2L));
@@ -167,7 +167,7 @@ class CourseEnrollmentTests {
 
     @Test
     void markLessonAsIncomplete_ShouldThrowException_WhenLessonAlreadyIncomplete() {
-        CourseEnrollment enrollment = new CourseEnrollment("user", 1L, "teacher", Set.of(
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
                 new LessonProgress("Course Lesson 1", 1L), 
                 new LessonProgress("Course Lesson 2", 2L)), 
                 Set.of(1L, 2L));
@@ -178,7 +178,7 @@ class CourseEnrollmentTests {
 
     @Test
     void addLessonProgress_ShouldThrowException_WhenLessonProgressIsNull() {
-        CourseEnrollment enrollment = new CourseEnrollment("user", 1L, "teacher", Set.of(
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
                 new LessonProgress("Course Lesson 1", 1L), 
                 new LessonProgress("Course Lesson 2", 2L)), 
                 Set.of(1L, 2L));
@@ -189,7 +189,7 @@ class CourseEnrollmentTests {
 
     @Test
     void findLessonProgressByLessonId_ShouldThrowException_WhenLessonProgressNotFound() {
-        CourseEnrollment enrollment = new CourseEnrollment("user", 1L, "teacher", Set.of(
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
                 new LessonProgress("Course Lesson 1", 1L), 
                 new LessonProgress("Course Lesson 2", 2L)), 
                 Set.of(1L, 2L));
@@ -201,7 +201,7 @@ class CourseEnrollmentTests {
 
     @Test
     void findLessonProgressByLessonId_ShouldThrowException_WhenLessonIdIsNull() {
-        CourseEnrollment enrollment = new CourseEnrollment("user", 1L, "teacher", Set.of(
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
                 new LessonProgress("Course Lesson 1", 1L), 
                 new LessonProgress("Course Lesson 2", 2L)), 
                 Set.of(1L, 2L));

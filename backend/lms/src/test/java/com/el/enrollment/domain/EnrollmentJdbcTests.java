@@ -17,30 +17,30 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("integration")
 @DataJdbcTest
-class CourseEnrollmentJdbcTests {
+class EnrollmentJdbcTests {
 
     @Autowired
-    private CourseEnrollmentRepository repository;
+    private EnrollmentRepository repository;
 
     @BeforeEach
     void setUp() {
-        CourseEnrollment courseEnrollment = new CourseEnrollment("user", 1L, "teacher", Set.of(
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
                 new LessonProgress("Course Lesson 1", 1L),
                 new LessonProgress("Course Lesson 2", 2L)),
                 Set.of(1L, 2L));
-        courseEnrollment.markAsEnrolled();
-        repository.save(courseEnrollment);
+        enrollment.markAsEnrolled();
+        repository.save(enrollment);
     }
 
     @Test
     void testSave() {
-        CourseEnrollment courseEnrollment = new CourseEnrollment("user", 1L, "teacher", Set.of(
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
                 new LessonProgress("Course Lesson 1", 1L),
                 new LessonProgress("Course Lesson 2", 2L)),
                 Set.of(1L, 2L));
-        courseEnrollment.markAsEnrolled();
-        repository.save(courseEnrollment);
-        assertNotNull(courseEnrollment.getId());
+        enrollment.markAsEnrolled();
+        repository.save(enrollment);
+        assertNotNull(enrollment.getId());
     }
 
     @Test

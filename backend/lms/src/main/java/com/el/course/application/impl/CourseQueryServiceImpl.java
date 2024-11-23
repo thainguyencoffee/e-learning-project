@@ -9,7 +9,7 @@ import com.el.course.application.dto.PostInTrashDTO;
 import com.el.course.application.dto.PublishedCourseDTO;
 import com.el.course.application.dto.QuizInTrashDTO;
 import com.el.course.domain.*;
-import com.el.enrollment.domain.CourseEnrollmentRepository;
+import com.el.enrollment.domain.EnrollmentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,12 +20,12 @@ import java.util.List;
 public class CourseQueryServiceImpl implements CourseQueryService {
 
     private final CourseRepository courseRepository;
-    private final CourseEnrollmentRepository courseEnrollmentRepository;
+    private final EnrollmentRepository enrollmentRepository;
     private final RolesBaseUtil rolesBaseUtil;
 
-    public CourseQueryServiceImpl(CourseRepository courseRepository, CourseEnrollmentRepository courseEnrollmentRepository, RolesBaseUtil rolesBaseUtil) {
+    public CourseQueryServiceImpl(CourseRepository courseRepository, EnrollmentRepository enrollmentRepository, RolesBaseUtil rolesBaseUtil) {
         this.courseRepository = courseRepository;
-        this.courseEnrollmentRepository = courseEnrollmentRepository;
+        this.enrollmentRepository = enrollmentRepository;
         this.rolesBaseUtil = rolesBaseUtil;
     }
 
@@ -229,7 +229,7 @@ public class CourseQueryServiceImpl implements CourseQueryService {
     }
 
     private boolean isUserEnrolled(Long courseId, String username) {
-        return courseEnrollmentRepository.findByCourseIdAndStudent(courseId, username).isPresent();
+        return enrollmentRepository.findByCourseIdAndStudent(courseId, username).isPresent();
     }
 
     private Post findPost(Long courseId, Long postId) {

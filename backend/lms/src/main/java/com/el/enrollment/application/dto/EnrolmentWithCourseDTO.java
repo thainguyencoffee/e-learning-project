@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
- * Combination DTO class between {@link CourseEnrollment} and {@link Course}.
+ * Combination DTO class between {@link Enrollment} and {@link Course}.
  * */
 public record EnrolmentWithCourseDTO(
         Long courseId,
@@ -33,7 +33,7 @@ public record EnrolmentWithCourseDTO(
         Progress progress,
         Set<QuizSubmission> quizSubmissions
 ) {
-    public static EnrolmentWithCourseDTO of(CourseEnrollment enrolment, Course course) {
+    public static EnrolmentWithCourseDTO of(Enrollment enrolment, Course course) {
         return new EnrolmentWithCourseDTO(
                 // Course fields
                 course.getId(),

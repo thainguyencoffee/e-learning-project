@@ -1,7 +1,7 @@
 package com.el.salary.application;
 
 import com.el.course.domain.Course;
-import com.el.enrollment.domain.CourseEnrollment;
+import com.el.enrollment.domain.Enrollment;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +20,7 @@ public class MutateSalaryListener {
     }
 
     @ApplicationModuleListener
-    public void onEnrol(CourseEnrollment.EnrolmentCreatedEvent event) {
+    public void onEnrol(Enrollment.EnrollmentCreatedEvent event) {
         salaryService.adjustRank(event.teacher(), false);
     }
 

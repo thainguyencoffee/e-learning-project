@@ -152,7 +152,7 @@ create table payment
 (
     id             uuid DEFAULT gen_random_uuid() not null,
     order_id       uuid                           not null,
-    amount         varchar(50)                    not null,
+    price          varchar(50)                    not null,
     payment_date   timestamp,
     payment_method varchar(50)                    not null,
     status         varchar(50)                    not null,
@@ -162,7 +162,7 @@ create table payment
     constraint fk_payment primary key (id)
 );
 
-create table course_enrollment
+create table enrollment
 (
     id                 bigserial    not null,
     course_id          bigint       not null,
@@ -178,7 +178,7 @@ create table course_enrollment
     completed_date     timestamp,
     last_modified_by   varchar(50)  not null,
     last_modified_date timestamp    not null,
-    constraint fk_course_enrollment primary key (id)
+    constraint fk_enrollment primary key (id)
 );
 
 create table quiz_submission
@@ -186,7 +186,7 @@ create table quiz_submission
     id                 bigserial not null,
     quiz_id            bigint    not null,
     after_lesson_id    bigint    not null,
-    course_enrollment  bigint    not null references course_enrollment (id) on DELETE cascade,
+    enrollment         bigint    not null references enrollment (id) on DELETE cascade,
     score              int       not null,
     passed             boolean   not null,
     bonus              boolean   not null,
@@ -197,41 +197,41 @@ create table quiz_submission
 
 create table quiz_answer
 (
-    id                bigserial   not null,
-    quiz_submission   bigint      not null references quiz_submission (id) on DELETE cascade,
-    question_id       bigint      not null,
-    answer_option_ids bigint[],
-    true_false_answer boolean,
+    id                   bigserial   not null,
+    quiz_submission      bigint      not null references quiz_submission (id) on DELETE cascade,
+    question_id          bigint      not null,
+    answer_option_ids    bigint[],
+    true_false_answer    boolean,
     single_choice_answer bigint,
-    type              varchar(50) not null,
+    type                 varchar(50) not null,
     constraint fk_quiz_answer primary key (id)
 );
 
 create table certificate
 (
-    id                uuid DEFAULT gen_random_uuid() not null,
-    course_enrollment bigint                         not null references course_enrollment (id) on DELETE cascade,
-    full_name         varchar(255)                   not null,
-    email             varchar(255)                   not null,
-    student           varchar(255)                   not null,
-    teacher           varchar(255)                   not null,
-    url               varchar(500)                   not null,
-    course_id         bigint                         not null,
-    course_title      varchar(255)                   not null,
-    issued_date       timestamp                      not null,
-    certified         boolean                        not null,
+    id           uuid DEFAULT gen_random_uuid() not null,
+    enrollment   bigint                         not null references enrollment (id) on DELETE cascade,
+    full_name    varchar(255)                   not null,
+    email        varchar(255)                   not null,
+    student      varchar(255)                   not null,
+    teacher      varchar(255)                   not null,
+    url          varchar(500)                   not null,
+    course_id    bigint                         not null,
+    course_title varchar(255)                   not null,
+    issued_date  timestamp                      not null,
+    certified    boolean                        not null,
     constraint fk_certificate primary key (id)
 );
 
 create table lesson_progress
 (
-    id                bigserial not null,
-    course_enrollment bigint    not null references course_enrollment (id) on DELETE cascade,
-    lesson_id         bigint    not null,
-    lesson_title      varchar(255),
-    completed         boolean   not null,
-    bonus             boolean   not null,
-    completed_date    timestamp,
+    id             bigserial not null,
+    enrollment     bigint    not null references enrollment (id) on DELETE cascade,
+    lesson_id      bigint    not null,
+    lesson_title   varchar(255),
+    completed      boolean   not null,
+    bonus          boolean   not null,
+    completed_date timestamp,
     constraint fk_lesson_progress primary key (id)
 );
 
@@ -288,18 +288,18 @@ create table salary
     constraint fk_salary primary key (id)
 );
 
-create table salary_payment
+create table salary_record
 (
     id             bigserial   not null,
     salary         bigint      not null references salary (id) on DELETE cascade,
     type           varchar(50) not null,
-    amount         varchar(50) not null,
+    price         varchar(50) not null,
     created_date   timestamp   not null,
     paid_date      timestamp,
     noc_by_month   int         not null,
     nos_by_month   int         not null,
-    total_amount   varchar(50) not null,
+    total_price   varchar(50) not null,
     status         varchar(50) not null,
     failure_reason varchar(500),
-    constraint fk_salary_payment primary key (id)
+    constraint fk_salary_record primary key (id)
 );

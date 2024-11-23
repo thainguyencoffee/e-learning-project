@@ -1,8 +1,7 @@
 package com.el.enrollment.application.dto;
 
-import com.el.enrollment.domain.CourseEnrollment;
+import com.el.enrollment.domain.Enrollment;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public record CourseInfoWithEnrolmentsDTO(
@@ -10,11 +9,11 @@ public record CourseInfoWithEnrolmentsDTO(
         String title,
         String thumbnailUrl,
         String teacher,
-        List<CourseEnrollment> enrolments
+        List<Enrollment> enrolments
 
 ) {
 
-    public static CourseInfoWithEnrolmentsDTO of(CourseInfoDTO courseInfo, List<CourseEnrollment> enrollments) {
+    public static CourseInfoWithEnrolmentsDTO of(CourseInfoDTO courseInfo, List<Enrollment> enrollments) {
         return new CourseInfoWithEnrolmentsDTO(
                 courseInfo.id(),
                 courseInfo.title(),

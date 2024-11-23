@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@Table("course_enrollment")
+@Table("enrollment")
 @Getter
 @ToString
-public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
+public class Enrollment extends AbstractAggregateRoot<Enrollment> {
     @Id
     private Long id;
     private String student;
@@ -25,13 +25,13 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     private Set<Long> quizIds;
     private Integer totalLessons;
     private LocalDateTime enrollmentDate;
-    @MappedCollection(idColumn = "course_enrollment")
+    @MappedCollection(idColumn = "enrollment")
     private Set<LessonProgress> lessonProgresses = new HashSet<>();
     private Boolean completed;
     private Boolean reviewed = false;
     private LocalDateTime completedDate;
     private Certificate certificate;
-    @MappedCollection(idColumn = "course_enrollment")
+    @MappedCollection(idColumn = "enrollment")
     private Set<QuizSubmission> quizSubmissions = new HashSet<>();
     @CreatedBy
     private String createdBy;
@@ -42,7 +42,7 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
-    public CourseEnrollment(String student, Long courseId, String teacher, Set<LessonProgress> lessonProgresses, Set<Long> quizIds) {
+    public Enrollment(String student, Long courseId, String teacher, Set<LessonProgress> lessonProgresses, Set<Long> quizIds) {
         if (student == null) throw new InputInvalidException("Student must not be null.");
         if (courseId == null) throw new InputInvalidException("CourseId must not be null.");
         if (teacher == null) throw new InputInvalidException("Teacher must not be null.");
@@ -91,7 +91,7 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
         if (allLessonsCompleted() && allQuizSubmitPassed()) {
             this.completed = true;
             this.completedDate = LocalDateTime.now();
-            registerEvent(new EnrolmentCompletedEvent(this.id, this.courseId, this.student));
+            registerEvent(new EnrollmentCompletedEvent(this.id, this.courseId, this.student));
         }
     }
 
@@ -165,7 +165,7 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
 
     public void markAsEnrolled() {
         this.enrollmentDate = LocalDateTime.now();
-        registerEvent(new EnrolmentCreatedEvent(teacher));
+        registerEvent(new EnrollmentCreatedEvent(teacher));
     }
 
     public void markAsReviewed() {
@@ -200,16 +200,16 @@ public class CourseEnrollment extends AbstractAggregateRoot<CourseEnrollment> {
         completedDate = null;
         certificate = null;
         reviewed = false;
-        registerEvent(new EnrolmentIncompleteEvent(this.id, this.courseId, this.student, certificateUrl));
+        registerEvent(new EnrollmentIncompleteEvent(this.id, this.courseId, this.student, certificateUrl));
     }
 
-    public record EnrolmentCompletedEvent(Long id, Long courseId, String student) {
+    public record EnrollmentCompletedEvent(Long id, Long courseId, String student) {
     }
 
-    public record EnrolmentIncompleteEvent(Long id, Long courseId, String student, String certificateUrl) {
+    public record EnrollmentIncompleteEvent(Long id, Long courseId, String student, String certificateUrl) {
     }
 
-    public record EnrolmentCreatedEvent(String teacher) {
+    public record EnrollmentCreatedEvent(String teacher) {
     }
 
 }

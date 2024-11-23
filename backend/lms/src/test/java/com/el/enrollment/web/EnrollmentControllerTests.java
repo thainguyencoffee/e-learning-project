@@ -10,8 +10,8 @@ import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.web.dto.QuestionSubmitDTO;
 import com.el.enrollment.web.dto.QuizSubmitDTO;
 import com.el.enrollment.application.impl.CourseEnrollmentServiceImpl;
-import com.el.enrollment.domain.CourseEnrollment;
-import com.el.enrollment.domain.CourseEnrollmentRepository;
+import com.el.enrollment.domain.Enrollment;
+import com.el.enrollment.domain.EnrollmentRepository;
 import com.el.enrollment.domain.LessonProgress;
 import com.el.enrollment.web.dto.LessonMarkRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,9 +37,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@WebMvcTest(CourseEnrollmentController.class)
+@WebMvcTest(EnrollmentController.class)
 @Import({SecurityConfig.class, JacksonCustomizations.class, CustomAuthenticationEntryPoint.class})
-class CourseEnrollmentControllerTests {
+class EnrollmentControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -51,13 +51,13 @@ class CourseEnrollmentControllerTests {
     private CourseEnrollmentServiceImpl courseEnrollmentService;
 
     @MockBean
-    private CourseEnrollmentRepository enrollmentRepository;
+    private EnrollmentRepository enrollmentRepository;
 
     @Test
     void getAllEnrollments_ValidRequest_ReturnsAllEnrollments() throws Exception {
         Pageable pageable = PageRequest.of(0, 10);
 
-        CourseEnrollment enrollment = new CourseEnrollment("user", 1L, "teacher", Set.of(
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
                 new LessonProgress("Course Lesson 1", 1L),
                 new LessonProgress("Course Lesson 2", 2L)),
                 Set.of(1L, 2L));
@@ -83,7 +83,7 @@ class CourseEnrollmentControllerTests {
 
     @Test
     void getEnrollmentById_ValidRequest_ReturnsEnrollment() throws Exception {
-        CourseEnrollment enrollment = new CourseEnrollment("user", 1L, "teacher", Set.of(
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
                 new LessonProgress("Course Lesson 1", 1L),
                 new LessonProgress("Course Lesson 2", 2L)),
                 Set.of(1L, 2L));

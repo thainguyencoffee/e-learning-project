@@ -364,7 +364,7 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
         FROM 
             course c
         LEFT JOIN 
-            course_enrollment e ON c.id = e.course_id
+            enrollment e ON c.id = e.course_id
         WHERE c.teacher = :teacher
         GROUP BY c.teacher
     """)

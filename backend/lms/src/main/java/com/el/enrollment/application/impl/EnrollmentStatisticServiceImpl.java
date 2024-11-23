@@ -2,26 +2,26 @@ package com.el.enrollment.application.impl;
 
 import com.el.common.RolesBaseUtil;
 import com.el.common.exception.AccessDeniedException;
-import com.el.enrollment.application.CourseEnrolmentQueryService;
-import com.el.enrollment.application.EnrolmentStatisticService;
+import com.el.enrollment.application.CourseEnrollmentQueryService;
+import com.el.enrollment.application.EnrollmentStatisticService;
 import com.el.enrollment.application.dto.CourseInfoDTO;
 import com.el.enrollment.application.dto.CourseInfoWithEnrolmentStatisticDTO;
 import com.el.enrollment.application.dto.CourseInfoWithEnrolmentsDTO;
-import com.el.enrollment.domain.CourseEnrollmentRepository;
+import com.el.enrollment.domain.EnrollmentRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class EnrolmentStatisticServiceImpl implements EnrolmentStatisticService  {
+public class EnrollmentStatisticServiceImpl implements EnrollmentStatisticService {
 
-    private final CourseEnrolmentQueryService courseEnrolmentQueryService;
-    private final CourseEnrollmentRepository repository;
+    private final CourseEnrollmentQueryService courseEnrollmentQueryService;
+    private final EnrollmentRepository repository;
     private final RolesBaseUtil rolesBaseUtil;
 
-    public EnrolmentStatisticServiceImpl(CourseEnrolmentQueryService courseEnrolmentQueryService, CourseEnrollmentRepository repository, RolesBaseUtil rolesBaseUtil) {
-        this.courseEnrolmentQueryService = courseEnrolmentQueryService;
+    public EnrollmentStatisticServiceImpl(CourseEnrollmentQueryService courseEnrollmentQueryService, EnrollmentRepository repository, RolesBaseUtil rolesBaseUtil) {
+        this.courseEnrollmentQueryService = courseEnrollmentQueryService;
         this.repository = repository;
         this.rolesBaseUtil = rolesBaseUtil;
     }
@@ -43,7 +43,7 @@ public class EnrolmentStatisticServiceImpl implements EnrolmentStatisticService 
 
     @Override
     public CourseInfoWithEnrolmentsDTO getCourseWithEnrolmentStatistics(Long courseId) {
-        CourseInfoDTO courseInfo = courseEnrolmentQueryService.findCourseWithoutSectionsDTOByIdAndPublished(courseId, true);
+        CourseInfoDTO courseInfo = courseEnrollmentQueryService.findCourseWithoutSectionsDTOByIdAndPublished(courseId, true);
         var enrollments = repository.findAllByCourseId(courseId);
         return CourseInfoWithEnrolmentsDTO.of(courseInfo, enrollments);
     }

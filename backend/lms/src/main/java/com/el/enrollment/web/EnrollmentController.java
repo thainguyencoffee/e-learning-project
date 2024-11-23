@@ -4,8 +4,8 @@ import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.enrollment.application.dto.*;
 import com.el.enrollment.application.CourseEnrollmentService;
-import com.el.enrollment.domain.CourseEnrollment;
-import com.el.enrollment.domain.CourseEnrollmentRepository;
+import com.el.enrollment.domain.Enrollment;
+import com.el.enrollment.domain.EnrollmentRepository;
 import com.el.enrollment.domain.QuizSubmission;
 import com.el.enrollment.web.dto.LessonMarkRequest;
 import com.el.enrollment.web.dto.QuizSubmitDTO;
@@ -22,12 +22,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("enrollments")
-public class CourseEnrollmentController {
+public class EnrollmentController {
 
     private final CourseEnrollmentService courseEnrollmentService;
-    private final CourseEnrollmentRepository enrollmentRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
-    public CourseEnrollmentController(CourseEnrollmentService courseEnrollmentService, CourseEnrollmentRepository enrollmentRepository) {
+    public EnrollmentController(CourseEnrollmentService courseEnrollmentService, EnrollmentRepository enrollmentRepository) {
         this.courseEnrollmentService = courseEnrollmentService;
         this.enrollmentRepository = enrollmentRepository;
     }
@@ -39,7 +39,7 @@ public class CourseEnrollmentController {
     }
 
     @GetMapping("/{enrollmentId}")
-    public ResponseEntity<CourseEnrollment> getEnrollmentById(@PathVariable Long enrollmentId) {
+    public ResponseEntity<Enrollment> getEnrollmentById(@PathVariable Long enrollmentId) {
         return ResponseEntity.ok(courseEnrollmentService.findCourseEnrollmentById(enrollmentId));
     }
 
@@ -49,11 +49,11 @@ public class CourseEnrollmentController {
     }
 
     @GetMapping("/course/{courseId}")
-    public ResponseEntity<CourseEnrollment> getEnrolmentByCourseId(@PathVariable Long courseId, @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<Enrollment> getEnrolmentByCourseId(@PathVariable Long courseId, @AuthenticationPrincipal Jwt jwt) {
         String username = jwt.getClaim("preferred_username");
-        CourseEnrollment courseEnrollment = enrollmentRepository.findByCourseIdAndStudent(courseId, username)
+        Enrollment enrollment = enrollmentRepository.findByCourseIdAndStudent(courseId, username)
                 .orElseThrow(ResourceNotFoundException::new);
-        return ResponseEntity.ok(courseEnrollment);
+        return ResponseEntity.ok(enrollment);
     }
 
     @GetMapping("/{enrollmentId}/content")

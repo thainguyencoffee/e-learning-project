@@ -17,7 +17,7 @@ public class Payment extends AbstractAggregateRoot<Payment> {
     @Id
     private UUID id;
     private UUID orderId;
-    private MonetaryAmount amount;
+    private MonetaryAmount price;
     private PaymentStatus status;
     private LocalDateTime paymentDate;
     private PaymentMethod paymentMethod;
@@ -25,15 +25,15 @@ public class Payment extends AbstractAggregateRoot<Payment> {
     private String receiptUrl;
     private String failureReason;
 
-    public Payment(UUID orderId, MonetaryAmount amount, PaymentMethod paymentMethod) {
+    public Payment(UUID orderId, MonetaryAmount price, PaymentMethod paymentMethod) {
         if (orderId == null) throw new InputInvalidException("Order ID must not be null.");
-        if (amount == null) throw new InputInvalidException("Amount must not be null.");
+        if (price == null) throw new InputInvalidException("Price must not be null.");
         if (paymentMethod == null) throw new InputInvalidException("Payment method must not be null.");
 
-        MoneyUtils.checkValidPrice(amount);
+        MoneyUtils.checkValidPrice(price);
 
         this.orderId = orderId;
-        this.amount = amount;
+        this.price = price;
         this.paymentMethod = paymentMethod;
         this.status = PaymentStatus.PENDING;
     }

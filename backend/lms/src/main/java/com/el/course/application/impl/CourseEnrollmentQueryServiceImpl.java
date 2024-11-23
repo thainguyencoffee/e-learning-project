@@ -4,17 +4,17 @@ import com.el.common.RolesBaseUtil;
 import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.domain.CourseRepository;
-import com.el.enrollment.application.CourseEnrolmentQueryService;
+import com.el.enrollment.application.CourseEnrollmentQueryService;
 import com.el.enrollment.application.dto.CourseInfoDTO;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CourseEnrolmentQueryServiceImpl implements CourseEnrolmentQueryService {
+public class CourseEnrollmentQueryServiceImpl implements CourseEnrollmentQueryService {
 
     private final RolesBaseUtil rolesBaseUtil;
     private final CourseRepository courseRepository;
 
-    public CourseEnrolmentQueryServiceImpl(RolesBaseUtil rolesBaseUtil, CourseRepository courseRepository) {
+    public CourseEnrollmentQueryServiceImpl(RolesBaseUtil rolesBaseUtil, CourseRepository courseRepository) {
         this.rolesBaseUtil = rolesBaseUtil;
         this.courseRepository = courseRepository;
     }

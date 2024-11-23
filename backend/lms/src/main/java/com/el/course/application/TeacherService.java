@@ -8,7 +8,7 @@ import com.el.common.projection.MonthStats;
 import com.el.common.projection.RatingMonthStats;
 import com.el.course.application.dto.teacher.*;
 import com.el.course.domain.CourseRepository;
-import com.el.enrollment.domain.CourseEnrollmentRepository;
+import com.el.enrollment.domain.EnrollmentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,11 +21,11 @@ public class TeacherService {
 
     private final KeycloakUsersManagement keycloakUsersManagement;
     private final CourseRepository courseRepository;
-    private final CourseEnrollmentRepository enrollmentRepository;
+    private final EnrollmentRepository enrollmentRepository;
     private final RolesBaseUtil rolesBaseUtil;
 
     public TeacherService(KeycloakUsersManagement keycloakUsersManagement, CourseRepository courseRepository,
-                          CourseEnrollmentRepository enrollmentRepository, RolesBaseUtil rolesBaseUtil) {
+                          EnrollmentRepository enrollmentRepository, RolesBaseUtil rolesBaseUtil) {
         this.keycloakUsersManagement = keycloakUsersManagement;
         this.courseRepository = courseRepository;
         this.enrollmentRepository = enrollmentRepository;

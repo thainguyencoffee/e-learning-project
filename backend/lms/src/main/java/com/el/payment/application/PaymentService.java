@@ -29,7 +29,7 @@ public class PaymentService {
 
     public Payment pay(PaymentRequest paymentRequest) {
         Payment payment = new Payment(paymentRequest.orderId(),
-                paymentRequest.amount(), paymentRequest.paymentMethod());
+                paymentRequest.price(), paymentRequest.paymentMethod());
 
         boolean isPaymentFailed = false;
         String failureMessage = null;

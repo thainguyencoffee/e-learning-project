@@ -1,6 +1,6 @@
 package com.el.enrollment.web;
 
-import com.el.enrollment.application.EnrolmentStatisticService;
+import com.el.enrollment.application.EnrollmentStatisticService;
 import com.el.enrollment.application.dto.CourseInfoWithEnrolmentStatisticDTO;
 import com.el.enrollment.application.dto.CourseInfoWithEnrolmentsDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -18,25 +18,25 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(path = "enrollments/statistics", produces = "application/json")
-public class EnrolmentStatisticController {
+public class EnrollmentStatisticController {
 
-    private final EnrolmentStatisticService enrolmentStatisticService;
+    private final EnrollmentStatisticService enrollmentStatisticService;
 
-    public EnrolmentStatisticController(EnrolmentStatisticService enrolmentStatisticService) {
-        this.enrolmentStatisticService = enrolmentStatisticService;
+    public EnrollmentStatisticController(EnrollmentStatisticService enrollmentStatisticService) {
+        this.enrollmentStatisticService = enrollmentStatisticService;
     }
 
     @GetMapping
     public ResponseEntity<Page<CourseInfoWithEnrolmentStatisticDTO>> minInfoWithEnrolmentStatistic(Pageable pageable) {
         log.info("Request to get courses min info and enrolment statistics");
-        List<CourseInfoWithEnrolmentStatisticDTO> result = enrolmentStatisticService.getCourseMinInfoWithEnrolmentStatistics(pageable);
+        List<CourseInfoWithEnrolmentStatisticDTO> result = enrollmentStatisticService.getCourseMinInfoWithEnrolmentStatistics(pageable);
         return ResponseEntity.ok(new PageImpl<>(result, pageable, result.size()));
     }
 
     @GetMapping("/{courseId}")
     public ResponseEntity<CourseInfoWithEnrolmentsDTO> courseWithEnrolmentStatistic(@PathVariable Long courseId) {
         log.info("Request to get course with enrolment statistics");
-        CourseInfoWithEnrolmentsDTO result = enrolmentStatisticService.getCourseWithEnrolmentStatistics(courseId);
+        CourseInfoWithEnrolmentsDTO result = enrollmentStatisticService.getCourseWithEnrolmentStatistics(courseId);
         return ResponseEntity.ok(result);
     }
 

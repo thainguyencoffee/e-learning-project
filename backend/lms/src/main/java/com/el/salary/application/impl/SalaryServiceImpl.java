@@ -1,7 +1,7 @@
 package com.el.salary.application.impl;
 
 import com.el.course.domain.CourseRepository;
-import com.el.enrollment.domain.CourseEnrollmentRepository;
+import com.el.enrollment.domain.EnrollmentRepository;
 import com.el.salary.application.SalaryService;
 import com.el.salary.domain.Salary;
 import com.el.salary.domain.SalaryRepository;
@@ -15,12 +15,12 @@ public class SalaryServiceImpl implements SalaryService {
 
     private final SalaryRepository salaryRepository;
     private final CourseRepository courseRepository;
-    private final CourseEnrollmentRepository courseEnrollmentRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
-    public SalaryServiceImpl(SalaryRepository salaryRepository, CourseRepository courseRepository, CourseEnrollmentRepository courseEnrollmentRepository) {
+    public SalaryServiceImpl(SalaryRepository salaryRepository, CourseRepository courseRepository, EnrollmentRepository enrollmentRepository) {
         this.salaryRepository = salaryRepository;
         this.courseRepository = courseRepository;
-        this.courseEnrollmentRepository = courseEnrollmentRepository;
+        this.enrollmentRepository = enrollmentRepository;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class SalaryServiceImpl implements SalaryService {
         salaryRepository.findAll().forEach(salary -> {
             String teacher = salary.getTeacher();
             int numberOfCourses = courseRepository.countCourseByTeacherAndCreatedDateAfterAndPublished(teacher, firstDayOfMonth, true);
-            int numberOfStudents = courseEnrollmentRepository.countCourseEnrollmentByTeacherAndCreatedDateAfter(teacher, firstDayOfMonth);
+            int numberOfStudents = enrollmentRepository.countCourseEnrollmentByTeacherAndCreatedDateAfter(teacher, firstDayOfMonth);
             salary.addSalaryRecord(numberOfCourses, numberOfStudents);
             salaryRepository.save(salary);
         });
