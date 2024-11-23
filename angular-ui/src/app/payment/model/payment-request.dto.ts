@@ -1,6 +1,6 @@
 export class PaymentRequestDto {
   orderId?: string | null;
-  amount?: string | null;
+  price?: string | null;
   paymentMethod?: string | null;
   token?: string | null;
 

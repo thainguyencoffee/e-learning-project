@@ -74,15 +74,15 @@
           </ng-container>
 
           <ng-template #loggedIn>
-            <div *ngIf="enrolment" class="alert alert-success mt-3" role="alert">
+            <div *ngIf="enrollment" class="alert alert-success mt-3" role="alert">
               <h6 class="alert-heading">Congratulations!</h6>
               <p>You can start learning right now.</p>
-              <a [routerLink]="['/enrolments', enrolment.id, 'overview']" class="btn btn-primary btn-block">
+              <a [routerLink]="['/enrollments', enrollment.id, 'overview']" class="btn btn-primary btn-block">
                 Start Learning
               </a>
             </div>
 
-            <div *ngIf="!enrolment" class="alert alert-warning mt-3" role="alert">
+            <div *ngIf="!enrollment" class="alert alert-warning mt-3" role="alert">
               <h6 class="alert-heading">You have not purchased this course!</h6>
               <p>To start learning, please purchase the course.</p>
               <a [routerLink]="['/checkout', course?.id]" class="btn btn-success btn-block">

@@ -27,13 +27,13 @@ public class EnrollmentCompletedListener {
     @ApplicationModuleListener
     public void onEnrollmentCompleted(EnrollmentCompletedEvent e) {
         // Create certificate
-        log.info("Creating certificate for enrolment: {}", e.id());
+        log.info("Creating certificate for enrollment: {}", e.id());
         courseEnrollmentService.createCertificate(e.id(), e.student(), e.courseId());
     }
 
     @ApplicationModuleListener
     public void onEnrollmentIncompleteEvent(Enrollment.EnrollmentIncompleteEvent e) {
-        log.info("Enrolment incomplete event received: {}", e.id());
+        log.info("Enrollment incomplete event received: {}", e.id());
         certificateServiceS3Storage.revocationCertificate(e.certificateUrl());
         courseService.deleteReview(e.courseId(), e.student());
     }

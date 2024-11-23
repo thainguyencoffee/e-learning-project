@@ -1,0 +1,90 @@
+<div *ngIf="enrollmentWithCourse$ | async as enrollmentWithCourse">
+  <div *ngIf="getLessonById(lessonId!, enrollmentWithCourse.sections) as lessonDetail">
+
+    <!--Header-->
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+      <div class="w-100 mb-3" *ngIf="!isLessonRequire(lessonDetail.id, enrollmentWithCourse.lessonProgresses)">
+        <p class="alert alert-info text-center mb-0">
+          This lesson is not required to complete the course.
+        </p>
+      </div>
+
+      <h1 class="flex-grow-1 mb-0 text-primary fw-bold">
+        {{ lessonDetail.title }}
+      </h1>
+
+      <div>
+        <a [routerLink]="['/enrollments', enrollmentId, 'lessons']"
+           class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Back to lessons
+        </a>
+      </div>
+    </div>
+
+    <!--Content-->
+    <!--display video-->
+    <div class="w-100 mb-4">
+      <div *ngIf="lessonType === 'video'" class="video-container">
+        <app-video-player [videoLink]="lessonDetail.link"></app-video-player>
+      </div>
+
+      <div *ngIf="lessonType === 'docx'" class="document-container">
+        <app-document-viewer [documentLink]="lessonDetail.link"></app-document-viewer>
+      </div>
+
+    </div>
+
+
+    <!--Action Buttons-->
+    <div class="d-flex justify-content-between mb-4">
+      <div>
+        <button *ngIf="!lessonIsCompleted(lessonDetail.id, enrollmentWithCourse.lessonProgresses)"
+                (click)="markLessonAsCompleted(enrollmentWithCourse.courseId, lessonDetail.id, enrollmentWithCourse.sections, enrollmentWithCourse.quizSubmissions)"
+                class="btn btn-success me-2">Mark as Completed
+        </button>
+
+        <div *ngIf="lessonIsCompleted(lessonDetail.id, enrollmentWithCourse.lessonProgresses) && getQuizByLessonId(lessonDetail.id, enrollmentWithCourse.sections) as quiz">
+          <div class="w-100 mb-3" *ngIf="!isLessonRequire(lessonDetail.id, enrollmentWithCourse.lessonProgresses)">
+            <p class="alert alert-info text-center mb-0">
+              This quiz is not required to complete the course.
+            </p>
+          </div>
+          <div *ngIf="getQuizSubmissionByLessonId(lessonDetail.id, enrollmentWithCourse.sections, enrollmentWithCourse.quizSubmissions) as quizSubmission; else haveNotSubmittedYet">
+            <a [routerLink]="['/enrollments', this.enrollmentId, 'quiz-submit', quiz.id]"
+               [queryParams]="{quizSubmissionId: quizSubmission.id}"
+               class="btn btn-success me-2">View Quiz submission</a>
+          </div>
+          <ng-template #haveNotSubmittedYet>
+            <a [routerLink]="['/enrollments', this.enrollmentId, 'quiz-submit', quiz.id]"
+               class="btn btn-success me-2">Take quiz now</a>
+          </ng-template>
+        </div>
+
+        @if (!enrollmentWithCourse.completed) {
+          <button *ngIf="lessonIsCompleted(lessonDetail.id, enrollmentWithCourse.lessonProgresses)"
+                  (click)="markLessonAsIncomplete(enrollmentWithCourse.courseId, lessonDetail.id, lessonDetail.title)"
+                  class="btn btn-warning">Mark as Incomplete
+          </button>
+        } @else {
+          <button *ngIf="lessonIsCompleted(lessonDetail.id, enrollmentWithCourse.lessonProgresses)" disabled
+                  class="btn btn-warning">Mark as Incomplete
+          </button>
+        }
+      </div>
+      <div>
+        <a *ngIf="lessonPrev" [routerLink]="['/enrollments', enrollmentId, 'lessons', lessonPrev]"
+           [queryParams]="{
+              lessonPrev: enrollmentWithCourseDataService.getPrevLesson(lessonPrev!),
+              lessonNext: enrollmentWithCourseDataService.getNextLesson(lessonPrev!),
+           }"
+           class="btn btn-primary me-2">Previous Course</a>
+        <a *ngIf="lessonNext" [routerLink]="['/enrollments', enrollmentId, 'lessons', lessonNext]"
+           [queryParams]="{
+              lessonPrev: enrollmentWithCourseDataService.getPrevLesson(lessonNext!),
+              lessonNext: enrollmentWithCourseDataService.getNextLesson(lessonNext!),
+           }"
+           class="btn btn-primary">Next Course</a>
+      </div>
+    </div>
+  </div>
+</div>

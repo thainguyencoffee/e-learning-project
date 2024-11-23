@@ -1,8 +1,8 @@
 package com.el.enrollment.web;
 
 import com.el.enrollment.application.EnrollmentStatisticService;
-import com.el.enrollment.application.dto.CourseInfoWithEnrolmentStatisticDTO;
-import com.el.enrollment.application.dto.CourseInfoWithEnrolmentsDTO;
+import com.el.enrollment.application.dto.CourseInfoWithEnrollmentStatisticDTO;
+import com.el.enrollment.application.dto.CourseInfoWithEnrollmentsDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -27,16 +27,16 @@ public class EnrollmentStatisticController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CourseInfoWithEnrolmentStatisticDTO>> minInfoWithEnrolmentStatistic(Pageable pageable) {
-        log.info("Request to get courses min info and enrolment statistics");
-        List<CourseInfoWithEnrolmentStatisticDTO> result = enrollmentStatisticService.getCourseMinInfoWithEnrolmentStatistics(pageable);
+    public ResponseEntity<Page<CourseInfoWithEnrollmentStatisticDTO>> minInfoWithEnrollmentStatistic(Pageable pageable) {
+        log.info("Request to get courses min info and enrollment statistics");
+        List<CourseInfoWithEnrollmentStatisticDTO> result = enrollmentStatisticService.getCourseMinInfoWithEnrollmentStatistics(pageable);
         return ResponseEntity.ok(new PageImpl<>(result, pageable, result.size()));
     }
 
     @GetMapping("/{courseId}")
-    public ResponseEntity<CourseInfoWithEnrolmentsDTO> courseWithEnrolmentStatistic(@PathVariable Long courseId) {
-        log.info("Request to get course with enrolment statistics");
-        CourseInfoWithEnrolmentsDTO result = enrollmentStatisticService.getCourseWithEnrolmentStatistics(courseId);
+    public ResponseEntity<CourseInfoWithEnrollmentsDTO> courseWithEnrollmentStatistic(@PathVariable Long courseId) {
+        log.info("Request to get course with enrollment statistics");
+        CourseInfoWithEnrollmentsDTO result = enrollmentStatisticService.getCourseWithEnrollmentStatistics(courseId);
         return ResponseEntity.ok(result);
     }
 

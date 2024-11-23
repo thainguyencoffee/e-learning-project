@@ -10,7 +10,7 @@ import {Course} from "../../model/view/course";
 import {RejectRequestDto} from "../../model/reject-request.dto";
 import {Observable} from "rxjs";
 import {AsyncPipe, NgIf} from "@angular/common";
-import {EnrolmentsService} from "../../../../enrolments/service/enrolments.service";
+import {EnrollmentsService} from "../../../../enrollment/service/enrollments.service";
 
 @Component({
   selector: 'app-resolve-request',
@@ -31,7 +31,7 @@ export class ResolveRequestComponent implements OnInit{
   router = inject(Router);
   userService = inject(UserService);
   courseService = inject(CourseService);
-  enrolmentService = inject(EnrolmentsService);
+  enrollmentService = inject(EnrollmentsService);
   errorHandler = inject(ErrorHandler);
 
   requestType: string = '';
@@ -39,7 +39,7 @@ export class ResolveRequestComponent implements OnInit{
   courseId?: number;
   requestId?: number;
   course?: Course
-  enrolmentsCount$!: Observable<number>;
+  enrollmentsCount$!: Observable<number>;
 
   isReadDocumentationForUnpublishedCourse = false;
 
@@ -108,7 +108,7 @@ export class ResolveRequestComponent implements OnInit{
     this.courseId = this.route.snapshot.params['courseId'];
     this.requestId = this.route.snapshot.params['requestId'];
 
-    this.enrolmentsCount$ = this.enrolmentService.countEnrolmentsByCourseId(this.courseId!);
+    this.enrollmentsCount$ = this.enrollmentService.countEnrollmentsByCourseId(this.courseId!);
 
     this.courseService.getCourse(this.courseId!).subscribe({
       next: (course) => {

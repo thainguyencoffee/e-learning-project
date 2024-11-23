@@ -1,0 +1,59 @@
+@if (!enrollments || enrollments.length === 0) {
+  <div>No Enrollments could be found.</div>
+} @else {
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    @for (enrollment of enrollments; track enrollment.id) {
+      <div class="col">
+
+        <div class="card h-100 shadow border-0 hover-effect">
+          <a [routerLink]="['/courses', enrollment.courseId]">
+            <img
+              [src]="enrollment.thumbnailUrl || 'https://placehold.co/600x400/000000/FFF?text=No+Image'"
+              class="card-img-top"
+              alt="Course Thumbnail"
+              style="height: 200px; object-fit: cover; border-radius: 8px;">
+          </a>
+          <div class="position-absolute top-0 start-0 p-2">
+            <span class="badge bg-success  fs-12" *ngIf="enrollment.completed">Completed</span>
+            <span class="badge bg-warning  fs-12" *ngIf="!enrollment.completed">Incomplete</span>
+
+          </div>
+          <div class="card-body">
+            <h5 class="card-title" title="{{ enrollment.title }}"
+                style="word-wrap: break-word; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">
+              {{ enrollment.title }}
+            </h5>
+            <p class="card-text">
+              <span class="card-text">Enroll date: {{ enrollment.enrollmentDate | date }}</span>
+            </p>
+            <a [routerLink]="['/enrollments', enrollment.id, 'overview']" class="btn btn-primary">Study</a>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+  <br>
+  <nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+      <!-- Previous button -->
+      <li class="page-item" [class.disabled]="paginationUtils!.number === 0">
+        <button class="page-link" (click)="onPageChange(paginationUtils!.number - 1)" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </button>
+      </li>
+
+      <!-- Page number buttons -->
+      <li *ngFor="let page of getPageRange()" class="page-item" [class.active]="page === paginationUtils!.number">
+        <button class="page-link" (click)="onPageChange(page)">{{ page + 1 }}</button>
+      </li>
+
+      <!-- Next button -->
+      <li class="page-item" [class.disabled]="paginationUtils!.number === paginationUtils!.totalPages - 1">
+        <button class="page-link" (click)="onPageChange(paginationUtils!.number + 1)" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+}

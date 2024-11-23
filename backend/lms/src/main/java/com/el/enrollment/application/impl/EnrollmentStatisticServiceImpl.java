@@ -5,8 +5,8 @@ import com.el.common.exception.AccessDeniedException;
 import com.el.enrollment.application.CourseEnrollmentQueryService;
 import com.el.enrollment.application.EnrollmentStatisticService;
 import com.el.enrollment.application.dto.CourseInfoDTO;
-import com.el.enrollment.application.dto.CourseInfoWithEnrolmentStatisticDTO;
-import com.el.enrollment.application.dto.CourseInfoWithEnrolmentsDTO;
+import com.el.enrollment.application.dto.CourseInfoWithEnrollmentStatisticDTO;
+import com.el.enrollment.application.dto.CourseInfoWithEnrollmentsDTO;
 import com.el.enrollment.domain.EnrollmentRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class EnrollmentStatisticServiceImpl implements EnrollmentStatisticServic
     }
 
     @Override
-    public List<CourseInfoWithEnrolmentStatisticDTO> getCourseMinInfoWithEnrolmentStatistics(Pageable pageable) {
+    public List<CourseInfoWithEnrollmentStatisticDTO> getCourseMinInfoWithEnrollmentStatistics(Pageable pageable) {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
         String currentUser = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
@@ -42,10 +42,10 @@ public class EnrollmentStatisticServiceImpl implements EnrollmentStatisticServic
     }
 
     @Override
-    public CourseInfoWithEnrolmentsDTO getCourseWithEnrolmentStatistics(Long courseId) {
+    public CourseInfoWithEnrollmentsDTO getCourseWithEnrollmentStatistics(Long courseId) {
         CourseInfoDTO courseInfo = courseEnrollmentQueryService.findCourseWithoutSectionsDTOByIdAndPublished(courseId, true);
         var enrollments = repository.findAllByCourseId(courseId);
-        return CourseInfoWithEnrolmentsDTO.of(courseInfo, enrollments);
+        return CourseInfoWithEnrollmentsDTO.of(courseInfo, enrollments);
     }
 
 }

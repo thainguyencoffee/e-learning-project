@@ -12,7 +12,7 @@ import com.el.course.domain.QuizCalculationResult;
 import com.el.course.domain.Quiz;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
-import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
+import com.el.enrollment.application.dto.EnrollmentWithCourseDTO;
 import com.el.enrollment.application.dto.QuizDetailDTO;
 import com.el.enrollment.web.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.Enrollment;
@@ -89,18 +89,18 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     }
 
     @Override
-    public EnrolmentWithCourseDTO findEnrolmentWithCourseById(Long id) {
-        Enrollment enrolment;
+    public EnrollmentWithCourseDTO findEnrollmentWithCourseById(Long id) {
+        Enrollment enrollment;
         if (rolesBaseUtil.isAdmin() || rolesBaseUtil.isTeacher()) {
-            enrolment = repository.findById(id)
+            enrollment = repository.findById(id)
                     .orElseThrow(ResourceNotFoundException::new);
         } else {
             String student = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
-            enrolment = repository.findByIdAndStudent(id, student)
+            enrollment = repository.findByIdAndStudent(id, student)
                     .orElseThrow(ResourceNotFoundException::new);
         }
-        Course course = courseQueryService.findPublishedCourseById(enrolment.getCourseId());
-        return EnrolmentWithCourseDTO.of(enrolment, course);
+        Course course = courseQueryService.findPublishedCourseById(enrollment.getCourseId());
+        return EnrollmentWithCourseDTO.of(enrollment, course);
     }
 
     public void enrollment(String student, Long courseId) {

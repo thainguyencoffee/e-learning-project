@@ -44,12 +44,12 @@ public class EnrollmentController {
     }
 
     @GetMapping("/count")
-    public ResponseEntity<Integer> countEnrolmentsByCourseId(@RequestParam(name = "courseId") Long courseId) {
+    public ResponseEntity<Integer> countEnrollmentsByCourseId(@RequestParam(name = "courseId") Long courseId) {
         return ResponseEntity.ok(enrollmentRepository.countAllByCourseId(courseId));
     }
 
     @GetMapping("/course/{courseId}")
-    public ResponseEntity<Enrollment> getEnrolmentByCourseId(@PathVariable Long courseId, @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<Enrollment> getEnrollmentByCourseId(@PathVariable Long courseId, @AuthenticationPrincipal Jwt jwt) {
         String username = jwt.getClaim("preferred_username");
         Enrollment enrollment = enrollmentRepository.findByCourseIdAndStudent(courseId, username)
                 .orElseThrow(ResourceNotFoundException::new);
@@ -57,8 +57,8 @@ public class EnrollmentController {
     }
 
     @GetMapping("/{enrollmentId}/content")
-    public ResponseEntity<EnrolmentWithCourseDTO> getContentByEnrollmentId(@PathVariable Long enrollmentId) {
-        return ResponseEntity.ok(courseEnrollmentService.findEnrolmentWithCourseById(enrollmentId));
+    public ResponseEntity<EnrollmentWithCourseDTO> getContentByEnrollmentId(@PathVariable Long enrollmentId) {
+        return ResponseEntity.ok(courseEnrollmentService.findEnrollmentWithCourseById(enrollmentId));
     }
 
     @PutMapping("/{enrollmentId}/mark-lesson")

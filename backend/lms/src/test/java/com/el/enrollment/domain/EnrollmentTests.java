@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class EnrollmentTests {
 
     @Test
-    void courseEnrollmentConstructor_ShouldCreatedEnrollmentWhenValid() {
+    void enrollmentConstructor_ShouldCreatedEnrollmentWhenValid() {
         Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
                 new LessonProgress("Course Lesson 1", 1L), 
                 new LessonProgress("Course Lesson 2", 2L)), 
@@ -32,7 +32,7 @@ class EnrollmentTests {
     }
 
     @Test
-    void courseEnrollmentConstructor_ShouldThrowException_WhenLessonProgressesIsEmpty() {
+    void enrollmentConstructor_ShouldThrowException_WhenLessonProgressesIsEmpty() {
         assertThrows(InputInvalidException.class, () -> {
             new Enrollment("user",
                     1L,
@@ -43,7 +43,7 @@ class EnrollmentTests {
     }
 
     @Test
-    void courseEnrollmentConstructor_ShouldThrowException_WhenQuizIdsIsEmpty() {
+    void enrollmentConstructor_ShouldThrowException_WhenQuizIdsIsEmpty() {
         assertThrows(InputInvalidException.class, () -> {
             new Enrollment("user",
                     1L,

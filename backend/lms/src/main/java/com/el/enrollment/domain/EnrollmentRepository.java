@@ -3,7 +3,7 @@ package com.el.enrollment.domain;
 import com.el.common.projection.MonthStats;
 import com.el.course.application.dto.teacher.StudentsByCourseDTO;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
-import com.el.enrollment.application.dto.CourseInfoWithEnrolmentStatisticDTO;
+import com.el.enrollment.application.dto.CourseInfoWithEnrollmentStatisticDTO;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -98,14 +98,14 @@ public interface EnrollmentRepository extends CrudRepository<Enrollment, Long> {
         FROM
             course c
                 JOIN
-            course_enrollment e ON c.id = e.course_id
+            enrollment e ON c.id = e.course_id
         WHERE
             c.published = true
         GROUP BY
             c.id, c.title, c.thumbnail_url, c.description, c.teacher 
         LIMIT :size OFFSET :page * :size
     """)
-    List<CourseInfoWithEnrolmentStatisticDTO> findAllCourseStatistics(int page, int size);
+    List<CourseInfoWithEnrollmentStatisticDTO> findAllCourseStatistics(int page, int size);
 
     @Query("""
         SELECT
@@ -119,14 +119,14 @@ public interface EnrollmentRepository extends CrudRepository<Enrollment, Long> {
         FROM
             course c
                 JOIN
-            course_enrollment e ON c.id = e.course_id
+            enrollment e ON c.id = e.course_id
         WHERE
             c.published = true AND c.teacher = :teacher
         GROUP BY
             c.id, c.title, c.thumbnail_url, c.description, c.teacher 
         LIMIT :size OFFSET :page * :size
     """)
-    List<CourseInfoWithEnrolmentStatisticDTO> findAllCourseStatisticsByTeacher(String teacher, int page, int size);
+    List<CourseInfoWithEnrollmentStatisticDTO> findAllCourseStatisticsByTeacher(String teacher, int page, int size);
 
     int countCourseEnrollmentByTeacherAndCreatedDateAfter(String teacher, LocalDateTime createdDateAfter);
 

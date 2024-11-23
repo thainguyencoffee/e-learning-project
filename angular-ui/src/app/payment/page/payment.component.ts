@@ -3,7 +3,7 @@ import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 import {OrdersService} from "../../orders/service/orders.service";
 import {Order} from "../../orders/model/order";
 import {createErr, ErrorHandler} from "../../common/error-handler.injectable";
-import {NgIf} from "@angular/common";
+import {JsonPipe, NgIf} from "@angular/common";
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {updateForm} from "../../common/utils";
 import {InputRowComponent} from "../../common/input-row/input-row.component";
@@ -19,7 +19,8 @@ declare var StripeCheckout: any;
     RouterLink,
     NgIf,
     InputRowComponent,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    JsonPipe
   ],
   templateUrl: './payment.component.html',
 })
@@ -43,7 +44,7 @@ export class PaymentComponent implements OnInit {
 
   paymentForm = new FormGroup({
     orderId: new FormControl(null, [Validators.required]),
-    amount: new FormControl(null, [Validators.required]),
+    price: new FormControl(null, [Validators.required]),
     paymentMethod: new FormControl(null, [Validators.required]),
     token: new FormControl(null, [Validators.required])
   })
@@ -55,7 +56,7 @@ export class PaymentComponent implements OnInit {
         this.order = order;
         updateForm(this.paymentForm, {
           orderId: order.id,
-          amount: order.discountedPrice || order.totalPrice,
+          price: order.discountedPrice || order.totalPrice,
         })
       },
       error: error => {

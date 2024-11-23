@@ -32,7 +32,7 @@
           <span *ngIf="!isCreateByYou(courseDto.teacher)">{{ courseDto.teacher }}</span>
         </p>
         <p><strong>Participant: {{ participantNumber }} - <a
-          [routerLink]="['/administration/enrolment-statistics', courseDto.id]">Enrolment statistic</a></strong></p>
+          [routerLink]="['/administration/enrollment-statistics', courseDto.id]">Enrollment statistic</a></strong></p>
         <p><strong>Description: </strong> {{ courseDto.description || 'No description available' }}</p>
         <p><strong>Language: </strong> <span class="fw-bold">{{ courseDto.language }}</span></p>
         <p><strong>Price: </strong> {{ courseDto.price || 'Price not available' }}</p>

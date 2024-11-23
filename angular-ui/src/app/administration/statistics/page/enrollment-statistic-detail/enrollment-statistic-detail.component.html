@@ -1,0 +1,119 @@
+<div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+  <h1 class="text-primary fw-bold">Enrollments statistic Center</h1>
+  <a routerLink="/administration/enrollment-statistics" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Back to list
+  </a>
+</div>
+
+<div class="alert alert-warning">
+Quiz submissions are not included lesson information. Fix it later.
+  <a href="https://github.com/thainguyencoffee/e-learning-project/issues/152">Issue 152</a>
+</div>
+
+<div class="container-fluid bg-light p-4 rounded shadow-sm" *ngIf="courseInfoWithEnrollments">
+  <section id="basic" class="p-4 border rounded mb-4 bg-white">
+    <h2 class="mb-4 border-bottom pb-2">Basic Information</h2>
+    <div class="row">
+      <div class="col-lg-4 text-center">
+        <img
+          [src]="courseInfoWithEnrollments.thumbnailUrl || 'https://placehold.jp/200x200.png'"
+          class="img-fluid rounded shadow-sm mb-3"
+          alt="Course Thumbnail"
+          style="width: auto; height: 300px; object-fit: cover;">
+      </div>
+      <div class="col-lg-8">
+        <p><strong>Title:</strong> {{ courseInfoWithEnrollments.title }}</p>
+        <p>
+          <strong>Teacher: </strong>
+          <span *ngIf="isCreateByYou(courseInfoWithEnrollments.teacher)">{{ courseInfoWithEnrollments.teacher }}
+            <span class="badge bg-secondary">this account</span>
+          </span>
+          <span *ngIf="!isCreateByYou(courseInfoWithEnrollments.teacher)">{{ courseInfoWithEnrollments.teacher }}</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="enrollments" class="p-4 border rounded mb-4 bg-white">
+    <h2 class="mb-4 border-bottom pb-2">Students</h2>
+    <!-- Section -->
+    <div class="accordion mt-4" id="courseSections">
+      <div *ngFor="let enrollment of courseInfoWithEnrollments.enrollments; let i = index" class="accordion-item mb-3 border rounded">
+        <!-- Accordion Header -->
+        <h2 class="accordion-header" [attr.id]="'heading' + enrollment.id">
+          <div class="d-flex align-items-center justify-content-between px-3 py-2">
+            <!-- Title và nút collapse -->
+            <button
+              class="accordion-button collapsed bg-light text-dark fw-bold p-0 me-3"
+              type="button"
+              data-bs-toggle="collapse"
+              [attr.data-bs-target]="'#collapse' + enrollment.id"
+              aria-expanded="false"
+              [attr.aria-controls]="'collapse' + enrollment.id"
+            >
+              <span>{{ enrollment.student }}</span>
+            </button>
+
+            <div class="d-flex align-items-center">
+              <div class="d-flex gap-2">
+                <span class="badge bg-primary">Enrolled at: {{ enrollment.enrollmentDate | date }}</span>
+                <span class="badge bg-info">Total lessons done: {{ enrollment.progress.completedLessons }}</span>
+              </div>
+            </div>
+          </div>
+        </h2>
+        <!-- Accordion Content -->
+        <div
+          [attr.id]="'collapse' + enrollment.id"
+          class="accordion-collapse collapse"
+          [attr.aria-labelledby]="'heading' + enrollment.id"
+          data-bs-parent="#courseSections"
+        >
+          <div class="accordion-body border-top">
+            <ul class="list-group border-0">
+              <li *ngFor="let lessonProgress of enrollment.lessonProgresses; let j = index"
+                  class="list-group-item d-flex justify-content-between align-items-center border-0">
+                <!-- Lesson Title -->
+                <span class="fw-bold">{{ lessonProgress.lessonTitle }}</span>
+                <span *ngIf="lessonProgress.bonus" class="ms-2">
+                  <i class="bi bi-gift-fill text-success"></i>
+                </span>
+                <!-- Completed Status -->
+                <span *ngIf="lessonProgress.completed" class="badge bg-success">
+                Completed - {{lessonProgress.completedDate | date }}
+              </span>
+                <span *ngIf="!lessonProgress.completed" class="badge bg-warning">In progress</span>
+              </li>
+            </ul>
+
+            <!-- Quiz Submissions -->
+            <div *ngIf="enrollment.quizSubmissions && enrollment.quizSubmissions.length > 0" class="mt-4">
+              <h5>Quiz Submissions</h5>
+              <ul class="list-group">
+                <li *ngFor="let quizSubmission of enrollment.quizSubmissions" class="list-group-item d-flex justify-content-between align-items-center">
+                  <!-- Quiz Information -->
+                  <div>
+                    <p><strong>ID:</strong> {{ quizSubmission.id }}</p>
+                    <p><strong>Quiz ID:</strong> {{ quizSubmission.quizId }}</p>
+                    <p><strong>LessonID: {{quizSubmission.afterLessonId}}</strong></p>
+                    <p><strong>Bonus:</strong> {{ quizSubmission.bonus }}</p>
+                    <p><strong>Score:</strong> {{ quizSubmission.score }}</p>
+                    <p><strong>Status:</strong> {{ quizSubmission.passed ? 'Passed' : 'Failed' }}</p>
+                    <p><strong>Submitted On:</strong> {{ quizSubmission.submittedDate | date }}</p>
+                  </div>
+
+                  <!-- Delete Button -->
+                  <button (click)="deleteQuizSubmission(enrollment.id, quizSubmission.id)" class="btn btn-danger btn-sm">
+                    Delete
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+</div>

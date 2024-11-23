@@ -1,0 +1,78 @@
+<div *ngIf="enrollmentWithCourse$ | async as enrollmentWithCourse">
+  <div class="overview-card">
+    <h1>Overview</h1>
+
+    <div class="section-card">
+      <h3>Your Progress</h3>
+      <p>Total lessons: {{enrollmentWithCourse.progress.totalLessons }}</p>
+      <p>Total quizzes: {{enrollmentWithCourse.progress.totalQuizzes }}</p>
+      <p>Total completed lessons: {{enrollmentWithCourse.progress.completedLessons }}</p>
+      <p>Total passed quizzes: {{enrollmentWithCourse.progress.passedQuizzes }}</p>
+      <p>You're done: {{enrollmentWithCourse.progress.totalLessonBonus }} lesson bonus</p>
+      <p>You're done: {{enrollmentWithCourse.progress.totalQuizBonus }} quiz bonus</p>
+      <div class="progress" role="progressbar" aria-label="Example with label"
+           [attr.aria-valuenow]="enrollmentWithCourse.progress.progressPercentage" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" [style.width]="enrollmentWithCourse.progress.progressPercentage + '%'">
+          {{ enrollmentWithCourse.progress.progressPercentage | number:'1.0-2' }}%
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h3>Completed Date</h3>
+      <p>{{ enrollmentWithCourse.completedDate | date }}</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Teacher</h3>
+      <p>{{ enrollmentWithCourse.teacher }}</p>
+    </div>
+
+    <div *ngIf="enrollmentWithCourse.completed">
+      <div class="alert alert-success">
+        <h3>Completed</h3>
+        <p>Congratulations! You have completed this course.
+          <span *ngIf="!enrollmentWithCourse.reviewed">
+            Please <button class="btn btn-primary" (click)="onToggleReviewBtn()">review</button>
+          this course to help us.
+          </span>
+        </p>
+        @if (toggleReviewBtn) {
+          <form [formGroup]="reviewForm" (ngSubmit)="handleSubmit(enrollmentWithCourse.courseId)">
+            <app-input-row [group]="reviewForm" label="Rating" field="rating" rowType="radio"
+                           [options]="ratingOptions"/>
+            <app-input-row [group]="reviewForm" label="Comment" field="comment" rowType="textarea"/>
+            <button type="submit" class="btn btn-primary">Review</button>
+          </form>
+        }
+      </div>
+
+        <div class="section-card">
+          <h3>Certificate</h3>
+          <p>
+            <a [href]="enrollmentWithCourse.certificate.url" target="_blank">Download</a>
+          </p>
+        </div>
+    </div>
+
+    <div class="section-card">
+      <h3>Language</h3>
+      <p>{{ enrollmentWithCourse.language }}</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Subtitles</h3>
+      <p *ngFor="let subtitle of enrollmentWithCourse.subtitles">{{ subtitle }}</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Benefits</h3>
+      <p *ngFor="let benefit of enrollmentWithCourse.benefits">{{ benefit }}</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Prerequisites</h3>
+      <p *ngFor="let prerequisite of enrollmentWithCourse.prerequisites">{{ prerequisite }}</p>
+    </div>
+  </div>
+</div>

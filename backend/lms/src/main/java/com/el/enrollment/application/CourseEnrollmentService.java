@@ -1,7 +1,7 @@
 package com.el.enrollment.application;
 
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
-import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
+import com.el.enrollment.application.dto.EnrollmentWithCourseDTO;
 import com.el.enrollment.application.dto.QuizDetailDTO;
 import com.el.enrollment.web.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.Enrollment;
@@ -18,7 +18,7 @@ public interface CourseEnrollmentService {
 
     Enrollment findCourseEnrollmentById(Long id);
 
-    EnrolmentWithCourseDTO findEnrolmentWithCourseById(Long id);
+    EnrollmentWithCourseDTO findEnrollmentWithCourseById(Long id);
 
     /**
      * When OrderPaid event is received, this method is called to enroll the student in the course.
