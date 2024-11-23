@@ -99,7 +99,7 @@ class CourseServiceTests {
     @Test
     void testUpdateInfoCourse_ShouldUpdateCourseInfo() {
         // Mock
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         when(courseRepository.save(any(Course.class))).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
@@ -108,14 +108,14 @@ class CourseServiceTests {
         courseService.updateCourse(1L, courseUpdateDTO);
 
         // Verify
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(courseRepository, times(1)).save(any(Course.class));
     }
 
     @Test
     void testUpdateInfoCourse_ShouldThrowException_WhenCourseNotFound() {
         // Mock
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("teacher123");
@@ -131,7 +131,7 @@ class CourseServiceTests {
     @Test
     void testUpdateInfoCourse_ShouldThrowException_WhenNotPermission() {
         // Mock
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher"); // course's is teacher123
@@ -148,7 +148,7 @@ class CourseServiceTests {
     void testUpdateInfoCourse_ShouldThrowException_WhenCoursePublished() {
         // Mock
         Course courseMock = spy(course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(courseMock);
         doReturn(true).when(courseMock).isPublishedAndNotUnpublishedOrDelete();
 //        doReturn(false).when(courseMock).isNotPublishedOrDeleted();
         // Mock canEdit method
@@ -165,7 +165,7 @@ class CourseServiceTests {
 
     @Test
     void deleteCourse_ValidCourseId_DeletesCourse() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
@@ -176,7 +176,7 @@ class CourseServiceTests {
 
     @Test
     void deleteCourse_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
@@ -187,7 +187,7 @@ class CourseServiceTests {
     @Test
     void deleteCourse_AlreadyDeletedCourse_ThrowsException() {
         course.delete();
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
@@ -198,7 +198,7 @@ class CourseServiceTests {
     @Test
     void deleteCourse_PublishedCourse_ThrowsException() {
         Course courseMock = spy(course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(courseMock);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 //        doReturn(false).when(courseMock).isNotPublishedOrDeleted();
@@ -210,7 +210,7 @@ class CourseServiceTests {
 
     @Test
     void deleteCourse_ThrowException_WhenNotPermission() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher");
@@ -221,7 +221,7 @@ class CourseServiceTests {
 
     @Test
     void updatePrice_ValidCourseIdAndPrice_UpdatesPrice() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(courseWithSections);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(courseWithSections);
 
         MonetaryAmount newPrice = Money.of(100, Currencies.USD);
         courseService.updatePrice(1L, newPrice);
@@ -231,7 +231,7 @@ class CourseServiceTests {
 
     @Test
     void updatePrice_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         MonetaryAmount newPrice = Money.of(100, Currencies.USD);
         assertThrows(ResourceNotFoundException.class, () -> courseService.updatePrice(1L, newPrice));
@@ -240,7 +240,7 @@ class CourseServiceTests {
 
     @Test
     void updatePrice_NegativePrice_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
 
         MonetaryAmount negativePrice = Money.of(-100, Currencies.VND);
         assertThrows(InputInvalidException.class, () -> courseService.updatePrice(1L, negativePrice));
@@ -250,7 +250,7 @@ class CourseServiceTests {
     @Test
     void updatePrice_CoursePublished_ThrowsException() {
         Course courseMock = spy(course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(courseMock);
         doReturn(false).when(courseMock).isNotPublishedOrDeleted();
 
         MonetaryAmount newPrice = Money.of(100, Currencies.VND);
@@ -261,7 +261,7 @@ class CourseServiceTests {
     @Test
     void assignTeacher_ValidCourseIdAndTeacher_AssignsTeacher() {
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
 
         courseService.assignTeacher(1L, "NewTeacher");
         verify(courseRepository, times(1)).save(course);
@@ -279,7 +279,7 @@ class CourseServiceTests {
     @Test
     void assignTeacher_CourseNotFound_ThrowsException() {
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.assignTeacher(1L, "NewTeacher"));
         verify(courseRepository, never()).save(any(Course.class));
@@ -287,7 +287,7 @@ class CourseServiceTests {
 
     @Test
     void assignTeacher_NullTeacher_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
         assertThrows(InputInvalidException.class, () -> courseService.assignTeacher(1L, null));
@@ -297,7 +297,7 @@ class CourseServiceTests {
     @Test
     void assignTeacher_PublishedCourse_ThrowsException() {
         Course courseMock = spy(course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(courseMock);
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
         doReturn(true).when(courseMock).isPublishedAndNotUnpublishedOrDelete();
@@ -309,7 +309,7 @@ class CourseServiceTests {
 
     @Test
     void addCourseSection_ShouldAddCourseSection() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
@@ -320,13 +320,13 @@ class CourseServiceTests {
         courseService.addSection(1L, courseSectionDTO);
 
         // Verify
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(courseRepository, times(1)).save(course);
     }
 
     @Test
     void addCourseSection_ShouldThrowException_WhenCourseNotFound() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
@@ -343,7 +343,7 @@ class CourseServiceTests {
 
     @Test
     void addCourseSection_ShouldThrowException_WhenNotPermission() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher");
@@ -363,7 +363,7 @@ class CourseServiceTests {
     void updateSectionInfo_ShouldUpdateSectionInfo() {
         // Arrange: Mock và course
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
@@ -374,14 +374,14 @@ class CourseServiceTests {
         courseService.updateSectionInfo(1L, 2L, "New Section 1");
 
         // Assert: Xác minh rằng các phương thức cần thiết đã được gọi đúng
-        verify(courseQueryService, times(1)).findCourseById(1L); // Xác minh lấy course
+        verify(courseQueryService, times(1)).findCourseById(1L, false); // Xác minh lấy course
         verify(course, times(1)).updateSection(2L, "New Section 1"); // Xác minh cập nhật thông tin section
         verify(courseRepository, times(1)).save(course); // Xác minh lưu lại course
     }
 
     @Test
     void updateSectionInfo_ShouldThrowException_WhenCourseNotFound() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
@@ -398,7 +398,7 @@ class CourseServiceTests {
     void updateSectionInfo_CoursePublish_ThrowsException() {
         // Arrange: Mock
         Course courseMock = spy(course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(courseMock);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 //        doReturn(false).when(courseMock).isNotPublishedOrDeleted();
@@ -415,7 +415,7 @@ class CourseServiceTests {
 
     @Test
     void updateSectionInfo_ShouldThrowException_WhenNotPermission() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher");
@@ -432,21 +432,21 @@ class CourseServiceTests {
     @Test
     void removeSection_ValidCourseIdAndSectionId_RemovesSection() {
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
         doNothing().when(course).removeSection(2L);
 
         courseService.removeSection(1L, 2L);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(course, times(1)).removeSection(2L);
         verify(courseRepository, times(1)).save(course);
     }
 
     @Test
     void removeSection_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
@@ -458,7 +458,7 @@ class CourseServiceTests {
     @Test
     void removeSection_SectionNotFound_ThrowsException() {
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
         doThrow(new ResourceNotFoundException()).when(course).removeSection(999L);
@@ -471,7 +471,7 @@ class CourseServiceTests {
     @Test
     void removeSection_PublishedCourse_ThrowsException() {
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
         doReturn(true).when(course).isPublishedAndNotUnpublishedOrDelete();
@@ -484,7 +484,7 @@ class CourseServiceTests {
 
     @Test
     void removeSection_ShouldThrowException_WhenNotPermission() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher");
@@ -498,21 +498,21 @@ class CourseServiceTests {
     void addLesson_ValidCourseIdAndSectionId_AddsLesson() {
         Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com");
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
         doNothing().when(course).addLessonToSection(2L, lesson);
 
         courseService.addLesson(1L, 2L, lesson);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(course, times(1)).addLessonToSection(2L, lesson);
         verify(courseRepository, times(1)).save(course);
     }
 
     @Test
     void addLesson_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
         Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com");
@@ -525,7 +525,7 @@ class CourseServiceTests {
     @Test
     void addLesson_SectionNotFound_ThrowsException() {
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
         doThrow(new ResourceNotFoundException()).when(course).addLessonToSection(any(Long.class), any(Lesson.class));
@@ -539,7 +539,7 @@ class CourseServiceTests {
     @Test
     void addLesson_PublishedCourse_ThrowsException() {
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 //        doReturn(false).when(course).isNotPublishedOrDeleted();
@@ -553,7 +553,7 @@ class CourseServiceTests {
 
     @Test
     void addLesson_ShouldThrowException_WhenNotPermission() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher");
@@ -568,14 +568,14 @@ class CourseServiceTests {
     void updateLesson_ValidCourseIdAndSectionIdAndLessonId_UpdatesLesson() {
         Course course = spy(this.course);
         Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/updated");
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
         doNothing().when(course).updateLessonInSection(2L, 3L, updatedLesson);
 
         courseService.updateLesson(1L, 2L, 3L, updatedLesson);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(course, times(1)).updateLessonInSection(2L, 3L, updatedLesson);
         verify(courseRepository, times(1)).save(course);
     }
@@ -583,7 +583,7 @@ class CourseServiceTests {
     @Test
     void updateLesson_CourseNotFound_ThrowsException() {
         Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/updated");
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
@@ -596,7 +596,7 @@ class CourseServiceTests {
     void updateLesson_SectionNotFound_ThrowsException() {
         Course course = spy(this.course);
         Lesson updatedLesson = new Lesson("UpdatedLessonTitle", Lesson.Type.TEXT, "https://www.example.com/updated");
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
         doThrow(new ResourceNotFoundException()).when(course).updateLessonInSection(999L, 3L, updatedLesson);
@@ -608,7 +608,7 @@ class CourseServiceTests {
 
     @Test
     void updateLesson_ThrowException_WhenNotPermission() {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(false);
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("otherTeacher");
@@ -622,21 +622,21 @@ class CourseServiceTests {
     @Test
     void removeLesson_ValidCourseIdAndSectionIdAndLessonId_RemovesLesson() {
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
         doNothing().when(course).removeLessonFromSection(2L, 3L);
 
         courseService.removeLesson(1L, 2L, 3L);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(course, times(1)).removeLessonFromSection(2L, 3L);
         verify(courseRepository, times(1)).save(course);
     }
 
     @Test
     void removeLesson_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
@@ -648,7 +648,7 @@ class CourseServiceTests {
     @Test
     void removeLesson_SectionNotFound_ThrowsException() {
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
         doThrow(new ResourceNotFoundException()).when(course).removeLessonFromSection(999L, 3L);
@@ -661,7 +661,7 @@ class CourseServiceTests {
     @Test
     void removeLesson_LessonNotFound_ThrowsException() {
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
         doThrow(new ResourceNotFoundException()).when(course).removeLessonFromSection(2L, 999L);
@@ -674,7 +674,7 @@ class CourseServiceTests {
     @Test
     void removeLesson_PublishedCourse_ThrowsException() {
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         // Mock canEdit method
         when(rolesBaseUtil.isAdmin()).thenReturn(true);
         doReturn(true).when(course).isPublishedAndNotUnpublishedOrDelete();
@@ -689,12 +689,12 @@ class CourseServiceTests {
     void requestPublish_shouldAddRequest_whenValidRequest() {
         CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOPublish();
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doNothing().when(course).requestPublish(any(CourseRequest.class));
 
         courseService.requestPublish(1L, courseRequestDTO);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(course, times(1)).requestPublish(any(CourseRequest.class));
         verify(courseRepository, times(1)).save(course);
     }
@@ -702,7 +702,7 @@ class CourseServiceTests {
     @Test
     void requestPublish_shouldThrowException_whenCourseNotFound() {
         CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOPublish();
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.requestPublish(1L, courseRequestDTO));
 
@@ -713,7 +713,7 @@ class CourseServiceTests {
     void requestPublish_shouldThrowException_whenBusinessLogicThrow() {
         CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOPublish();
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doThrow(new InputInvalidException("something err")).when(course).requestPublish(any(CourseRequest.class));
 
         assertThrows(InputInvalidException.class, () -> courseService.requestPublish(1L, courseRequestDTO));
@@ -725,12 +725,12 @@ class CourseServiceTests {
     void requestUnpublish_shouldAddRequest_whenValidRequest() {
         CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOUnPublish();
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doNothing().when(course).requestUnpublish(any(CourseRequest.class));
 
         courseService.requestUnpublish(1L, courseRequestDTO);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(course, times(1)).requestUnpublish(any(CourseRequest.class));
         verify(courseRepository, times(1)).save(course);
     }
@@ -738,7 +738,7 @@ class CourseServiceTests {
     @Test
     void requestUnpublish_shouldThrowException_whenCourseNotFound() {
         CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOUnPublish();
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.requestUnpublish(1L, courseRequestDTO));
 
@@ -749,7 +749,7 @@ class CourseServiceTests {
     void requestUnpublish_shouldThrowException_whenBusinessLogicThrow() {
         CourseRequestDTO courseRequestDTO = TestFactory.createDefaultCourseRequestDTOUnPublish();
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doThrow(new InputInvalidException("something err")).when(course).requestUnpublish(any(CourseRequest.class));
 
         assertThrows(InputInvalidException.class, () -> courseService.requestUnpublish(1L, courseRequestDTO));
@@ -761,12 +761,12 @@ class CourseServiceTests {
     void approvePublish_shouldApprovePublishRequest_whenValidRequest() {
         CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doNothing().when(course).approvePublish(anyLong(), anyString(), anyString());
 
         courseService.approvePublish(1L, 2L, resolveDTO);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(course, times(1)).approvePublish(2L, resolveDTO.resolvedBy(), resolveDTO.message());
         verify(courseRepository, times(1)).save(course);
     }
@@ -774,7 +774,7 @@ class CourseServiceTests {
     @Test
     void approvePublish_shouldThrowException_whenCourseNotFound() {
         CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.approvePublish(1L, 2L, resolveDTO));
 
@@ -785,7 +785,7 @@ class CourseServiceTests {
     void approvePublish_shouldThrowException_whenBusinessLogicThrow() {
         CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doThrow(new InputInvalidException("something err")).when(course).approvePublish(anyLong(), anyString(), anyString());
 
         assertThrows(InputInvalidException.class, () -> courseService.approvePublish(1L, 2L, resolveDTO));
@@ -797,12 +797,12 @@ class CourseServiceTests {
     void rejectPublish_shouldRejectPublishRequest_whenValidRequest() {
         CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doNothing().when(course).rejectPublish(anyLong(), anyString(), anyString());
 
         courseService.rejectPublish(1L, 2L, resolveDTO);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(course, times(1)).rejectPublish(2L, resolveDTO.resolvedBy(), resolveDTO.message());
         verify(courseRepository, times(1)).save(course);
     }
@@ -810,7 +810,7 @@ class CourseServiceTests {
     @Test
     void rejectPublish_shouldThrowException_whenCourseNotFound() {
         CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.rejectPublish(1L, 2L, resolveDTO));
 
@@ -821,7 +821,7 @@ class CourseServiceTests {
     void rejectPublish_shouldThrowException_whenBusinessLogicThrow() {
         CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doThrow(new InputInvalidException("something err")).when(course).rejectPublish(anyLong(), anyString(), anyString());
 
         assertThrows(InputInvalidException.class, () -> courseService.rejectPublish(1L, 2L, resolveDTO));
@@ -833,12 +833,12 @@ class CourseServiceTests {
     void approveUnPublish_shouldApproveUnPublishRequest_whenValidRequest() {
         CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doNothing().when(course).approveUnpublish(anyLong(), anyString(), anyString());
 
         courseService.approveUnpublish(1L, 2L, resolveDTO);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(course, times(1)).approveUnpublish(2L, resolveDTO.resolvedBy(), resolveDTO.message());
         verify(courseRepository, times(1)).save(course);
     }
@@ -846,7 +846,7 @@ class CourseServiceTests {
     @Test
     void approveUnPublish_shouldThrowException_whenCourseNotFound() {
         CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.approveUnpublish(1L, 2L, resolveDTO));
 
@@ -857,7 +857,7 @@ class CourseServiceTests {
     void approveUnPublish_shouldThrowException_whenBusinessLogicThrow() {
         CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doThrow(new InputInvalidException("something err")).when(course).approveUnpublish(anyLong(), anyString(), anyString());
 
         assertThrows(InputInvalidException.class, () -> courseService.approveUnpublish(1L, 2L, resolveDTO));
@@ -869,12 +869,12 @@ class CourseServiceTests {
     void rejectUnPublish_shouldRejectUnPublishRequest_whenValidRequest() {
         CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doNothing().when(course).rejectUnpublish(anyLong(), anyString(), anyString());
 
         courseService.rejectUnpublish(1L, 2L, resolveDTO);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(course, times(1)).rejectUnpublish(any(), any(), any());
         verify(courseRepository, times(1)).save(course);
     }
@@ -882,7 +882,7 @@ class CourseServiceTests {
     @Test
     void rejectUnPublish_shouldThrowException_whenCourseNotFound() {
         CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.rejectUnpublish(1L, 2L, resolveDTO));
 
@@ -893,7 +893,7 @@ class CourseServiceTests {
     void rejectUnPublish_shouldThrowException_whenBusinessLogicThrow() {
         CourseRequestResolveDTO resolveDTO = TestFactory.createDefaultCourseRequestResolveDTO();
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doThrow(new InputInvalidException("something err")).when(course).rejectUnpublish(anyLong(), anyString(), anyString());
 
         assertThrows(InputInvalidException.class, () -> courseService.rejectUnpublish(1L, 2L, resolveDTO));
@@ -906,7 +906,7 @@ class CourseServiceTests {
     void addPost_ValidCourseId_AddsPost() {
         Course spy = spy(course);
         doNothing().when(spy).addPost(any());
-        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(spy);
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
         when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
 
@@ -918,7 +918,7 @@ class CourseServiceTests {
 
     @Test
     void addPost_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
         when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
 
@@ -934,7 +934,7 @@ class CourseServiceTests {
         Course spy = spy(course);
         doNothing().when(spy).updatePost(any(), any(), any());
 
-        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(spy);
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
         when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
 
@@ -946,7 +946,7 @@ class CourseServiceTests {
 
     @Test
     void updatePost_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
         when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
 
@@ -961,7 +961,7 @@ class CourseServiceTests {
         Course spy = spy(course);
         doNothing().when(spy).deletePost(any());
 
-        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(spy);
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
         when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
 
@@ -972,7 +972,7 @@ class CourseServiceTests {
 
     @Test
     void deletePost_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
         when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
 
@@ -985,7 +985,7 @@ class CourseServiceTests {
         Course spy = spy(course);
         doNothing().when(spy).restorePost(any());
 
-        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(spy);
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
         when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
 
@@ -996,7 +996,7 @@ class CourseServiceTests {
 
     @Test
     void restorePost_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
         when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
 
@@ -1009,7 +1009,7 @@ class CourseServiceTests {
         Course spy = spy(course);
         doNothing().when(spy).forceDeletePost(any());
 
-        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(spy);
         when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn(TestFactory.teacher);
         when(rolesBaseUtil.getCurrentUserInfoFromJwt()).thenReturn(TestFactory.createDefaultUserInfo());
 
@@ -1022,7 +1022,7 @@ class CourseServiceTests {
     void addQuizToSection_ValidCourseIdAndSectionId_AddsQuiz() {
         Course spy = spy(course);
         doNothing().when(spy).addQuizToSection(anyLong(), any());
-        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(spy);
 
         QuizDTO quizDTO = new QuizDTO("Quiz Title", "Quiz Description", 1L, 50);
         courseService.addQuizToSection(1L, 1L, quizDTO);
@@ -1032,7 +1032,7 @@ class CourseServiceTests {
 
     @Test
     void addQuizToSection_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         QuizDTO quizDTO = new QuizDTO("Quiz Title", "Quiz Description", 1L, 50);
 
@@ -1044,7 +1044,7 @@ class CourseServiceTests {
     void addQuizToSection_SectionNotFound_ThrowsException() {
         Course spy = spy(course);
         doThrow(new ResourceNotFoundException()).when(spy).addQuizToSection(anyLong(), any());
-        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(spy);
 
         QuizDTO quizDTO = new QuizDTO("Quiz Title", "Quiz Description", 1L, 50);
 
@@ -1057,7 +1057,7 @@ class CourseServiceTests {
         Course spy = spy(course);
 //        doReturn(false).when(spy).isNotPublishedOrDeleted();
         doReturn(true).when(spy).isPublishedAndNotUnpublishedOrDelete();
-        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(spy);
 
         QuizDTO quizDTO = new QuizDTO("Quiz Title", "Quiz Description", 1L, 50);
 
@@ -1071,19 +1071,19 @@ class CourseServiceTests {
         Course course = spy(this.course);
         QuizUpdateDTO quizUpdateDTO = new QuizUpdateDTO("Updated Title", "Updated Description", 85);
 
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doNothing().when(course).updateQuizInSection(2L, 3L, quizUpdateDTO.title(), quizUpdateDTO.description(), 85);
 
         courseService.updateQuiz(1L, 2L, 3L, quizUpdateDTO);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(course, times(1)).updateQuizInSection(2L, 3L, quizUpdateDTO.title(), quizUpdateDTO.description(), 85);
         verify(courseRepository, times(1)).save(course);
     }
 
     @Test
     void updateQuiz_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         QuizUpdateDTO quizUpdateDTO = new QuizUpdateDTO("Updated Title", "Updated Description", 85);
 
@@ -1096,7 +1096,7 @@ class CourseServiceTests {
         Course course = spy(this.course);
         QuizUpdateDTO quizUpdateDTO = new QuizUpdateDTO("Updated Title", "Updated Description", 85);
 
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doThrow(new ResourceNotFoundException()).when(course).updateQuizInSection(999L, 3L,
                 quizUpdateDTO.title(), quizUpdateDTO.description(), 85);
 
@@ -1109,7 +1109,7 @@ class CourseServiceTests {
         Course course = spy(this.course);
         QuizUpdateDTO quizUpdateDTO = new QuizUpdateDTO("Updated Title", "Updated Description", 85);
 
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doThrow(new ResourceNotFoundException()).when(course).updateQuizInSection(2L, 999L,
                 quizUpdateDTO.title(), quizUpdateDTO.description(), 85);
 
@@ -1122,7 +1122,7 @@ class CourseServiceTests {
         Course course = spy(this.course);
         QuizUpdateDTO quizUpdateDTO = new QuizUpdateDTO("Updated Title", "Updated Description", 85);
 
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doReturn(true).when(course).isPublishedAndNotUnpublishedOrDelete();
 
         assertThrows(InputInvalidException.class, () -> courseService.updateQuiz(1L, 2L, 3L, quizUpdateDTO));
@@ -1133,19 +1133,19 @@ class CourseServiceTests {
     @Test
     void deleteQuiz_ValidCourseIdAndSectionIdAndQuizId_DeletesQuiz() {
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doNothing().when(course).deleteQuizFromSection(2L, 3L);
 
         courseService.deleteQuiz(1L, 2L, 3L);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(course, times(1)).deleteQuizFromSection(2L, 3L);
         verify(courseRepository, times(1)).save(course);
     }
 
     @Test
     void deleteQuiz_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.deleteQuiz(1L, 2L, 3L));
         verify(courseRepository, never()).save(any(Course.class));
@@ -1154,7 +1154,7 @@ class CourseServiceTests {
     @Test
     void deleteQuiz_PublishedCourse_ThrowsException() {
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doReturn(true).when(course).isPublishedAndNotUnpublishedOrDelete();
 //        doReturn(false).when(course).isNotPublishedOrDeleted();
 
@@ -1165,19 +1165,19 @@ class CourseServiceTests {
     @Test
     void restoreQuiz_ValidCourseIdAndSectionIdAndQuizId_RestoresQuiz() {
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doNothing().when(course).restoreQuizInSection(2L, 3L);
 
         courseService.restoreQuiz(1L, 2L, 3L);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(course, times(1)).restoreQuizInSection(2L, 3L);
         verify(courseRepository, times(1)).save(course);
     }
 
     @Test
     void restoreQuiz_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.restoreQuiz(1L, 2L, 3L));
         verify(courseRepository, never()).save(any(Course.class));
@@ -1186,19 +1186,19 @@ class CourseServiceTests {
     @Test
     void deleteForceQuiz_ValidCourseIdAndSectionIdAndQuizId_ForceDeletesQuiz() {
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doNothing().when(course).forceDeleteQuizFromSection(2L, 3L);
 
         courseService.deleteForceQuiz(1L, 2L, 3L);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(course, times(1)).forceDeleteQuizFromSection(2L, 3L);
         verify(courseRepository, times(1)).save(course);
     }
 
     @Test
     void deleteForceQuiz_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.deleteForceQuiz(1L, 2L, 3L));
         verify(courseRepository, never()).save(any(Course.class));
@@ -1208,7 +1208,7 @@ class CourseServiceTests {
     void addQuestionToQuiz_ValidCourseIdAndSectionIdAndQuizId_AddsQuestion() {
         Course spy = spy(course);
         doNothing().when(spy).addQuestionToQuizInSection(anyLong(), anyLong(), any());
-        when(courseQueryService.findCourseById(1L)).thenReturn(spy);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(spy);
 
         QuestionDTO questionDTO = new QuestionDTO("Question content", QuestionType.SINGLE_CHOICE,
                 Set.of(new AnswerOptionDTO("Option 1", true), new AnswerOptionDTO("Option 2", false)), 1, null);
@@ -1219,7 +1219,7 @@ class CourseServiceTests {
 
     @Test
     void addQuestionToQuiz_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         QuestionDTO questionDTO = new QuestionDTO("Question content", QuestionType.SINGLE_CHOICE,
                 Set.of(new AnswerOptionDTO("Option 1", true), new AnswerOptionDTO("Option 2", false)), 1, null);
@@ -1232,7 +1232,7 @@ class CourseServiceTests {
     void updateQuestion_ValidCourseIdAndSectionIdAndQuizIdAndQuestionId_UpdatesQuestion() {
         Course course = spy(this.course);
 
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doNothing().when(course).updateQuestionInQuizInSection(anyLong(), anyLong(), any(), any(Question.class));
 
         QuestionDTO questionDTO = new QuestionDTO("Question content", QuestionType.SINGLE_CHOICE,
@@ -1240,13 +1240,13 @@ class CourseServiceTests {
 
         courseService.updateQuestion(1L, 2L, 3L, 4L, questionDTO);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(courseRepository, times(1)).save(course);
     }
 
     @Test
     void updateQuestion_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         QuestionDTO questionDTO = new QuestionDTO("Question content", QuestionType.SINGLE_CHOICE,
                 Set.of(new AnswerOptionDTO("Option 1", true), new AnswerOptionDTO("Option 2", false)), 1, null);
@@ -1258,19 +1258,19 @@ class CourseServiceTests {
     @Test
     void deleteQuestion_ValidCourseIdAndSectionIdAndQuizIdAndQuestionId_DeletesQuestion() {
         Course course = spy(this.course);
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
         doNothing().when(course).deleteQuestionFromQuizInSection(2L, 3L, 4L);
 
         courseService.deleteQuestion(1L, 2L, 3L, 4L);
 
-        verify(courseQueryService, times(1)).findCourseById(1L);
+        verify(courseQueryService, times(1)).findCourseById(1L, false);
         verify(course, times(1)).deleteQuestionFromQuizInSection(2L, 3L, 4L);
         verify(courseRepository, times(1)).save(course);
     }
 
     @Test
     void deleteQuestion_CourseNotFound_ThrowsException() {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.deleteQuestion(1L, 2L, 3L, 4L));
         verify(courseRepository, never()).save(any(Course.class));

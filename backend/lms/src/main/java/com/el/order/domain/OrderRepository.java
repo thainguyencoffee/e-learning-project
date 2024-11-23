@@ -14,18 +14,36 @@ public interface OrderRepository extends CrudRepository<Order, UUID> {
 
     Page<Order> findAll(Pageable pageable);
 
-    @Query("SELECT * FROM orders WHERE created_by = :createdBy LIMIT :size OFFSET :page * :size")
+    @Query("""
+        SELECT * 
+        FROM 
+            orders 
+        WHERE created_by = :createdBy 
+        LIMIT :size OFFSET :page * :size
+    """)
     List<Order> findAllByCreatedBy(String createdBy, int page, int size);
 
     Optional<Order> findByCreatedByAndId(String createdBy, UUID id);
 
-    @Query("SELECT COUNT(*) > 0 FROM orders o " +
-            "JOIN order_items oi ON o.id = oi.orders " +
-            "WHERE o.created_by = :username AND oi.course = :courseId")
+    @Query("""
+        SELECT 
+            COUNT(*) > 0 
+        FROM 
+            orders o
+        JOIN order_items oi ON o.id = oi.orders
+        WHERE o.created_by = :username 
+          AND oi.course = :courseId
+    """)
     boolean hasPurchasedCourse(@Param("courseId") Long courseId, @Param("username") String username);
 
-    @Query("SELECT oi.course FROM orders o JOIN order_items oi on o.id = oi.orders " +
-            "WHERE o.created_by = :createdBy")
+    @Query("""
+        SELECT 
+            oi.course 
+        FROM 
+            orders o 
+        JOIN order_items oi ON o.id = oi.orders 
+        WHERE o.created_by = :createdBy
+    """)
     List<Long> findPurchasedCourseIdsByUserId(String createdBy);
 
 }

@@ -7,7 +7,7 @@ import com.el.course.domain.Review;
 import javax.money.MonetaryAmount;
 import java.util.Set;
 
-public record CourseWithoutSectionsDTO(
+public record PublishedCourseDTO(
         Long id,
         String title,
         String thumbnailUrl,
@@ -22,8 +22,8 @@ public record CourseWithoutSectionsDTO(
         double averageRating
 ) {
 
-    public static CourseWithoutSectionsDTO fromCourse(Course course) {
-        return new CourseWithoutSectionsDTO(
+    public static PublishedCourseDTO fromCourse(Course course) {
+        return new PublishedCourseDTO(
                 course.getId(),
                 course.getTitle(),
                 course.getThumbnailUrl(),

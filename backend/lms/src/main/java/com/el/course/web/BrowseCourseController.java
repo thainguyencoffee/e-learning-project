@@ -1,7 +1,7 @@
 package com.el.course.web;
 
 import com.el.course.application.CourseQueryService;
-import com.el.course.application.dto.CourseWithoutSectionsDTO;
+import com.el.course.application.dto.PublishedCourseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -24,14 +24,14 @@ public class BrowseCourseController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CourseWithoutSectionsDTO>> getAllPublishedCourses(Pageable pageable) {
-        List<CourseWithoutSectionsDTO> result = courseQueryService.findAllCourseWithoutSectionsDTOs(pageable);
+    public ResponseEntity<Page<PublishedCourseDTO>> getAllPublishedCourses(Pageable pageable) {
+        List<PublishedCourseDTO> result = courseQueryService.findAllPublishedCoursesDTO(pageable);
         return ResponseEntity.ok(new PageImpl<>(result, pageable, result.size()));
     }
 
     @GetMapping("/{courseId}")
-    public ResponseEntity<CourseWithoutSectionsDTO> getPublishedCourseById(@PathVariable Long courseId) {
-        return ResponseEntity.ok(courseQueryService.findCourseWithoutSectionsDTOById(courseId));
+    public ResponseEntity<PublishedCourseDTO> getPublishedCourseById(@PathVariable Long courseId) {
+        return ResponseEntity.ok(courseQueryService.findCoursePublishedById(courseId));
     }
 
 }

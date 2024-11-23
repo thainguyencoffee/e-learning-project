@@ -93,7 +93,7 @@ class CourseManagementControllerTests {
 
     @Test
     void getCourseById_ShouldReturnCourse_WhenCourseExistsAndTeacherRole() throws Exception {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
 
         mockMvc.perform(get("/courses/1")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
@@ -103,7 +103,7 @@ class CourseManagementControllerTests {
 
     @Test
     void getCourseById_ShouldReturnCourse_WhenCourseExistsAndAdminRole() throws Exception {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
 
         mockMvc.perform(get("/courses/1")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
@@ -113,7 +113,7 @@ class CourseManagementControllerTests {
 
     @Test
     void getCourseById_ShouldReturnNotFound_WhenCourseDoesNotExist() throws Exception {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         mockMvc.perform(get("/courses/1")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))

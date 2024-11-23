@@ -45,7 +45,7 @@ public class CourseManagementController {
 
     @GetMapping("/{courseId}")
     public ResponseEntity<Course> getCourseById(@PathVariable Long courseId) {
-        return ResponseEntity.ok(courseQueryService.findCourseById(courseId));
+        return ResponseEntity.ok(courseQueryService.findCourseById(courseId, false));
     }
 
     @PostMapping
