@@ -32,9 +32,11 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
                 .exchange()
                 .expectStatus().isCreated()
                 .expectHeader().value("Location", location -> assertThat(location).contains("/courses/"))
-                .expectBody()
-                .jsonPath("$.title").isEqualTo(courseDTO.title())
-                .jsonPath("$.teacher").isEqualTo(teacher);
+                .expectBody(Long.class)
+                .value(id -> {
+                    assertThat(id).isNotNull();
+                    assertThat(id).isGreaterThan(0);
+                });
     }
 
     @Test
@@ -105,6 +107,11 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(courseUpdateDTO))
+                .exchange()
+                .expectStatus().isOk();
+
+        webTestClient.get().uri("/courses/{courseId}", course.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -289,44 +296,45 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         var courseDTO = TestFactory.createDefaultCourseDTO();
         Course course = createCourseWithParameters(teacherToken, courseDTO, false, null); // admin has the same permission as teacher
 
-        // Thiết lập giáo viên mới cho khóa học
-        var assignTeacherDTO = new AssignTeacherDTO("new-teacher-id");
+        var assignTeacherDTO = new AssignTeacherDTO(TestFactory.teacher);
 
-        // Gửi request PUT để cập nhật giáo viên cho khóa học
         webTestClient.put().uri("/courses/{courseId}/assign-teacher", course.getId())
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(assignTeacherDTO))  // Body của request là JSON AssignTeacherDTO
+                .body(BodyInserters.fromValue(assignTeacherDTO))
+                .exchange()
+                .expectStatus().isOk();
+
+        webTestClient.get().uri("/courses/{courseId}", course.getId())
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.teacher").isEqualTo("new-teacher-id");  // Kiểm tra giáo viên đã được cập nhật
+                .jsonPath("$.teacher").isEqualTo(TestFactory.teacher);
+        
+        // other teachers can't access the course
     }
 
     @Test
     void testAssignTeacher_Forbidden() {
-        // Thiết lập giáo viên mới cho khóa học
-        var assignTeacherDTO = new AssignTeacherDTO("new-teacher-id");
+        var assignTeacherDTO = new AssignTeacherDTO(TestFactory.teacher);
 
-        // Gửi request PUT để cập nhật giáo viên cho khóa học
         webTestClient.put().uri("/courses/{courseId}/assign-teacher", 1)
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(assignTeacherDTO))  // Body của request là JSON AssignTeacherDTO
+                .body(BodyInserters.fromValue(assignTeacherDTO))
                 .exchange()
                 .expectStatus().isForbidden();
     }
 
     @Test
     void testAssignTeacher_NotFound() {
-        // Thiết lập giáo viên mới cho khóa học
-        var assignTeacherDTO = new AssignTeacherDTO("new-teacher-id");
+        var assignTeacherDTO = new AssignTeacherDTO(TestFactory.teacher);
 
-        // Gửi request PUT để cập nhật giáo viên cho khóa học không tồn tại
         webTestClient.put().uri("/courses/{courseId}/assign-teacher", 999)
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(assignTeacherDTO))  // Body của request là JSON AssignTeacherDTO
+                .body(BodyInserters.fromValue(assignTeacherDTO))
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -338,7 +346,6 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
-        // Gửi request POST để yêu cầu xuất bản khóa học
         webTestClient.post().uri("/courses/{courseId}/requests", course.getId())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .body(BodyInserters.fromValue(TestFactory.createDefaultCourseRequestDTOPublish()))
@@ -357,7 +364,6 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
         Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
 
-        // Gửi request POST để yêu cầu xuất bản khóa học
         webTestClient.post().uri("/courses/{courseId}/requests", course.getId())
                 .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
                 .body(BodyInserters.fromValue(TestFactory.createDefaultCourseRequestDTOPublish()))
@@ -367,7 +373,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         var requestId = courseRepository.findById(course.getId()).get().getCourseRequests().iterator().next().getId();
 
         CourseRequestApproveDTO approveDTO = TestFactory.createDefaultCourseRequestApproveDTOPublish();
-        // Gửi request PUT để duyệt yêu cầu xuất bản khóa học
+
         webTestClient.put().uri("/courses/{courseId}/requests/{requestId}/approve", course.getId(), requestId)
                 .headers(header -> header.setBearerAuth(bossToken.getAccessToken()))
                 .body(BodyInserters.fromValue(approveDTO))

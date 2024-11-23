@@ -10,9 +10,9 @@ import java.util.Map;
 
 public interface CourseService {
 
-    Course createCourse(String teacher, CourseDTO courseDTO);
+    Long createCourse(String teacher, CourseDTO courseDTO);
 
-    Course updateCourse(Long courseId, CourseUpdateDTO courseUpdateDTO);
+    void updateCourse(Long courseId, CourseUpdateDTO courseUpdateDTO);
 
     void deleteCourse(Long courseId);
 
@@ -20,7 +20,7 @@ public interface CourseService {
 
     void restoreCourse(Long courseId);
 
-    Course assignTeacher(Long courseId, String teacher);
+    void assignTeacher(Long courseId, String teacher);
 
     Long addSection(Long courseId, CourseSectionDTO courseSectionDTO);
 

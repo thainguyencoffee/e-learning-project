@@ -1,5 +1,6 @@
 package com.el.course.application;
 
+import com.el.course.application.dto.CourseInTrashDTO;
 import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.domain.*;
 import org.springframework.data.domain.Page;
@@ -11,9 +12,9 @@ public interface CourseQueryService {
 
     Page<Course> findAllCourses(Pageable pageable);
 
-    Page<Course> findTrashedCourses(Pageable pageable);
-
     Course findCourseById(Long courseId);
+
+    List<CourseInTrashDTO> findAllCoursesInTrash(Pageable pageable);
 
     Course findCourseInTrashById(Long courseId);
 

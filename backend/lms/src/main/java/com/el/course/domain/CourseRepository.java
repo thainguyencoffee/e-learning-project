@@ -2,6 +2,7 @@ package com.el.course.domain;
 
 import com.el.common.projection.MonthStats;
 import com.el.common.projection.RatingMonthStats;
+import com.el.course.application.dto.CourseInTrashDTO;
 import com.el.course.application.dto.teacher.CountDataDTO;
 import com.el.enrollment.application.dto.CourseInfoDTO;
 import org.springframework.data.domain.Page;
@@ -149,4 +150,21 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
     """)
     Optional<Quiz> findQuizByQuizId(Long quizId);
 
+
+    /*New version*/
+    @Query("""
+        SELECT c.id, c.title, c.thumbnail_url, c.description, c.teacher, c.language
+            FROM course c
+            WHERE c.deleted = true
+            LIMIT :size OFFSET :page * :size
+    """)
+    List<CourseInTrashDTO> findAllCoursesInTrash(int page, int size);
+
+    @Query("""
+        SELECT c.id, c.title, c.thumbnail_url, c.description, c.teacher, c.language
+            FROM course c
+            WHERE c.teacher = :teacher AND c.deleted = true
+            LIMIT :size OFFSET :page * :size
+    """)
+    List<CourseInTrashDTO> findAllCoursesInTrashByTeacher(String teacher, int page, int size);
 }

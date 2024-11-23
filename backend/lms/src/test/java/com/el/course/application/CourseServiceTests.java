@@ -260,6 +260,7 @@ class CourseServiceTests {
 
     @Test
     void assignTeacher_ValidCourseIdAndTeacher_AssignsTeacher() {
+        when(rolesBaseUtil.isAdmin()).thenReturn(true);
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
 
         courseService.assignTeacher(1L, "NewTeacher");
@@ -268,7 +269,16 @@ class CourseServiceTests {
     }
 
     @Test
+    void assignTeacher_NotAdmin_ThrowsException() {
+        when(rolesBaseUtil.isAdmin()).thenReturn(false);
+
+        assertThrows(AccessDeniedException.class, () -> courseService.assignTeacher(1L, "NewTeacher"));
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
     void assignTeacher_CourseNotFound_ThrowsException() {
+        when(rolesBaseUtil.isAdmin()).thenReturn(true);
         when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
 
         assertThrows(ResourceNotFoundException.class, () -> courseService.assignTeacher(1L, "NewTeacher"));
@@ -278,6 +288,7 @@ class CourseServiceTests {
     @Test
     void assignTeacher_NullTeacher_ThrowsException() {
         when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
         assertThrows(InputInvalidException.class, () -> courseService.assignTeacher(1L, null));
         verify(courseRepository, never()).save(any(Course.class));
@@ -287,8 +298,8 @@ class CourseServiceTests {
     void assignTeacher_PublishedCourse_ThrowsException() {
         Course courseMock = spy(course);
         when(courseQueryService.findCourseById(1L)).thenReturn(courseMock);
+        when(rolesBaseUtil.isAdmin()).thenReturn(true);
 
-//        doReturn(false).when(courseMock).isNotPublishedOrDeleted();
         doReturn(true).when(courseMock).isPublishedAndNotUnpublishedOrDelete();
 
         assertThrows(InputInvalidException.class, () -> courseService.assignTeacher(1L, "NewTeacher"));

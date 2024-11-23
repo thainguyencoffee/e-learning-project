@@ -1,12 +1,14 @@
 package com.el.course.web;
 
 import com.el.course.application.*;
+import com.el.course.application.dto.CourseInTrashDTO;
 import com.el.course.domain.Course;
 import com.el.course.domain.RequestType;
 import com.el.course.web.dto.*;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,6 +17,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -35,8 +38,9 @@ public class CourseManagementController {
     }
 
     @GetMapping("/trash")
-    public ResponseEntity<Page<Course>> getTrashedCourses(Pageable pageable) {
-        return ResponseEntity.ok(courseQueryService.findTrashedCourses(pageable));
+    public ResponseEntity<Page<CourseInTrashDTO>> getTrashedCourses(Pageable pageable) {
+        List<CourseInTrashDTO> result = courseQueryService.findAllCoursesInTrash(pageable);
+        return ResponseEntity.ok(new PageImpl<>(result, pageable, result.size()));
     }
 
     @GetMapping("/{courseId}")
@@ -45,21 +49,21 @@ public class CourseManagementController {
     }
 
     @PostMapping
-    public ResponseEntity<Course> createCourse(
+    public ResponseEntity<Long> createCourse(
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody @Valid CourseDTO courseDTO
     ) {
         String teacher = jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME);
-        Course createdCourse = courseService.createCourse(teacher, courseDTO);
-        URI location = URI.create("/courses/" + createdCourse.getId());
-        return ResponseEntity.created(location).body(createdCourse);
+        var courseId = courseService.createCourse(teacher, courseDTO);
+        URI location = URI.create("/courses/" + courseId);
+        return ResponseEntity.created(location).body(courseId);
     }
 
     @PutMapping("/{courseId}")
-    public ResponseEntity<Course> updateCourse(@PathVariable Long courseId,
+    public ResponseEntity<Void> updateCourse(@PathVariable Long courseId,
                                                @RequestBody @Valid CourseUpdateDTO courseUpdateDTO) {
-        Course updatedCourse = courseService.updateCourse(courseId, courseUpdateDTO);
-        return ResponseEntity.ok(updatedCourse);
+        courseService.updateCourse(courseId, courseUpdateDTO);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{courseId}")
@@ -119,9 +123,10 @@ public class CourseManagementController {
     }
 
     @PutMapping("/{courseId}/assign-teacher")
-    public ResponseEntity<Course> assignTeacher(@PathVariable Long courseId,
+    public ResponseEntity<Void> assignTeacher(@PathVariable Long courseId,
                                                 @Valid @RequestBody AssignTeacherDTO assignTeacherDTO) {
-        return ResponseEntity.ok(courseService.assignTeacher(courseId, assignTeacherDTO.teacher()));
+        courseService.assignTeacher(courseId, assignTeacherDTO.teacher());
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{courseId}/sections")

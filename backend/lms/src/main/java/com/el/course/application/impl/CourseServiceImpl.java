@@ -5,7 +5,6 @@ import com.el.common.exception.AccessDeniedException;
 import com.el.course.application.CourseQueryService;
 import com.el.course.application.CourseService;
 import com.el.course.application.EnsureEnrolmentCompleted;
-//import com.el.course.application.dto.*;
 import com.el.course.domain.*;
 import com.el.course.web.dto.*;
 import org.springframework.stereotype.Service;
@@ -34,13 +33,14 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course createCourse(String teacher, CourseDTO courseDTO) {
+    public Long createCourse(String teacher, CourseDTO courseDTO) {
         Course course = courseDTO.toCourse(teacher);
-        return courseRepository.save(course);
+        courseRepository.save(course);
+        return course.getId();
     }
 
     @Override
-    public Course updateCourse(Long courseId, CourseUpdateDTO courseUpdateDTO) {
+    public void updateCourse(Long courseId, CourseUpdateDTO courseUpdateDTO) {
         Course course = courseQueryService.findCourseById(courseId);
 
         if (cannotUpdateCourse(course)) {
@@ -54,7 +54,7 @@ public class CourseServiceImpl implements CourseService {
                 courseUpdateDTO.benefits(),
                 courseUpdateDTO.prerequisites(),
                 courseUpdateDTO.subtitles());
-        return courseRepository.save(course);
+        courseRepository.save(course);
     }
 
     @Override
@@ -95,11 +95,13 @@ public class CourseServiceImpl implements CourseService {
 
 
     @Override
-    public Course assignTeacher(Long courseId, String teacher) {
+    public void assignTeacher(Long courseId, String teacher) {
+        if (!rolesBaseUtil.isAdmin()) {
+            throw new AccessDeniedException("Only admin can assign teacher to course");
+        }
         Course existsCourse = courseQueryService.findCourseById(courseId);
         existsCourse.assignTeacher(teacher);
         courseRepository.save(existsCourse);
-        return existsCourse;
     }
 
 

@@ -4,6 +4,7 @@ import com.el.common.RolesBaseUtil;
 import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
+import com.el.course.application.dto.CourseInTrashDTO;
 import com.el.course.application.dto.CourseWithoutSectionsDTO;
 import com.el.course.domain.*;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
@@ -38,17 +39,6 @@ public class CourseQueryServiceImpl implements CourseQueryService {
     }
 
     @Override
-    public Page<Course> findTrashedCourses(Pageable pageable) {
-        if (rolesBaseUtil.isAdmin()) {
-            return courseRepository.findAllByDeleted(true, pageable);
-        } else if(rolesBaseUtil.isTeacher()) {
-            String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
-            return courseRepository.findAllByTeacherAndDeleted(teacher, true, pageable);
-        }
-        throw new AccessDeniedException("Access denied");
-    }
-
-    @Override
     public Course findCourseById(Long courseId) {
         if (rolesBaseUtil.isAdmin()) {
             return courseRepository.findByIdAndDeleted(courseId, false)
@@ -57,6 +47,19 @@ public class CourseQueryServiceImpl implements CourseQueryService {
             String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
             return courseRepository.findByTeacherAndIdAndDeleted(teacher, courseId, false)
                     .orElseThrow(ResourceNotFoundException::new);
+        }
+        throw new AccessDeniedException("Access denied");
+    }
+
+    @Override
+    public List<CourseInTrashDTO> findAllCoursesInTrash(Pageable pageable) {
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+        if (rolesBaseUtil.isAdmin()) {
+            return courseRepository.findAllCoursesInTrash(page, size);
+        } else if(rolesBaseUtil.isTeacher()) {
+            String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+            return courseRepository.findAllCoursesInTrashByTeacher(teacher, page, size);
         }
         throw new AccessDeniedException("Access denied");
     }
