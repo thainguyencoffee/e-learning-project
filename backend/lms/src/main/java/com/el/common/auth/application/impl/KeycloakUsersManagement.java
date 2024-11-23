@@ -48,19 +48,6 @@ public class KeycloakUsersManagement implements UsersManagement {
     }
 
     @Override
-    public List<UserRepresentation> search(String username, Boolean exact, Pageable pageable) {
-        return List.of();
-    }
-
-    @Override
-    public List<UserRepresentation> search(String username, Boolean exact, String roleName) {
-        List<UserRepresentation> users = keycloak.realm(realmName).users().searchByUsername(username, exact);
-        return users.stream()
-                .filter(user -> hasRole(user, roleName))
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<UserRepresentation> search(String username, Boolean exact, String roleName, Pageable pageable) {
         int pageNumber = pageable.getPageNumber();
         int pageSize = pageable.getPageSize();
@@ -101,27 +88,5 @@ public class KeycloakUsersManagement implements UsersManagement {
                 .listAll();
         return roles.stream().anyMatch(role -> role.getName().equals(roleName));
     }
-
-
-    @Override
-    public List<UserRepresentation> searchByEmail(String email, Boolean exact) {
-        return keycloak.realm(realmName).users().searchByEmail(email, exact);
-    }
-
-    @Override
-    public List<UserRepresentation> searchByFirstName(String firstName, Boolean exact) {
-        return keycloak.realm(realmName).users().searchByFirstName(firstName, exact);
-    }
-
-    @Override
-    public List<UserRepresentation> searchByLastName(String lastName, Boolean exact) {
-        return keycloak.realm(realmName).users().searchByLastName(lastName, exact);
-    }
-
-    @Override
-    public List<UserRepresentation> search(String search, Integer first, Integer max) {
-        return keycloak.realm(realmName).users().search(search, first, max);
-    }
-
 
 }
