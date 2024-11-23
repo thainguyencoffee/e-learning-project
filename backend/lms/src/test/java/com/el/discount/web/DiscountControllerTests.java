@@ -6,7 +6,7 @@ import com.el.common.config.SecurityConfig;
 import com.el.common.config.jackson.JacksonCustomizations;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.discount.application.DiscountService;
-import com.el.discount.application.dto.DiscountDTO;
+import com.el.discount.web.dto.DiscountDTO;
 import com.el.discount.domain.Discount;
 import com.el.discount.domain.Type;
 import com.fasterxml.jackson.databind.ObjectMapper;

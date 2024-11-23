@@ -1,13 +1,11 @@
 package com.el;
 
 import com.el.common.Currencies;
-import com.el.course.application.dto.*;
 import com.el.course.domain.Course;
 import com.el.course.domain.CourseRepository;
 import com.el.course.domain.Lesson;
-import com.el.course.web.dto.CourseRequestApproveDTO;
-import com.el.course.web.dto.UpdatePriceDTO;
-import com.el.discount.application.dto.DiscountDTO;
+import com.el.course.web.dto.*;
+import com.el.discount.web.dto.DiscountDTO;
 import com.el.discount.domain.DiscountRepository;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

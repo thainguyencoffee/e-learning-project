@@ -4,7 +4,10 @@ import com.el.common.RolesBaseUtil;
 import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
-import com.el.course.application.dto.CourseWithoutSectionsDTO;
+import com.el.course.application.dto.CourseInTrashDTO;
+import com.el.course.application.dto.PostInTrashDTO;
+import com.el.course.application.dto.PublishedCourseDTO;
+import com.el.course.application.dto.QuizInTrashDTO;
 import com.el.course.domain.*;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
 import org.springframework.data.domain.Page;
@@ -30,7 +33,9 @@ public class CourseQueryServiceImpl implements CourseQueryService {
     public Page<Course> findAllCourses(Pageable pageable) {
         if (rolesBaseUtil.isAdmin()) {
             return courseRepository.findAllByDeleted(false, pageable);
-        } else if(rolesBaseUtil.isTeacher()) {
+        }
+
+        if(rolesBaseUtil.isTeacher()) {
             String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
             return courseRepository.findAllByTeacherAndDeleted(teacher, false, pageable);
         }
@@ -38,69 +43,59 @@ public class CourseQueryServiceImpl implements CourseQueryService {
     }
 
     @Override
-    public Page<Course> findTrashedCourses(Pageable pageable) {
+    public Course findCourseById(Long courseId, Boolean deleted) {
         if (rolesBaseUtil.isAdmin()) {
-            return courseRepository.findAllByDeleted(true, pageable);
-        } else if(rolesBaseUtil.isTeacher()) {
-            String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
-            return courseRepository.findAllByTeacherAndDeleted(teacher, true, pageable);
+            return courseRepository.findByIdAndDeleted(courseId, deleted)
+                    .orElseThrow(ResourceNotFoundException::new);
         }
+
+        if(rolesBaseUtil.isTeacher()) {
+            String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+            return courseRepository.findByIdAndDeletedAndTeacher(courseId, deleted, teacher)
+                    .orElseThrow(ResourceNotFoundException::new);
+        }
+
         throw new AccessDeniedException("Access denied");
     }
 
     @Override
-    public Course findCourseById(Long courseId) {
-        if (rolesBaseUtil.isAdmin()) {
-            return courseRepository.findByIdAndDeleted(courseId, false)
-                    .orElseThrow(ResourceNotFoundException::new);
-        } else if(rolesBaseUtil.isTeacher()) {
-            String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
-            return courseRepository.findByTeacherAndIdAndDeleted(teacher, courseId, false)
-                    .orElseThrow(ResourceNotFoundException::new);
-        }
-        throw new AccessDeniedException("Access denied");
-    }
+    public List<CourseInTrashDTO> findAllCoursesInTrash(Pageable pageable) {
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
 
-    @Override
-    public Course findCourseInTrashById(Long courseId) {
         if (rolesBaseUtil.isAdmin()) {
-            return courseRepository.findByIdAndDeleted(courseId, true)
-                    .orElseThrow(ResourceNotFoundException::new);
-        } else if(rolesBaseUtil.isTeacher()) {
-            String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
-            return courseRepository.findByTeacherAndIdAndDeleted(teacher, courseId, true)
-                    .orElseThrow(ResourceNotFoundException::new);
+            return courseRepository.findAllCoursesInTrash(page, size);
         }
-        throw new AccessDeniedException("Access denied");
-    }
 
-    @Override
-    public Course findCourseDeleted(Long courseId) {
-        return courseRepository.findByIdAndDeleted(courseId, true)
-                .orElseThrow(ResourceNotFoundException::new);
+        if(rolesBaseUtil.isTeacher()) {
+            String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+            return courseRepository.findAllCoursesInTrashByTeacher(teacher, page, size);
+        }
+
+        throw new AccessDeniedException("Access denied");
     }
 
     @Override
     public Course findPublishedCourseById(Long courseId) {
-        return courseRepository.findByIdAndPublishedAndDeleted(courseId, true, false)
+        return courseRepository.findByIdAndDeletedAndPublished(courseId, false, true)
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
     public Page<Course> findAllPublishedCourses(Pageable pageable) {
-        return courseRepository.findAllByPublishedAndDeleted(true, false, pageable);
+        return courseRepository.findAllByDeletedAndPublished(false,true, pageable);
     }
 
     @Override
-    public List<CourseWithoutSectionsDTO> findAllCourseWithoutSectionsDTOs(Pageable pageable) {
+    public List<PublishedCourseDTO> findAllPublishedCoursesDTO(Pageable pageable) {
         Page<Course> courses = findAllPublishedCourses(pageable);
-        return courses.getContent().stream().map(CourseWithoutSectionsDTO::fromCourse).toList();
+        return courses.getContent().stream().map(PublishedCourseDTO::fromCourse).toList();
     }
 
     @Override
-    public CourseWithoutSectionsDTO findCourseWithoutSectionsDTOById(Long courseId) {
+    public PublishedCourseDTO findCoursePublishedById(Long courseId) {
         Course course = findPublishedCourseById(courseId);
-        return CourseWithoutSectionsDTO.fromCourse(course);
+        return PublishedCourseDTO.fromCourse(course);
     }
 
     @Override
@@ -109,17 +104,14 @@ public class CourseQueryServiceImpl implements CourseQueryService {
         int size = pageable.getPageSize();
         String currentUser = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
 
-        if (rolesBaseUtil.isAdmin()) {
-            return courseRepository.findAllPostsByCourseIdAndDeleted(courseId, false, page, size);
-        }
+        if (rolesBaseUtil.isAdmin())
+            return courseRepository.findAllPostsByCourseId(courseId, page, size);
 
-        if(rolesBaseUtil.isTeacher()) {
-            return courseRepository.findAllPostsByCourseIdAndTeacherAndDeleted(courseId, currentUser, false, page, size);
-        }
+        if(rolesBaseUtil.isTeacher())
+            return courseRepository.findAllPostsByCourseIdAndTeacher(courseId, currentUser, page, size);
 
-        if (rolesBaseUtil.isUser() && isUserEnrolled(courseId, currentUser)) {
-            return courseRepository.findAllPostsByCourseIdAndDeleted(courseId, false, page, size);
-        }
+        if (rolesBaseUtil.isUser() && isUserEnrolled(courseId, currentUser))
+            return courseRepository.findAllPostsByCourseId(courseId, page, size);
 
         throw new AccessDeniedException("Access denied");
     }
@@ -128,34 +120,29 @@ public class CourseQueryServiceImpl implements CourseQueryService {
     public Post findPostByCourseIdAndPostId(Long courseId, Long postId) {
         String currentUser = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
 
-        if (rolesBaseUtil.isAdmin()) {
+        if (rolesBaseUtil.isAdmin())
             return findPost(courseId, postId);
-        }
 
-        if(rolesBaseUtil.isTeacher()) {
+        if(rolesBaseUtil.isTeacher())
             return findPostForTeacher(courseId, postId, currentUser);
-        }
 
-        if (rolesBaseUtil.isUser() && isUserEnrolled(courseId, currentUser)) {
+        if (rolesBaseUtil.isUser() && isUserEnrolled(courseId, currentUser))
             return findPost(courseId, postId);
-        }
 
         throw new AccessDeniedException("Access denied");
     }
 
     @Override
-    public List<Post> findTrashedPosts(Long courseId, Pageable pageable) {
+    public List<PostInTrashDTO> findAllPostsInTrash(Long courseId, Pageable pageable) {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
         String currentUser = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
 
-        if (rolesBaseUtil.isAdmin()) {
-            return courseRepository.findAllPostsByCourseIdAndDeleted(courseId, true, page, size);
-        }
+        if (rolesBaseUtil.isAdmin())
+            return courseRepository.findAllPostsInTrashByCourseId(courseId, page, size);
 
-        if(rolesBaseUtil.isTeacher()) {
-            return courseRepository.findAllPostsByCourseIdAndTeacherAndDeleted(courseId, currentUser, true, page, size);
-        }
+        if(rolesBaseUtil.isTeacher())
+            return courseRepository.findAllPostsInTrashByCourseIdAndTeacher(courseId, currentUser, page, size);
 
         throw new AccessDeniedException("Access denied");
     }
@@ -166,49 +153,46 @@ public class CourseQueryServiceImpl implements CourseQueryService {
         int size = pageable.getPageSize();
         String currentUser = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
 
-        if (rolesBaseUtil.isAdmin()) {
+        if (rolesBaseUtil.isAdmin())
             return courseRepository.findAllCommentsByCourseIdAndPostId(courseId, postId, page, size);
-        }
 
-        if(rolesBaseUtil.isTeacher()) {
+        if(rolesBaseUtil.isTeacher())
             return courseRepository.findAllCommentsByCourseIdAndPostIdAndTeacher(courseId, postId, currentUser, page, size);
-        }
 
-        if (rolesBaseUtil.isUser() && isUserEnrolled(courseId, currentUser)) {
+        if (rolesBaseUtil.isUser() && isUserEnrolled(courseId, currentUser))
             return courseRepository.findAllCommentsByCourseIdAndPostId(courseId, postId, page, size);
-        }
 
         throw new AccessDeniedException("Access denied");
     }
 
     @Override
-    public List<Quiz> findQuizzesByCourseIdAndSectionId(Long courseId, Long sectionId, Pageable pageable) {
+    public List<Quiz> findAllQuizzes(Long courseId, Long sectionId, Pageable pageable) {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
         String currentUser = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
 
         if (rolesBaseUtil.isAdmin()) {
-            return courseRepository.findAllQuizzesByCourseIdAndSectionIdAndDeleted(courseId, sectionId, false, page, size);
+            return courseRepository.findAllQuizzesByCourseIdAndSectionId(courseId, sectionId, page, size);
         }
 
         if(rolesBaseUtil.isTeacher()) {
-            return courseRepository.findAllQuizzesByCourseIdAndSectionIdAndTeacherAndDeleted(courseId, sectionId, currentUser, false, page, size);
+            return courseRepository.findAllQuizzesByCourseIdAndSectionIdAndTeacher(courseId, sectionId, currentUser, page, size);
         }
 
         throw new AccessDeniedException("Access denied");
     }
 
     @Override
-    public Quiz findQuizByCourseIdAndSectionIdAndQuizId(Long courseId, Long sectionId, Long quizId) {
+    public Quiz findQuizById(Long courseId, Long sectionId, Long quizId) {
         String currentUser = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
 
         if (rolesBaseUtil.isAdmin()) {
-            return courseRepository.findQuizByCourseIdAndSectionIdAndQuizIdAndDeleted(courseId, sectionId, quizId, false)
+            return courseRepository.findQuizByCourseIdAndSectionIdAndQuizId(courseId, sectionId, quizId)
                     .orElseThrow(ResourceNotFoundException::new);
         }
 
         if(rolesBaseUtil.isTeacher()) {
-            return courseRepository.findQuizByCourseIdAndSectionIdAndQuizIdAndTeacherAndDeleted(courseId, sectionId, quizId, currentUser, false)
+            return courseRepository.findQuizByCourseIdAndSectionIdAndQuizIdAndTeacher(courseId, sectionId, quizId, currentUser)
                     .orElseThrow(ResourceNotFoundException::new);
         }
 
@@ -216,17 +200,17 @@ public class CourseQueryServiceImpl implements CourseQueryService {
     }
 
     @Override
-    public List<Quiz> findTrashQuizzesByCourseIdAndSectionId(Long courseId, Long sectionId, Pageable pageable) {
+    public List<QuizInTrashDTO> findAllQuizzesInTrash(Long courseId, Long sectionId, Pageable pageable) {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
         String currentUser = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
 
         if (rolesBaseUtil.isAdmin()) {
-            return courseRepository.findAllQuizzesByCourseIdAndSectionIdAndDeleted(courseId, sectionId, true, page, size);
+            return courseRepository.findAllPostsInTrashByCourseIdAndSectionId(courseId, sectionId, page, size);
         }
 
         if(rolesBaseUtil.isTeacher()) {
-            return courseRepository.findAllQuizzesByCourseIdAndSectionIdAndTeacherAndDeleted(courseId, sectionId, currentUser, true, page, size);
+            return courseRepository.findAllPostsInTrashByCourseIdAndSectionIdAndTeacher(courseId, sectionId, currentUser, page, size);
         }
 
         throw new AccessDeniedException("Access denied");
@@ -249,12 +233,12 @@ public class CourseQueryServiceImpl implements CourseQueryService {
     }
 
     private Post findPost(Long courseId, Long postId) {
-        return courseRepository.findPostByCourseIdAndPostIdAndDeleted(courseId, postId, false)
+        return courseRepository.findPostByCourseIdAndPostId(courseId, postId)
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
     private Post findPostForTeacher(Long courseId, Long postId, String teacher) {
-        return courseRepository.findPostByCourseIdAndPostIdAndTeacherAndDeleted(courseId, postId, teacher, false)
+        return courseRepository.findPostByCourseIdAndPostIdAndTeacher(courseId, postId, teacher)
                 .orElseThrow(ResourceNotFoundException::new);
     }
 

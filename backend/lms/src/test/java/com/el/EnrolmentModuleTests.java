@@ -1,11 +1,11 @@
 package com.el;
 
 import com.el.common.Currencies;
-import com.el.course.application.dto.CourseSectionDTO;
+import com.el.course.web.dto.CourseSectionDTO;
 import com.el.course.domain.Course;
-import com.el.order.application.dto.OrderItemDTO;
-import com.el.order.application.dto.OrderRequestDTO;
-import com.el.payment.application.PaymentRequest;
+import com.el.order.web.dto.OrderItemDTO;
+import com.el.order.web.dto.OrderRequestDTO;
+import com.el.payment.web.dto.PaymentRequest;
 import com.el.payment.domain.PaymentMethod;
 import org.javamoney.moneta.Money;
 import org.springframework.http.MediaType;

@@ -1,19 +1,18 @@
 package com.el.course.application;
 
-import com.el.course.application.dto.*;
 import com.el.course.domain.Course;
 import com.el.course.domain.Lesson;
-import com.el.course.application.dto.QuizCalculationResult;
+import com.el.course.domain.QuizCalculationResult;
+import com.el.course.web.dto.*;
 
 import javax.money.MonetaryAmount;
 import java.util.Map;
-import java.util.Set;
 
 public interface CourseService {
 
-    Course createCourse(String teacher, CourseDTO courseDTO);
+    Long createCourse(String teacher, CourseDTO courseDTO);
 
-    Course updateCourse(Long courseId, CourseUpdateDTO courseUpdateDTO);
+    void updateCourse(Long courseId, CourseUpdateDTO courseUpdateDTO);
 
     void deleteCourse(Long courseId);
 
@@ -21,7 +20,7 @@ public interface CourseService {
 
     void restoreCourse(Long courseId);
 
-    Course assignTeacher(Long courseId, String teacher);
+    void assignTeacher(Long courseId, String teacher);
 
     Long addSection(Long courseId, CourseSectionDTO courseSectionDTO);
 

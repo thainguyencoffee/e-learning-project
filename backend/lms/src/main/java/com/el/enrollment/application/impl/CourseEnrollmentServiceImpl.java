@@ -6,15 +6,15 @@ import com.el.common.exception.AccessDeniedException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
 import com.el.course.application.CourseService;
-import com.el.course.application.dto.CourseWithoutSectionsDTO;
+import com.el.course.application.dto.PublishedCourseDTO;
 import com.el.course.domain.Course;
-import com.el.course.application.dto.QuizCalculationResult;
+import com.el.course.domain.QuizCalculationResult;
 import com.el.course.domain.Quiz;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
 import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
 import com.el.enrollment.application.dto.QuizDetailDTO;
-import com.el.enrollment.application.dto.QuizSubmitDTO;
+import com.el.enrollment.web.dto.QuizSubmitDTO;
 import com.el.enrollment.domain.CourseEnrollment;
 import com.el.enrollment.domain.CourseEnrollmentRepository;
 import com.el.enrollment.domain.LessonProgress;
@@ -137,8 +137,8 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     public void createCertificate(Long id, String student, Long courseId) {
         CourseEnrollment enrollment = repository.findByIdAndStudent(id, student)
                 .orElseThrow(ResourceNotFoundException::new);
-        CourseWithoutSectionsDTO courseInfo =
-                courseQueryService.findCourseWithoutSectionsDTOById(courseId);
+        PublishedCourseDTO courseInfo =
+                courseQueryService.findCoursePublishedById(courseId);
         UserRepresentation userRepresentation = usersManagement.getUser(student);
 
         enrollment.createCertificate(getFullName(userRepresentation),

@@ -8,7 +8,6 @@ import com.el.common.config.SecurityConfig;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
-import com.el.course.application.dto.*;
 import com.el.course.application.impl.CourseServiceImpl;
 import com.el.course.domain.Course;
 import com.el.course.domain.Language;
@@ -94,7 +93,7 @@ class CourseManagementControllerTests {
 
     @Test
     void getCourseById_ShouldReturnCourse_WhenCourseExistsAndTeacherRole() throws Exception {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
 
         mockMvc.perform(get("/courses/1")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
@@ -104,7 +103,7 @@ class CourseManagementControllerTests {
 
     @Test
     void getCourseById_ShouldReturnCourse_WhenCourseExistsAndAdminRole() throws Exception {
-        when(courseQueryService.findCourseById(1L)).thenReturn(course);
+        when(courseQueryService.findCourseById(1L, false)).thenReturn(course);
 
         mockMvc.perform(get("/courses/1")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
@@ -114,7 +113,7 @@ class CourseManagementControllerTests {
 
     @Test
     void getCourseById_ShouldReturnNotFound_WhenCourseDoesNotExist() throws Exception {
-        when(courseQueryService.findCourseById(1L)).thenThrow(new ResourceNotFoundException());
+        when(courseQueryService.findCourseById(1L, false)).thenThrow(new ResourceNotFoundException());
 
         mockMvc.perform(get("/courses/1")
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
@@ -136,17 +135,9 @@ class CourseManagementControllerTests {
 
     @Test
     public void testCreateCourse_ShouldReturnCreatedStatus() throws Exception {
-        Course createdCourse = Mockito.mock(Course.class);
-        when(createdCourse.getId()).thenReturn(1L);
-
-        // Mock
-        when(createdCourse.getTitle()).thenReturn(courseDTO.title());
-        when(createdCourse.getDescription()).thenReturn(courseDTO.description());
-        when(createdCourse.getTeacher()).thenReturn("teacher123");
-
         // Mock
         when(courseService.createCourse(any(), any()))
-                .thenReturn(createdCourse);
+                .thenReturn(1L);
 
         mockMvc.perform(post("/courses")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -154,8 +145,7 @@ class CourseManagementControllerTests {
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher"))))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/courses/1"))
-                .andExpect(jsonPath("$.title").value(courseDTO.title()))
-                .andExpect(jsonPath("$.teacher").value("teacher123"));
+                .andExpect(content().string("1"));
     }
 
     @Test
@@ -188,22 +178,14 @@ class CourseManagementControllerTests {
 
     @Test
     void testUpdateInfoCourse_ShouldReturnOKStatus() throws Exception {
-        Course updatedCourse = Mockito.mock(Course.class);
-        when(updatedCourse.getId()).thenReturn(1L);
-        when(updatedCourse.getTitle()).thenReturn("Java Programming");
-        when(updatedCourse.getDescription()).thenReturn("Learn Java from scratch");
-
-        when(courseService.updateCourse(any(Long.class), any(CourseUpdateDTO.class)))
-                .thenReturn(updatedCourse);
+        doNothing().when(courseService).updateCourse(any(), any());
 
         mockMvc.perform(put("/courses/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(courseDTO))
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_teacher")))
                 )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Java Programming"))
-                .andExpect(jsonPath("$.description").value("Learn Java from scratch"));
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -365,7 +347,7 @@ class CourseManagementControllerTests {
     void assignTeacher_ValidCourseIdAndTeacher_ShouldReturnOk() throws Exception {
         Course updatedCourse = Mockito.mock(Course.class);
         when(updatedCourse.getId()).thenReturn(1L);
-        when(courseService.assignTeacher(1L, "NewTeacher")).thenReturn(updatedCourse);
+        doNothing().when(courseService).assignTeacher(1L, "NewTeacher");
 
         String body = objectMapper.writeValueAsString(new AssignTeacherDTO("NewTeacher"));
 
@@ -373,8 +355,7 @@ class CourseManagementControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body)
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_admin"))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L));
+                .andExpect(status().isOk());
     }
 
     @Test

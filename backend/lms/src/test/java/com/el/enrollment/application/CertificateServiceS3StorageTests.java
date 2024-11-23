@@ -3,7 +3,7 @@ package com.el.enrollment.application;
 import com.el.TestFactory;
 import com.el.common.utils.pdfgen.PdfGenerationService;
 import com.el.common.utils.signer.PdfSignerService;
-import com.el.common.utils.upload.impl.awss3.AwsS3UploadService;
+import com.el.common.upload.application.impl.awss3.AwsS3UploadService;
 import com.el.enrollment.application.impl.CertificateServiceS3Storage;
 import com.el.enrollment.domain.Certificate;
 import org.junit.jupiter.api.Test;

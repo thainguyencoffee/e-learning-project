@@ -1,7 +1,7 @@
 package com.el;
 
 import com.el.common.Currencies;
-import com.el.discount.application.dto.DiscountDTO;
+import com.el.discount.web.dto.DiscountDTO;
 import com.el.discount.domain.Type;
 import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.Test;

@@ -1,12 +1,11 @@
 package com.el.discount.domain;
 
-import com.el.common.AuditSupportClass;
 import com.el.common.MoneyUtils;
 import com.el.common.exception.InputInvalidException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.javamoney.moneta.Money;
-import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.Table;
 
 import javax.money.CurrencyUnit;
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Table("discount")
-public class Discount extends AuditSupportClass {
+public class Discount {
     @Id
     private Long id;
     private String code;
@@ -29,6 +28,14 @@ public class Discount extends AuditSupportClass {
     private Integer maxUsage;
     @JsonIgnore
     private boolean deleted;
+    @CreatedBy
+    private String createdBy;
+    @CreatedDate
+    private LocalDateTime createdDate;
+    @LastModifiedBy
+    private String lastModifiedBy;
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
 
     public Discount(
             String code,

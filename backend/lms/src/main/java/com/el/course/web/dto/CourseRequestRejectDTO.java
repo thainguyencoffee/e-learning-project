@@ -1,7 +1,6 @@
 package com.el.course.web.dto;
 
 import com.el.common.ValidateMessages;
-import com.el.course.application.dto.CourseRequestResolveDTO;
 import com.el.course.domain.RequestType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

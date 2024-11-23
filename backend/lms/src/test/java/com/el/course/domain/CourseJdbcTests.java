@@ -94,12 +94,12 @@ class CourseJdbcTests {
         savedCourse.addPost(post);
         courseRepository.save(savedCourse);
 
-        Optional<Post> postOptional = courseRepository.findPostByCourseIdAndPostIdAndDeleted(
-                courseWithSections.getId(), post.getId(), false);
-        List<Post> postsWithCorrectTeacher = courseRepository.findAllPostsByCourseIdAndTeacherAndDeleted(
-                courseWithSections.getId(), TestFactory.teacher, false, 0, 10);
-        List<Post> postsWithIncorrectTeacher = courseRepository.findAllPostsByCourseIdAndTeacherAndDeleted(
-                courseWithSections.getId(), "somebody", false, 0, 10);
+        Optional<Post> postOptional = courseRepository.findPostByCourseIdAndPostId(
+                courseWithSections.getId(), post.getId());
+        List<Post> postsWithCorrectTeacher = courseRepository.findAllPostsByCourseIdAndTeacher(
+                courseWithSections.getId(), TestFactory.teacher, 0, 10);
+        List<Post> postsWithIncorrectTeacher = courseRepository.findAllPostsByCourseIdAndTeacher(
+                courseWithSections.getId(), "somebody", 0, 10);
 
         assertEquals(1, postsWithCorrectTeacher.size());
         assertEquals(0, postsWithIncorrectTeacher.size());
@@ -156,8 +156,8 @@ class CourseJdbcTests {
         post.addEmotion(new Emotion("nam"));
         courseRepository.save(savedCourse);
 
-        Optional<Post> postOptional = courseRepository.findPostByCourseIdAndPostIdAndDeleted(
-                courseWithSections.getId(), post.getId(), false);
+        Optional<Post> postOptional = courseRepository.findPostByCourseIdAndPostId(
+                courseWithSections.getId(), post.getId());
 
         assertTrue(postOptional.isPresent());
         assertEquals(3, postOptional.get().getEmotions().size());

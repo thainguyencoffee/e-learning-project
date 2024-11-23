@@ -1,6 +1,6 @@
 package com.el.discount.application;
 
-import com.el.discount.application.dto.DiscountDTO;
+import com.el.discount.web.dto.DiscountDTO;
 import com.el.discount.application.dto.DiscountSearchDTO;
 import com.el.discount.domain.Discount;
 import org.springframework.data.domain.Page;

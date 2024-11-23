@@ -1,7 +1,7 @@
 package com.el.order.web;
 
 import com.el.order.application.OrderService;
-import com.el.order.application.dto.OrderRequestDTO;
+import com.el.order.web.dto.OrderRequestDTO;
 import com.el.order.domain.Order;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;

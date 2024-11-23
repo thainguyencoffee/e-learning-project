@@ -6,6 +6,7 @@ import com.el.payment.domain.Payment;
 import com.el.payment.domain.PaymentMethod;
 import com.el.payment.domain.PaymentRepository;
 import com.el.payment.domain.PaymentStatus;
+import com.el.payment.web.dto.PaymentRequest;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
 import org.javamoney.moneta.Money;

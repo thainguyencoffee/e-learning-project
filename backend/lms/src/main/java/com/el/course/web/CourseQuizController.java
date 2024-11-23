@@ -2,9 +2,10 @@ package com.el.course.web;
 
 import com.el.course.application.CourseQueryService;
 import com.el.course.application.CourseService;
-import com.el.course.application.dto.QuestionDTO;
-import com.el.course.application.dto.QuizDTO;
-import com.el.course.application.dto.QuizUpdateDTO;
+import com.el.course.application.dto.QuizInTrashDTO;
+import com.el.course.web.dto.QuestionDTO;
+import com.el.course.web.dto.QuizDTO;
+import com.el.course.web.dto.QuizUpdateDTO;
 import com.el.course.domain.Quiz;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -29,18 +30,18 @@ public class CourseQuizController {
 
     @GetMapping
     public ResponseEntity<Page<Quiz>> getAllQuizzes(@PathVariable Long courseId, @PathVariable Long sectionId, Pageable pageable) {
-        List<Quiz> result = courseQueryService.findQuizzesByCourseIdAndSectionId(courseId, sectionId, pageable);
+        List<Quiz> result = courseQueryService.findAllQuizzes(courseId, sectionId, pageable);
         return ResponseEntity.ok().body(new PageImpl<>(result, pageable, result.size()));
     }
 
     @GetMapping("/{quizId}")
     public ResponseEntity<Quiz> getQuiz(@PathVariable Long courseId, @PathVariable Long sectionId, @PathVariable Long quizId) {
-        return ResponseEntity.ok(courseQueryService.findQuizByCourseIdAndSectionIdAndQuizId(courseId, sectionId, quizId));
+        return ResponseEntity.ok(courseQueryService.findQuizById(courseId, sectionId, quizId));
     }
 
     @GetMapping("/trash")
-    public ResponseEntity<Page<Quiz>> getDeletedQuizzes(@PathVariable Long courseId, @PathVariable Long sectionId, Pageable pageable) {
-        List<Quiz> result = courseQueryService.findTrashQuizzesByCourseIdAndSectionId(courseId, sectionId, pageable);
+    public ResponseEntity<Page<QuizInTrashDTO>> getDeletedQuizzes(@PathVariable Long courseId, @PathVariable Long sectionId, Pageable pageable) {
+        List<QuizInTrashDTO> result = courseQueryService.findAllQuizzesInTrash(courseId, sectionId, pageable);
         return ResponseEntity.ok().body(new PageImpl<>(result, pageable, result.size()));
     }
 

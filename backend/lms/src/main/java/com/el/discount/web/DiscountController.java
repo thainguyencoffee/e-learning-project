@@ -1,7 +1,7 @@
 package com.el.discount.web;
 
 import com.el.discount.application.DiscountService;
-import com.el.discount.application.dto.DiscountDTO;
+import com.el.discount.web.dto.DiscountDTO;
 import com.el.discount.application.dto.DiscountSearchDTO;
 import com.el.discount.domain.Discount;
 import jakarta.validation.Valid;

@@ -15,21 +15,57 @@ public interface CourseEnrollmentRepository extends CrudRepository<CourseEnrollm
 
     Integer countAllByCourseId(Long courseId);
 
-    @Query("select ce.id, ce.student, ce.course_id, c.title, c.thumbnail_url, c.teacher, ce.enrollment_date, ce.completed " +
-            "from course_enrollment ce join course c on ce.course_id = c.id where ce.student = :student LIMIT :size OFFSET :page * :size")
+    @Query("""
+        SELECT 
+            ce.id, 
+            ce.student, 
+            ce.course_id, 
+            c.title, 
+            c.thumbnail_url, 
+            c.teacher, 
+            ce.enrollment_date, 
+            ce.completed
+        FROM course_enrollment ce
+        JOIN course c on ce.course_id = c.id
+        WHERE ce.student = :student
+        LIMIT :size OFFSET :page * :size
+    """)
     List<CourseEnrollmentDTO> findAllCourseEnrollmentDTOsByStudent(String student, int page, int size);
 
     @Query("""
-    select ce.id, ce.student, ce.course_id, c.title, c.thumbnail_url, c.teacher, ce.enrollment_date, ce.completed
-        from course_enrollment ce
-        join course c on ce.course_id = c.id
-        where c.teacher = :teacher
+        SELECT 
+            ce.id, 
+            ce.student, 
+            ce.course_id, 
+            c.title, 
+            c.thumbnail_url, 
+            c.teacher, 
+            ce.enrollment_date, 
+            ce.completed
+        FROM 
+            course_enrollment ce
+        JOIN course c on ce.course_id = c.id
+        WHERE c.teacher = :teacher
         LIMIT :size OFFSET :page * :size
     """)
     List<CourseEnrollmentDTO> findAllCourseEnrollmentDTOsByTeacher(String teacher, int page, int size);
 
-    @Query("select ce.id, ce.student, ce.course_id, c.title, c.thumbnail_url, c.teacher, ce.enrollment_date, ce.completed " +
-            "from course_enrollment ce join course c on ce.course_id = c.id LIMIT :size OFFSET :page * :size")
+    @Query("""
+        SELECT 
+            ce.id, 
+            ce.student, 
+            ce.course_id, 
+            c.title, 
+            c.thumbnail_url, 
+            c.teacher, 
+            ce.enrollment_date, 
+            ce.completed 
+        FROM 
+            course_enrollment ce 
+        JOIN 
+            course c on ce.course_id = c.id 
+        LIMIT :size OFFSET :page * :size
+    """)
     List<CourseEnrollmentDTO> findAllCourseEnrollmentDTOs(int page, int size);
 
     Optional<CourseEnrollment> findByIdAndStudent(Long id, String student);
@@ -41,8 +77,8 @@ public interface CourseEnrollmentRepository extends CrudRepository<CourseEnrollm
             course_enrollment ce
                 JOIN
             course c ON ce.course_id = c.id
-        WHERE
-            ce.id = :id AND c.teacher = :teacher
+        WHERE ce.id = :id 
+          AND c.teacher = :teacher
     """)
     Optional<CourseEnrollment> findByIdAndTeacher(Long id, String teacher);
 
@@ -66,7 +102,8 @@ public interface CourseEnrollmentRepository extends CrudRepository<CourseEnrollm
         WHERE
             c.published = true
         GROUP BY
-            c.id, c.title, c.thumbnail_url, c.description, c.teacher LIMIT :size OFFSET :page * :size
+            c.id, c.title, c.thumbnail_url, c.description, c.teacher 
+        LIMIT :size OFFSET :page * :size
     """)
     List<CourseInfoWithEnrolmentStatisticDTO> findAllCourseStatistics(int page, int size);
 
@@ -86,18 +123,22 @@ public interface CourseEnrollmentRepository extends CrudRepository<CourseEnrollm
         WHERE
             c.published = true AND c.teacher = :teacher
         GROUP BY
-            c.id, c.title, c.thumbnail_url, c.description, c.teacher LIMIT :size OFFSET :page * :size
+            c.id, c.title, c.thumbnail_url, c.description, c.teacher 
+        LIMIT :size OFFSET :page * :size
     """)
     List<CourseInfoWithEnrolmentStatisticDTO> findAllCourseStatisticsByTeacher(String teacher, int page, int size);
 
     int countCourseEnrollmentByTeacherAndCreatedDateAfter(String teacher, LocalDateTime createdDateAfter);
 
     @Query("""
-        select extract(MONTH from ce.enrollment_date) as month, COUNT(ce.id) AS count
-        from course_enrollment ce
-            join course c on ce.course_id = c.id
-        where c.teacher = :teacher and extract(YEAR from ce.enrollment_date) = :year
-        group by extract(MONTH from ce.enrollment_date)
+        SELECT 
+            extract(MONTH from ce.enrollment_date) as month, COUNT(ce.id) AS count
+        FROM 
+            course_enrollment ce
+        JOIN course c on ce.course_id = c.id
+        WHERE c.teacher = :teacher 
+          and extract(YEAR from ce.enrollment_date) = :year
+        GROUP BY extract(MONTH from ce.enrollment_date)
     """)
     List<MonthStats> statsMonthEnrolledByTeacherAndYear(String teacher, Integer year);
 
@@ -109,7 +150,7 @@ public interface CourseEnrollmentRepository extends CrudRepository<CourseEnrollm
             COUNT(ce.student) AS total_students,
             COUNT(CASE WHEN ce.completed THEN 1 END) AS completed_students
         FROM course c
-            JOIN course_enrollment ce ON c.id = ce.course_id
+        JOIN course_enrollment ce ON c.id = ce.course_id
         WHERE c.teacher = :teacher
         GROUP BY
             c.id, c.title, c.thumbnail_url

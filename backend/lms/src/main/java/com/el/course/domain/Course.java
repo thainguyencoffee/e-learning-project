@@ -3,7 +3,6 @@ package com.el.course.domain;
 import com.el.common.MoneyUtils;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.common.exception.InputInvalidException;
-import com.el.course.application.dto.QuizCalculationResult;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.ToString;
