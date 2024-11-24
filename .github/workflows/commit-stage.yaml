@@ -6,6 +6,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME_LMS: thainguyencoffee/lms
   IMAGE_NAME_BFF: thainguyencoffee/bff
+  IMAGE_NAME_ANGULAR_UI: thainguyencoffee/angular-ui
   VERSION: latest
 
 jobs:
@@ -94,6 +95,13 @@ jobs:
           ./gradlew :bff:bootBuildImage \
             --imageName ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BFF }}:${{ env.VERSION }}
 
+      - name: Build container image for Angular UI
+        run: |
+          cd angular-ui/
+          npm i
+          npm run build
+          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_ANGULAR_UI }}:${{ env.VERSION }} .
+
       - name: OCI image vulnerability scanning for LMS
         uses: anchore/scan-action@v3
         id: scan_lms
@@ -112,6 +120,15 @@ jobs:
           severity-cutoff: high
           output-format: sarif
 
+      - name: OCI image vulnerability scanning for Angular UI
+        uses: anchore/scan-action@v3
+        id: scan_angular_ui
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_ANGULAR_UI }}:${{ env.VERSION }}
+          fail-build: false
+          severity-cutoff: high
+          output-format: sarif
+
       - name: Upload vulnerability report for LMS
         if: ${{ always() }}
         uses: github/codeql-action/upload-sarif@v2
@@ -125,6 +142,13 @@ jobs:
         with:
           sarif_file: ${{ steps.scan_bff.outputs.sarif }}
           category: "BFF Vulnerability Scan"
+
+      - name: Upload vulnerability report for Angular UI
+        if: ${{ always() }}
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ steps.scan_angular_ui.outputs.sarif }}
+          category: "Angular UI Vulnerability Scan"
 
       - name: Log into container registry
         uses: docker/login-action@v2
