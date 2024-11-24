@@ -89,7 +89,7 @@ jobs:
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LMS }}:${{ env.VERSION }}
           fail-build: false
           severity-cutoff: high
-          acs-report-enable: true
+          output-format: sarif
 
       - name: OCI image vulnerability scanning for BFF
         uses: anchore/scan-action@v3
@@ -98,19 +98,21 @@ jobs:
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BFF }}:${{ env.VERSION }}
           fail-build: false
           severity-cutoff: high
-          acs-report-enable: true
+          output-format: sarif
 
       - name: Upload vulnerability report for LMS
         if: ${{ always() }}
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: ${{ steps.scan_lms.outputs.sarif }}
+          category: "LMS Vulnerability Scan"
 
       - name: Upload vulnerability report for BFF
         if: ${{ always() }}
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: ${{ steps.scan_bff.outputs.sarif }}
+          category: "BFF Vulnerability Scan"
 
       - name: Log into container registry
         uses: docker/login-action@v2
