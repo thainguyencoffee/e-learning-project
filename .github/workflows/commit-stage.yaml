@@ -48,6 +48,18 @@ jobs:
           chmod +x gradlew
           ./gradlew build
 
+      - name: Setup tools
+        uses: alexellis/setup-arkade@v3
+      - name: Install tools
+        uses: alexellis/arkade-get@master
+        with:
+          kubeconform: latest
+
+      - name: Validate Kubernetes manifests
+        run: |
+          cd backend/lms
+          kubeconform --strict k8s
+
   package:
     name: Package and Publish
     if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/thainguyen101' }}
