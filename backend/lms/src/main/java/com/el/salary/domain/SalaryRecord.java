@@ -9,7 +9,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import javax.money.MonetaryAmount;
 import java.time.LocalDateTime;
 
-@Table("salary_payment")
+@Table("salary_record")
 @Getter
 public class SalaryRecord {
     @Id
@@ -20,7 +20,7 @@ public class SalaryRecord {
     private LocalDateTime paidDate;
     private Integer nocByMonth;
     private Integer nosByMonth;
-    private Integer totalAmount;
+    private Integer totalPrice;
     private SalaryRecordStatus status;
     private String failureReason;
 
@@ -33,7 +33,7 @@ public class SalaryRecord {
 
         this.bonus = new Bonus(bonusType, nocByMonth, nosByMonth);
         this.createdDate = LocalDateTime.now();
-        this.totalAmount = baseSalary.add(bonus.amount()).getNumber().intValue();
+        this.totalPrice = baseSalary.add(bonus.price()).getNumber().intValue();
         this.status = SalaryRecordStatus.PENDING;
     }
 

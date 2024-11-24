@@ -43,4 +43,6 @@ public interface CourseQueryService {
     Quiz findQuizByQuizId(Long quizId);
 
     Lesson findLessonByCourseIdAndLessonId(Long courseId, Long lessonId);
+
+    List<PublishedCourseDTO> searchPublishedCoursesDTO(String query, Pageable pageable);
 }

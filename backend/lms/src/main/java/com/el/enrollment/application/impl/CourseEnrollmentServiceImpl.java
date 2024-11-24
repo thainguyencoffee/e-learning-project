@@ -12,11 +12,11 @@ import com.el.course.domain.QuizCalculationResult;
 import com.el.course.domain.Quiz;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
-import com.el.enrollment.application.dto.EnrolmentWithCourseDTO;
+import com.el.enrollment.application.dto.EnrollmentWithCourseDTO;
 import com.el.enrollment.application.dto.QuizDetailDTO;
 import com.el.enrollment.web.dto.QuizSubmitDTO;
-import com.el.enrollment.domain.CourseEnrollment;
-import com.el.enrollment.domain.CourseEnrollmentRepository;
+import com.el.enrollment.domain.Enrollment;
+import com.el.enrollment.domain.EnrollmentRepository;
 import com.el.enrollment.domain.LessonProgress;
 import com.el.enrollment.domain.QuizSubmission;
 import lombok.extern.slf4j.Slf4j;
@@ -33,13 +33,13 @@ import java.util.stream.Collectors;
 public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
     private final CertificateServiceS3Storage certificateServiceS3Storage;
-    private final CourseEnrollmentRepository repository;
+    private final EnrollmentRepository repository;
     private final CourseQueryService courseQueryService;
     private final CourseService courseService;
     private final UsersManagement usersManagement;
     private final RolesBaseUtil rolesBaseUtil;
 
-    public CourseEnrollmentServiceImpl(CertificateServiceS3Storage certificateServiceS3Storage, CourseEnrollmentRepository repository,
+    public CourseEnrollmentServiceImpl(CertificateServiceS3Storage certificateServiceS3Storage, EnrollmentRepository repository,
                                        CourseQueryService courseQueryService, CourseService courseService, UsersManagement usersManagement,
                                        RolesBaseUtil rolesBaseUtil) {
         this.certificateServiceS3Storage = certificateServiceS3Storage;
@@ -67,13 +67,13 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     }
 
     @Override
-    public CourseEnrollment findCourseEnrollmentByCourseIdAndStudent(Long courseId, String student) {
+    public Enrollment findCourseEnrollmentByCourseIdAndStudent(Long courseId, String student) {
         return repository.findByCourseIdAndStudent(courseId, student)
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
-    public CourseEnrollment findCourseEnrollmentById(Long id) {
+    public Enrollment findCourseEnrollmentById(Long id) {
         String currentUsername = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
         if (rolesBaseUtil.isAdmin()) {
             return repository.findById(id)
@@ -89,18 +89,18 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     }
 
     @Override
-    public EnrolmentWithCourseDTO findEnrolmentWithCourseById(Long id) {
-        CourseEnrollment enrolment;
+    public EnrollmentWithCourseDTO findEnrollmentWithCourseById(Long id) {
+        Enrollment enrollment;
         if (rolesBaseUtil.isAdmin() || rolesBaseUtil.isTeacher()) {
-            enrolment = repository.findById(id)
+            enrollment = repository.findById(id)
                     .orElseThrow(ResourceNotFoundException::new);
         } else {
             String student = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
-            enrolment = repository.findByIdAndStudent(id, student)
+            enrollment = repository.findByIdAndStudent(id, student)
                     .orElseThrow(ResourceNotFoundException::new);
         }
-        Course course = courseQueryService.findPublishedCourseById(enrolment.getCourseId());
-        return EnrolmentWithCourseDTO.of(enrolment, course);
+        Course course = courseQueryService.findPublishedCourseById(enrollment.getCourseId());
+        return EnrollmentWithCourseDTO.of(enrollment, course);
     }
 
     public void enrollment(String student, Long courseId) {
@@ -110,7 +110,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
                 .map(entry -> new LessonProgress(entry.getValue(), entry.getKey()))
                 .collect(Collectors.toSet());
 
-        CourseEnrollment enrollment = new CourseEnrollment(student, courseId, course.getTeacher(), lessonProgresses, course.getQuizIds());
+        Enrollment enrollment = new Enrollment(student, courseId, course.getTeacher(), lessonProgresses, course.getQuizIds());
         enrollment.markAsEnrolled();
         repository.save(enrollment);
     }
@@ -120,7 +120,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
         checkAccess();
         var lesson = courseQueryService.findLessonByCourseIdAndLessonId(courseId, lessonId);
 
-        CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        Enrollment enrollment = findCourseEnrollmentById(enrollmentId);
         enrollment.markLessonAsCompleted(lesson.getId(), lesson.getTitle());
         repository.save(enrollment);
     }
@@ -128,14 +128,14 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     @Override
     public void markLessonAsIncomplete(Long enrollmentId, Long courseId, Long lessonId) {
         checkAccess();
-        CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        Enrollment enrollment = findCourseEnrollmentById(enrollmentId);
         enrollment.markLessonAsIncomplete(lessonId);
         repository.save(enrollment);
     }
 
     @Override
     public void createCertificate(Long id, String student, Long courseId) {
-        CourseEnrollment enrollment = repository.findByIdAndStudent(id, student)
+        Enrollment enrollment = repository.findByIdAndStudent(id, student)
                 .orElseThrow(ResourceNotFoundException::new);
         PublishedCourseDTO courseInfo =
                 courseQueryService.findCoursePublishedById(courseId);
@@ -152,19 +152,19 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
     @Override
     public boolean isSubmittedQuiz(Long enrollmentId, Long quizId) {
-        CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        Enrollment enrollment = findCourseEnrollmentById(enrollmentId);
         return enrollment.isSubmittedQuiz(quizId);
     }
 
     @Override
     public QuizSubmission getQuizSubmission(Long enrollmentId, Long quizSubmissionId) {
-        CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        Enrollment enrollment = findCourseEnrollmentById(enrollmentId);
         return enrollment.getQuizSubmission(quizSubmissionId);
     }
 
     @Override
     public Long submitQuiz(Long enrollmentId, QuizSubmitDTO quizSubmitDTO) {
-        CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        Enrollment enrollment = findCourseEnrollmentById(enrollmentId);
         log.info("Found enrollment: {}", enrollment);
         QuizCalculationResult calculationResult = courseService.calculateQuizScore(enrollment.getCourseId(), quizSubmitDTO.quizId(), quizSubmitDTO.getAnswers());
         log.info("Calculation result: {}", calculationResult);
@@ -178,7 +178,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
     @Override
     public void markAsReviewed(Long courseId, String student) {
-        CourseEnrollment enrollment = findCourseEnrollmentByCourseIdAndStudent(courseId, student);
+        Enrollment enrollment = findCourseEnrollmentByCourseIdAndStudent(courseId, student);
         enrollment.markAsReviewed();
         repository.save(enrollment);
     }
@@ -191,7 +191,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
     @Override
     public void deleteQuizSubmission(Long enrollmentId, Long quizSubmissionId) {
-        CourseEnrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        Enrollment enrollment = findCourseEnrollmentById(enrollmentId);
         enrollment.deleteQuizSubmission(quizSubmissionId);
         repository.save(enrollment);
     }

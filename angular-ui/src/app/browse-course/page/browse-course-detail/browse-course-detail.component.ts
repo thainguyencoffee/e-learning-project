@@ -5,8 +5,8 @@ import {ErrorHandler} from "../../../common/error-handler.injectable";
 import {Subscription} from "rxjs";
 import {DatePipe, NgForOf, NgIf, SlicePipe} from "@angular/common";
 import {UserService} from "../../../common/auth/user.service";
-import {EnrolmentsService} from "../../../enrolments/service/enrolments.service";
-import {Enrolment} from "../../../enrolments/model/enrolment";
+import {EnrollmentsService} from "../../../enrollment/service/enrollments.service";
+import {Enrollment} from "../../../enrollment/model/enrollment";
 import {CourseWithoutSections} from "../../model/course-without-sections";
 import {LoginComponent} from "../../../common/auth/login.component";
 import {getStarsIcon} from "../../star-util";
@@ -29,14 +29,14 @@ export class BrowseCourseDetailComponent implements OnInit, OnDestroy{
   route = inject(ActivatedRoute);
   router = inject(Router);
   browseCourseService = inject(BrowseCourseService);
-  enrolmentService = inject(EnrolmentsService);
+  enrollmentService = inject(EnrollmentsService);
   userService = inject(UserService);
   errorHandler = inject(ErrorHandler);
   navigationSubscription?: Subscription;
 
   courseId?: number;
   course?: CourseWithoutSections;
-  enrolment?: Enrolment;
+  enrollment?: Enrollment;
   isAuthenticated= false;
   showFullDescription: boolean = false;
 
@@ -65,7 +65,7 @@ export class BrowseCourseDetailComponent implements OnInit, OnDestroy{
       next: user => {
         if (user.isAuthenticated) {
           this.isAuthenticated = true;
-          this.getEnrolmentByCourseId()
+          this.getEnrollmentByCourseId()
         } else {
           this.isAuthenticated = false;
         }
@@ -74,13 +74,13 @@ export class BrowseCourseDetailComponent implements OnInit, OnDestroy{
 
   }
 
-  private getEnrolmentByCourseId() {
-    this.enrolmentService.getEnrolmentByCourseId(this.courseId!)
+  private getEnrollmentByCourseId() {
+    this.enrollmentService.getEnrollmentByCourseId(this.courseId!)
       .subscribe({
         next: data => {
-          this.enrolment = data
+          this.enrollment = data
         },
-        error: _ => this.enrolment = undefined
+        error: _ => this.enrollment = undefined
       })
   }
 

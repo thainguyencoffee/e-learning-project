@@ -46,8 +46,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     discountCode: new FormControl(null, [])
   })
 
-  discountedPrice?: string;
-
   ngOnInit(): void {
     const courseId = +this.route.snapshot.params['courseId']; // this is for the route /checkout/:courseId
     this.courseIds.push(courseId);

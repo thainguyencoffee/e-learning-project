@@ -9,7 +9,7 @@ import javax.money.MonetaryAmount;
 
 public record Bonus(
         BonusType type,
-        MonetaryAmount amount
+        MonetaryAmount price
 ) {
 
     public Bonus {
@@ -30,22 +30,22 @@ public record Bonus(
         return switch (type) {
             case NUMBER_OF_STUDENTS -> {
                 int unit = numberOfStudents / rate;
-                Money amount = Money.of(dollarPerUnitForStudent * unit, Currencies.USD);
-                MoneyUtils.checkValidPrice(amount, Currencies.USD);
-                yield amount;
+                Money price = Money.of(dollarPerUnitForStudent * unit, Currencies.USD);
+                MoneyUtils.checkValidPrice(price, Currencies.USD);
+                yield price;
             }
             case NUMBER_OF_COURSES -> {
                 int unit2 = numberOfCourses / rate;
-                Money amount = Money.of(dollarPerUnitForCourse * unit2, Currencies.USD);
-                MoneyUtils.checkValidPrice(amount, Currencies.USD);
-                yield amount;
+                Money price = Money.of(dollarPerUnitForCourse * unit2, Currencies.USD);
+                MoneyUtils.checkValidPrice(price, Currencies.USD);
+                yield price;
             }
             case ALL -> {
                 int unit = numberOfStudents / rate;
                 int unit2 = numberOfCourses / rate;
-                Money amount = Money.of(dollarPerUnitForStudent * unit + dollarPerUnitForCourse * unit2, Currencies.USD);
-                MoneyUtils.checkValidPrice(amount, Currencies.USD);
-                yield amount;
+                Money price = Money.of(dollarPerUnitForStudent * unit + dollarPerUnitForCourse * unit2, Currencies.USD);
+                MoneyUtils.checkValidPrice(price, Currencies.USD);
+                yield price;
             }
         };
     }

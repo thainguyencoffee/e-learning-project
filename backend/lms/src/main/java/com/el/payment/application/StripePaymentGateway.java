@@ -25,14 +25,14 @@ public class StripePaymentGateway {
     }
 
     public Charge charge(PaymentRequest paymentRequest) throws StripeException {
-        NumberValue amountNumber = paymentRequest.amount().getNumber();
-        if (paymentRequest.amount().getCurrency() == Currencies.USD) {
-            amountNumber = paymentRequest.amount().multiply(100).getNumber();
+        NumberValue amountNumber = paymentRequest.price().getNumber();
+        if (paymentRequest.price().getCurrency() == Currencies.USD) {
+            amountNumber = paymentRequest.price().multiply(100).getNumber();
         }
 
         Map<String, Object> chargeParams = new HashMap<>();
         chargeParams.put("amount", amountNumber);
-        chargeParams.put("currency", paymentRequest.amount().getCurrency());
+        chargeParams.put("currency", paymentRequest.price().getCurrency());
         chargeParams.put("source", paymentRequest.token());
         return Charge.create(chargeParams);
     }

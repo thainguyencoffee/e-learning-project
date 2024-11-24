@@ -43,7 +43,7 @@
             <p>{{ salary.nocAllTime }}</p>
           </div>
           <div class="col-md-6 d-flex justify-content-between">
-            <p><strong>Base amount:</strong></p>
+            <p><strong>Base salary:</strong></p>
             <p>{{ salary.baseSalary }}</p>
           </div>
           <div class="col-md-6 d-flex justify-content-between">
@@ -76,9 +76,9 @@
               <p><strong>Number of courses:</strong> <span class="text-primary">{{ record.nocByMonth }}</span></p>
               <p><strong>Number of students:</strong> <span class="text-primary">{{ record.nosByMonth }}</span></p>
               <p><strong>Bonus type:</strong> <span class="text-primary">{{ record.bonus.type }}</span></p>
-              <p><strong>Bonus amount:</strong> <span class="text-primary">{{ record.bonus.amount }}</span></p>
-              <p><strong>Total amount:</strong>
-                <span class="fw-bold text-success fs-4 bg-light p-1 rounded">{{ record.totalAmount }}</span>
+              <p><strong>Bonus price:</strong> <span class="text-primary">{{ record.bonus.price }}</span></p>
+              <p><strong>Total price:</strong>
+                <span class="fw-bold text-success fs-4 bg-light p-1 rounded">{{ record.totalPrice }}</span>
               </p>
               <p><strong>Status:</strong>
                 <span *ngIf="record.status === 'PAID'" class="badge bg-success">{{ record.status }}</span>

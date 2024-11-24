@@ -33,7 +33,7 @@ public class MoneyUtils {
 
     private static void checkValidVNDCurrency(MonetaryAmount price) {
         if (price.getNumber().intValue() % 1000 != 0) {
-            throw new InputInvalidException("Invalid Vietnamese Dong amount. Must be a multiple of 1000.");
+            throw new InputInvalidException("Invalid Vietnamese Dong price. Must be a multiple of 1000.");
         }
         if (price.isGreaterThan(Money.of(1_000_000_000, Currencies.VND))) {
             throw new InputInvalidException("Price must not exceed 1,000,000,000 VND.");

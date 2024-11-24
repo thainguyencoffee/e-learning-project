@@ -1,6 +1,6 @@
 import {inject, Injectable} from "@angular/core";
-import {HttpClient, HttpParams} from "@angular/common/http";
-import {catchError, Observable, switchMap, throwError} from "rxjs";
+import {HttpClient} from "@angular/common/http";
+import {Observable, switchMap} from "rxjs";
 import {Course} from "../model/view/course";
 import {AddCourseDto} from "../model/add-course.dto";
 import {UploadService} from "../../../common/upload/upload.service";
@@ -18,7 +18,7 @@ import {PostDto} from "../model/post-dto";
 import {EditQuizDto} from "../model/edit-quiz.dto";
 import {QuestionDto} from "../model/question.dto";
 import {Quiz} from "../model/view/quiz";
-import {CommentDto} from "../../../enrolments/model/comment.dto";
+import {CommentDto} from "../../../enrollment/model/comment.dto";
 import {ReviewDto} from "../model/review.dto";
 
 @Injectable(

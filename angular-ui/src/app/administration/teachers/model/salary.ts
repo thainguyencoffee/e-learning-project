@@ -1,6 +1,6 @@
 export interface Bonus {
   type: string,
-  amount: string,
+  price: string,
 }
 
 export interface SalaryRecord {
@@ -10,7 +10,7 @@ export interface SalaryRecord {
   paidDate: string,
   nocByMonth: number,
   nosByMonth: number,
-  totalAmount: number,
+  totalPrice: number,
   status: string,
   failureReason: string
 }

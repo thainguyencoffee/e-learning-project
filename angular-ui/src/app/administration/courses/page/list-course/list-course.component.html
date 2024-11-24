@@ -64,8 +64,8 @@
                    class="btn btn-sm btn-secondary me-2">Add Section</a>
                 <a *ngIf="isEditable(course)" [routerLink]="['/administration/courses/edit', course.id]"
                    class="btn btn-sm btn-secondary me-2">Edit</a>
-                <a *ngIf="course.published" [routerLink]="['/administration/enrolment-statistics', course.id]"
-                   class="btn btn-sm btn-secondary me-2">Enrolment statistic</a>
+                <a *ngIf="course.published" [routerLink]="['/administration/enrollment-statistics', course.id]"
+                   class="btn btn-sm btn-secondary me-2">Enrollment statistic</a>
                 @if (isEditable(course) && isAdminCourseOwner(course.teacher)) {
                   <a *ngIf="isAdminCourseOwner(course.teacher)"
                      [routerLink]="['/administration/courses/assign-teacher', course.id]"

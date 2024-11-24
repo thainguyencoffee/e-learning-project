@@ -25,16 +25,16 @@ import {CheckoutComponent} from "./orders/page/checkout/checkout.component";
 import {PaymentComponent} from "./payment/page/payment.component";
 import {MyOrdersComponent} from "./orders/page/my-orders/my-orders.component";
 import {MyOrderDetailComponent} from "./orders/page/my-order-detail/my-order-detail.component";
-import {MyEnrolmentsComponent} from "./enrolments/page/my-enrolments/my-enrolments.component";
+import {MyEnrollmentsComponent} from "./enrollment/page/my-enrollments/my-enrollments.component";
 import {BrowseCourseDetailComponent} from "./browse-course/page/browse-course-detail/browse-course-detail.component";
-import {EnrolmentContentComponent} from "./enrolments/page/enrolment-content/enrolment-content.component";
+import {EnrollmentContentComponent} from "./enrollment/page/enrollment-content/enrollment-content.component";
 import {CourseDetailComponent} from "./administration/courses/page/course-detail/course-detail.component";
-import {EnrolmentOverviewComponent} from "./enrolments/page/enrolment-content/enrolment-overview/enrolment-overview.component";
+import {EnrollmentOverviewComponent} from "./enrollment/page/enrollment-content/enrollment-overview/enrollment-overview.component";
 import {
-  EnrolmentLessonsComponent
-} from "./enrolments/page/enrolment-content/enrolment-lessons/enrolment-lessons.component";
-import {EnrolmentPostsComponent} from "./enrolments/page/enrolment-content/enrolment-posts/enrolment-posts.component";
-import {LessonDetailComponent} from "./enrolments/page/enrolment-content/lesson-detail/lesson-detail.component";
+  EnrollmentLessonsComponent
+} from "./enrollment/page/enrollment-content/enrollment-lessons/enrollment-lessons.component";
+import {EnrollmentPostsComponent} from "./enrollment/page/enrollment-content/enrollment-posts/enrollment-posts.component";
+import {LessonDetailComponent} from "./enrollment/page/enrollment-content/lesson-detail/lesson-detail.component";
 import {PostListComponent} from "./administration/courses/page/manage-post/post-list/post-list.component";
 import {PostAddComponent} from "./administration/courses/page/manage-post/post-add/post-add.component";
 import {PostDetailComponent} from "./administration/courses/page/manage-post/post-detail/post-detail.component";
@@ -46,15 +46,15 @@ import {EditQuizComponent} from "./administration/courses/page/manage-quiz/edit-
 import {AddQuestionComponent} from "./administration/courses/page/manage-quiz/add-question/add-question.component";
 import {EditQuestionComponent} from "./administration/courses/page/manage-quiz/edit-question/edit-question.component";
 import {QuizTrashComponent} from "./administration/courses/page/manage-quiz/quiz-trash/quiz-trash.component";
-import {EnrolmentStatisticsComponent} from "./administration/statistics/page/enrolment-statistics.component";
+import {EnrollmentStatisticsComponent} from "./administration/statistics/page/enrollment-statistics.component";
 import {
-  EnrolmentStatisticDetailComponent
-} from "./administration/statistics/page/enrolment-statistic-detail/enrolment-statistic-detail.component";
+  EnrollmentStatisticDetailComponent
+} from "./administration/statistics/page/enrollment-statistic-detail/enrollment-statistic-detail.component";
 import {RoleGuard} from "./role.guard";
 import {ListTeachersComponent} from "./administration/teachers/page/list-teachers/list-teachers.component";
 import {TeacherDetailComponent} from "./administration/teachers/page/teacher-detail/teacher-detail.component";
 import {SalaryTeacherComponent} from "./administration/teachers/page/salary-teacher/salary-teacher.component";
-import {QuizSubmitComponent} from "./enrolments/page/enrolment-content/quiz-submit/quiz-submit.component";
+import {QuizSubmitComponent} from "./enrollment/page/enrollment-content/quiz-submit/quiz-submit.component";
 import {UsageComponent} from "./usage/usage.component";
 import {AboutUnpublishComponent} from "./usage/about-unpublish/about-unpublish.component";
 import {ErrorComponent} from "./error/error.component";
@@ -77,7 +77,6 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: {
           requiredRoles: ['ROLE_admin', 'ROLE_teacher'],
-          deniedRoles: ['ROLE_user'],
           errorStatus: 403,
           errorMessage: 'Only admin and teacher can access usage page'
         },
@@ -91,27 +90,27 @@ export const routes: Routes = [
   },
   {
     title: 'Course content',
-    path: 'enrolments/:id',
-    component: EnrolmentContentComponent,
+    path: 'enrollments/:id',
+    component: EnrollmentContentComponent,
     canActivate: [RoleGuard],
     data: {
       requiredRoles: ['ROLE_user']
     },
     children: [
       {
-        title: 'Enrolment overview',
+        title: 'Enrollment overview',
         path: 'overview',
-        component: EnrolmentOverviewComponent
+        component: EnrollmentOverviewComponent
       },
       {
-        title: 'Enrolment lessons',
+        title: 'Enrollment lessons',
         path: 'lessons',
-        component: EnrolmentLessonsComponent
+        component: EnrollmentLessonsComponent
       },
       {
-        title: 'Enrolment posts',
+        title: 'Enrollment posts',
         path: 'posts',
-        component: EnrolmentPostsComponent
+        component: EnrollmentPostsComponent
       },
       {
         title: 'Submit quiz page',
@@ -122,7 +121,7 @@ export const routes: Routes = [
   },
   {
     title: 'Lesson detail',
-    path: 'enrolments/:enrolmentId/lessons/:lessonId',
+    path: 'enrollments/:enrollmentId/lessons/:lessonId',
     component: LessonDetailComponent,
     canActivate: [RoleGuard],
     data: {
@@ -179,14 +178,14 @@ export const routes: Routes = [
   },
   {
     title: 'Welcome to my courses!',
-    path: 'my-enrolments',
-    component: MyEnrolmentsComponent,
+    path: 'my-enrollments',
+    component: MyEnrollmentsComponent,
     canActivate: [RoleGuard],
     data: {
       requiredRoles: ['ROLE_user'],
       deniedRoles: ['ROLE_admin', 'ROLE_teacher'],
       errorStatus: 403,
-      errorMessage: 'Only user can access my enrolments page'
+      errorMessage: 'Only user can access my enrollments page'
     }
   },
   {
@@ -385,20 +384,20 @@ export const routes: Routes = [
 
       // Student management
       {
-        title: 'Enrolment statistics',
-        path: 'enrolment-statistics',
-        component: EnrolmentStatisticsComponent,
+        title: 'Enrollment statistics',
+        path: 'enrollment-statistics',
+        component: EnrollmentStatisticsComponent,
       },
       // Link posts
       {
-        title: 'Enrolment statistics posts',
-        path: 'enrolment-statistics/posts',
-        component: EnrolmentPostsComponent
+        title: 'Enrollment statistics posts',
+        path: 'enrollment-statistics/posts',
+        component: EnrollmentPostsComponent
       },
       {
-        title: 'Enrolment statistics detail',
-        path: 'enrolment-statistics/:courseId',
-        component: EnrolmentStatisticDetailComponent
+        title: 'Enrollment statistics detail',
+        path: 'enrollment-statistics/:courseId',
+        component: EnrollmentStatisticDetailComponent
       },
 
       // Discount management

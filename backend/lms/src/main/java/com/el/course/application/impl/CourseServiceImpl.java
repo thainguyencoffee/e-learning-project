@@ -4,7 +4,7 @@ import com.el.common.RolesBaseUtil;
 import com.el.common.exception.AccessDeniedException;
 import com.el.course.application.CourseQueryService;
 import com.el.course.application.CourseService;
-import com.el.course.application.EnsureEnrolmentCompleted;
+import com.el.course.application.EnsureEnrollmentCompleted;
 import com.el.course.domain.*;
 import com.el.course.web.dto.*;
 import org.springframework.stereotype.Service;
@@ -20,16 +20,16 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final CourseQueryService courseQueryService;
     private final RolesBaseUtil rolesBaseUtil;
-    private final EnsureEnrolmentCompleted ensureEnrolmentCompleted;
+    private final EnsureEnrollmentCompleted ensureEnrollmentCompleted;
 
     public CourseServiceImpl(CourseRepository courseRepository,
                              CourseQueryService courseQueryService,
                              RolesBaseUtil rolesBaseUtil,
-                             EnsureEnrolmentCompleted ensureEnrolmentCompleted) {
+                             EnsureEnrollmentCompleted ensureEnrollmentCompleted) {
         this.courseRepository = courseRepository;
         this.courseQueryService = courseQueryService;
         this.rolesBaseUtil = rolesBaseUtil;
-        this.ensureEnrolmentCompleted = ensureEnrolmentCompleted;
+        this.ensureEnrollmentCompleted = ensureEnrollmentCompleted;
     }
 
     @Override
@@ -375,19 +375,19 @@ public class CourseServiceImpl implements CourseService {
      * */
     @Override
     public QuizCalculationResult calculateQuizScore(Long courseId, Long quizId, Map<Long, Object> userAnswers) {
-        Course course = courseQueryService.findCourseById(courseId, false);
+        Course course = courseQueryService.findPublishedCourseById(courseId);
         return course.calculateQuiz(quizId, userAnswers);
     }
 
     @Override
     public Long addReview(Long courseId, Long enrollmentId, ReviewDTO reviewDTO) {
-        Course course = courseQueryService.findCourseById(courseId, false);
+        Course course = courseQueryService.findPublishedCourseById(courseId);
 
         if (rolesBaseUtil.isTeacher() || rolesBaseUtil.isAdmin()) {
             throw new AccessDeniedException("Teacher and Admin cannot add review to course");
         }
         String username = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
-        ensureEnrolmentCompleted.ensureEnrolmentCompleted(enrollmentId, username);
+        ensureEnrollmentCompleted.ensureEnrollmentCompleted(enrollmentId, username);
 
         Review review = reviewDTO.toReview(username);
         course.addReview(review);

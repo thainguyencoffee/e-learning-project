@@ -36,7 +36,7 @@ class CourseServiceTests {
     private DiscountService discountService;
 
     @Mock
-    private EnsureEnrolmentCompleted ensureEnrolmentCompleted;
+    private EnsureEnrollmentCompleted ensureEnrollmentCompleted;
 
     @Mock
     private CourseQueryService courseQueryService;

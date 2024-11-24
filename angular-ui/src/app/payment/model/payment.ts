@@ -1,7 +1,7 @@
 export interface Payment {
   id: string;
   orderId: string;
-  amount: string;
+  price: string;
   status: string;
   paymentDate: string;
   paymentMethod: string;
