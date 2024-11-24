@@ -22,4 +22,9 @@ export class BrowseCourseService {
     return this.http.get<CourseWithoutSections>(this.resourcePath + '/' + courseId);
   }
 
+  searchPublishedCourses(query: string, pageNumber: number = 0, pageSize: number = 10): Observable<PageWrapper<CourseWithoutSections>> {
+    const url = `${this.resourcePath}/search?query=${query}&page=${pageNumber}&size=${pageSize}`;
+    return this.http.get<PageWrapper<CourseWithoutSections>>(url)
+  }
+
 }

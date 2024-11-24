@@ -13,4 +13,5 @@ export interface CourseWithoutSections {
   teacher: string,
   reviews: Review[],
   averageRating: number,
+  hasPurchased: boolean,
 }

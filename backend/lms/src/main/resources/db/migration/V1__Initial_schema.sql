@@ -24,6 +24,16 @@ create table course
     constraint fk_course primary key (id)
 );
 
+CREATE INDEX idx_course_fulltext
+    ON course USING GIN (
+    to_tsvector(
+        'english',
+        title || ' ' ||
+        teacher || ' ' ||
+        description
+    )
+);
+
 create table course_request
 (
     id              bigserial     not null,

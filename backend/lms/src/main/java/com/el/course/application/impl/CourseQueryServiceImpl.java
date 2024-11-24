@@ -228,6 +228,14 @@ public class CourseQueryServiceImpl implements CourseQueryService {
         return course.getLessonInSectionForPublishedById(lessonId);
     }
 
+    @Override
+    public List<PublishedCourseDTO> searchPublishedCoursesDTO(String query, Pageable pageable) {
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+        List<Course> courses = courseRepository.searchPublishedCourses(query, page, size);
+        return courses.stream().map(PublishedCourseDTO::fromCourse).toList();
+    }
+
     private boolean isUserEnrolled(Long courseId, String username) {
         return enrollmentRepository.findByCourseIdAndStudent(courseId, username).isPresent();
     }

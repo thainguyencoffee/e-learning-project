@@ -81,6 +81,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lms
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_PROFILES_ACTIVE: local
     depends_on:
       keycloak:
         condition: service_healthy

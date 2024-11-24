@@ -6,10 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,6 +29,12 @@ public class BrowseCourseController {
     @GetMapping("/{courseId}")
     public ResponseEntity<PublishedCourseDTO> getPublishedCourseById(@PathVariable Long courseId) {
         return ResponseEntity.ok(courseQueryService.findCoursePublishedById(courseId));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<PublishedCourseDTO>> searchPublishedCourse(@RequestParam String query, Pageable pageable) {
+        List<PublishedCourseDTO> result = courseQueryService.searchPublishedCoursesDTO(query, pageable);
+        return ResponseEntity.ok(new PageImpl<>(result, pageable, result.size()));
     }
 
 }
