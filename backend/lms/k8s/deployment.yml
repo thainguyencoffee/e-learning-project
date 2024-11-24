@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lms
+  labels:
+    app: lms
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lms
+  template:
+    metadata:
+      labels:
+        app: lms
+    spec:
+      containers:
+        - name: lms
+          image: lms
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "sh", "-c", "sleep 5" ]
+          ports:
+            - containerPort: 7084
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://el-postgres/lms
