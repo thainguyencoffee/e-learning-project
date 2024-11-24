@@ -161,3 +161,4 @@ jobs:
         run: |
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LMS }}:${{ env.VERSION }}
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BFF }}:${{ env.VERSION }}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_ANGULAR_UI }}:${{ env.VERSION }}
