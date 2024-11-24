@@ -7,10 +7,10 @@ realm_name: keycloak101
 client_id: bff-client
 client_secret: secret
 issuer: ${reverse-proxy-uri}${authorization-server-prefix}/realms/${realm_name}
-lms-port: 7084
+#lms-port: 7084
 
 server:
-  port: ${lms-port}
+  port: 7084
   shutdown: graceful
   tomcat:
     threads:
