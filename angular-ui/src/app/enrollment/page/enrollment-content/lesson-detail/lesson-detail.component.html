@@ -25,11 +25,16 @@
     <!--display video-->
     <div class="w-100 mb-4">
       <div *ngIf="lessonType === 'video'" class="video-container">
-        <app-video-player [videoLink]="lessonDetail.link"></app-video-player>
+        <video *ngIf="lessonDetail.link" #videoPlayer id="myVideo" controls width="100%">
+          <source [src]="lessonDetail.link" type="video/mp4">
+        </video>
       </div>
 
       <div *ngIf="lessonType === 'docx'" class="document-container">
-        <app-document-viewer [documentLink]="lessonDetail.link"></app-document-viewer>
+        <p>
+          This content is not available for preview. Please
+          <a [href]="lessonDetail.link" download class="btn btn-primary">download</a> the document to view it.
+        </p>
       </div>
 
     </div>
