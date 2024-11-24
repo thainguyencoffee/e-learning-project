@@ -67,11 +67,6 @@
             },
             "development": {
               "buildTarget": "angular-ui:build:development"
-            },
-            "local": {
-              "buildTarget": "angular-ui:build:development",
-              "host": "0.0.0.0",
-              "port": 4201
             }
           },
           "defaultConfiguration": "development"

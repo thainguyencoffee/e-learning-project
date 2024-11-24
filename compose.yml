@@ -65,7 +65,7 @@ services:
     container_name: el.angular-ui
     image: el/angular-ui
     ports:
-      - 4201:80
+      - 7085:7085
     extra_hosts:
       - "host.docker.internal:host-gateway"
       - "LOCALHOST_NAME:host-gateway"
