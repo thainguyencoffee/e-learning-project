@@ -50,7 +50,7 @@ jobs:
 
   package:
     name: Package and Publish
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/thainguyen101' }}
     needs: [ build ]
     runs-on: ubuntu-22.04
     permissions:
