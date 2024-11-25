@@ -80,3 +80,6 @@ s3:
   secret-key: ZY2YAo3WrW+Eq28oLYVW89mDwst//QLJyqiF4TMP+Vg
   endpoint: https://bookstore-bucket.sgp1.digitaloceanspaces.com
   bucket-name: bookstore-bucket
+
+lms:
+  greeting: Welcome to LMS from Local!

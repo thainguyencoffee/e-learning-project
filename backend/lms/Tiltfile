@@ -1,12 +1,12 @@
 # Build
 custom_build(
-    ref = 'lms',
+    ref = 'lms-service',
     command = '../gradlew bootBuildImage --imageName $EXPECTED_REF',
     deps = ['build.gradle', 'src']
 )
 
 # Deploy
-k8s_yaml(['k8s/deployment.yml', 'k8s/service.yml'])
+k8s_yaml(kustomize('k8s'))
 
 # Manage
-k8s_resource('lms', port_forwards=['7084'])
+k8s_resource('lms-service', port_forwards=['7084'])

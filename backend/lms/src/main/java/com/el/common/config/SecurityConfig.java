@@ -23,7 +23,7 @@ public class SecurityConfig {
                         .authorizeHttpRequests(authorize -> authorize
 
                         // Actuator
-                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/actuator/**", "/greeting").permitAll()
                         .requestMatchers("/me").permitAll()
 
                         // Allow all requests to /upload/** with any roles

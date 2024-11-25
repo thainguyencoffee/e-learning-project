@@ -59,7 +59,7 @@ jobs:
       - name: Validate Kubernetes manifests
         run: |
           cd backend/lms
-          kubeconform --strict k8s
+          kustomize build k8s | kubeconform --strict -
 
   package:
     name: Package and Publish
