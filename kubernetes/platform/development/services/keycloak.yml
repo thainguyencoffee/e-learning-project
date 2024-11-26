@@ -38,14 +38,8 @@ spec:
               value: secret
             - name: KC_HTTP_PORT
               value: "8080"
-            - name: KC_HOSTNAME_URL
-              value: http://el-keycloak/auth
-            - name: KC_HOSTNAME_ADMIN_URL
-              value: http://el-keycloak/auth
             - name: KC_HOSTNAME_STRICT_BACKCHANNEL
               value: "true"
-            - name: KC_HTTP_RELATIVE_PATH
-              value: /auth/
             - name: KC_HTTP_ENABLED
               value: "true"
             - name: KC_HEALTH_ENABLED

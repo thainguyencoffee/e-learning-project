@@ -1,0 +1,21 @@
+reverse-proxy-uri: http://reverse-proxy
+
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak101:
+            issuer-uri: http://el-keycloak/realms/keycloak101
+
+com:
+  c4-soft:
+    springaddons:
+      oidc:
+        ops:
+          - iss: http://el-keycloak/realms/keycloak101
+        client:
+          client-uri: http://reverse-proxy/bff
+
+bff:
+  greeting: Welcome to BFF from Kubernetes environment!
