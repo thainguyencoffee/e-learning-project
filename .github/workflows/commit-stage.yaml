@@ -56,9 +56,14 @@ jobs:
         with:
           kubeconform: latest
 
-      - name: Validate Kubernetes manifests
+      - name: Validate Kubernetes manifests for LMS
         run: |
           cd backend/lms
+          kustomize build k8s | kubeconform --strict -
+
+      - name: Validate Kubernetes manifests for BFF
+        run: |
+          cd backend/bff
           kustomize build k8s | kubeconform --strict -
 
   package:
