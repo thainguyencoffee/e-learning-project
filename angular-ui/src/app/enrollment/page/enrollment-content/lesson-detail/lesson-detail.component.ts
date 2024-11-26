@@ -1,4 +1,4 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {Component, ElementRef, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router";
 import {EnrollmentWithCourseDataService} from "../enrollment-with-course-data.service";
 import {Observable, Subscription} from "rxjs";
@@ -7,8 +7,6 @@ import {AsyncPipe, NgIf} from "@angular/common";
 import {Section} from "../../../../administration/courses/model/view/section";
 import {EnrollmentsService} from "../../../service/enrollments.service";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
-import {VideoPlayerComponent} from "../../../../common/video-player/video-player.component";
-import {DocumentViewerComponent} from "../../../../common/document-viewer/document-viewer.component";
 import {LessonProgress} from "../../../model/lesson-progress";
 import {QuizSubmission} from "../../../model/quiz-submission";
 
@@ -18,8 +16,6 @@ import {QuizSubmission} from "../../../model/quiz-submission";
   imports: [
     AsyncPipe,
     NgIf,
-    VideoPlayerComponent,
-    DocumentViewerComponent,
     RouterLink
   ],
   templateUrl: './lesson-detail.component.html',
@@ -39,6 +35,7 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
   enrollmentWithCourse$!: Observable<EnrollmentWithCourseDto | null>;
   navigationSubscription?: Subscription;
   lessonType: 'video' | 'docx' = 'video';
+  @ViewChild('videoPlayer') videoPlayer: ElementRef | undefined;
 
   ngOnInit(): void {
     this.loadData();
@@ -144,9 +141,10 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
   }
 
   setLessonType(lessonLink: string): void {
-    const normalizedLink = lessonLink.trim().toLowerCase();  // Chuyển tất cả về chữ thường và loại bỏ khoảng trắng dư thừa
+    const normalizedLink = lessonLink.trim().toLowerCase();
     if (normalizedLink.endsWith('.mp4') || normalizedLink.endsWith('.avi') || normalizedLink.endsWith('.mkv')) {
       this.lessonType = 'video'; // Video
+      this.videoPlayer?.nativeElement.load();
     } else if (normalizedLink.endsWith('.docx')) {
       this.lessonType = 'docx'; // DOCX
     } else {

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lms-service
+  labels:
+    app: lms-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lms-service
+  template:
+    metadata:
+      labels:
+        app: lms-service
+    spec:
+      containers:
+        - name: lms-service
+          image: lms-service
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "sh", "-c", "sleep 5" ]
+          ports:
+            - containerPort: 7084
+          env:
+            - name: BPL_JVM_THREAD_COUNT
+              value: "50"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 7084
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 7084
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          volumeMounts:
+            - name: lms-config-volume
+              mountPath: /workspace/config
+      volumes:
+        - name: lms-config-volume
+          configMap:
+            name: lms-config

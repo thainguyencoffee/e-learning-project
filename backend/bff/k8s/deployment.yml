@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bff-service
+  labels:
+    app: bff-service
+spec:
+  selector:
+    matchLabels:
+      app: bff-service
+  template:
+    metadata:
+      labels:
+        app: bff-service
+    spec:
+      containers:
+        - name: bff-service
+          image: bff-service
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "sh", "-c", "sleep 5" ]
+          ports:
+            - containerPort: 7081
+          env:
+            - name: LMS_SERVICE_URI
+              value: http://lms-service
+          volumeMounts:
+            - name: bff-config-volume
+              mountPath: /workspace/config
+      volumes:
+        - name: bff-config-volume
+          configMap:
+            name: bff-config

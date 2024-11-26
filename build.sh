@@ -101,9 +101,6 @@ else
 fi
 
 $SED "s/LOCALHOST_NAME/${host}/g" nginx.conf
-if $WITHOUT_ANGULAR; then
-  $SED "s/4201/4200/g" nginx.conf
-fi
 cd ..
 
 if $WITHOUT_ANGULAR; then

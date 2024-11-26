@@ -1,19 +1,5 @@
-scheme: http
-hostname: localhost
-reverse-proxy-port: 7080
-reverse-proxy-uri: ${scheme}://${hostname}:${reverse-proxy-port}
-authorization-server-prefix: /auth
-realm_name: keycloak101
-issuer: ${reverse-proxy-uri}${authorization-server-prefix}/realms/${realm_name}
-client-id: bff-client
-client-secret: secret
-bff-port: 7081
-bff-prefix: /bff
-resource-server-port: 7084
-authorities-json-path: $.roles
-
 server:
-  port: ${bff-port}
+  port: 7081
 
 spring:
   application:
@@ -21,8 +7,8 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: bff
-          uri: ${scheme}://${hostname}:${resource-server-port}
+        - id: lms
+          uri: ${LMS_SERVICE_URI:http://localhost:7084}
           predicates:
             - Path=/api/**
           filters:
@@ -35,13 +21,13 @@ spring:
       client:
         provider:
           keycloak101:
-            issuer-uri: ${issuer}
+            issuer-uri: http://localhost:7080/auth/realms/keycloak101
         registration:
           keycloak101:
             provider: keycloak101
             authorization-grant-type: authorization_code
-            client-id: ${client-id}
-            client-secret: ${client-secret}
+            client-id: bff-client
+            client-secret: secret
             scope: openid,profile,email,offline_access
 
 com:
@@ -49,12 +35,12 @@ com:
     springaddons:
       oidc:
         ops:
-          - iss: ${issuer}
+          - iss: ${spring.security.oauth2.client.provider.keycloak101.issuer-uri}
             authorities:
-              - path: ${authorities-json-path}
-            aud: ${audience}
+              - path: $.roles
+            aud:
         client:
-          client-uri: ${reverse-proxy-uri}${bff-prefix}
+          client-uri: http://localhost:7080/bff
           security-matchers:
             - /api/**
             - /login/**
@@ -65,7 +51,7 @@ com:
             - /login/**
             - /oauth2/**
             - /logout/connect/back-channel/keycloak101
-          post-logout-redirect-host: ${hostname}
+          post-logout-redirect-host: localhost
           csrf: cookie_accessible_from_js
           oauth2-redirections:
             rp-initiated-logout: accepted
@@ -80,6 +66,7 @@ com:
             - /error
             - /actuator/health/readiness
             - /actuator/health/liveness
+            - /greeting
 
 management:
   endpoint:
@@ -95,3 +82,6 @@ management:
       enabled: true
     readinessstate:
       enabled: true
+
+bff:
+  greeting: Welcome to BFF from local!

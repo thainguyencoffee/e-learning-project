@@ -1,0 +1,12 @@
+# Build
+custom_build(
+    ref = 'bff-service',
+    command = '../gradlew :bff:bootBuildImage --imageName $EXPECTED_REF',
+    deps = ['build.gradle', 'src']
+)
+
+# Deploy
+k8s_yaml(kustomize('k8s'))
+
+# Manage
+k8s_resource('bff-service', port_forwards=['7081'])

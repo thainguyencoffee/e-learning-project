@@ -1,0 +1,10 @@
+lms:
+  greeting: Welcome to LMS from Kubernetes!
+spring:
+  datasource:
+    url: jdbc:postgresql://el-postgres/lms
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://el-keycloak/auth/realms/keycloak101

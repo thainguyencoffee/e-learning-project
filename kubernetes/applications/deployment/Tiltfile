@@ -1,0 +1,4 @@
+include('../../../backend/bff/Tiltfile')
+include('../../../backend/lms/Tiltfile')
+
+update_settings(max_parallel_updates=1)

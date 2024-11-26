@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lms-service
+spec:
+  template:
+    spec:
+      containers:
+        - name: lms-service
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: staging

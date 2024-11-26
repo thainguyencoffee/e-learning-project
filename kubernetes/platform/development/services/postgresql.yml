@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: el-postgres
+  labels:
+    db: el-postgres
+spec:
+  selector:
+    matchLabels:
+      db: el-postgres
+  template:
+    metadata:
+      labels:
+        db: el-postgres
+    spec:
+      containers:
+        - name: el-postgres
+          image: postgres:latest
+          env:
+            - name: POSTGRES_PASSWORD
+              value: secret
+          volumeMounts:
+            - name: el-postgres-volume
+              mountPath: /docker-entrypoint-initdb.d/
+          resources:
+            requests:
+              cpu: 100m
+              memory: 60Mi
+            limits:
+              cpu: 200m
+              memory: 120Mi
+      volumes:
+        - name: el-postgres-volume
+          configMap:
+            name: el-postgres-config
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: el-postgres-config
+data:
+  init.sql: |
+    create database lms;
+    create database keycloak;
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: el-postgres
+  labels:
+    db: el-postgres
+spec:
+  type: ClusterIP
+  selector:
+    db: el-postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
