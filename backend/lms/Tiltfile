@@ -1,7 +1,7 @@
 # Build
 custom_build(
     ref = 'lms-service',
-    command = '../gradlew bootBuildImage --imageName $EXPECTED_REF',
+    command = '../gradlew :lms:bootBuildImage --imageName $EXPECTED_REF',
     deps = ['build.gradle', 'src']
 )
 

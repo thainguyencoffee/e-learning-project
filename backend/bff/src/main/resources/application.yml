@@ -7,13 +7,12 @@ realm_name: keycloak101
 issuer: ${reverse-proxy-uri}${authorization-server-prefix}/realms/${realm_name}
 client-id: bff-client
 client-secret: secret
-bff-port: 7081
 bff-prefix: /bff
 resource-server-port: 7084
 authorities-json-path: $.roles
 
 server:
-  port: ${bff-port}
+  port: 7084
 
 spring:
   application:
