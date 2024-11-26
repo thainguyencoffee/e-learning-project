@@ -66,6 +66,7 @@ com:
             - /error
             - /actuator/health/readiness
             - /actuator/health/liveness
+            - /greeting
 
 management:
   endpoint:

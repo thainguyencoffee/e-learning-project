@@ -7,7 +7,7 @@ env:
   IMAGE_NAME_LMS: thainguyencoffee/lms-service
   IMAGE_NAME_BFF: thainguyencoffee/bff-service
   IMAGE_NAME_ANGULAR_UI: thainguyencoffee/angular-ui
-  VERSION: latest
+  VERSION: ${{ github.sha }}
 
 jobs:
   build:
@@ -167,3 +167,12 @@ jobs:
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LMS }}:${{ env.VERSION }}
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BFF }}:${{ env.VERSION }}
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_ANGULAR_UI }}:${{ env.VERSION }}
+
+      - name: Publish container image (latest)
+        run: |
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LMS }}:${{ env.VERSION }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LMS }}:latest
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BFF }}:${{ env.VERSION }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BFF }}:latest
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_ANGULAR_UI }}:${{ env.VERSION }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_ANGULAR_UI }}:latest
+            docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LMS }}:latest
+            docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BFF }}:latest
+            docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_ANGULAR_UI }}:latest
