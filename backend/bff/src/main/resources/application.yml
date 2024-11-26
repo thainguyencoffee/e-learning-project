@@ -35,7 +35,7 @@ com:
     springaddons:
       oidc:
         ops:
-          - iss: http://localhost:7080/auth/realms/keycloak101
+          - iss: ${spring.security.oauth2.client.provider.keycloak101.issuer-uri}
             authorities:
               - path: $.roles
             aud:
