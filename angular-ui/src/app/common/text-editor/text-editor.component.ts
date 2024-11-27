@@ -2,6 +2,8 @@ import {AfterViewInit, Component, ElementRef, EventEmitter, inject, Input, Outpu
 import Quill from "quill";
 import {UploadService} from "../upload/upload.service";
 import {ErrorHandler} from "../error-handler.injectable";
+import {FormControl} from "@angular/forms";
+import {filter, first} from "rxjs";
 
 @Component({
   selector: 'app-text-editor',
@@ -15,7 +17,8 @@ export class TextEditorComponent implements AfterViewInit{
 
   @ViewChild('editorContainer', { static: false }) editorContainer!: ElementRef;
   @Output() contentChange = new EventEmitter<string>();
-  @Input() content = '';
+  @Input({required: true}) control?: FormControl;
+
   uploadService = inject(UploadService);
   errorHandler = inject(ErrorHandler);
   editor!: Quill;
@@ -33,7 +36,12 @@ export class TextEditorComponent implements AfterViewInit{
       }
     })
 
-    this.editor.root.innerHTML = this.content;
+    this.control?.valueChanges.pipe(
+      filter(value => !!value),
+      first()
+    ).subscribe(value => {
+      this.editor.root.innerHTML = value;
+    })
 
     const toolbar = this.editor.getModule('toolbar') as any;
     toolbar.addHandler('image', this.imageHandler.bind(this))

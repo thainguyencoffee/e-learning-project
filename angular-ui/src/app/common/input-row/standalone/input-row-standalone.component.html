@@ -23,7 +23,7 @@
       }
 
       @else if (rowType === 'textarea') {
-        <app-text-editor (contentChange)="textEditorChange($event)" />
+        <app-text-editor (contentChange)="textEditorChange($event)" [control]="control" />
       }
 
       @else if (rowType === 'select') {
