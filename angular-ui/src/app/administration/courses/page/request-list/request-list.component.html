@@ -39,7 +39,7 @@
         <td>{{ request.type }}</td>
         <td>{{ request.status }}</td>
         <td>{{ request.requestedBy === userService.current.name ? 'This account' : request.requestedBy }}</td>
-        <td>{{ request.resolvedBy === userService.current.name ? 'This account' : request.resolvedBy }}</td>
+        <td>{{ request.resolvedBy === userService.current.name ? 'This account' : request.resolvedBy || 'has not been resolved yet.' }}</td>
         <td>
           <ng-container *ngIf="!request.resolved">
             <a [routerLink]="[resourceUrl, 'approve', request.id]"
@@ -49,7 +49,7 @@
                class="btn btn-sm btn-secondary ms-2"
                *ngIf="canResolveRequest(request)">Reject</a>
           </ng-container>
-          <a [routerLink]="[resourceUrl, request.id]" class="btn btn-sm btn-secondary me-2">View</a>
+          <a [routerLink]="[resourceUrl, request.id]" class="btn btn-sm btn-secondary ms-2">View</a>
         </td>
       </tr>
       </tbody>

@@ -64,7 +64,9 @@
       <!-- Quiz Title -->
       <div class="mb-4">
         <h2>{{ quizDetail.title }}</h2>
-        <p class="text-muted">{{ quizDetail.description }}</p>
+        <p class="text-muted">
+          <span [innerHTML]="quizDetail.description"></span>
+        </p>
       </div>
 
       <!-- Questions -->

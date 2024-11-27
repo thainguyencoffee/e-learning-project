@@ -94,7 +94,9 @@
               <span *ngFor="let star of getStarsIcon(course.averageRating)" [innerHTML]="star"></span>
             </div>
             <!-- Comment -->
-            <p class="mt-2">{{ review.comment }}</p>
+            <p class="mt-2">
+              <span [innerHTML]="review.comment"></span>
+            </p>
             <!-- Review date -->
             <small class="text-muted">{{ review.reviewDate | date:'short' }}</small>
           </div>
