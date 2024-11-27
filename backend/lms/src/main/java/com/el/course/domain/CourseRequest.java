@@ -5,6 +5,8 @@ import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDateTime;
+
 @Table("course_request")
 @Getter
 public class CourseRequest  {
@@ -19,6 +21,8 @@ public class CourseRequest  {
     private String message;
     private String rejectReason;
     private String approveMessage;
+    private LocalDateTime requestedDate;
+    private LocalDateTime resolvedDate;
 
     public CourseRequest(RequestType type, String message, String requestedBy) {
         if (type == null) {
@@ -34,6 +38,7 @@ public class CourseRequest  {
         this.type = type;
         this.message = message;
         this.requestedBy = requestedBy;
+        this.requestedDate = LocalDateTime.now();
 
         this.status = RequestStatus.PENDING;
         this.resolved = false;
@@ -50,6 +55,7 @@ public class CourseRequest  {
         this.status = RequestStatus.APPROVED;
         this.approveMessage = approveMessage;
         this.resolvedBy = approvedBy;
+        this.resolvedDate = LocalDateTime.now();
         this.resolved = true;
     }
 
@@ -64,6 +70,7 @@ public class CourseRequest  {
         this.status = RequestStatus.REJECTED;
         this.rejectReason = rejectReason;
         this.resolvedBy = rejectedBy;
+        this.resolvedDate = LocalDateTime.now();
         this.resolved = true;
     }
 

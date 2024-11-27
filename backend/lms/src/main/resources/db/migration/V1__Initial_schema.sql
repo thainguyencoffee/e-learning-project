@@ -27,12 +27,12 @@ create table course
 CREATE INDEX idx_course_fulltext
     ON course USING GIN (
     to_tsvector(
-        'english',
-        title || ' ' ||
-        teacher || ' ' ||
-        description
+    'english',
+    title || ' ' ||
+    teacher || ' ' ||
+    description
     )
-);
+    );
 
 create table course_request
 (
@@ -46,6 +46,8 @@ create table course_request
     message         varchar(2000) not null,
     reject_reason   varchar(2000),
     approve_message varchar(2000),
+    requested_date  timestamp     not null,
+    resolved_date   timestamp,
     constraint fk_course_request primary key (id)
 );
 
@@ -303,12 +305,12 @@ create table salary_record
     id             bigserial   not null,
     salary         bigint      not null references salary (id) on DELETE cascade,
     type           varchar(50) not null,
-    price         varchar(50) not null,
+    price          varchar(50) not null,
     created_date   timestamp   not null,
     paid_date      timestamp,
     noc_by_month   int         not null,
     nos_by_month   int         not null,
-    total_price   varchar(50) not null,
+    total_price    varchar(50) not null,
     status         varchar(50) not null,
     failure_reason varchar(500),
     constraint fk_salary_record primary key (id)

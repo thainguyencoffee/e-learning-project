@@ -28,6 +28,8 @@
             "styles": [
               "src/styles.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/quill/dist/quill.snow.css",
+
               "node_modules/bootstrap-icons/font/bootstrap-icons.css",
               "node_modules/video.js/dist/video-js.css",
               "node_modules/flatpickr/dist/flatpickr.css"

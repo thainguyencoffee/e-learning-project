@@ -26,8 +26,7 @@
       }
 
       @else if (rowType === 'textarea') {
-        <textarea [id]="field + randomId" [formControlName]="field" [placeholder]="placeholder"
-                  class="form-control {{ getInputClasses() }}"></textarea>
+          <app-text-editor (contentChange)="textEditorChange($event)"/>
       }
 
       @else if (rowType === 'select') {

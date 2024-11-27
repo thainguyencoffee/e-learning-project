@@ -1,4 +1,4 @@
-import { KeyValuePipe, NgForOf, NgIf } from '@angular/common';
+import {AsyncPipe, KeyValuePipe, NgForOf, NgIf} from '@angular/common';
 import {
   AfterViewInit,
   Component,
@@ -21,12 +21,13 @@ import {
 import { InputErrorsComponent } from "./input-errors.component";
 import flatpickr from 'flatpickr';
 import {FileRowComponent} from "./shared/file-row.component";
+import {TextEditorComponent} from "../text-editor/text-editor.component";
 
 @Component({
   selector: 'app-input-row',
   standalone: true,
   templateUrl: './input-row.component.html',
-  imports: [ReactiveFormsModule, InputErrorsComponent, KeyValuePipe, FormsModule, NgForOf, NgIf, FileRowComponent],
+  imports: [ReactiveFormsModule, InputErrorsComponent, KeyValuePipe, FormsModule, NgForOf, NgIf, FileRowComponent, TextEditorComponent],
 })
 export class InputRowComponent implements AfterViewInit, OnChanges {
 
@@ -109,6 +110,10 @@ export class InputRowComponent implements AfterViewInit, OnChanges {
       : this.datepicker === 'timepicker'
         ? 'H:i:S'
         : 'Y-m-dTH:i:S';
+  }
+
+  textEditorChange($event: string) {
+    this.dynamicControl?.setValue($event);
   }
 
 }
