@@ -2,7 +2,7 @@ import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 import {CourseService} from "../../service/course.service";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
-import {updateForm, updateFormAdvanced, validJson} from "../../../../common/utils";
+import {updateFormAdvanced} from "../../../../common/utils";
 import {FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {InputRowComponent} from "../../../../common/input-row/input-row.component";
 import {EditCourseDto} from "../../model/edit-course.dto";
@@ -17,7 +17,7 @@ import {ArrayRowComponent} from "../../../../common/input-row/array/array-row.co
     FormsModule,
     InputRowComponent,
     ReactiveFormsModule,
-    ArrayRowComponent
+    ArrayRowComponent,
   ],
   templateUrl: './edit-course.component.html',
 })

@@ -31,8 +31,6 @@ export class EnrollmentContentComponent implements OnInit {
   enrollmentId?: number;
   enrollmentWithCourse$!: Observable<EnrollmentWithCourseDto | null>;
 
-  showFullDescription: boolean = false;
-
   ngOnInit(): void {
     this.loadData();
   }

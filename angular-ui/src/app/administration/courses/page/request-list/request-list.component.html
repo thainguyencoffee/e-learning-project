@@ -27,8 +27,8 @@
         <th scope="col">Id</th>
         <th scope="col">Type</th>
         <th scope="col">Status</th>
-        <th scope="col">RequestBy</th>
-        <th scope="col">Message</th>
+        <th scope="col">Request by</th>
+        <th scope="col">Solved by</th>
         <th><!-- --></th>
       </tr>
       </thead>
@@ -39,26 +39,17 @@
         <td>{{ request.type }}</td>
         <td>{{ request.status }}</td>
         <td>{{ request.requestedBy === userService.current.name ? 'This account' : request.requestedBy }}</td>
-        <td>
-          <p class="mb-3">
-            {{ expandMessageFlags[request.id] ? request.message : (request.message | slice: 0: 50) + '...' }}
-            <ng-container *ngIf="request.message.length > 50">
-              <button class="btn btn-link p-0 text-primary"
-                      (click)="expandMessageFlags[request.id] = !expandMessageFlags[request.id]">
-                {{ expandMessageFlags[request.id] ? 'Collapse' : 'Expand' }}
-              </button>
-            </ng-container>
-          </p>
-        </td>
+        <td>{{ request.resolvedBy === userService.current.name ? 'This account' : request.resolvedBy || 'has not been resolved yet.' }}</td>
         <td>
           <ng-container *ngIf="!request.resolved">
-            <a [routerLink]="['/administration/courses', courseId, 'requests', 'approve', request.id]"
+            <a [routerLink]="[resourceUrl, 'approve', request.id]"
                class="btn btn-sm btn-success ms-2"
                *ngIf="canResolveRequest(request)">Approve</a>
-            <a [routerLink]="['/administration/courses', courseId, 'requests', 'reject', request.id]"
+            <a [routerLink]="[resourceUrl, 'reject', request.id]"
                class="btn btn-sm btn-secondary ms-2"
                *ngIf="canResolveRequest(request)">Reject</a>
           </ng-container>
+          <a [routerLink]="[resourceUrl, request.id]" class="btn btn-sm btn-secondary ms-2">View</a>
         </td>
       </tr>
       </tbody>

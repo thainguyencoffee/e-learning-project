@@ -21,13 +21,14 @@ import {Router} from "@angular/router";
 import flatpickr from 'flatpickr';
 import {InputErrorsComponent} from "../input-errors.component";
 import {FileRowComponent} from "../shared/file-row.component";
+import {TextEditorComponent} from "../../text-editor/text-editor.component";
 
 
 @Component({
   selector: 'app-input-row-standalone',
   standalone: true,
   templateUrl: './input-row-standalone.component.html',
-  imports: [ReactiveFormsModule, InputErrorsComponent, KeyValuePipe /**/, FormsModule, NgForOf, NgIf, FileRowComponent]
+    imports: [ReactiveFormsModule, InputErrorsComponent, KeyValuePipe /**/, FormsModule, NgForOf, NgIf, FileRowComponent, TextEditorComponent]
 })
 export class InputRowStandaloneComponent implements AfterViewInit, OnChanges {
 
@@ -118,4 +119,7 @@ export class InputRowStandaloneComponent implements AfterViewInit, OnChanges {
         : 'Y-m-dTH:i:S';
   }
 
+  textEditorChange($event: string) {
+    this.control?.setValue($event);
+  }
 }

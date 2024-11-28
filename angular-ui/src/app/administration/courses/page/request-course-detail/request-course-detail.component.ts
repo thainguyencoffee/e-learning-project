@@ -2,7 +2,7 @@ import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterLink} from "@angular/router";
 import {CourseService} from "../../service/course.service";
 import {CourseRequest} from "../../model/view/course-request";
-import {NgClass, NgIf} from "@angular/common";
+import {DatePipe, NgClass, NgIf} from "@angular/common";
 import {UserService} from "../../../../common/auth/user.service";
 
 @Component({
@@ -11,7 +11,8 @@ import {UserService} from "../../../../common/auth/user.service";
   imports: [
     NgIf,
     RouterLink,
-    NgClass
+    NgClass,
+    DatePipe
   ],
   templateUrl: './request-course-detail.component.html',
 })
@@ -24,12 +25,14 @@ export class RequestCourseDetailComponent implements OnInit{
   courseId?: number;
   requestId?: number;
   requestCourse?: CourseRequest;
+  resourceUrl?: string;
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.courseId = params['courseId'];
       this.requestId = params['requestId'];
     });
+    this.resourceUrl = `/administration/courses/${this.courseId}/requests`
 
     this.courseService.getCourse(this.courseId!).subscribe({
       next: course => {

@@ -20,7 +20,6 @@ import {QuizSubmission} from "../../../model/quiz-submission";
     NgTemplateOutlet,
   ],
   templateUrl: './quiz-submit.component.html',
-  styleUrl: './quiz-submit.component.css'
 })
 export class QuizSubmitComponent implements OnInit, OnDestroy {
 

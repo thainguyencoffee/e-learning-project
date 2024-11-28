@@ -23,8 +23,7 @@
       }
 
       @else if (rowType === 'textarea') {
-        <textarea [id]="index" [formControl]="control!" [placeholder]="placeholder"
-                  class="form-control {{ getInputClasses() }}"></textarea>
+        <app-text-editor (contentChange)="textEditorChange($event)" [control]="control" />
       }
 
       @else if (rowType === 'select') {
