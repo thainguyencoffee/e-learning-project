@@ -51,9 +51,4 @@ public class OrderController {
         return ResponseEntity.created(URI.create("/orders/" + orderCreated.getId())).body(orderCreated);
     }
 
-    @GetMapping("/purchased-courses")
-    public ResponseEntity<List<Long>> purchasedCourses(@AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.ok(orderService.purchasedCourses(jwt.getClaim(StandardClaimNames.PREFERRED_USERNAME)));
-    }
-
 }

@@ -22,4 +22,9 @@ public class OrderPaidListener {
         }
     }
 
+    @ApplicationModuleListener
+    public void handleOrderExchangePaid(Order.OrderExchangePaidEvent e) {
+        courseEnrollmentService.changeCourseByOrderExchangeEvent(e.exchangeDetails().enrollmentId(), e.exchangeDetails().courseId());
+    }
+
 }

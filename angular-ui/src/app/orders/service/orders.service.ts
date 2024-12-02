@@ -26,8 +26,4 @@ export class OrdersService {
     return this.http.get<Order>(`${this.resourcePath}/${orderId}`);
   }
 
-  getAllCourseIdsHasPurchased() {
-    return this.http.get<number[]>(`${this.resourcePath}/purchased-courses`);
-  }
-
 }

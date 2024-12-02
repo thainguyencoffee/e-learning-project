@@ -1,5 +1,6 @@
 package com.el.enrollment.domain;
 
+import com.el.common.MoneyUtils;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
+import javax.money.MonetaryAmount;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,9 +32,11 @@ public class Enrollment extends AbstractAggregateRoot<Enrollment> {
     private Boolean completed;
     private Boolean reviewed = false;
     private LocalDateTime completedDate;
+
     private Certificate certificate;
     @MappedCollection(idColumn = "enrollment")
     private Set<QuizSubmission> quizSubmissions = new HashSet<>();
+    private Boolean changedCourse;
     @CreatedBy
     private String createdBy;
     @CreatedDate
@@ -57,9 +61,70 @@ public class Enrollment extends AbstractAggregateRoot<Enrollment> {
         this.completed = false;
         this.quizIds = quizIds;
         this.totalLessons = 0;
+        this.changedCourse = false;
 
         lessonProgresses.forEach(this::addLessonProgress);
     }
+
+    public void changeCourse(Long newCourseId, String teacher, Set<LessonProgress> lessonProgresses,
+                             Set<Long> quizIds) {
+        if (newCourseId == null) throw new InputInvalidException("New course id must not be null.");
+        if (lessonProgresses == null || lessonProgresses.isEmpty())
+            throw new InputInvalidException("LessonProgresses must not be null or empty.");
+        if (quizIds == null || quizIds.isEmpty())
+            throw new InputInvalidException("QuizIds must not be null or empty.");
+        if (newCourseId.equals(courseId)) throw new InputInvalidException("New course id must be different from the current course id.");
+
+        if (!getCanChangeCourse()) {
+            throw new InputInvalidException("You can't request change course.");
+        }
+
+        if (!this.teacher.equals(teacher)) {
+            registerEvent(new EnrollNewTeacherCourseEvent(this.teacher, teacher));
+        }
+
+        this.courseId = newCourseId;
+        this.teacher = teacher;
+        this.quizIds = quizIds;
+        this.totalLessons = 0;
+        this.lessonProgresses.clear();
+        this.quizSubmissions.clear();
+        this.changedCourse = true;
+        lessonProgresses.forEach(this::addLessonProgress);
+        enrollmentDate = LocalDateTime.now();
+    }
+
+    public void requestChangeCourse(Long newCourseId,
+                                    MonetaryAmount oldCoursePrice,
+                                    MonetaryAmount newCoursePrice,
+                                    String teacher,
+                                    Set<LessonProgress> lessonProgresses,
+                                    Set<Long> quizIds) throws AdditionalPaymentRequiredException {
+        if (oldCoursePrice == null) throw new InputInvalidException("Old course price must not be null.");
+        if (newCoursePrice == null) throw new InputInvalidException("New course price must not be null.");
+        if (newCourseId.equals(courseId)) throw new InputInvalidException("New course id must be different from the current course id.");
+
+        if (!getCanChangeCourse()) {
+            throw new InputInvalidException("You can't request change course.");
+        }
+        MoneyUtils.checkValidPrice(oldCoursePrice, newCoursePrice.getCurrency());
+
+        MonetaryAmount priceDifference = newCoursePrice.subtract(oldCoursePrice);
+        if (priceDifference.isPositive()) {
+            throw new AdditionalPaymentRequiredException(priceDifference);
+        }
+
+        changeCourse(newCourseId, teacher, lessonProgresses, quizIds);
+    }
+
+    private boolean isSevenDaysAfterEnrollment() {
+        return LocalDateTime.now().minusDays(7).isAfter(enrollmentDate);
+    }
+
+    public boolean getCanChangeCourse() {
+        return !completed && !changedCourse && !isSevenDaysAfterEnrollment();
+    }
+
 
     public void markLessonAsCompleted(Long lessonId, String lessonTitle) {
         LessonProgress lessonProgress = lessonProgresses.stream()
@@ -210,6 +275,9 @@ public class Enrollment extends AbstractAggregateRoot<Enrollment> {
     }
 
     public record EnrollmentCreatedEvent(String teacher) {
+    }
+
+    public record EnrollNewTeacherCourseEvent(String oldTeacher, String newTeacher) {
     }
 
 }

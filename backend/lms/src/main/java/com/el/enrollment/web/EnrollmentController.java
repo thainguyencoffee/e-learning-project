@@ -38,11 +38,6 @@ public class EnrollmentController {
         return ResponseEntity.ok(new PageImpl<>(result, pageable, result.size()));
     }
 
-    @GetMapping("/{enrollmentId}")
-    public ResponseEntity<Enrollment> getEnrollmentById(@PathVariable Long enrollmentId) {
-        return ResponseEntity.ok(courseEnrollmentService.findCourseEnrollmentById(enrollmentId));
-    }
-
     @GetMapping("/count")
     public ResponseEntity<Integer> countEnrollmentsByCourseId(@RequestParam(name = "courseId") Long courseId) {
         return ResponseEntity.ok(enrollmentRepository.countAllByCourseId(courseId));
@@ -77,7 +72,7 @@ public class EnrollmentController {
 
     @GetMapping("/{enrollmentId}/quizzes/{quizId}")
     public ResponseEntity<QuizDetailDTO> getQuiz(@PathVariable Long enrollmentId,
-                                        @PathVariable Long quizId) {
+                                                 @PathVariable Long quizId) {
         QuizDetailDTO quizDetailDTO = courseEnrollmentService.findQuizByIdAndQuizId(enrollmentId, quizId);
         return ResponseEntity.ok(quizDetailDTO);
     }
@@ -90,7 +85,7 @@ public class EnrollmentController {
 
     @GetMapping("/{enrollmentId}/quizzes/{quizSubmissionId}/submission")
     public ResponseEntity<QuizSubmission> getQuizSubmission(@PathVariable Long enrollmentId,
-                                                           @PathVariable Long quizSubmissionId) {
+                                                            @PathVariable Long quizSubmissionId) {
         return ResponseEntity.ok(courseEnrollmentService.getQuizSubmission(enrollmentId, quizSubmissionId));
     }
 
@@ -103,9 +98,18 @@ public class EnrollmentController {
 
     @PostMapping("/{enrollmentId}/submit-quiz")
     public ResponseEntity<Long> submitQuiz(@PathVariable Long enrollmentId,
-                                                            @Valid @RequestBody QuizSubmitDTO quizSubmitDTO) {
+                                           @Valid @RequestBody QuizSubmitDTO quizSubmitDTO) {
         return ResponseEntity.ok(courseEnrollmentService.submitQuiz(enrollmentId, quizSubmitDTO));
     }
 
+    @PutMapping("/{enrollmentId}/change-course")
+    public ResponseEntity<ChangeCourseResponse> changeCourse(@PathVariable Long enrollmentId, @RequestParam Long courseId) {
+        return ResponseEntity.ok(courseEnrollmentService.changeCourse(enrollmentId, courseId));
+    }
+
+    @GetMapping("/purchased-courses")
+    public ResponseEntity<List<Long>> purchasedCourses() {
+        return ResponseEntity.ok(courseEnrollmentService.getPurchasedCourseIds());
+    }
 
 }

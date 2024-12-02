@@ -70,16 +70,6 @@ public interface EnrollmentRepository extends CrudRepository<Enrollment, Long> {
 
     Optional<Enrollment> findByIdAndStudent(Long id, String student);
 
-    @Query("""
-        SELECT
-            e.*
-        FROM
-            enrollment e
-                JOIN
-            course c ON e.course_id = c.id
-        WHERE e.id = :id 
-          AND c.teacher = :teacher
-    """)
     Optional<Enrollment> findByIdAndTeacher(Long id, String teacher);
 
     Optional<Enrollment> findByCourseIdAndStudent(Long courseId, String student);
@@ -160,4 +150,11 @@ public interface EnrollmentRepository extends CrudRepository<Enrollment, Long> {
     """)
     List<StudentsByCourseDTO> statsStudentsByCourse(String teacher, int page, int size);
 
+    @Query("""
+        SELECT 
+            e.course_id
+        FROM enrollment e
+        WHERE e.student = :student
+    """)
+    List<Long> getEnrolledCourseIdsByStudent(String student);
 }

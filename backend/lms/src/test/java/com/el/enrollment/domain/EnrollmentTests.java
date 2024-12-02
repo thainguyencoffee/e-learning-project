@@ -2,14 +2,19 @@ package com.el.enrollment.domain;
 
 
 import com.el.TestFactory;
+import com.el.common.Currencies;
 import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.domain.QuestionType;
+import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.Test;
 
+import javax.money.MonetaryAmount;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.spy;
 
 class EnrollmentTests {
 
@@ -27,6 +32,7 @@ class EnrollmentTests {
         assertEquals(2L, enrollment.getLessonProgresses().size());
 
         assertEquals(2, enrollment.getQuizIds().size());
+        assertFalse(enrollment.getChangedCourse());
         assertEquals(2L, enrollment.getProgress().totalLessons());
         assertEquals(0, enrollment.getProgress().completedLessons());
     }
@@ -208,6 +214,81 @@ class EnrollmentTests {
 
         InputInvalidException e = assertThrows(InputInvalidException.class, () -> enrollment.findLessonProgressByLessonId(null));
         assertEquals("LessonId must not be null.", e.getMessage());
+    }
+
+    @Test
+    void requestChangeCourse_ShouldChangeCourse_WhenValid() throws AdditionalPaymentRequiredException {
+        Enrollment enrollment = spy(new Enrollment("user", 1L, "teacher", Set.of(
+                new LessonProgress("Course Lesson 1", 1L),
+                new LessonProgress("Course Lesson 2", 2L)),
+                Set.of(1L, 2L)));
+        enrollment.markAsEnrolled();
+
+        LocalDateTime enrollmentDate = enrollment.getEnrollmentDate();
+        MonetaryAmount oldCoursePrice = Money.of(100, Currencies.USD);
+        MonetaryAmount newCoursePrice = Money.of(80, Currencies.USD);
+
+        enrollment.requestChangeCourse(2L, oldCoursePrice, newCoursePrice, "newTeacher", Set.of(
+                        new LessonProgress("New Course Lesson 1", 3L),
+                        new LessonProgress("New Course Lesson 2", 4L)),
+                Set.of(3L, 4L, 5L));
+
+        assertEquals(2L, enrollment.getCourseId());
+        assertEquals("newTeacher", enrollment.getTeacher());
+        assertEquals(2, enrollment.getLessonProgresses().size());
+        assertEquals(3, enrollment.getQuizIds().size());
+        assertTrue(enrollment.getChangedCourse());
+        assertNotEquals(enrollment.getEnrollmentDate(), enrollmentDate);
+    }
+
+    @Test
+    void requestChangeCourse_ShouldThrowException_WhenAdditionalPaymentRequired() {
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
+                new LessonProgress("Course Lesson 1", 1L),
+                new LessonProgress("Course Lesson 2", 2L)),
+                Set.of(1L, 2L));
+        enrollment.markAsEnrolled();
+
+        MonetaryAmount oldCoursePrice = Money.of(100, Currencies.USD);
+        MonetaryAmount newCoursePrice = Money.of(120, Currencies.USD);
+
+        assertThrows(AdditionalPaymentRequiredException.class, () -> enrollment.requestChangeCourse(2L, oldCoursePrice, newCoursePrice, "newTeacher", Set.of(
+                        new LessonProgress("New Course Lesson 1", 3L),
+                        new LessonProgress("New Course Lesson 2", 4L)),
+                Set.of(3L, 4L)));
+    }
+
+    @Test
+    void changeCourse_ShouldChangeCourse_WhenValid() {
+        Enrollment enrollment = spy(new Enrollment("user", 1L, "teacher", Set.of(
+                new LessonProgress("Course Lesson 1", 1L),
+                new LessonProgress("Course Lesson 2", 2L)),
+                Set.of(1L, 2L)));
+        enrollment.markAsEnrolled();
+
+        enrollment.changeCourse(2L, "newTeacher", Set.of(
+                        new LessonProgress("New Course Lesson 1", 3L)),
+                Set.of(3L, 4L, 5L));
+
+        assertEquals(2L, enrollment.getCourseId());
+        assertEquals("newTeacher", enrollment.getTeacher());
+        assertEquals(1, enrollment.getLessonProgresses().size());
+        assertEquals(3, enrollment.getQuizIds().size());
+        assertTrue(enrollment.getChangedCourse());
+        assertNotNull(enrollment.getEnrollmentDate());
+    }
+
+    @Test
+    void changeCourse_ShouldThrowException_WhenNewCourseIdIsSameAsCurrent() {
+        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
+                new LessonProgress("Course Lesson 1", 1L),
+                new LessonProgress("Course Lesson 2", 2L)),
+                Set.of(1L, 2L));
+
+        assertThrows(InputInvalidException.class, () -> enrollment.changeCourse(1L, "newTeacher", Set.of(
+                        new LessonProgress("New Course Lesson 1", 3L),
+                        new LessonProgress("New Course Lesson 2", 4L)),
+                Set.of(3L, 4L)));
     }
 
 }

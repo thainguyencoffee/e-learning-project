@@ -71,6 +71,11 @@
               </a>
             </div>
 
+            <div *ngIf="enrollment && enrollment.canChangeCourse" class="alert alert-success mt-3" role="alert">
+              <h6 class="alert-heading">Congratulations! You are eligible to redeem to any course when you purchase the course for less than 7 days</h6>
+              <a [routerLink]="['/change-course']" [queryParams]="{courseId: enrollment.courseId, enrollmentId: enrollment.id}">Change</a>
+            </div>
+
             <div *ngIf="!enrollment" class="alert alert-warning mt-3" role="alert">
               <h6 class="alert-heading">You have not purchased this course!</h6>
               <p>To start learning, please purchase the course.</p>

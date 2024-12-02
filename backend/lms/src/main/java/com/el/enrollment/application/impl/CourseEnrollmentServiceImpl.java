@@ -10,15 +10,15 @@ import com.el.course.application.dto.PublishedCourseDTO;
 import com.el.course.domain.Course;
 import com.el.course.domain.QuizCalculationResult;
 import com.el.course.domain.Quiz;
+import com.el.enrollment.application.dto.ChangeCourseResponse;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.CourseEnrollmentService;
 import com.el.enrollment.application.dto.EnrollmentWithCourseDTO;
 import com.el.enrollment.application.dto.QuizDetailDTO;
+import com.el.enrollment.domain.*;
 import com.el.enrollment.web.dto.QuizSubmitDTO;
-import com.el.enrollment.domain.Enrollment;
-import com.el.enrollment.domain.EnrollmentRepository;
-import com.el.enrollment.domain.LessonProgress;
-import com.el.enrollment.domain.QuizSubmission;
+import com.el.order.application.OrderService;
+import com.el.order.domain.Order;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.data.domain.Pageable;
@@ -38,16 +38,24 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     private final CourseService courseService;
     private final UsersManagement usersManagement;
     private final RolesBaseUtil rolesBaseUtil;
+    private final OrderService orderService;
 
     public CourseEnrollmentServiceImpl(CertificateServiceS3Storage certificateServiceS3Storage, EnrollmentRepository repository,
                                        CourseQueryService courseQueryService, CourseService courseService, UsersManagement usersManagement,
-                                       RolesBaseUtil rolesBaseUtil) {
+                                       RolesBaseUtil rolesBaseUtil, OrderService orderService) {
         this.certificateServiceS3Storage = certificateServiceS3Storage;
         this.repository = repository;
         this.courseQueryService = courseQueryService;
         this.courseService = courseService;
         this.usersManagement = usersManagement;
         this.rolesBaseUtil = rolesBaseUtil;
+        this.orderService = orderService;
+    }
+
+    @Override
+    public Enrollment findById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
@@ -105,10 +113,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
     public void enrollment(String student, Long courseId) {
         Course course = courseQueryService.findPublishedCourseById(courseId);
-        Set<LessonProgress> lessonProgresses = course.getLessonIdAndTitleMap().entrySet()
-                .stream()
-                .map(entry -> new LessonProgress(entry.getValue(), entry.getKey()))
-                .collect(Collectors.toSet());
+        Set<LessonProgress> lessonProgresses = createLessonProgressesByCourse(course);
 
         Enrollment enrollment = new Enrollment(student, courseId, course.getTeacher(), lessonProgresses, course.getQuizIds());
         enrollment.markAsEnrolled();
@@ -192,8 +197,41 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     @Override
     public void deleteQuizSubmission(Long enrollmentId, Long quizSubmissionId) {
         Enrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        log.info("Delete quiz submission {} of enrollment: {}", quizSubmissionId, enrollment);
         enrollment.deleteQuizSubmission(quizSubmissionId);
         repository.save(enrollment);
+    }
+
+    @Override
+    public ChangeCourseResponse changeCourse(Long enrollmentId, Long courseId) {
+        Enrollment enrollment = findCourseEnrollmentById(enrollmentId);
+        Course oldCourse = courseQueryService.findPublishedCourseById(enrollment.getCourseId());
+        Course newCourse = courseQueryService.findPublishedCourseById(courseId);
+        Set<LessonProgress> lessonProgresses = createLessonProgressesByCourse(newCourse);
+        try {
+            enrollment.requestChangeCourse(courseId, oldCourse.getPrice(), newCourse.getPrice(), newCourse.getTeacher(), lessonProgresses, newCourse.getQuizIds());
+            repository.save(enrollment);
+            return ChangeCourseResponse.basicChange();
+        } catch (AdditionalPaymentRequiredException e) {
+            Order order = orderService.createOrderExchange(courseId, enrollmentId, e.getPriceAdditional());
+            return ChangeCourseResponse.pendingPaymentAdditional(order.getId(), e.getPriceAdditional());
+        }
+    }
+
+    // Event service
+    public void changeCourseByOrderExchangeEvent(Long enrollmentId, Long courseId) {
+        Enrollment enrollment = findById(enrollmentId);
+        Course newCourse = courseQueryService.findById(courseId);
+        Set<LessonProgress> lessonProgresses = createLessonProgressesByCourse(newCourse);
+
+        enrollment.changeCourse(courseId, newCourse.getTeacher(), lessonProgresses, newCourse.getQuizIds());
+        repository.save(enrollment);
+    }
+
+    @Override
+    public List<Long> getPurchasedCourseIds() {
+        String student = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+        return repository.getEnrolledCourseIdsByStudent(student);
     }
 
     private String getFullName(UserRepresentation userRepresentation) {
@@ -204,6 +242,13 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
         if (rolesBaseUtil.isTeacher() || rolesBaseUtil.isAdmin()) {
             throw new AccessDeniedException("You are not allowed to write, only students can write. You just can read.");
         }
+    }
+
+    private Set<LessonProgress> createLessonProgressesByCourse(Course course) {
+        return course.getLessonIdAndTitleMap().entrySet()
+                .stream()
+                .map(entry -> new LessonProgress(entry.getValue(), entry.getKey()))
+                .collect(Collectors.toSet());
     }
 
 }

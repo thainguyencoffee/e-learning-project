@@ -1,0 +1,33 @@
+<div class="row" *ngIf="currentCourse">
+  <div class="col-3">
+    <div class="col-12">
+      <h5 class="badge bg-success">Current course information</h5>
+      <app-course-card [course]="currentCourse" [showCheckoutButton]="false"/>
+    </div>
+  </div>
+
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    @for (course of courses; track course.id) {
+      <app-course-card [course]="course"
+                       [showCheckoutButton]="false"
+                       customButtonText="Change"
+                       [customButtonAction]="onChange.bind(this)"
+      />
+    }
+  </div>
+
+  <nav class="mt-3" aria-label="Page navigation example" *ngIf="paginationUtils">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="paginationUtils!.number === 0">
+        <button class="page-link" (click)="onPageChange(paginationUtils!.number - 1)">Previous</button>
+      </li>
+      <li class="page-item" *ngFor="let page of getPageRange()" [class.active]="page === paginationUtils!.number">
+        <button class="page-link" (click)="onPageChange(page)">{{ page + 1 }}</button>
+      </li>
+      <li class="page-item" [class.disabled]="paginationUtils!.number === paginationUtils!.totalPages - 1">
+        <button class="page-link" (click)="onPageChange(paginationUtils!.number + 1)">Next</button>
+      </li>
+    </ul>
+  </nav>
+
+</div>
