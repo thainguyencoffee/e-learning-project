@@ -127,10 +127,13 @@ public class Quiz {
                             .map(AnswerOption::getId)
                             .collect(Collectors.toSet());
 
-                    long selectedCorrectAnswers = userAnswerOptions.stream()
-                            .filter(correctOptionIds::contains)
-                            .count();
-                    score += (int) ((double) selectedCorrectAnswers / correctOptionIds.size() * question.getScore());
+//                    long selectedCorrectAnswers = userAnswerOptions.stream()
+//                            .filter(correctOptionIds::contains)
+//                            .count();
+//                    score += (int) ((double) selectedCorrectAnswers / correctOptionIds.size() * question.getScore());
+                    if (correctOptionIds.equals(userAnswerOptions)) {
+                        score += question.getScore();
+                    }
                 } else {
                     throw new InputInvalidException("Quiz calculation error: Multiple choice question must have multiple answers.");
                 }
