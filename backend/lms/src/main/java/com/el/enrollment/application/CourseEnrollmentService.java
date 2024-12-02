@@ -1,5 +1,6 @@
 package com.el.enrollment.application;
 
+import com.el.enrollment.application.dto.ChangeCourseResponse;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.application.dto.EnrollmentWithCourseDTO;
 import com.el.enrollment.application.dto.QuizDetailDTO;
@@ -11,6 +12,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface CourseEnrollmentService {
+
+    // bypass, just called by event
+    Enrollment findById(Long id);
 
     List<CourseEnrollmentDTO> findAllCourseEnrollments(Pageable pageable);
 
@@ -46,5 +50,11 @@ public interface CourseEnrollmentService {
     QuizDetailDTO findQuizByIdAndQuizId(Long enrollmentId, Long quizId);
 
     void deleteQuizSubmission(Long enrollmentId, Long quizSubmissionId);
+
+    ChangeCourseResponse changeCourse(Long enrollmentId, Long courseId);
+
+    void changeCourseByOrderExchangeEvent(Long enrollmentId, Long courseId);
+
+    List<Long> getPurchasedCourseIds();
 
 }

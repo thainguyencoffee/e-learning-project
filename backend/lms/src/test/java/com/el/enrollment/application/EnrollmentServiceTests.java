@@ -8,9 +8,12 @@ import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
 import com.el.course.domain.Course;
 import com.el.course.domain.Lesson;
+import com.el.enrollment.application.dto.ChangeCourseResponse;
 import com.el.enrollment.application.impl.CourseEnrollmentServiceImpl;
+import com.el.enrollment.domain.AdditionalPaymentRequiredException;
 import com.el.enrollment.domain.Enrollment;
 import com.el.enrollment.domain.EnrollmentRepository;
+import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -225,5 +229,30 @@ class EnrollmentServiceTests {
         verify(enrollmentRepository, never()).save(any(Enrollment.class));
     }
 
+    @Test
+    void changeCourse_ValidRequest_ChangesCourse() throws AdditionalPaymentRequiredException {
+        Enrollment enrollment = mock(Enrollment.class);
+        Course oldCourse = mock(Course.class);
+        Course newCourse = mock(Course.class);
+
+        // mock for enrollmentService.findCourseEnrollmentById
+        when(rolesBaseUtil.getCurrentPreferredUsernameFromJwt()).thenReturn("student");
+        when(rolesBaseUtil.isUser()).thenReturn(true);
+        when(enrollmentRepository.findByIdAndStudent(anyLong(), anyString())).thenReturn(Optional.of(enrollment));
+
+        when(courseQueryService.findPublishedCourseById(anyLong())).thenReturn(oldCourse).thenReturn(newCourse);
+
+        when(oldCourse.getPrice()).thenReturn(Money.of(100, "USD"));
+        when(newCourse.getPrice()).thenReturn(Money.of(80, "USD"));
+        when(newCourse.getTeacher()).thenReturn("newTeacher");
+        when(newCourse.getQuizIds()).thenReturn(Set.of(3L, 4L));
+        when(newCourse.getLessonIdAndTitleMap()).thenReturn(Map.of(3L, "New Course Lesson 1", 4L, "New Course Lesson 2"));
+
+        ChangeCourseResponse response = courseEnrollmentService.changeCourse(1L, 2L);
+
+        verify(enrollment).requestChangeCourse(eq(2L), any(), any(), eq("newTeacher"), anySet(), anySet());
+        verify(enrollmentRepository, times(1)).save(enrollment);
+        assertEquals(ChangeCourseResponse.basicChange(), response);
+    }
 
 }

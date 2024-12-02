@@ -8,6 +8,7 @@ import com.el.course.application.CourseQueryService;
 import com.el.course.domain.Course;
 import com.el.discount.application.DiscountService;
 import com.el.order.application.OrderService;
+import com.el.order.domain.ExchangeDetails;
 import com.el.order.web.dto.OrderItemDTO;
 import com.el.order.web.dto.OrderRequestDTO;
 import com.el.order.domain.Order;
@@ -72,16 +73,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public boolean hasPurchase(String createdBy, Long courseId) {
-        return orderRepository.hasPurchasedCourse(courseId, createdBy);
-    }
-
-    @Override
-    public List<Long> purchasedCourses(String createdBy) {
-        return orderRepository.findPurchasedCourseIdsByUserId(createdBy);
-    }
-
-    @Override
     public Order createOrder(String currentUsername, OrderRequestDTO orderRequestDTO) {
         if (rolesBaseUtil.isAdmin() || rolesBaseUtil.isTeacher()) {
             throw new AccessDeniedException("Only authenticated users can create orders");
@@ -106,6 +97,19 @@ public class OrderServiceImpl implements OrderService {
             newOrder.applyDiscount(monetaryAmount, orderRequestDTO.discountCode());
         }
 
+        return orderRepository.save(newOrder);
+    }
+
+    public Order createOrderExchange(Long courseId, Long enrollmentId, MonetaryAmount additionalPrice) {
+        String currentUsername = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+
+        if (rolesBaseUtil.isAdmin() || rolesBaseUtil.isTeacher()) {
+            throw new AccessDeniedException("Only authenticated users can create orders");
+        }
+        if (orderRepository.hasPurchasedCourse(courseId, currentUsername)) {
+            throw new InputInvalidException("You cannot purchase the same course twice");
+        }
+        Order newOrder = new Order(new ExchangeDetails(enrollmentId, courseId, additionalPrice));
         return orderRepository.save(newOrder);
     }
 

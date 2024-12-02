@@ -58,6 +58,7 @@ import {QuizSubmitComponent} from "./enrollment/page/enrollment-content/quiz-sub
 import {UsageComponent} from "./usage/usage.component";
 import {AboutUnpublishComponent} from "./usage/about-unpublish/about-unpublish.component";
 import {ErrorComponent} from "./error/error.component";
+import {ChangeCourseComponent} from "./browse-course/page/change-course/change-course.component";
 
 export const routes: Routes = [
   {
@@ -87,6 +88,15 @@ export const routes: Routes = [
     title: 'Course detail',
     path: 'courses/:id',
     component: BrowseCourseDetailComponent
+  },
+  {
+    title: 'Change course',
+    path: 'change-course',
+    component: ChangeCourseComponent,
+    canActivate: [RoleGuard],
+    data: {
+      requiredRoles: ['ROLE_user'],
+    }
   },
   {
     title: 'Course content',

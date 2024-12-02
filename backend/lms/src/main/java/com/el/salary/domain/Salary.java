@@ -3,6 +3,7 @@ package com.el.salary.domain;
 import com.el.common.Currencies;
 import com.el.common.exception.InputInvalidException;
 import lombok.Getter;
+import lombok.ToString;
 import org.javamoney.moneta.Money;
 import org.springframework.data.annotation.*;
 import org.springframework.data.relational.core.mapping.MappedCollection;
@@ -15,6 +16,7 @@ import java.util.Set;
 
 @Table("salary")
 @Getter
+@ToString
 public class Salary {
     @Id
     private Long id;
@@ -62,6 +64,13 @@ public class Salary {
 
     public void adjustNumberOfCourses() {
         nocAllTime++;
+        adjustRank();
+    }
+
+    public void decreaseNumberOfStudents() {
+        if (nosAllTime == 0)
+            throw new IllegalStateException("Number of students all time is already 0");
+        nosAllTime--;
         adjustRank();
     }
 

@@ -24,4 +24,9 @@ public class MutateSalaryListener {
         salaryService.adjustRank(event.teacher(), false);
     }
 
+    @ApplicationModuleListener
+    public void onEnrollmentRemoved(Enrollment.EnrollNewTeacherCourseEvent event) {
+        salaryService.studentChanged(event.oldTeacher(), event.newTeacher());
+    }
+
 }

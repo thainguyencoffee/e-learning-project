@@ -16,5 +16,6 @@ export interface Enrollment {
   createdDate: string,
   lastModifiedBy: string,
   lastModifiedDate: string,
-  progress: Progress
+  progress: Progress,
+  canChangeCourse: boolean
 }

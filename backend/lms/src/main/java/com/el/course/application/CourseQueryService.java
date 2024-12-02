@@ -12,6 +12,9 @@ import java.util.List;
 
 public interface CourseQueryService {
 
+    // bypass, just called by event
+    Course findById(Long id);
+
     Page<Course> findAllCourses(Pageable pageable);
 
     Course findCourseById(Long courseId, Boolean deleted);

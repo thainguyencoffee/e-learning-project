@@ -36,14 +36,4 @@ public interface OrderRepository extends CrudRepository<Order, UUID> {
     """)
     boolean hasPurchasedCourse(@Param("courseId") Long courseId, @Param("username") String username);
 
-    @Query("""
-        SELECT 
-            oi.course 
-        FROM 
-            orders o 
-        JOIN order_items oi ON o.id = oi.orders 
-        WHERE o.created_by = :createdBy
-    """)
-    List<Long> findPurchasedCourseIdsByUserId(String createdBy);
-
 }

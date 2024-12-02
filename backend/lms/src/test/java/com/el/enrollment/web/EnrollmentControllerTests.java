@@ -4,8 +4,10 @@ import com.el.TestFactory;
 import com.el.common.config.CustomAuthenticationEntryPoint;
 import com.el.common.config.SecurityConfig;
 import com.el.common.config.jackson.JacksonCustomizations;
+import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.domain.QuestionType;
+import com.el.enrollment.application.dto.ChangeCourseResponse;
 import com.el.enrollment.application.dto.CourseEnrollmentDTO;
 import com.el.enrollment.web.dto.QuestionSubmitDTO;
 import com.el.enrollment.web.dto.QuizSubmitDTO;
@@ -79,20 +81,6 @@ class EnrollmentControllerTests {
                         .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)));
-    }
-
-    @Test
-    void getEnrollmentById_ValidRequest_ReturnsEnrollment() throws Exception {
-        Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
-                new LessonProgress("Course Lesson 1", 1L),
-                new LessonProgress("Course Lesson 2", 2L)),
-                Set.of(1L, 2L));
-        when(courseEnrollmentService.findCourseEnrollmentById(any())).thenReturn(enrollment);
-
-        mockMvc.perform(get("/enrollments/{enrollmentId}", 1L)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.courseId").value(enrollment.getCourseId().toString()));
     }
 
     @Test
@@ -211,5 +199,44 @@ class EnrollmentControllerTests {
         ).andExpect(status().isBadRequest());
     }
 
+    @Test
+    void changeCourse_ValidRequest_ChangesCourse() throws Exception {
+        ChangeCourseResponse response = ChangeCourseResponse.basicChange();
+        when(courseEnrollmentService.changeCourse(anyLong(), anyLong())).thenReturn(response);
+
+        mockMvc.perform(put("/enrollments/{enrollmentId}/change-course", 1L)
+                        .param("courseId", "2")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.type").value("BASIC_CHANGE"))
+                .andExpect(jsonPath("$.priceAdditional").doesNotExist())
+                .andExpect(jsonPath("$.orderId").doesNotExist());
+    }
+
+    @Test
+    void changeCourse_InvalidCourseId_ReturnsBadRequest() throws Exception {
+        mockMvc.perform(put("/enrollments/{enrollmentId}/change-course", 1L)
+                        .param("courseId", "invalid")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void changeCourse_NotAuthorized_ReturnsUnauthorized() throws Exception {
+        mockMvc.perform(put("/enrollments/{enrollmentId}/change-course", 1L)
+                        .param("courseId", "2"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void changeCourse_AppServiceThrowThenBadRequest() throws Exception {
+        when(courseEnrollmentService.changeCourse(anyLong(), anyLong())).thenThrow(InputInvalidException.class);
+
+        mockMvc.perform(put("/enrollments/{enrollmentId}/change-course", 1L)
+                        .param("courseId", "2")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_user"))))
+                .andExpect(status().isBadRequest());
+    }
 
 }

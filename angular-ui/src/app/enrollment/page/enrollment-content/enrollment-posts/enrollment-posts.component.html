@@ -41,7 +41,7 @@
         </div>
       </div>
       <div class="card-body">
-        <p class="card-text">{{ post.content }}</p>
+        <p class="card-text" [innerHTML]="post.content"></p>
 
         <!-- Attachments Grid -->
         <div *ngIf="post.attachmentUrls && post.attachmentUrls.length > 0" class="mt-3">
@@ -121,7 +121,7 @@
                 </div>
 <!--                <p>{{ comment.content }}</p>-->
                 <div *ngIf="!comment.isEditing">
-                  <p>{{ comment.content }}</p>
+                  <p [innerHTML]="comment.content"></p>
                 </div>
 
                 <form *ngIf="comment.isEditing" [formGroup]="editCommentForm" (ngSubmit)="handleSubmitEditComment(post.id, comment)">

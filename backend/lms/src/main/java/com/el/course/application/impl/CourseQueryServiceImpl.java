@@ -30,6 +30,12 @@ public class CourseQueryServiceImpl implements CourseQueryService {
     }
 
     @Override
+    public Course findById(Long id) {
+        return courseRepository.findById(id)
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Override
     public Page<Course> findAllCourses(Pageable pageable) {
         if (rolesBaseUtil.isAdmin()) {
             return courseRepository.findAllByDeleted(false, pageable);
