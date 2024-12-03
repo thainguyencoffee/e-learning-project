@@ -15,6 +15,7 @@ import javax.money.MonetaryAmount;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 @Table("course")
@@ -635,10 +636,8 @@ public class Course extends AbstractAggregateRoot<Course> {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
-    public Map<Long, String> getLessonIdAndTitleMap() {
-        return this.sections.stream()
-                .flatMap(section -> section.getLessons().stream())
-                .collect(HashMap::new, (map, lesson) -> map.put(lesson.getId(), lesson.getTitle()), Map::putAll);
+    public Stream<Lesson> getLessons() {
+        return this.getSections().stream().flatMap(section -> section.getLessons().stream());
     }
 
     /*Events*/

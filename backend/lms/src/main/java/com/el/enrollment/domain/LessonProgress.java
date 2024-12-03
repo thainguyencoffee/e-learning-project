@@ -17,13 +17,17 @@ public class LessonProgress {
     private String lessonTitle;
     private boolean bonus;
     private boolean completed;
+    private Integer orderIndex;
     private LocalDateTime completedDate;
 
-    public LessonProgress(String lessonTitle, Long lessonId) {
+    public LessonProgress(String lessonTitle, Long lessonId, Integer orderIndex) {
         if (lessonId == null) throw new InputInvalidException("LessonId must not be null.");
+        if (lessonTitle == null) throw new InputInvalidException("LessonTitle must not be null.");
+        if (orderIndex == null) throw new InputInvalidException("OrderIndex must not be null.");
 
         this.lessonId = lessonId;
         this.lessonTitle = lessonTitle;
+        this.orderIndex = orderIndex;
         this.completed = false;
         this.bonus = false;
         completedDate = null;

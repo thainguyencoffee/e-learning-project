@@ -60,8 +60,8 @@ class EnrollmentControllerTests {
         Pageable pageable = PageRequest.of(0, 10);
 
         Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
-                new LessonProgress("Course Lesson 1", 1L),
-                new LessonProgress("Course Lesson 2", 2L)),
+                new LessonProgress("Course Lesson 1", 1L, 1),
+                new LessonProgress("Course Lesson 2", 2L, 2)),
                 Set.of(1L, 2L));
         CourseEnrollmentDTO enrollmentDTO = new CourseEnrollmentDTO(
                 enrollment.getId(),
