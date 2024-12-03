@@ -1897,10 +1897,10 @@ class CourseTests {
                 Map.of(
                         1L, 1L,
                         2L, true,
-                        3L, Set.of(6L, 7L)
+                        3L, Set.of(6L, 8L)
                 )
         ));
-        assertEquals(7, result.score());
+        assertEquals(9, result.score());
         assertTrue(result.passed());
     }
 
