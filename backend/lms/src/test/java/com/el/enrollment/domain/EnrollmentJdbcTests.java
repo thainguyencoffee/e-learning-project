@@ -25,8 +25,8 @@ class EnrollmentJdbcTests {
     @BeforeEach
     void setUp() {
         Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
-                new LessonProgress("Course Lesson 1", 1L),
-                new LessonProgress("Course Lesson 2", 2L)),
+                new LessonProgress("Course Lesson 1", 1L, 1),
+                new LessonProgress("Course Lesson 2", 2L, 2)),
                 Set.of(1L, 2L));
         enrollment.markAsEnrolled();
         repository.save(enrollment);
@@ -35,8 +35,8 @@ class EnrollmentJdbcTests {
     @Test
     void testSave() {
         Enrollment enrollment = new Enrollment("user", 1L, "teacher", Set.of(
-                new LessonProgress("Course Lesson 1", 1L),
-                new LessonProgress("Course Lesson 2", 2L)),
+                new LessonProgress("Course Lesson 1", 1L, 1),
+                new LessonProgress("Course Lesson 2", 2L, 2)),
                 Set.of(1L, 2L));
         enrollment.markAsEnrolled();
         repository.save(enrollment);

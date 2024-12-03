@@ -73,7 +73,8 @@ public class Enrollment extends AbstractAggregateRoot<Enrollment> {
             throw new InputInvalidException("LessonProgresses must not be null or empty.");
         if (quizIds == null || quizIds.isEmpty())
             throw new InputInvalidException("QuizIds must not be null or empty.");
-        if (newCourseId.equals(courseId)) throw new InputInvalidException("New course id must be different from the current course id.");
+        if (newCourseId.equals(courseId))
+            throw new InputInvalidException("New course id must be different from the current course id.");
 
         if (!getCanChangeCourse()) {
             throw new InputInvalidException("You can't request change course.");
@@ -102,7 +103,8 @@ public class Enrollment extends AbstractAggregateRoot<Enrollment> {
                                     Set<Long> quizIds) throws AdditionalPaymentRequiredException {
         if (oldCoursePrice == null) throw new InputInvalidException("Old course price must not be null.");
         if (newCoursePrice == null) throw new InputInvalidException("New course price must not be null.");
-        if (newCourseId.equals(courseId)) throw new InputInvalidException("New course id must be different from the current course id.");
+        if (newCourseId.equals(courseId))
+            throw new InputInvalidException("New course id must be different from the current course id.");
 
         if (!getCanChangeCourse()) {
             throw new InputInvalidException("You can't request change course.");
@@ -126,16 +128,22 @@ public class Enrollment extends AbstractAggregateRoot<Enrollment> {
     }
 
 
-    public void markLessonAsCompleted(Long lessonId, String lessonTitle) {
+    public void markLessonAsCompleted(Long lessonId, String lessonTitle, Integer orderIndex) {
         LessonProgress lessonProgress = lessonProgresses.stream()
                 .filter(lp -> lp.getLessonId().equals(lessonId))
                 .findFirst()
                 .orElseGet(() -> {
-                    LessonProgress newLessonProgress = new LessonProgress(lessonTitle, lessonId);
+                    LessonProgress newLessonProgress = new LessonProgress(lessonTitle, lessonId, orderIndex);
                     newLessonProgress.markAsBonus();
                     lessonProgresses.add(newLessonProgress);
                     return newLessonProgress;
                 });
+
+        boolean canMarkLesson = lessonProgresses.stream()
+                .filter(lp -> lp.getOrderIndex() < lessonProgress.getOrderIndex())
+                .allMatch(LessonProgress::isCompleted);
+        if (!canMarkLesson)
+            throw new InputInvalidException("You can't mark lesson as completed. Please follow the progress.");
 
         lessonProgress.markAsCompleted();
         checkCompleted();
@@ -148,6 +156,13 @@ public class Enrollment extends AbstractAggregateRoot<Enrollment> {
                 .filter(lp -> lp.getLessonId().equals(lessonId))
                 .findFirst()
                 .orElseThrow(ResourceNotFoundException::new);
+
+        boolean canMarkLesson = lessonProgresses.stream()
+                .filter(lp -> lp.getOrderIndex() > lessonProgress.getOrderIndex())
+                .noneMatch(LessonProgress::isCompleted);
+        if (!canMarkLesson)
+            throw new InputInvalidException("You can't mark lesson as incomplete. Please follow the progress.");
+
         lessonProgress.markAsIncomplete();
         this.completed = false;
     }

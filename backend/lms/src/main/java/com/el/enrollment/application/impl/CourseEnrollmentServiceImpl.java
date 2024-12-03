@@ -126,7 +126,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
         var lesson = courseQueryService.findLessonByCourseIdAndLessonId(courseId, lessonId);
 
         Enrollment enrollment = findCourseEnrollmentById(enrollmentId);
-        enrollment.markLessonAsCompleted(lesson.getId(), lesson.getTitle());
+        enrollment.markLessonAsCompleted(lesson.getId(), lesson.getTitle(), lesson.getOrderIndex());
         repository.save(enrollment);
     }
 
@@ -245,10 +245,8 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     }
 
     private Set<LessonProgress> createLessonProgressesByCourse(Course course) {
-        return course.getLessonIdAndTitleMap().entrySet()
-                .stream()
-                .map(entry -> new LessonProgress(entry.getValue(), entry.getKey()))
-                .collect(Collectors.toSet());
+        return course.getLessons()
+                .map(lesson -> new LessonProgress(lesson.getTitle(), lesson.getId(), lesson.getOrderIndex())).collect(Collectors.toSet());
     }
 
 }
