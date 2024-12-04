@@ -16,8 +16,8 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./postgresql/data:/var/lib/postgresql/data
+#      - ./postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - /home/thainguyen101/data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d lms -U postgres && pg_isready -d keycloak -U postgres"]
       interval: 10s
