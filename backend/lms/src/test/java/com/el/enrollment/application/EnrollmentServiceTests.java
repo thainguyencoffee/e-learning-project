@@ -23,6 +23,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -52,8 +53,17 @@ class EnrollmentServiceTests {
 
         // Tạo một Course giả lập với lessonIds
         Course mockCourse = Mockito.mock(Course.class);
-        Map<Long, String> lessonTitles = Map.of(1L, "Course Lesson 1", 2L, "Course Lesson 2");
-        when(mockCourse.getLessonIdAndTitleMap()).thenReturn(lessonTitles);
+
+        // mock lessons
+        Lesson lesson1 = spy(new Lesson("Lesson 1", Lesson.Type.VIDEO, "https://www.youtube.com/watch?v=123"));
+        when(lesson1.getId()).thenReturn(1L);
+        when(lesson1.getOrderIndex()).thenReturn(1);
+        Lesson lesson2 = spy(new Lesson("Lesson 2", Lesson.Type.VIDEO, "https://www.youtube.com/watch?v=456"));
+        when(lesson2.getId()).thenReturn(2L);
+        when(lesson2.getOrderIndex()).thenReturn(2);
+        Stream<Lesson> lessonStream = Stream.of(lesson1, lesson2);
+
+        when(mockCourse.getLessons()).thenReturn(lessonStream);
         when(mockCourse.getQuizIds()).thenReturn(Set.of(1L, 2L));
         when(mockCourse.getTeacher()).thenReturn(TestFactory.teacher);
         when(courseQueryService.findPublishedCourseById(courseId)).thenReturn(mockCourse);
@@ -87,7 +97,6 @@ class EnrollmentServiceTests {
 
         Course mockCourse = Mockito.mock(Course.class);
         when(courseQueryService.findPublishedCourseById(courseId)).thenReturn(mockCourse);
-        when(mockCourse.getLessonIdAndTitleMap()).thenReturn(new HashMap<>());
 
         // Act and Assert
         Assertions.assertThrows(InputInvalidException.class, () ->
@@ -112,7 +121,7 @@ class EnrollmentServiceTests {
                 courseEnrollmentService.markLessonAsCompleted(enrollmentId, courseId, lessonId));
 
         // Assert
-        verify(mockEnrollment, never()).markLessonAsCompleted(lessonId, "Lesson Title");
+        verify(mockEnrollment, never()).markLessonAsCompleted(lessonId, "Lesson Title", 1);
         verify(enrollmentRepository, never()).save(mockEnrollment);
     }
 
@@ -140,7 +149,7 @@ class EnrollmentServiceTests {
         courseEnrollmentService.markLessonAsCompleted(enrollmentId, courseId, lessonId);
 
         // Assert
-        verify(mockEnrollment, times(1)).markLessonAsCompleted(lessonId, "Lesson Title");
+        verify(mockEnrollment, times(1)).markLessonAsCompleted(anyLong(), anyString(), any());
         verify(enrollmentRepository, times(1)).save(mockEnrollment);
     }
 
@@ -246,7 +255,6 @@ class EnrollmentServiceTests {
         when(newCourse.getPrice()).thenReturn(Money.of(80, "USD"));
         when(newCourse.getTeacher()).thenReturn("newTeacher");
         when(newCourse.getQuizIds()).thenReturn(Set.of(3L, 4L));
-        when(newCourse.getLessonIdAndTitleMap()).thenReturn(Map.of(3L, "New Course Lesson 1", 4L, "New Course Lesson 2"));
 
         ChangeCourseResponse response = courseEnrollmentService.changeCourse(1L, 2L);
 
