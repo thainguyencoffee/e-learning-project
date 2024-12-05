@@ -67,9 +67,9 @@ class EnrollmentTests {
                 new LessonProgress("Course Lesson 2", 2L, 2)),
                 Set.of(1L, 2L));
 
-        enrollment.markLessonAsCompleted(1L, "Lesson title 1", 1);
-        enrollment.markLessonAsCompleted(2L, "Lesson title 2", 2);
-        enrollment.markLessonAsCompleted(3L, "Lesson title 3", 3);
+        enrollment.markLessonAsCompleted(1L, "Lesson title 1");
+        enrollment.markLessonAsCompleted(2L, "Lesson title 2");
+        enrollment.markLessonAsCompleted(3L, "Lesson title 3");
 
         assertEquals(2, enrollment.getProgress().totalLessons());
         assertEquals(2, enrollment.getProgress().completedLessons());
@@ -86,9 +86,9 @@ class EnrollmentTests {
                 Set.of(new LessonProgress("Course Lesson 1", 1L, 1)),
                 Set.of(1L, 2L)); // quizIds
 
-        enrollment.markLessonAsCompleted(1L, "Lesson title 1", 1);
+        enrollment.markLessonAsCompleted(1L, "Lesson title 1");
         // Bonus
-        enrollment.markLessonAsCompleted(2L, "Lesson title 2", 2);
+        enrollment.markLessonAsCompleted(2L, "Lesson title 2");
 
         assertEquals(1, enrollment.getProgress().totalLessons());
         assertEquals(1, enrollment.getProgress().completedLessons());
@@ -105,9 +105,9 @@ class EnrollmentTests {
                         new LessonProgress("Course Lesson 2", 2L, 2)),
                 Set.of(1L, 2L)); // quizIds
 
-        assertThrows(InputInvalidException.class, () -> enrollment.markLessonAsCompleted(2L, "Lesson title 2", 2));
+        assertThrows(InputInvalidException.class, () -> enrollment.markLessonAsCompleted(2L, "Lesson title 2"));
         // bonus
-        assertThrows(InputInvalidException.class, () -> enrollment.markLessonAsCompleted(3L, "Lesson title 3 (bonus)", 3));
+        assertThrows(InputInvalidException.class, () -> enrollment.markLessonAsCompleted(3L, "Lesson title 3 (bonus)"));
     }
 
     @Test
@@ -116,9 +116,9 @@ class EnrollmentTests {
                 new LessonProgress("Course Lesson 1", 1L, 1),
                 new LessonProgress("Course Lesson 2", 2L, 2)),
                 Set.of(1L, 2L));
-        enrollment.markLessonAsCompleted(1L, "Lesson title", 1);
+        enrollment.markLessonAsCompleted(1L, "Lesson title");
 
-        InputInvalidException e = assertThrows(InputInvalidException.class, () -> enrollment.markLessonAsCompleted(1L, "Lesson title", 1));
+        InputInvalidException e = assertThrows(InputInvalidException.class, () -> enrollment.markLessonAsCompleted(1L, "Lesson title"));
         assertEquals("LessonProgress is already completed.", e.getMessage());
     }
 
@@ -128,11 +128,11 @@ class EnrollmentTests {
                 new LessonProgress("Course Lesson 1", 1L, 1),
                 new LessonProgress("Course Lesson 2", 2L, 2)),
                 Set.of(1L, 2L));
-        enrollment.markLessonAsCompleted(1L, "Lesson title", 1);
-        enrollment.markLessonAsCompleted(2L, "Lesson title 2", 2);
+        enrollment.markLessonAsCompleted(1L, "Lesson title");
+        enrollment.markLessonAsCompleted(2L, "Lesson title 2");
 
         // bonus
-        enrollment.markLessonAsCompleted(3L, "Lesson title 3", 3);
+        enrollment.markLessonAsCompleted(3L, "Lesson title 3");
 
         // Just need to mark all lessons as completed to complete the enrollment, quizzes don't need
         long quizId1 = 1L;
@@ -175,7 +175,7 @@ class EnrollmentTests {
                 new LessonProgress("Course Lesson 1", 1L, 1),
                 new LessonProgress("Course Lesson 2", 2L, 2)),
                 Set.of(1L, 2L));
-        enrollment.markLessonAsCompleted(1L, "Lesson title", 1);
+        enrollment.markLessonAsCompleted(1L, "Lesson title");
 
         enrollment.markLessonAsIncomplete(1L);
 

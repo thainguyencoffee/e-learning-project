@@ -4,5 +4,6 @@ export interface LessonProgress {
   lessonTitle: string,
   bonus: boolean,
   completed: boolean,
-  completedDate: string
+  completedDate: string,
+  inProgress: boolean,
 }

@@ -12,6 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import javax.money.MonetaryAmount;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -127,26 +128,46 @@ public class Enrollment extends AbstractAggregateRoot<Enrollment> {
         return !completed && !changedCourse && !isSevenDaysAfterEnrollment();
     }
 
-
-    public void markLessonAsCompleted(Long lessonId, String lessonTitle, Integer orderIndex) {
+    public void markLessonAsCompleted(Long lessonId, String lessonTitle) {
         LessonProgress lessonProgress = lessonProgresses.stream()
                 .filter(lp -> lp.getLessonId().equals(lessonId))
                 .findFirst()
                 .orElseGet(() -> {
+                    int orderIndex = getTailLessonProgress().getOrderIndex() + 1;
                     LessonProgress newLessonProgress = new LessonProgress(lessonTitle, lessonId, orderIndex);
+                    if (isInProgress(newLessonProgress)) {
+                        newLessonProgress.makeInProgress();
+                    }
                     newLessonProgress.markAsBonus();
                     lessonProgresses.add(newLessonProgress);
                     return newLessonProgress;
                 });
 
-        boolean canMarkLesson = lessonProgresses.stream()
-                .filter(lp -> lp.getOrderIndex() < lessonProgress.getOrderIndex())
-                .allMatch(LessonProgress::isCompleted);
-        if (!canMarkLesson)
+        if (!lessonProgress.getInProgress())
             throw new InputInvalidException("You can't mark lesson as completed. Please follow the progress.");
 
         lessonProgress.markAsCompleted();
+        nextLessonProgressInProgress(lessonProgress.getOrderIndex());
         checkCompleted();
+    }
+
+    private void nextLessonProgressInProgress(Integer orderIndex) {
+        lessonProgresses.stream()
+                .filter(lp -> lp.getOrderIndex() == orderIndex + 1)
+                .findFirst()
+                .ifPresent(LessonProgress::makeInProgress);
+    }
+
+    private boolean isInProgress(LessonProgress lessonProgress) {
+        return lessonProgresses.stream()
+                .filter(lp -> lp.getOrderIndex() < lessonProgress.getOrderIndex())
+                .allMatch(LessonProgress::isCompleted);
+    }
+
+    private LessonProgress getTailLessonProgress() {
+        return lessonProgresses.stream()
+                .max(Comparator.comparing(LessonProgress::getOrderIndex))
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
     public void markLessonAsIncomplete(Long lessonId) {
@@ -164,7 +185,15 @@ public class Enrollment extends AbstractAggregateRoot<Enrollment> {
             throw new InputInvalidException("You can't mark lesson as incomplete. Please follow the progress.");
 
         lessonProgress.markAsIncomplete();
+        nextLessonProgressNotInProgress(lessonProgress.getOrderIndex());
         this.completed = false;
+    }
+
+    private void nextLessonProgressNotInProgress(Integer orderIndex) {
+        lessonProgresses.stream()
+                .filter(lp -> lp.getOrderIndex() == orderIndex + 1)
+                .findFirst()
+                .ifPresent(LessonProgress::makeNotInProgress);
     }
 
     private void checkCompleted() {

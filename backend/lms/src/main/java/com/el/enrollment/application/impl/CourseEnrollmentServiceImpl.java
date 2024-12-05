@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -126,7 +127,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
         var lesson = courseQueryService.findLessonByCourseIdAndLessonId(courseId, lessonId);
 
         Enrollment enrollment = findCourseEnrollmentById(enrollmentId);
-        enrollment.markLessonAsCompleted(lesson.getId(), lesson.getTitle(), lesson.getOrderIndex());
+        enrollment.markLessonAsCompleted(lesson.getId(), lesson.getTitle());
         repository.save(enrollment);
     }
 
@@ -245,8 +246,10 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     }
 
     private Set<LessonProgress> createLessonProgressesByCourse(Course course) {
-        return course.getLessons()
-                .map(lesson -> new LessonProgress(lesson.getTitle(), lesson.getId(), lesson.getOrderIndex())).collect(Collectors.toSet());
+        AtomicInteger globalOrderIndexCounter = new AtomicInteger(1);
+        return course.getLessonsOrdered().stream()
+                .map(lesson -> new LessonProgress(lesson.getTitle(), lesson.getId(), globalOrderIndexCounter.getAndIncrement()))
+                .collect(Collectors.toSet());
     }
 
 }

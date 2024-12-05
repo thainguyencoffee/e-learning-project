@@ -3,7 +3,7 @@ import {ActivatedRoute, NavigationEnd, Router, RouterLink} from "@angular/router
 import {EnrollmentWithCourseDataService} from "../enrollment-with-course-data.service";
 import {Observable, Subscription} from "rxjs";
 import {EnrollmentWithCourseDto} from "../../../model/enrollment-with-course-dto";
-import {AsyncPipe, NgIf} from "@angular/common";
+import {AsyncPipe, NgClass, NgIf} from "@angular/common";
 import {Section} from "../../../../administration/courses/model/view/section";
 import {EnrollmentsService} from "../../../service/enrollments.service";
 import {ErrorHandler} from "../../../../common/error-handler.injectable";
@@ -20,7 +20,8 @@ import {QuizSubmission} from "../../../model/quiz-submission";
     NgIf,
     VideoPlayerComponent,
     DocumentViewerComponent,
-    RouterLink
+    RouterLink,
+    NgClass
   ],
   templateUrl: './lesson-detail.component.html',
 })
@@ -69,10 +70,10 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
           const sortedData = this.enrollmentWithCourseDataService.sortSectionAndLessons(data);
           this.enrollmentWithCourseDataService.setEnrollmentWithCourse(sortedData);
 
-          // Lấy link bài học từ dữ liệu trả về và xác định loại tài liệu
+
           const lesson = this.getLessonById(this.lessonId!, sortedData.sections);
           if (lesson && lesson.link) {
-            this.setLessonType(lesson.link);  // Gọi setLessonType ở đây
+            this.setLessonType(lesson.link);
           }
         },
         error: (error) => this.errorHandler.handleServerError(error.error)
@@ -89,31 +90,29 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
     return lessonProgresses.some(lp => lp.lessonId === lessonId && lp.completed);
   }
 
-  isLessonRequire(lessonId: number, lessonProgresses: LessonProgress[]) {
+  isLessonBonus(lessonId: number, lessonProgresses: LessonProgress[]) {
     const lessonProgress = lessonProgresses.find(lp => lp.lessonId === lessonId);
-    if (lessonProgress) {
-      return !lessonProgress.bonus;
-    }
-    return false;
+    return lessonProgress ? lessonProgress.bonus : true;
   }
 
   markLessonAsCompleted(courseId: number, lessonId: number, sections: Section[], quizSubmissions: QuizSubmission[]) {
     const quiz = this.getQuizByLessonId(lessonId, sections);
-    this.completeLesson(courseId, lessonId);
-
-    if (quiz) {
-      const quizSubmission = this.getQuizSubmissionByLessonId(lessonId, sections, quizSubmissions);
-      if (!quizSubmission) {
-        this.router.navigate(['/enrollments', this.enrollmentId, 'quiz-submit', quiz.id]);
-      }
-    }
-  }
-
-  private completeLesson(courseId: number, lessonId: number) {
     this.enrollmentService.markLessonAsCompleted(this.enrollmentId!, courseId, lessonId).subscribe({
-      next: _ => this.loadData(),
-      error: error => this.errorHandler.handleServerError(error.error),
+      next: _ => {
+        this.loadData();
+        if (quiz) {
+          const quizSubmission = this.getQuizSubmissionByLessonId(lessonId, sections, quizSubmissions);
+          if (!quizSubmission) {
+            this.router.navigate(['/enrollments', this.enrollmentId, 'quiz-submit', quiz.id]);
+          }
+        }
+      },
+      error: error => {
+        this.errorHandler.handleServerError(error.error);
+        return;
+      },
     });
+
   }
 
   markLessonAsIncomplete(courseId: number, lessonId: number, title: string): void {
@@ -144,11 +143,10 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
   }
 
   setLessonType(lessonLink: string): void {
-    const normalizedLink = lessonLink.trim().toLowerCase();  // Chuyển tất cả về chữ thường và loại bỏ khoảng trắng dư thừa
-    if (normalizedLink.endsWith('.mp4') || normalizedLink.endsWith('.avi') || normalizedLink.endsWith('.mkv')) {
-      this.lessonType = 'video'; // Video
-    } else if (normalizedLink.endsWith('.docx')) {
-      this.lessonType = 'docx'; // DOCX
+    if (lessonLink.endsWith('.mp4') || lessonLink.endsWith('.avi') || lessonLink.endsWith('.mkv')) {
+      this.lessonType = 'video';
+    } else if (lessonLink.endsWith('.docx')) {
+      this.lessonType = 'docx';
     } else {
       console.warn('Unknown lesson type for link:', lessonLink);
     }
@@ -160,6 +158,11 @@ export class LessonDetailComponent implements OnInit, OnDestroy {
       return null;
     }
     return quizSubmissions.find(qs => qs.quizId === quiz!.id);
+  }
+
+  inProgress(lessonId: number, lessonProgresses: LessonProgress[]) {
+    const lessonProgress = lessonProgresses.find(lp => lp.lessonId === lessonId);
+    return lessonProgress ? lessonProgress.inProgress : false;
   }
 
 }

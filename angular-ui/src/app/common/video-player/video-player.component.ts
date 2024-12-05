@@ -22,7 +22,7 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy, OnChanges
   @ViewChild('videoPlayer', { static: false }) videoPlayer!: ElementRef;
   @Input() videoLink!: string;
   player: any;
-
+  @Input() disablePlay: boolean = false;
 
   ngAfterViewInit(): void {
     this.initializePlayer();
@@ -31,17 +31,30 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy, OnChanges
   private initializePlayer(): void {
     this.player = videojs(this.videoPlayer.nativeElement, {
       controls: true,
-      autoplay: false,
+      autoplay: false,  // Hủy chế độ autoplay
       preload: 'auto',
     });
 
     this.updateVideoSource();
+
+    if (this.disablePlay) {
+      this.disablePlayButton();  // Vô hiệu hóa nút Play nếu disablePlay là true
+    }
   }
 
-
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['videoLink'] && !changes['videoLink'].firstChange) {
-      this.updateVideoSource();
+    if (this.player) {
+      if (changes['disablePlay']) {
+        if (this.disablePlay) {
+          this.disablePlayButton();
+        } else {
+          this.enablePlayButton();
+        }
+      }
+
+      if (changes['videoLink'] && !changes['videoLink'].firstChange) {
+        this.updateVideoSource();
+      }
     }
   }
 
@@ -52,8 +65,35 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy, OnChanges
         type: 'video/mp4'
       });
       this.player.load();
-      this.player.play();
+      if (!this.disablePlay) {
+        this.player.play();
+      }
     }
+  }
+
+  private disablePlayButton(): void {
+    if (this.player) {
+      this.player.pause();
+      this.player.currentTime(0);
+    }
+
+    const playButton = this.player.controlBar.playToggle;
+    if (playButton) {
+      playButton.el().setAttribute('disabled', 'true');
+      playButton.el().style.pointerEvents = 'none';  // Vô hiệu hóa sự kiện click
+    }
+
+    this.player.el().style.pointerEvents = 'none';  // Vô hiệu hóa toàn bộ sự kiện click
+  }
+
+  private enablePlayButton(): void {
+    const playButton = this.player.controlBar.playToggle;
+    if (playButton) {
+      playButton.el().removeAttribute('disabled');
+      playButton.el().style.pointerEvents = '';  // Bật lại sự kiện click
+    }
+
+    this.player.el().style.pointerEvents = '';  // Bật lại sự kiện click
   }
 
   ngOnDestroy(): void {
@@ -61,5 +101,4 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy, OnChanges
       this.player.dispose();
     }
   }
-
 }

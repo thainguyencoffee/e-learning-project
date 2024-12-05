@@ -57,13 +57,10 @@ class EnrollmentServiceTests {
         // mock lessons
         Lesson lesson1 = spy(new Lesson("Lesson 1", Lesson.Type.VIDEO, "https://www.youtube.com/watch?v=123"));
         when(lesson1.getId()).thenReturn(1L);
-        when(lesson1.getOrderIndex()).thenReturn(1);
         Lesson lesson2 = spy(new Lesson("Lesson 2", Lesson.Type.VIDEO, "https://www.youtube.com/watch?v=456"));
         when(lesson2.getId()).thenReturn(2L);
-        when(lesson2.getOrderIndex()).thenReturn(2);
-        Stream<Lesson> lessonStream = Stream.of(lesson1, lesson2);
 
-        when(mockCourse.getLessons()).thenReturn(lessonStream);
+        when(mockCourse.getLessonsOrdered()).thenReturn(List.of(lesson1, lesson2));
         when(mockCourse.getQuizIds()).thenReturn(Set.of(1L, 2L));
         when(mockCourse.getTeacher()).thenReturn(TestFactory.teacher);
         when(courseQueryService.findPublishedCourseById(courseId)).thenReturn(mockCourse);
@@ -121,7 +118,7 @@ class EnrollmentServiceTests {
                 courseEnrollmentService.markLessonAsCompleted(enrollmentId, courseId, lessonId));
 
         // Assert
-        verify(mockEnrollment, never()).markLessonAsCompleted(lessonId, "Lesson Title", 1);
+        verify(mockEnrollment, never()).markLessonAsCompleted(lessonId, "Lesson Title");
         verify(enrollmentRepository, never()).save(mockEnrollment);
     }
 
@@ -149,7 +146,7 @@ class EnrollmentServiceTests {
         courseEnrollmentService.markLessonAsCompleted(enrollmentId, courseId, lessonId);
 
         // Assert
-        verify(mockEnrollment, times(1)).markLessonAsCompleted(anyLong(), anyString(), any());
+        verify(mockEnrollment, times(1)).markLessonAsCompleted(anyLong(), anyString());
         verify(enrollmentRepository, times(1)).save(mockEnrollment);
     }
 
