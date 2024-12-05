@@ -38,8 +38,13 @@ export class EnrollmentLessonsComponent implements OnInit {
     return lessonProgresses.find(lp => lp.lessonId === lessonId)?.completed;
   }
 
+  inProgress(lessonId: number, lessonProgresses: LessonProgress[]) {
+    return lessonProgresses.find(lp => lp.lessonId === lessonId)?.inProgress;
+  }
+
   isLessonBonus(lessonId: number, lessonProgresses: LessonProgress[]) {
-    return lessonProgresses.find(lp => lp.lessonId === lessonId)?.bonus;
+    const lessonProgress = lessonProgresses.find(lp => lp.lessonId === lessonId);
+    return lessonProgress ? lessonProgress.bonus : true;
   }
 
 }

@@ -3,9 +3,15 @@
 
     <!--Header-->
     <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
-      <div class="w-100 mb-3" *ngIf="!isLessonRequire(lessonDetail.id, enrollmentWithCourse.lessonProgresses)">
+      <div class="w-100 mb-3" *ngIf="isLessonBonus(lessonDetail.id, enrollmentWithCourse.lessonProgresses)">
+        <p class="alert alert-success text-center mb-0">
+          This lesson is not required to complete the course because it is a bonus lesson. <i class="bi bi-gift-fill text-success"></i>
+        </p>
+      </div>
+
+      <div class="w-100 mb-3" *ngIf="!inProgress(lessonId!, enrollmentWithCourse.lessonProgresses)">
         <p class="alert alert-info text-center mb-0">
-          This lesson is not required to complete the course.
+          You have to completed previous lesson to see this lesson.
         </p>
       </div>
 
@@ -25,7 +31,9 @@
     <!--display video-->
     <div class="w-100 mb-4">
       <div *ngIf="lessonType === 'video'" class="video-container">
-        <app-video-player [videoLink]="lessonDetail.link"></app-video-player>
+        <app-video-player [videoLink]="lessonDetail.link"
+                          [disablePlay]="!inProgress(lessonId!, enrollmentWithCourse.lessonProgresses)
+                                && !isLessonBonus(lessonDetail.id, enrollmentWithCourse.lessonProgresses)"/>
       </div>
 
       <div *ngIf="lessonType === 'docx'" class="document-container">
@@ -40,13 +48,16 @@
       <div>
         <button *ngIf="!lessonIsCompleted(lessonDetail.id, enrollmentWithCourse.lessonProgresses)"
                 (click)="markLessonAsCompleted(enrollmentWithCourse.courseId, lessonDetail.id, enrollmentWithCourse.sections, enrollmentWithCourse.quizSubmissions)"
-                class="btn btn-success me-2">Mark as Completed
+                class="btn btn-success me-2"
+                [ngClass]="{'disabled': !inProgress(lessonId!, enrollmentWithCourse.lessonProgresses)
+                      && !isLessonBonus(lessonDetail.id, enrollmentWithCourse.lessonProgresses)}">Mark as Completed
         </button>
 
-        <div *ngIf="lessonIsCompleted(lessonDetail.id, enrollmentWithCourse.lessonProgresses) && getQuizByLessonId(lessonDetail.id, enrollmentWithCourse.sections) as quiz">
-          <div class="w-100 mb-3" *ngIf="!isLessonRequire(lessonDetail.id, enrollmentWithCourse.lessonProgresses)">
+        <div *ngIf="lessonIsCompleted(lessonDetail.id, enrollmentWithCourse.lessonProgresses)
+            && getQuizByLessonId(lessonDetail.id, enrollmentWithCourse.sections) as quiz" class="mb-3">
+          <div class="w-100 mb-3" *ngIf="isLessonBonus(lessonDetail.id, enrollmentWithCourse.lessonProgresses)">
             <p class="alert alert-info text-center mb-0">
-              This quiz is not required to complete the course.
+              This quiz is not required to complete the course because it is a bonus quiz. <i class="bi bi-gift-fill text-success"></i>
             </p>
           </div>
           <div *ngIf="getQuizSubmissionByLessonId(lessonDetail.id, enrollmentWithCourse.sections, enrollmentWithCourse.quizSubmissions) as quizSubmission; else haveNotSubmittedYet">
@@ -71,6 +82,7 @@
           </button>
         }
       </div>
+
       <div>
         <a *ngIf="lessonPrev" [routerLink]="['/enrollments', enrollmentId, 'lessons', lessonPrev]"
            [queryParams]="{
