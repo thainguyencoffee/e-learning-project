@@ -636,8 +636,12 @@ public class Course extends AbstractAggregateRoot<Course> {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
-    public Stream<Lesson> getLessons() {
-        return this.getSections().stream().flatMap(section -> section.getLessons().stream());
+    public List<Lesson> getLessonsOrdered() {
+        return this.getSections().stream()
+                .sorted(Comparator.comparingInt(CourseSection::getOrderIndex))
+                .flatMap(section -> section.getLessons().stream()
+                        .sorted(Comparator.comparingInt(Lesson::getOrderIndex)))
+                .toList();
     }
 
     /*Events*/
