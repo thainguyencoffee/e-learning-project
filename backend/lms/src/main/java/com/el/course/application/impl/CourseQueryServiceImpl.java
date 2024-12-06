@@ -49,6 +49,15 @@ public class CourseQueryServiceImpl implements CourseQueryService {
     }
 
     @Override
+    public Page<Course> findAllCoursesPublished(Pageable pageable) {
+        if(rolesBaseUtil.isTeacher()) {
+            String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+            return courseRepository.findAllByTeacherAndPublished(teacher, true, pageable);
+        }
+        throw new AccessDeniedException("Access denied");
+    }
+
+    @Override
     public Course findCourseById(Long courseId, Boolean deleted) {
         if (rolesBaseUtil.isAdmin()) {
             return courseRepository.findByIdAndDeleted(courseId, deleted)
@@ -240,6 +249,11 @@ public class CourseQueryServiceImpl implements CourseQueryService {
         int size = pageable.getPageSize();
         List<Course> courses = courseRepository.searchPublishedCourses(query, page, size);
         return courses.stream().map(PublishedCourseDTO::fromCourse).toList();
+    }
+
+    @Override
+    public Integer getPurchaseCount(Long courseId) {
+        return enrollmentRepository.countByCourseId(courseId);
     }
 
     private boolean isUserEnrolled(Long courseId, String username) {

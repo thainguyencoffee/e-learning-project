@@ -1,7 +1,7 @@
 <div class="row">
-  <div class="col-md-4 col-12" *ngIf="enrollmentWithCourse$ | async as enrollmentWithCourse">
-    <img [src]="enrollmentWithCourse?.thumbnailUrl" class="img-thumbnail" alt="">
-    <h2>{{ enrollmentWithCourse?.title }}</h2>
+  <div class="col-md-4 col-12" *ngIf="enrollmentWithCourse">
+    <img [src]="enrollmentWithCourse.thumbnailUrl" class="img-thumbnail" alt="">
+    <h2>{{ enrollmentWithCourse.title }}</h2>
     <p>{{enrollmentWithCourse.enrollmentDate | date: 'yyyy-MM-dd HH:mm:ss'}}</p>
 
     <p class="mb-3">
@@ -19,6 +19,65 @@
          [ngClass]="{'active': isActive('/enrollments/' + enrollmentId + '/posts')}"
          [attr.aria-current]="isActive('/enrollments/' + enrollmentId + '/posts')">Posts</a>
     </div>
+
+    <div class="card mt-3" *ngIf="paginationUtils && coursePathsPublished && purchaseCourseIds">
+      <h5 class="card-header">Course Path Recommendation</h5>
+      <div class="card-body">
+
+        <div class="row">
+          <div class="col-12 mb-4" *ngFor="let coursePath of coursePathsPublished">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <p class="card-title">{{ coursePath.title }}</p>
+                    <p class="card-text text-muted" [innerHTML]="coursePath.description"></p>
+                  </div>
+                  <div class="text-end text-primary">
+                    <p><small>{{ coursePath.teacher }}</small></p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-footer">
+                <h6 class="text-muted">Courses in Path</h6>
+                <ul class="list-group list-group-flush">
+                  <li *ngFor="let courseOrder of courseOrdersSorted(coursePath.courseOrders)" class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                        <p class="card-title">
+                          <a [routerLink]="['/courses', courseOrder.courseId]">{{ courseOrder.title }}</a>
+                        </p>
+                        <p>{{ courseOrder.price }}</p>
+                        <p *ngIf="isTheBestSeller(coursePath, courseOrder)" class="badge bg-danger">Best seller</p>
+                      </div>
+                      <a *ngIf="!purchaseCourseIds.includes(courseOrder.courseId)" [routerLink]="['/checkout', courseOrder.courseId]" class="btn btn-primary btn-sm">Checkout</a>
+                      <button *ngIf="purchaseCourseIds.includes(courseOrder.courseId)" class="btn btn-success btn-sm" disabled>Enrolled</button>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+            <li class="page-item" [class.disabled]="paginationUtils!.number === 0">
+              <button class="page-link" (click)="onPageChange(paginationUtils!.number - 1)">Previous</button>
+            </li>
+            <li class="page-item" *ngFor="let page of getPageRange()" [class.active]="page === paginationUtils!.number">
+              <button class="page-link" (click)="onPageChange(page)">{{ page + 1 }}</button>
+            </li>
+            <li class="page-item" [class.disabled]="paginationUtils!.number === paginationUtils!.totalPages - 1">
+              <button class="page-link" (click)="onPageChange(paginationUtils!.number + 1)">Next</button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
   </div>
 
   <div class="col-md-8 col-12">

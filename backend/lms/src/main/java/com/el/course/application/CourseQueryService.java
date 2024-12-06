@@ -17,6 +17,8 @@ public interface CourseQueryService {
 
     Page<Course> findAllCourses(Pageable pageable);
 
+    Page<Course> findAllCoursesPublished(Pageable pageable);
+
     Course findCourseById(Long courseId, Boolean deleted);
 
     List<CourseInTrashDTO> findAllCoursesInTrash(Pageable pageable);
@@ -48,4 +50,6 @@ public interface CourseQueryService {
     Lesson findLessonByCourseIdAndLessonId(Long courseId, Long lessonId);
 
     List<PublishedCourseDTO> searchPublishedCoursesDTO(String query, Pageable pageable);
+
+    Integer getPurchaseCount(Long courseId);
 }
