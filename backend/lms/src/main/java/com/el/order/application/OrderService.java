@@ -20,4 +20,6 @@ public interface OrderService {
 
     void paymentSucceeded(UUID orderId);
 
+    void makeCancelledAllOrderByCourseId(UUID orderId);
+
 }

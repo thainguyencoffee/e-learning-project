@@ -2,6 +2,7 @@ package com.el.order.domain;
 
 import com.el.common.Currencies;
 import com.el.common.exception.InputInvalidException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.javamoney.moneta.Money;
 import org.springframework.data.annotation.*;
@@ -129,19 +130,15 @@ public class Order extends AbstractAggregateRoot<Order> {
 
     public void makePaid() {
         // Business rule: You can't pay for a completed order
-        if (isPaid()) {
+        if (status == Status.PAID) {
             throw new InputInvalidException("You can't pay for a completed order.");
         }
         this.status = Status.PAID;
         if (orderType == OrderType.PURCHASE) {
-            registerEvent(new OrderPaidEvent(items.stream().map(OrderItem::getCourse).toList(), createdBy));
+            registerEvent(new OrderPaidEvent(id, items.stream().map(OrderItem::getCourse).toList(), createdBy));
         } else {
-            registerEvent(new OrderExchangePaidEvent(exchangeDetails));
+            registerEvent(new OrderExchangePaidEvent(id, exchangeDetails));
         }
-    }
-
-    private boolean isPaid() {
-        return status == Status.PAID;
     }
 
     public void cancelOrder() {
@@ -149,11 +146,17 @@ public class Order extends AbstractAggregateRoot<Order> {
             throw new InputInvalidException("You can't cancel a paid order.");
         }
         this.status = Status.CANCELLED;
-        registerEvent(new OrderCancelledEvent(id));
     }
 
-    public record OrderPaidEvent(List<Long> items, String createdBy) {}
-    public record OrderExchangePaidEvent(ExchangeDetails exchangeDetails) {}
+    @JsonIgnore
+    public Long getACourseIdOnly() {
+        // make it more safety
+        return this.getItems().stream().findFirst().map(OrderItem::getCourse)
+                .orElseThrow(() -> new InputInvalidException("Order type PURCHASE must contain at least one item."));
+    }
+
+    public record OrderPaidEvent(UUID id, List<Long> items, String createdBy) {}
+    public record OrderExchangePaidEvent(UUID id, ExchangeDetails exchangeDetails) {}
     public record OrderCancelledEvent(UUID orderId) {}
 
 }
