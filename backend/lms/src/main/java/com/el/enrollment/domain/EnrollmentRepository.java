@@ -157,4 +157,6 @@ public interface EnrollmentRepository extends CrudRepository<Enrollment, Long> {
         WHERE e.student = :student
     """)
     List<Long> getEnrolledCourseIdsByStudent(String student);
+
+    Integer countByCourseId(Long courseId);
 }
