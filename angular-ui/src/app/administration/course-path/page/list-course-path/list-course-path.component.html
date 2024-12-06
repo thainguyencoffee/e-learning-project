@@ -1,0 +1,73 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Course Path List</h1>
+  <div>
+    <a routerLink="/administration/course-paths/add" class="btn btn-primary ms-2">Create new Course Path</a>
+  </div>
+</div>
+
+@if (!coursePaths || coursePaths.length === 0) {
+  <div>No Course Path could be found.</div>
+} @else {
+  <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
+      <thead>
+      <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Title</th>
+        <th scope="col">Description</th>
+        <th scope="col">Teacher</th>
+        <th scope="col">Status</th>
+        <th><!-- --></th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (coursePath of coursePaths; track coursePath.id) {
+          <tr>
+            <td>{{coursePath.id}}</td>
+            <td>{{coursePath.title}}</td>
+            <td><span [innerHTML]="coursePath.description"></span></td>
+            <td>{{coursePath.teacher}}</td>
+            <td>
+              <span class="badge {{ coursePath.published ? 'bg-success' : 'bg-primary' }}">
+              {{ coursePath.published ? 'Published' : 'Not published' }}
+              </span>
+            </td>
+            <td>
+              <a [routerLink]="['/administration/course-paths/edit', coursePath.id]" [ngClass]="{'disabled': coursePath.published}"
+                 class="btn btn-sm btn-secondary me-2">Edit</a>
+              <a [routerLink]="['/administration/course-paths/add-course', coursePath.id]" [ngClass]="{'disabled': coursePath.published}"
+                 class="btn btn-sm btn-secondary me-2">Add Course</a>
+              <button type="button" (click)="confirmDelete(coursePath.id!)" class="btn btn-sm btn-secondary me-2" [ngClass]="{'disabled': coursePath.published}">
+                Delete
+              </button>
+              <button type="button" (click)="confirmPublish(coursePath.id!)" class="btn btn-sm btn-secondary me-2" [ngClass]="{'disabled': coursePath.published}">
+                Publish
+              </button>
+              <button type="button" (click)="confirmUnpublish(coursePath.id!)" class="btn btn-sm btn-secondary me-2" [ngClass]="{'disabled': !coursePath.published}">
+                Unpublish
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        <li class="page-item" [class.disabled]="paginationUtils!.number === 0">
+          <button class="page-link" (click)="onPageChange(paginationUtils!.number - 1)">Previous</button>
+        </li>
+        <li class="page-item" *ngFor="let page of getPageRange()" [class.active]="page === paginationUtils!.number">
+          <button class="page-link" (click)="onPageChange(page)">{{ page + 1 }}</button>
+        </li>
+        <li class="page-item" [class.disabled]="paginationUtils!.number === paginationUtils!.totalPages - 1">
+          <button class="page-link" (click)="onPageChange(paginationUtils!.number + 1)">Next</button>
+        </li>
+      </ul>
+    </nav>
+
+  </div>
+}
+
+<a [routerLink]="['/administration/course-paths/trash']" class="btn btn-primary">Go to Trash</a>
+

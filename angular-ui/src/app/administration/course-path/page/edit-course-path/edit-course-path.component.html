@@ -1,0 +1,13 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Edit Course Path</h1>
+  <div>
+    <a routerLink="/administration/course-paths" class="btn btn-secondary ms-2">Back to list</a>
+  </div>
+</div>
+
+<form [formGroup]="editForm" (ngSubmit)="handleSubmit()">
+  <app-input-row [group]="editForm" field="id" rowType="number" label="Id"/>
+  <app-input-row [group]="editForm" field="title" label="Title" />
+  <app-input-row [group]="editForm" rowType="textarea" field="description" label="Description" />
+  <input type="submit" value="Update Course Path" class="btn btn-primary mt-4" />
+</form>

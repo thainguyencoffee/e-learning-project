@@ -35,7 +35,7 @@
       </p>
 
       <!-- Rating -->
-      <div class="d-flex align-items-center">
+      <div class="d-flex align-items-center" *ngIf="showReview">
         <div class="star-rating">
           <span *ngFor="let star of getStarsIcon(course.averageRating)" [innerHTML]="star"></span>
         </div>
@@ -56,10 +56,20 @@
 
       <button
         *ngIf="customButtonText && customButtonAction"
+        [ngClass]="{'disabled': disableCustomButton}"
         class="btn btn-secondary btn-sm w-100 mt-2"
         (click)="customButtonAction(course)">
         {{ customButtonText }}
       </button>
+
+      <button
+        *ngIf="enableFallbackButton && fallbackButtonText && fallbackButtonAction"
+        [ngClass]="{'disabled': disableFallbackButton}"
+        class="btn btn-secondary btn-sm w-100 mt-2"
+        (click)="fallbackButtonAction(course)">
+        {{ fallbackButtonText }}
+      </button>
+
     </div>
   </div>
 </div>

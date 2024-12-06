@@ -36,6 +36,11 @@ export class CourseService {
     return this.http.get<PageWrapper<Course>>(url)
   }
 
+  getAllCoursesPublished(pageNumber: number = 0, pageSize: number = 10): Observable<PageWrapper<Course>> {
+    const url = `${this.resourcePath}?page=${pageNumber}&size=${pageSize}&published=true`;
+    return this.http.get<PageWrapper<Course>>(url)
+  }
+
   getAllCoursesInTrash(pageNumber: number = 0, pageSize: number = 10): Observable<PageWrapper<Course>> {
     const url = `${this.resourcePath}/trash?page=${pageNumber}&size=${pageSize}`;
     return this.http.get<PageWrapper<Course>>(url)
