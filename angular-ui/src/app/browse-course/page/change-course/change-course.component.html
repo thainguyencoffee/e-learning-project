@@ -12,6 +12,7 @@
                        [showCheckoutButton]="false"
                        customButtonText="Change"
                        [customButtonAction]="onChange.bind(this)"
+                       [disableCustomButton]="course.hasPurchased"
       />
     }
   </div>
