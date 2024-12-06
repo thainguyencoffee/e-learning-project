@@ -17,7 +17,6 @@ import {NgClass, NgForOf, NgIf} from "@angular/common";
     NgForOf
   ],
   templateUrl: './list-course-path.component.html',
-  styleUrl: './list-course-path.component.css'
 })
 export class ListCoursePathComponent implements OnInit, OnDestroy {
 

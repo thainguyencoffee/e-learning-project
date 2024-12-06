@@ -21,7 +21,6 @@ import {CoursePath} from "../../model/course-path";
     NgIf
   ],
   templateUrl: './add-course-to-path.component.html',
-  styleUrl: './add-course-to-path.component.css'
 })
 export class AddCourseToPathComponent implements OnInit, OnDestroy {
 

@@ -17,7 +17,6 @@ import {InputRowComponent} from "../../../../common/input-row/input-row.componen
     ReactiveFormsModule
   ],
   templateUrl: './edit-course-path.component.html',
-  styleUrl: './edit-course-path.component.css'
 })
 export class EditCoursePathComponent implements OnInit{
 

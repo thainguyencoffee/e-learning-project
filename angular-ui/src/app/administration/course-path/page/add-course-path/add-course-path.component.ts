@@ -15,7 +15,6 @@ import {InputRowComponent} from "../../../../common/input-row/input-row.componen
     InputRowComponent
   ],
   templateUrl: './add-course-path.component.html',
-  styleUrl: './add-course-path.component.css'
 })
 export class AddCoursePathComponent {
 

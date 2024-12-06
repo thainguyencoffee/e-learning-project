@@ -15,7 +15,6 @@ import {NgForOf} from "@angular/common";
     NgForOf
   ],
   templateUrl: './course-path-trash.component.html',
-  styleUrl: './course-path-trash.component.css'
 })
 export class CoursePathTrashComponent implements OnInit, OnDestroy{
 
