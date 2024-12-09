@@ -9,6 +9,8 @@
 
 [![Backend CI with Gradle](https://github.com/thainguyencoffee/e-learning-project/actions/workflows/commit-stage.yaml/badge.svg)](https://github.com/thainguyencoffee/e-l/actions/workflows/commit-stage.yaml)
 
+> I use Keycloak as an OpenID Provider. It as a user-service in charge of authentication and user data (roles, profiles, contact info, etc.)
+
 ## How to build
 
 ### Prerequisites
