@@ -64,7 +64,7 @@ abstract class AbstractLmsApplicationTests {
     @BeforeAll
     static void generateAccessToken() {
         WebClient webClient = WebClient.builder()
-                .baseUrl(KeycloakTestContainer.getInstance().getAuthServerUrl() + "/realms/keycloak101/protocol/openid-connect/token")
+                .baseUrl(KeycloakTestContainer.getInstance().getAuthServerUrl() + "/realms/e-learning-project/protocol/openid-connect/token")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE,
                         MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();
@@ -350,7 +350,7 @@ abstract class AbstractLmsApplicationTests {
         return webClient
                 .post()
                 .body(BodyInserters.fromFormData("grant_type", "password")
-                        .with("client_id", "bff-client")
+                        .with("client_id", "bff-service-confidential")
                         .with("client_secret", "secret")
                         .with("username", username)
                         .with("password", password)

@@ -3,7 +3,7 @@ import {Router} from "@angular/router";
 import {FormGroup, ValidationErrors} from "@angular/forms";
 import {loginOptions} from "./auth/login.component";
 import {HttpClient} from "@angular/common/http";
-import {baseUri} from "../app.config";
+import {environment} from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -56,8 +56,8 @@ export class ErrorHandler {
         if (opts.length) {
           const loginUri = opts[0].loginUri;
           const url = new URL(loginUri);
-          url.searchParams.append('post_login_success_uri', `${baseUri}${this.router.url}`);
-          url.searchParams.append('post_login_failure_uri', `${baseUri}/login-error`);
+          url.searchParams.append('post_login_success_uri', `${environment.basePath}${this.router.url}`);
+          url.searchParams.append('post_login_failure_uri', `${environment.basePath}/login-error`);
           window.location.href = url.toString();
         } else {
           throw new Error('No login options available');

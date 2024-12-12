@@ -10,11 +10,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class KeycloakConfig {
 
-    @Value("${reverse-proxy-uri}")
-    private String reverseProxyUri;
-
-    @Value("${authorization-server-prefix}")
-    private String authorizationServerPrefix;
+    @Value("${keycloak-server-url}")
+    private String keycloakServerUrl;
 
     @Value("${realm_name}")
     private String realm;
@@ -28,7 +25,7 @@ public class KeycloakConfig {
     @Bean
     public Keycloak keycloak() {
         return KeycloakBuilder.builder()
-                .serverUrl(reverseProxyUri + authorizationServerPrefix)
+                .serverUrl(keycloakServerUrl)
                 .realm(realm)
                 .clientId(clientId)
                 .clientSecret(clientSecret)

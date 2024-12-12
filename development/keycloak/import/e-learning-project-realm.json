@@ -1,6 +1,8 @@
 {
   "id" : "8ad7f486-fc61-49f0-9ef9-8156cf11f903",
-  "realm" : "keycloak101",
+  "realm" : "e-learning-project",
+  "displayName" : "",
+  "displayNameHtml" : "",
   "notBefore" : 0,
   "defaultSignatureAlgorithm" : "RS256",
   "revokeRefreshToken" : false,
@@ -27,13 +29,13 @@
   "oauth2DevicePollingInterval" : 5,
   "enabled" : true,
   "sslRequired" : "external",
-  "registrationAllowed" : false,
+  "registrationAllowed" : true,
   "registrationEmailAsUsername" : false,
-  "rememberMe" : false,
+  "rememberMe" : true,
   "verifyEmail" : false,
   "loginWithEmailAllowed" : true,
   "duplicateEmailsAllowed" : false,
-  "resetPasswordAllowed" : false,
+  "resetPasswordAllowed" : true,
   "editUsernameAllowed" : false,
   "bruteForceProtected" : false,
   "permanentLockout" : false,
@@ -79,7 +81,12 @@
       "id" : "d501bed7-160c-496b-9168-9eb8b0381641",
       "name" : "admin",
       "description" : "",
-      "composite" : false,
+      "composite" : true,
+      "composites" : {
+        "client" : {
+          "realm-management" : [ "view-users", "manage-users", "query-users" ]
+        }
+      },
       "clientRole" : false,
       "containerId" : "8ad7f486-fc61-49f0-9ef9-8156cf11f903",
       "attributes" : { }
@@ -101,7 +108,6 @@
       "attributes" : { }
     } ],
     "client" : {
-      "bff-client" : [ ],
       "realm-management" : [ {
         "id" : "906752ec-1278-47e9-ac65-6547afd75196",
         "name" : "manage-authorization",
@@ -356,7 +362,8 @@
         "clientRole" : true,
         "containerId" : "72633d81-d3fc-4766-8223-ffd3f354267e",
         "attributes" : { }
-      } ]
+      } ],
+      "bff-service-confidential" : [ ]
     }
   },
   "groups" : [ ],
@@ -403,8 +410,8 @@
   "users" : [ {
     "id" : "fc23d891-5df9-4fbf-a063-6d77c11f884a",
     "username" : "boss",
-    "firstName" : "boss",
-    "lastName" : "nguyen",
+    "firstName" : "Olivia",
+    "lastName" : "Rodrigo",
     "email" : "nguyennt110320043@gmail.com",
     "emailVerified" : true,
     "createdTimestamp" : 1728052153673,
@@ -425,12 +432,12 @@
     "groups" : [ ]
   }, {
     "id" : "4cbf38c5-ba64-4884-853d-fd0107c9ae39",
-    "username" : "service-account-bff-client",
+    "username" : "service-account-bff-service-confidential",
     "emailVerified" : false,
     "createdTimestamp" : 1729414796960,
     "enabled" : true,
     "totp" : false,
-    "serviceAccountClientId" : "bff-client",
+    "serviceAccountClientId" : "bff-service-confidential",
     "credentials" : [ ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
@@ -443,8 +450,8 @@
   }, {
     "id" : "9db2e8a4-ca81-43ca-bfb4-bef6fa9e0844",
     "username" : "teacher",
-    "firstName" : "teacher",
-    "lastName" : "nguyen",
+    "firstName" : "Céline",
+    "lastName" : "Dion",
     "email" : "nguyennt110320042@gmail.com",
     "emailVerified" : true,
     "createdTimestamp" : 1728052117146,
@@ -464,10 +471,32 @@
     "notBefore" : 0,
     "groups" : [ ]
   }, {
+    "id" : "7e9b5332-e61e-4733-8e3d-cd0579f54dad",
+    "username" : "teacher2",
+    "firstName" : "Michael",
+    "lastName" : "Jackson",
+    "email" : "nguyenntph33935@fpt.edu.vn",
+    "emailVerified" : true,
+    "createdTimestamp" : 1731914819937,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "b0b50679-d123-4aa3-ae98-866eed8a20aa",
+      "type" : "password",
+      "createdDate" : 1731915460942,
+      "secretData" : "{\"value\":\"axjiwplK7lnIcrpWS3X3qJCaCKyTIV1k/xTbFCzJ81rPJHnxKG/fiCRCj6MAxOPSgvGpECuatbRfFTWzH1o+Lw==\",\"salt\":\"Wl1UdAjkry8V05p3vdH1pA==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-keycloak101" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
     "id" : "b75ab7d9-86c7-4cce-a81b-1e4e33036b0a",
     "username" : "user",
-    "firstName" : "nguyen",
-    "lastName" : "thai",
+    "firstName" : "Britney",
+    "lastName" : "Spears",
     "email" : "nguyennt11032004@gmail.com",
     "emailVerified" : true,
     "createdTimestamp" : 1728052086709,
@@ -479,29 +508,6 @@
       "userLabel" : "My password",
       "createdDate" : 1728052097189,
       "secretData" : "{\"value\":\"wEBJolRJMh4m/ClmF7A3vPxZfyPeftMv4Cd3N4FiqGYDgzvTTYn/w1qBUo9VJAeWMRl7Sek1y9O1tUiZMgZRPw==\",\"salt\":\"tKbK2mkrY3I/+cFvP9LZcw==\",\"additionalParameters\":{}}",
-      "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
-    } ],
-    "disableableCredentialTypes" : [ ],
-    "requiredActions" : [ ],
-    "realmRoles" : [ "default-roles-keycloak101" ],
-    "notBefore" : 0,
-    "groups" : [ ]
-  }, {
-    "id" : "a32aee3b-d6db-4b22-83c8-2d813d48e50e",
-    "username" : "user2",
-    "firstName" : "thai ",
-    "lastName" : "nguyen 2",
-    "email" : "demo2@gmail.com",
-    "emailVerified" : true,
-    "createdTimestamp" : 1729939430945,
-    "enabled" : true,
-    "totp" : false,
-    "credentials" : [ {
-      "id" : "2cb3c208-7c61-4edf-8d7d-f72093084745",
-      "type" : "password",
-      "userLabel" : "My password",
-      "createdDate" : 1729939459921,
-      "secretData" : "{\"value\":\"TuXRbM4QLzmg0BeGrRG5unam45Uat2dClIV7ZTAY+5EN5Hyis/zi9XnDxq3rtudvnhszKwvtyan0Mv6dYyJ10g==\",\"salt\":\"4HG1/TDDPLkwToBSqah3xA==\",\"additionalParameters\":{}}",
       "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
     } ],
     "disableableCredentialTypes" : [ ],
@@ -525,12 +531,12 @@
     "clientId" : "account",
     "name" : "${client_account}",
     "rootUrl" : "${authBaseUrl}",
-    "baseUrl" : "/realms/keycloak101/account/",
+    "baseUrl" : "/realms/e-learning-project/account/",
     "surrogateAuthRequired" : false,
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
-    "redirectUris" : [ "/realms/keycloak101/account/*" ],
+    "redirectUris" : [ "/realms/e-learning-project/account/*" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -555,12 +561,12 @@
     "clientId" : "account-console",
     "name" : "${client_account-console}",
     "rootUrl" : "${authBaseUrl}",
-    "baseUrl" : "/realms/keycloak101/account/",
+    "baseUrl" : "/realms/e-learning-project/account/",
     "surrogateAuthRequired" : false,
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
-    "redirectUris" : [ "/realms/keycloak101/account/*" ],
+    "redirectUris" : [ "/realms/e-learning-project/account/*" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -619,19 +625,19 @@
     "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
   }, {
     "id" : "c3cdb3a7-cddd-483f-8f49-2d71da01284e",
-    "clientId" : "bff-client",
+    "clientId" : "bff-service-confidential",
     "name" : "",
     "description" : "",
-    "rootUrl" : "",
+    "rootUrl" : "http://localhost:4200/",
     "adminUrl" : "",
-    "baseUrl" : "",
+    "baseUrl" : "http://localhost:4200/",
     "surrogateAuthRequired" : false,
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "secret",
-    "redirectUris" : [ "*" ],
-    "webOrigins" : [ "*" ],
+    "redirectUris" : [ "http://localhost:7081/login/oauth2/code/bff-service" ],
+    "webOrigins" : [ "+" ],
     "notBefore" : 0,
     "bearerOnly" : false,
     "consentRequired" : false,
@@ -646,8 +652,8 @@
       "oidc.ciba.grant.enabled" : "false",
       "client.secret.creation.time" : "1728051978",
       "backchannel.logout.session.required" : "true",
-      "backchannel.logout.url" : "http://localhost:9000/logout/connect/back-channel/keycloak101",
-      "post.logout.redirect.uris" : "http://localhost:9000/##http://127.0.0.1:9000/",
+      "backchannel.logout.url" : "http://localhost:7081/logout/connect/back-channel/bff-service",
+      "post.logout.redirect.uris" : "http://localhost:4200/",
       "display.on.consent.screen" : "false",
       "oauth2.device.authorization.grant.enabled" : "false",
       "backchannel.logout.revoke.offline.tokens" : "false"
@@ -664,6 +670,7 @@
       "config" : {
         "user.session.note" : "client_id",
         "introspection.token.claim" : "true",
+        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "client_id",
@@ -678,6 +685,7 @@
       "config" : {
         "user.session.note" : "clientHost",
         "introspection.token.claim" : "true",
+        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "clientHost",
@@ -692,6 +700,7 @@
       "config" : {
         "user.session.note" : "clientAddress",
         "introspection.token.claim" : "true",
+        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "clientAddress",
@@ -761,12 +770,12 @@
     "clientId" : "security-admin-console",
     "name" : "${client_security-admin-console}",
     "rootUrl" : "${authAdminUrl}",
-    "baseUrl" : "/admin/keycloak101/console/",
+    "baseUrl" : "/admin/e-learning-project/console/",
     "surrogateAuthRequired" : false,
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
-    "redirectUris" : [ "/admin/keycloak101/console/*" ],
+    "redirectUris" : [ "/admin/e-learning-project/console/*" ],
     "webOrigins" : [ "+" ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -1312,7 +1321,24 @@
     "xXSSProtection" : "1; mode=block",
     "strictTransportSecurity" : "max-age=31536000; includeSubDomains"
   },
-  "smtpServer" : { },
+  "smtpServer" : {
+    "replyToDisplayName" : "",
+    "starttls" : "true",
+    "auth" : "true",
+    "envelopeFrom" : "",
+    "ssl" : "false",
+    "password" : "jobp bowr xqxb nlcs",
+    "port" : "587",
+    "host" : "smtp.gmail.com",
+    "replyTo" : "",
+    "from" : "nguyennt11032004@gmail.com",
+    "fromDisplayName" : "",
+    "user" : "nguyennt11032004@gmail.com"
+  },
+  "loginTheme" : "keycloak",
+  "accountTheme" : "keycloak.v3",
+  "adminTheme" : "keycloak.v2",
+  "emailTheme" : "",
   "eventsEnabled" : false,
   "eventsListeners" : [ "jboss-logging" ],
   "enabledEventTypes" : [ ],
@@ -1328,7 +1354,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "saml-user-attribute-mapper", "oidc-usermodel-property-mapper", "oidc-full-name-mapper", "oidc-address-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-role-list-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-full-name-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-role-list-mapper", "saml-user-attribute-mapper", "oidc-usermodel-attribute-mapper", "oidc-usermodel-property-mapper", "saml-user-property-mapper", "oidc-address-mapper" ]
       }
     }, {
       "id" : "02c4a486-c98c-4fcd-8b86-2f38a6632506",
@@ -1355,7 +1381,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "saml-user-property-mapper", "oidc-usermodel-property-mapper", "oidc-usermodel-attribute-mapper", "oidc-address-mapper", "saml-role-list-mapper", "saml-user-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-full-name-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-full-name-mapper", "oidc-usermodel-attribute-mapper", "oidc-address-mapper", "saml-role-list-mapper", "oidc-usermodel-property-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-property-mapper", "saml-user-attribute-mapper" ]
       }
     }, {
       "id" : "163baea6-a403-4c7d-bee3-851d09513561",
@@ -2008,17 +2034,19 @@
   "firstBrokerLoginFlow" : "first broker login",
   "attributes" : {
     "cibaBackchannelTokenDeliveryMode" : "poll",
-    "cibaExpiresIn" : "120",
     "cibaAuthRequestedUserHint" : "login_hint",
-    "oauth2DeviceCodeLifespan" : "600",
     "clientOfflineSessionMaxLifespan" : "0",
     "oauth2DevicePollingInterval" : "5",
     "clientSessionIdleTimeout" : "0",
-    "parRequestUriLifespan" : "60",
-    "clientSessionMaxLifespan" : "0",
     "clientOfflineSessionIdleTimeout" : "0",
     "cibaInterval" : "5",
-    "realmReusableOtpCode" : "false"
+    "realmReusableOtpCode" : "false",
+    "cibaExpiresIn" : "120",
+    "oauth2DeviceCodeLifespan" : "600",
+    "parRequestUriLifespan" : "60",
+    "clientSessionMaxLifespan" : "0",
+    "frontendUrl" : "",
+    "acr.loa.map" : "{}"
   },
   "keycloakVersion" : "24.0.0",
   "userManagedAccessAllowed" : false,

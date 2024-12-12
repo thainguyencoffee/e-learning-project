@@ -15,6 +15,3 @@ export const appConfig: ApplicationConfig = {
       importProvidersFrom(RouterModule.forRoot(routes, routeConfig), BrowserAnimationsModule),
       provideHttpClient()],
 };
-
-export const reverseProxyUri = 'http://LOCALHOST_NAME:7080';
-export const baseUri = `${reverseProxyUri}/angular-ui`;

@@ -36,9 +36,3 @@ out/
 ### VS Code ###
 .vscode/
 /.idea/
-
-compose-*.yml
-compose-*.yml''
-nginx-reverse-proxy/nginx.conf
-keycloak/import/keycloak101-realm.json
-angular-ui/src/app/app.config.ts

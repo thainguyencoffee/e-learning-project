@@ -1,19 +1,5 @@
-scheme: http
-hostname: localhost
-reverse-proxy-port: 7080
-reverse-proxy-uri: ${scheme}://${hostname}:${reverse-proxy-port}
-authorization-server-prefix: /auth
-realm_name: keycloak101
-issuer: ${reverse-proxy-uri}${authorization-server-prefix}/realms/${realm_name}
-client-id: bff-client
-client-secret: secret
-bff-port: 7081
-bff-prefix: /bff
-resource-server-port: 7084
-authorities-json-path: $.roles
-
 server:
-  port: ${bff-port}
+  port: 7081
 
 spring:
   application:
@@ -21,8 +7,8 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: bff
-          uri: ${scheme}://${hostname}:${resource-server-port}
+        - id: lms
+          uri: ${LMS_URI:http://localhost:7084}
           predicates:
             - Path=/api/**
           filters:
@@ -34,14 +20,14 @@ spring:
     oauth2:
       client:
         provider:
-          keycloak101:
-            issuer-uri: ${issuer}
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/e-learning-project
         registration:
-          keycloak101:
-            provider: keycloak101
+          bff-service:
+            provider: keycloak
             authorization-grant-type: authorization_code
-            client-id: ${client-id}
-            client-secret: ${client-secret}
+            client-id: bff-service-confidential
+            client-secret: ${KEYCLOAK_CLIENT_SECRET:secret}
             scope: openid,profile,email,offline_access
 
 com:
@@ -49,12 +35,12 @@ com:
     springaddons:
       oidc:
         ops:
-          - iss: ${issuer}
+          - iss: http://localhost:8080/realms/e-learning-project
             authorities:
-              - path: ${authorities-json-path}
-            aud: ${audience}
+              - path: .roles
+            aud:
         client:
-          client-uri: ${reverse-proxy-uri}${bff-prefix}
+          client-uri: http://localhost:7081
           security-matchers:
             - /api/**
             - /login/**
@@ -64,8 +50,8 @@ com:
             - /api/**
             - /login/**
             - /oauth2/**
-            - /logout/connect/back-channel/keycloak101
-          post-logout-redirect-host: ${hostname}
+            - /logout/connect/back-channel/bff-service
+          post-logout-redirect-host: localhost
           csrf: cookie_accessible_from_js
           oauth2-redirections:
             rp-initiated-logout: accepted
@@ -80,6 +66,11 @@ com:
             - /error
             - /actuator/health/readiness
             - /actuator/health/liveness
+        cors:
+          - path: /**
+            allowed-origin-patterns:
+              - "http://localhost:4200"
+            allow-credentials: true
 
 management:
   endpoint:
@@ -90,8 +81,3 @@ management:
     web:
       exposure:
         include: gateway, health, info
-  health:
-    livenessstate:
-      enabled: true
-    readinessstate:
-      enabled: true

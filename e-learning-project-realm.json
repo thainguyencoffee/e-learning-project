@@ -1,6 +1,8 @@
 {
   "id" : "8ad7f486-fc61-49f0-9ef9-8156cf11f903",
-  "realm" : "keycloak101",
+  "realm" : "e-learning-project",
+  "displayName" : "",
+  "displayNameHtml" : "",
   "notBefore" : 0,
   "defaultSignatureAlgorithm" : "RS256",
   "revokeRefreshToken" : false,
@@ -106,7 +108,6 @@
       "attributes" : { }
     } ],
     "client" : {
-      "bff-client" : [ ],
       "realm-management" : [ {
         "id" : "906752ec-1278-47e9-ac65-6547afd75196",
         "name" : "manage-authorization",
@@ -361,7 +362,8 @@
         "clientRole" : true,
         "containerId" : "72633d81-d3fc-4766-8223-ffd3f354267e",
         "attributes" : { }
-      } ]
+      } ],
+      "bff-service-confidential" : [ ]
     }
   },
   "groups" : [ ],
@@ -430,12 +432,12 @@
     "groups" : [ ]
   }, {
     "id" : "4cbf38c5-ba64-4884-853d-fd0107c9ae39",
-    "username" : "service-account-bff-client",
+    "username" : "service-account-bff-service-confidential",
     "emailVerified" : false,
     "createdTimestamp" : 1729414796960,
     "enabled" : true,
     "totp" : false,
-    "serviceAccountClientId" : "bff-client",
+    "serviceAccountClientId" : "bff-service-confidential",
     "credentials" : [ ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
@@ -529,12 +531,12 @@
     "clientId" : "account",
     "name" : "${client_account}",
     "rootUrl" : "${authBaseUrl}",
-    "baseUrl" : "/realms/keycloak101/account/",
+    "baseUrl" : "/realms/e-learning-project/account/",
     "surrogateAuthRequired" : false,
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
-    "redirectUris" : [ "/realms/keycloak101/account/*" ],
+    "redirectUris" : [ "/realms/e-learning-project/account/*" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -559,12 +561,12 @@
     "clientId" : "account-console",
     "name" : "${client_account-console}",
     "rootUrl" : "${authBaseUrl}",
-    "baseUrl" : "/realms/keycloak101/account/",
+    "baseUrl" : "/realms/e-learning-project/account/",
     "surrogateAuthRequired" : false,
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
-    "redirectUris" : [ "/realms/keycloak101/account/*" ],
+    "redirectUris" : [ "/realms/e-learning-project/account/*" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -623,18 +625,18 @@
     "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
   }, {
     "id" : "c3cdb3a7-cddd-483f-8f49-2d71da01284e",
-    "clientId" : "bff-client",
+    "clientId" : "bff-service-confidential",
     "name" : "",
     "description" : "",
-    "rootUrl" : "",
+    "rootUrl" : "http://localhost:4200/",
     "adminUrl" : "",
-    "baseUrl" : "",
+    "baseUrl" : "http://localhost:4200/",
     "surrogateAuthRequired" : false,
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "secret",
-    "redirectUris" : [ "https://127.0.0.1:7080/bff/login/oauth2/code/keycloak101", "https://LOCALHOST_NAME:7080/bff/login/oauth2/code/keycloak101", "http://LOCALHOST_NAME:7080/bff/login/oauth2/code/keycloak101", "https://host.docker.internal:7080/bff/login/oauth2/code/keycloak101", "http://127.0.0.1:7080/bff/login/oauth2/code/keycloak101", "http://host.docker.internal:7080/bff/login/oauth2/code/keycloak101", "http://localhost:7080/bff/login/oauth2/code/keycloak101", "https://localhost:7080/bff/login/oauth2/code/keycloak101" ],
+    "redirectUris" : [ "http://localhost:7081/login/oauth2/code/bff-service" ],
     "webOrigins" : [ "+" ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -650,8 +652,8 @@
       "oidc.ciba.grant.enabled" : "false",
       "client.secret.creation.time" : "1728051978",
       "backchannel.logout.session.required" : "true",
-      "backchannel.logout.url" : "http://LOCALHOST_NAME:7080/bff/logout/connect/back-channel/keycloak101",
-      "post.logout.redirect.uris" : "http://localhost:7080/*##http://127.0.0.1:7080/*##https://localhost:7080/*##https://127.0.0.1:7080/*##http://LOCALHOST_NAME:7080/*##https://LOCALHOST_NAME:7080/*",
+      "backchannel.logout.url" : "http://localhost:7081/logout/connect/back-channel/bff-service",
+      "post.logout.redirect.uris" : "http://localhost:4200/",
       "display.on.consent.screen" : "false",
       "oauth2.device.authorization.grant.enabled" : "false",
       "backchannel.logout.revoke.offline.tokens" : "false"
@@ -768,12 +770,12 @@
     "clientId" : "security-admin-console",
     "name" : "${client_security-admin-console}",
     "rootUrl" : "${authAdminUrl}",
-    "baseUrl" : "/admin/keycloak101/console/",
+    "baseUrl" : "/admin/e-learning-project/console/",
     "surrogateAuthRequired" : false,
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
-    "redirectUris" : [ "/admin/keycloak101/console/*" ],
+    "redirectUris" : [ "/admin/e-learning-project/console/*" ],
     "webOrigins" : [ "+" ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -1352,7 +1354,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-attribute-mapper", "oidc-full-name-mapper", "oidc-usermodel-property-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-address-mapper", "saml-user-attribute-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-full-name-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-role-list-mapper", "saml-user-attribute-mapper", "oidc-usermodel-attribute-mapper", "oidc-usermodel-property-mapper", "saml-user-property-mapper", "oidc-address-mapper" ]
       }
     }, {
       "id" : "02c4a486-c98c-4fcd-8b86-2f38a6632506",
@@ -1379,7 +1381,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-full-name-mapper", "oidc-address-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "saml-user-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-property-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-full-name-mapper", "oidc-usermodel-attribute-mapper", "oidc-address-mapper", "saml-role-list-mapper", "oidc-usermodel-property-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-property-mapper", "saml-user-attribute-mapper" ]
       }
     }, {
       "id" : "163baea6-a403-4c7d-bee3-851d09513561",
@@ -2032,17 +2034,19 @@
   "firstBrokerLoginFlow" : "first broker login",
   "attributes" : {
     "cibaBackchannelTokenDeliveryMode" : "poll",
-    "cibaExpiresIn" : "120",
     "cibaAuthRequestedUserHint" : "login_hint",
-    "oauth2DeviceCodeLifespan" : "600",
     "clientOfflineSessionMaxLifespan" : "0",
     "oauth2DevicePollingInterval" : "5",
     "clientSessionIdleTimeout" : "0",
-    "parRequestUriLifespan" : "60",
-    "clientSessionMaxLifespan" : "0",
     "clientOfflineSessionIdleTimeout" : "0",
     "cibaInterval" : "5",
-    "realmReusableOtpCode" : "false"
+    "realmReusableOtpCode" : "false",
+    "cibaExpiresIn" : "120",
+    "oauth2DeviceCodeLifespan" : "600",
+    "parRequestUriLifespan" : "60",
+    "clientSessionMaxLifespan" : "0",
+    "frontendUrl" : "",
+    "acr.loa.map" : "{}"
   },
   "keycloakVersion" : "24.0.0",
   "userManagedAccessAllowed" : false,

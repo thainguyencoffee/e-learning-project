@@ -1,13 +1,4 @@
 services:
-  nginx-reverse-proxy:
-    container_name: el.nginx-reverse-proxy
-    image: el/nginx-reverse-proxy
-    ports:
-      - 7080:7080
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-      - "LOCALHOST_NAME:host-gateway"
-
   postgres:
     container_name: el.db
     image: postgres:16
@@ -42,10 +33,7 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: secret
       KC_HTTP_PORT: 8080
-      KC_HOSTNAME_URL: http://LOCALHOST_NAME:7080/auth
-      KC_HOSTNAME_ADMIN_URL: http://LOCALHOST_NAME:7080/auth
       KC_HOSTNAME_STRICT_BACKCHANNEL: true
-      KC_HTTP_RELATIVE_PATH: /auth/
       KC_HTTP_ENABLED: true
       KC_HEALTH_ENABLED: true
       KC_METRICS_ENABLED: true
@@ -60,47 +48,3 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
-
-  angular-ui:
-    container_name: el.angular-ui
-    image: el/angular-ui
-    ports:
-      - 4201:80
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-      - "LOCALHOST_NAME:host-gateway"
-
-  lms:
-    container_name: el.lms
-    image: el/lms
-    ports:
-      - 7084:7084
-    environment:
-      HOSTNAME: LOCALHOST_NAME
-      SERVER_ADDRESS: 0.0.0.0
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lms
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: secret
-      SPRING_PROFILES_ACTIVE: local
-    depends_on:
-      keycloak:
-        condition: service_healthy
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-      - "LOCALHOST_NAME:host-gateway"
-
-  bff:
-    container_name: el.bff
-    image: el/bff
-    ports:
-      - 7081:7081
-    environment:
-      HOSTNAME: LOCALHOST_NAME
-      SERVER_ADDRESS: 0.0.0.0
-      CLIENT_SECRET: secret
-    depends_on:
-      keycloak:
-        condition: service_healthy
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-      - "LOCALHOST_NAME:host-gateway"

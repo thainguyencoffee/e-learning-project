@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { UserService } from './user.service';
 import { lastValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import {baseUri} from "../../app.config";
+import {environment} from "../../../environments/environment";
 
 @Component({
   selector: 'app-logout',
@@ -19,9 +19,9 @@ export class LogoutComponent {
 
   logout() {
     lastValueFrom(
-      this.http.post('/bff/logout', null, {
+      this.http.post(environment.apiPath + '/logout', null, {
         headers: {
-          'X-POST-LOGOUT-SUCCESS-URI': baseUri,
+          'X-POST-LOGOUT-SUCCESS-URI': environment.basePath,
         },
         observe: 'response',
       })

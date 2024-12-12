@@ -5,7 +5,7 @@ import {map, Observable} from 'rxjs';
 import {UserService} from './user.service';
 import {Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
-import {baseUri} from "../../app.config";
+import {environment} from "../../../environments/environment";
 
 interface LoginOptionDto {
   label: string;
@@ -14,7 +14,7 @@ interface LoginOptionDto {
 
 export function loginOptions(http: HttpClient): Observable<Array<LoginOptionDto>> {
   return http
-    .get('/bff/login-options')
+    .get(environment.apiPath + '/login-options')
     .pipe(map((dto: any) => dto as LoginOptionDto[]));
 }
 
@@ -51,8 +51,8 @@ export class LoginComponent {
     }
 
     const url = new URL(this.loginUri);
-    url.searchParams.append('post_login_success_uri',`${baseUri}${this.router.url}`);
-    url.searchParams.append('post_login_failure_uri', `${baseUri}/login-error`);
+    url.searchParams.append('post_login_success_uri',`${environment.basePath}${this.router.url}`);
+    url.searchParams.append('post_login_failure_uri', `${environment.basePath}/login-error`);
     window.location.href = url.toString();
   }
 
