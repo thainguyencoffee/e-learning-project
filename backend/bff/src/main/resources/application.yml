@@ -66,11 +66,6 @@ com:
             - /error
             - /actuator/health/readiness
             - /actuator/health/liveness
-        cors:
-          - path: /**
-            allowed-origin-patterns:
-              - "http://localhost:4200"
-            allow-credentials: true
 
 management:
   endpoint:

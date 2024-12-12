@@ -1,0 +1,9 @@
+com:
+  c4-soft:
+    springaddons:
+      oidc:
+        cors:
+          - path: /**
+            allowed-origin-patterns:
+              - "http://localhost:4200"
+            allow-credentials: true
