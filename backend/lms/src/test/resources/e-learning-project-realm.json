@@ -1,6 +1,6 @@
 {
   "id" : "8ad7f486-fc61-49f0-9ef9-8156cf11f903",
-  "realm" : "keycloak101",
+  "realm" : "e-learning-project",
   "notBefore" : 0,
   "defaultSignatureAlgorithm" : "RS256",
   "revokeRefreshToken" : false,
@@ -63,7 +63,7 @@
       "attributes" : { }
     }, {
       "id" : "8d323ebe-15bb-4e87-b233-89f4a29f0218",
-      "name" : "default-roles-keycloak101",
+      "name" : "default-roles-e-learning-project",
       "description" : "${role_default-roles}",
       "composite" : true,
       "composites" : {
@@ -101,7 +101,7 @@
       "attributes" : { }
     } ],
     "client" : {
-      "bff-client" : [ ],
+      "bff-service-confidential" : [ ],
       "realm-management" : [ {
         "id" : "906752ec-1278-47e9-ac65-6547afd75196",
         "name" : "manage-authorization",
@@ -362,7 +362,7 @@
   "groups" : [ ],
   "defaultRole" : {
     "id" : "8d323ebe-15bb-4e87-b233-89f4a29f0218",
-    "name" : "default-roles-keycloak101",
+    "name" : "default-roles-e-learning-project",
     "description" : "${role_default-roles}",
     "composite" : true,
     "clientRole" : false,
@@ -420,21 +420,21 @@
     } ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
-    "realmRoles" : [ "default-roles-keycloak101", "admin" ],
+    "realmRoles" : [ "default-roles-e-learning-project", "admin" ],
     "notBefore" : 0,
     "groups" : [ ]
   }, {
     "id" : "4cbf38c5-ba64-4884-853d-fd0107c9ae39",
-    "username" : "service-account-bff-client",
+    "username" : "service-account-bff-service-confidential",
     "emailVerified" : false,
     "createdTimestamp" : 1729414796960,
     "enabled" : true,
     "totp" : false,
-    "serviceAccountClientId" : "bff-client",
+    "serviceAccountClientId" : "bff-service-confidential",
     "credentials" : [ ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
-    "realmRoles" : [ "default-roles-keycloak101" ],
+    "realmRoles" : [ "default-roles-e-learning-project" ],
     "clientRoles" : {
       "realm-management" : [ "realm-admin" ]
     },
@@ -460,7 +460,7 @@
     } ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
-    "realmRoles" : [ "teacher", "default-roles-keycloak101" ],
+    "realmRoles" : [ "teacher", "default-roles-e-learning-project" ],
     "notBefore" : 0,
     "groups" : [ ]
   }, {
@@ -483,7 +483,7 @@
     } ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
-    "realmRoles" : [ "default-roles-keycloak101" ],
+    "realmRoles" : [ "default-roles-e-learning-project" ],
     "notBefore" : 0,
     "groups" : [ ]
   }, {
@@ -506,7 +506,7 @@
     } ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
-    "realmRoles" : [ "default-roles-keycloak101" ],
+    "realmRoles" : [ "default-roles-e-learning-project" ],
     "notBefore" : 0,
     "groups" : [ ]
   } ],
@@ -525,12 +525,12 @@
     "clientId" : "account",
     "name" : "${client_account}",
     "rootUrl" : "${authBaseUrl}",
-    "baseUrl" : "/realms/keycloak101/account/",
+    "baseUrl" : "/realms/e-learning-project/account/",
     "surrogateAuthRequired" : false,
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
-    "redirectUris" : [ "/realms/keycloak101/account/*" ],
+    "redirectUris" : [ "/realms/e-learning-project/account/*" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -555,12 +555,12 @@
     "clientId" : "account-console",
     "name" : "${client_account-console}",
     "rootUrl" : "${authBaseUrl}",
-    "baseUrl" : "/realms/keycloak101/account/",
+    "baseUrl" : "/realms/e-learning-project/account/",
     "surrogateAuthRequired" : false,
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
-    "redirectUris" : [ "/realms/keycloak101/account/*" ],
+    "redirectUris" : [ "/realms/e-learning-project/account/*" ],
     "webOrigins" : [ ],
     "notBefore" : 0,
     "bearerOnly" : false,
@@ -619,7 +619,7 @@
     "optionalClientScopes" : [ "address", "phone", "offline_access", "microprofile-jwt" ]
   }, {
     "id" : "c3cdb3a7-cddd-483f-8f49-2d71da01284e",
-    "clientId" : "bff-client",
+    "clientId" : "bff-service-confidential",
     "name" : "",
     "description" : "",
     "rootUrl" : "",
@@ -646,7 +646,7 @@
       "oidc.ciba.grant.enabled" : "false",
       "client.secret.creation.time" : "1728051978",
       "backchannel.logout.session.required" : "true",
-      "backchannel.logout.url" : "http://localhost:9000/logout/connect/back-channel/keycloak101",
+      "backchannel.logout.url" : "http://localhost:9000/logout/connect/back-channel/e-learning-project",
       "post.logout.redirect.uris" : "http://localhost:9000/##http://127.0.0.1:9000/",
       "display.on.consent.screen" : "false",
       "oauth2.device.authorization.grant.enabled" : "false",
@@ -761,12 +761,12 @@
     "clientId" : "security-admin-console",
     "name" : "${client_security-admin-console}",
     "rootUrl" : "${authAdminUrl}",
-    "baseUrl" : "/admin/keycloak101/console/",
+    "baseUrl" : "/admin/e-learning-project/console/",
     "surrogateAuthRequired" : false,
     "enabled" : true,
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
-    "redirectUris" : [ "/admin/keycloak101/console/*" ],
+    "redirectUris" : [ "/admin/e-learning-project/console/*" ],
     "webOrigins" : [ "+" ],
     "notBefore" : 0,
     "bearerOnly" : false,

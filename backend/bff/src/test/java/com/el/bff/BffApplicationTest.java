@@ -28,11 +28,11 @@ class BffApplicationTest {
                 .jsonPath("$")
                 .isArray()
                 .jsonPath("$[0].label")
-                .isEqualTo("keycloak101")
+                .isEqualTo("keycloak")
                 .jsonPath("$[0].loginUri")
-                .isEqualTo("http://localhost:7080/bff/oauth2/authorization/keycloak101")
+                .isEqualTo("http://localhost:7081/oauth2/authorization/bff-service")
                 .jsonPath("$[0].isSameAuthority")
-                .isEqualTo(true);
+                .isEqualTo(false);
     }
 
     @Test
