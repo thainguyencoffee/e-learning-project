@@ -4,7 +4,7 @@ import {UserService} from "../../auth/user.service";
 import {LoginComponent} from "../../auth/login.component";
 import {LogoutComponent} from "../../auth/logout.component";
 import {NgIf} from "@angular/common";
-import {reverseProxyUri} from "../../../app.config";
+import {environment} from "../../../../environments/environment";
 
 @Component({
   selector: 'app-header',
@@ -35,11 +35,11 @@ export class HeaderComponent {
   }
 
   get adminConsoleUrl() {
-    return reverseProxyUri + '/auth/admin/keycloak101/console/';
+    return environment.keycloakPath + '/admin/keycloak101/console/';
   }
 
   get accountManagementUrl() {
-    return reverseProxyUri + '/auth/realms/keycloak101/account/';
+    return environment.keycloakPath + '/realms/keycloak101/account/';
   }
 
 }

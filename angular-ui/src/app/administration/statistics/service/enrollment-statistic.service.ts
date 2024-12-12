@@ -4,6 +4,7 @@ import {PageWrapper} from "../../../common/dto/page-wrapper";
 import {CourseInfoWithEnrollmentStatisticDto} from "../model/course-info-with-enrollment-statistic.dto";
 import {Observable} from "rxjs";
 import {CourseInfoWithEnrollmentsDto} from "../model/course-info-with-enrollments.dto";
+import {environment} from "../../../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ import {CourseInfoWithEnrollmentsDto} from "../model/course-info-with-enrollment
 export class EnrollmentStatisticService {
 
   http = inject(HttpClient);
-  resourcePath = '/bff/api/enrollments/statistics';
+  resourcePath = environment.apiPath + '/api/enrollments/statistics';
 
   getCourseInfoWithEnrollmentStatisticDTO(pageNumber: number = 0, pageSize: number = 10):
       Observable<PageWrapper<CourseInfoWithEnrollmentStatisticDto>> {

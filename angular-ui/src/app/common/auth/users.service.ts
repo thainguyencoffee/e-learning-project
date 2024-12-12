@@ -2,13 +2,14 @@ import {inject, Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {UserInfo} from "./user-info";
+import {environment} from "../../../environments/environment";
 
 @Injectable({
   providedIn: 'root',
 })
 export class UsersService {
   http = inject(HttpClient);
-  resourcePath = '/bff/api/users'
+  resourcePath = environment.apiPath + '/api/users'
 
   searchByUsername(username: string, exact?: boolean): Observable<UserInfo[]> {
     const isExact = exact || false;

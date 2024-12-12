@@ -10,8 +10,8 @@ class KeycloakTestContainer {
 
     public static KeycloakContainer getInstance() {
         if (keycloak == null) {
-            keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:24.0")
-                    .withRealmImportFile("keycloak101-realm.json")
+            keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:24.0.0")
+                    .withRealmImportFile("e-learning-project-realm.json")
                     .withEnv("KEYCLOAK_ADMIN", "admin")
                     .withEnv("KEYCLOAK_ADMIN_PASSWORD", "secret");
             keycloak.start();
@@ -22,9 +22,8 @@ class KeycloakTestContainer {
     @DynamicPropertySource
     static void keycloakProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri",
-                () -> getInstance().getAuthServerUrl() + "/realms/keycloak101");
-        registry.add("reverse-proxy-uri", getInstance()::getAuthServerUrl);
-        registry.add("authorization-server-prefix", () -> "");
+                () -> getInstance().getAuthServerUrl() + "/realms/e-learning-project");
+        registry.add("keycloak-server-url", getInstance()::getAuthServerUrl);
     }
 
 }

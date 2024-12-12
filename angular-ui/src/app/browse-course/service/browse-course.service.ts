@@ -5,6 +5,7 @@ import {PageWrapper, PaginationUtils} from "../../common/dto/page-wrapper";
 import {CourseWithoutSections} from "../model/course-without-sections";
 import {UserService} from "../../common/auth/user.service";
 import {EnrollmentsService} from "../../enrollment/service/enrollments.service";
+import {environment} from "../../../environments/environment";
 
 
 @Injectable(
@@ -16,7 +17,7 @@ export class BrowseCourseService {
   userService = inject(UserService);
   enrollmentService = inject(EnrollmentsService);
 
-  resourcePath = '/bff/api/published-courses'
+  resourcePath = environment.apiPath + '/api/published-courses'
   paginationUtils?: PaginationUtils;
 
   getAllPublishedCourses(pageNumber: number = 0, pageSize: number = 10): Observable<PageWrapper<CourseWithoutSections>> {
