@@ -24,18 +24,40 @@ git clone https://github.com/thainguyencoffee/e-learning-project.git
 cd e-learning-project
 ```
 
-### Compile and test; build all JARs, build image container, start docker compose
+#### Development
+1. Start docker compose
 
-1. Without angular (recommend when you want to develop frontend)
 ```bash
-./build.sh without-angular
-```
-2. With angular (recommend when you want to deploy)
-```bash
-./build.sh
+cd development 
+docker compose up -d
+cd ..
 ```
 
-3. If you want to build image
+2. Build backend (bff & lms)
+
 ```bash
-./build.sh native
+cd backend
+./gradlew clean build
+cd ..
 ```
+
+3. Run bff
+
+```bash
+java -jar backend/bff/build/libs/bff-0.0.1-SNAPSHOT.jar
+```
+
+4. Run lms
+
+```bash
+java -jar backend/lms/build/libs/lms-0.0.1-SNAPSHOT.jar
+```
+
+4. Run Angular
+
+```bash
+cd angular-ui
+ng serve
+```
+
+open browser and go to `http://localhost:4200`
