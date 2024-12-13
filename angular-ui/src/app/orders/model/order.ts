@@ -9,8 +9,14 @@ export enum OrderType {
   EXCHANGE = 'EXCHANGE'
 }
 
+export interface OrderItem {
+  id: number,
+  course: number
+}
+
 export interface Order {
   id: string;
+  items: OrderItem[],
   orderDate: string;
   totalPrice: string;
   discountedPrice: string;

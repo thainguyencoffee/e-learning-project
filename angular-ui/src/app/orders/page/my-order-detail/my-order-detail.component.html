@@ -27,12 +27,16 @@
               <p>{{ order.orderDate | date:'yyyy-MM-dd HH:mm:ss' }}</p>
             </div>
             <div class="d-flex justify-content-between">
-              <p><strong>Discount:</strong></p>
-              <p>{{ order.discountCode || 'No discount' }}</p>
+              <p><strong>Original Price:</strong></p>
+              <p class="text-success fw-bold">{{ order.totalPrice }}</p>
             </div>
             <div class="d-flex justify-content-between">
-              <p><strong>Total Price:</strong></p>
-              <p class="text-success fw-bold">{{ order.discountedPrice || order.totalPrice }}</p>
+              <p><strong>Discounted price:</strong></p>
+              <p class="text-success fw-bold">{{ order.discountedPrice }}</p>
+            </div>
+            <div class="d-flex justify-content-between">
+              <p><strong>Discount:</strong></p>
+              <p>{{ order.discountCode || 'No discount' }}</p>
             </div>
             <div class="d-flex justify-content-between">
               <p><strong>Created By:</strong></p>
