@@ -1,3 +1,5 @@
+import {CourseWithoutSections} from "../../browse-course/model/course-without-sections";
+
 export interface ExchangeDetails {
   enrollmentId?: number,
   courseId?: number,
@@ -9,8 +11,15 @@ export enum OrderType {
   EXCHANGE = 'EXCHANGE'
 }
 
+export interface OrderItem {
+  id: number,
+  course: number,
+  courseDetail: CourseWithoutSections
+}
+
 export interface Order {
   id: string;
+  items: OrderItem[],
   orderDate: string;
   totalPrice: string;
   discountedPrice: string;

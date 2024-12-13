@@ -6,6 +6,7 @@ import com.el.common.exception.InputInvalidException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.*;
 import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.relational.core.mapping.MappedCollection;
@@ -15,8 +16,8 @@ import javax.money.MonetaryAmount;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+@Slf4j
 @Getter
 @Table("course")
 @ToString
@@ -129,15 +130,23 @@ public class Course extends AbstractAggregateRoot<Course> {
         if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot change price of a published course.");
         }
-        if (validSections()) {
+        if (inValidSections()) {
             throw new InputInvalidException("Cannot change price of a course without sections or section without lessons");
+        }
+        if (isNoneQuizzes()) {
+            throw new InputInvalidException("Cannot change price of a course without quizzes or quiz is not valid");
         }
         MoneyUtils.checkValidPrice(newPrice);
         this.price = newPrice;
     }
 
-    private boolean validSections() {
+    private boolean inValidSections() {
         return this.sections.isEmpty() || !this.sections.stream().allMatch(CourseSection::hasLessons); // update later
+    }
+
+    public boolean isNoneQuizzes() {
+        return this.sections.stream()
+                .noneMatch(section -> section.hasQuizzes() && section.hasValidQuizzes());
     }
 
     public void assignTeacher(String teacher) {
@@ -157,8 +166,11 @@ public class Course extends AbstractAggregateRoot<Course> {
         if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot request publish for a published course.");
         }
-        if (validSections() || this.getTeacher() == null) {
+        if (inValidSections() || this.getTeacher() == null) {
             throw new InputInvalidException("Cannot publish a course without sections or teacher.");
+        }
+        if (isNoneQuizzes()) {
+            throw new InputInvalidException("Cannot change price of a course without quizzes or quiz is not valid");
         }
         if (courseRequest.getType() != RequestType.PUBLISH) {
             throw new InputInvalidException("Request type invalid.");

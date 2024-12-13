@@ -4,12 +4,14 @@ import com.el.common.Currencies;
 import com.el.course.domain.Course;
 import com.el.course.domain.CourseRepository;
 import com.el.course.domain.Lesson;
+import com.el.course.domain.QuestionType;
 import com.el.course.web.dto.*;
 import com.el.discount.web.dto.DiscountDTO;
 import com.el.discount.domain.DiscountRepository;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.javamoney.moneta.Money;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -236,37 +238,13 @@ abstract class AbstractLmsApplicationTests {
 
         if (sectionDTOs != null && !sectionDTOs.isEmpty()) {
             for (CourseSectionDTO sectionDTO : sectionDTOs) {
-                Long sectionId = webTestClient.post().uri("/courses/{courseId}/sections", courseId)
-                        .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromValue(sectionDTO))
-                        .exchange()
-                        .expectStatus().isOk()
-                        .expectBody(Long.class)
-                        .returnResult()
-                        .getResponseBody();
+                Long sectionId = postSection(sectionDTO, courseId);
+                Long lessonId = postLesson(courseId, sectionId);
 
-                webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", courseId, sectionId)
-                        .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromValue(new LessonDTO(
-                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vestibulum mi quis libero luctus sollicitudin. Suspendisse laoreet vulputate est",
-                                Lesson.Type.VIDEO,
-                                "https://www.youtube.com/watch?v=1")
-                        ))
-                        .exchange()
-                        .expectStatus().isOk();
-
-                webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", courseId, sectionId)
-                        .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromValue(new LessonDTO(
-                                "Donec facilisis vel tortor eget efficitur. Sed congue ante mi, sed tristique purus feugiat a",
-                                Lesson.Type.VIDEO,
-                                "https://www.youtube.com/watch?v=2")
-                        ))
-                        .exchange()
-                        .expectStatus().isOk();
+                if (hasPrice) {
+                    Long quizId = postQuiz(courseId, sectionId, lessonId);
+                    postQuestionToQuiz(courseId, sectionId, quizId);
+                }
             }
         }
 
@@ -281,6 +259,71 @@ abstract class AbstractLmsApplicationTests {
 
         return courseRepository.findById(Long.valueOf(courseId))
                 .orElseThrow(() -> new IllegalStateException("createCourseWithParameters something went wrong!"));
+    }
+
+    private void postQuestionToQuiz(String courseId, Long sectionId, Long quizId) {
+        var questionDto1 = new QuestionDTO("Lorem ipsum dolor sit amet. ",
+                QuestionType.TRUE_FALSE,
+                null, 5, true);
+
+        var questionDto2 = new QuestionDTO("Morbi tristique nunc sit amet. ",
+                QuestionType.TRUE_FALSE,
+                null, 5, true);
+
+        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/questions", courseId, sectionId, quizId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(questionDto1))
+                .exchange()
+                .expectStatus().isOk();
+
+        webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/quizzes/{quizId}/questions", courseId, sectionId, quizId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(questionDto2))
+                .exchange()
+                .expectStatus().isOk();
+    }
+
+    private Long postQuiz(String courseId, Long sectionId, Long lessonId) {
+        var quizDto = new QuizDTO("Demo quiz example.....", null, lessonId, 50);
+
+        return webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/quizzes", courseId, sectionId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(quizDto))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Long.class)
+                .returnResult()
+                .getResponseBody();
+    }
+
+    private @Nullable Long postSection(CourseSectionDTO sectionDTO, String courseId) {
+        return webTestClient.post().uri("/courses/{courseId}/sections", courseId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(sectionDTO))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Long.class)
+                .returnResult()
+                .getResponseBody();
+    }
+
+    private @Nullable Long postLesson(String courseId, Long sectionId) {
+        return webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", courseId, sectionId)
+                .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(new LessonDTO(
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vestibulum mi quis libero luctus sollicitudin. Suspendisse laoreet vulputate est",
+                        Lesson.Type.VIDEO,
+                        "https://www.youtube.com/watch?v=1")
+                ))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Long.class)
+                .returnResult().getResponseBody();
     }
 
     protected String performCreateDiscountTest(DiscountDTO discountDTO) {

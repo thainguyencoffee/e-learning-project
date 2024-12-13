@@ -155,4 +155,12 @@ public class Quiz {
     public Boolean isPassed(Integer score) {
         return (double) score / this.totalScore * 100 >= this.passScorePercentage;
     }
+
+    public boolean isValid() {
+        return !deleted
+                && title != null
+                && totalScore != null
+                && passScorePercentage != null
+                && questions != null && !questions.isEmpty();
+    }
 }

@@ -83,6 +83,14 @@ public class CourseSection {
         return !this.lessons.isEmpty();
     }
 
+    public boolean hasQuizzes() {
+        return !this.quizzes.isEmpty();
+    }
+
+    public boolean hasValidQuizzes() {
+        return quizzes.stream().allMatch(Quiz::isValid);
+    }
+
     protected void setOrderIndex(int i) {
         this.orderIndex = i;
     }

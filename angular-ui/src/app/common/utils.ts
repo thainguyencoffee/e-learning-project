@@ -76,3 +76,7 @@ export function minFormArrayLength(min: number): ValidatorFn {
     return null;
   };
 }
+
+export function shortUUID(id: string): string {
+  return id.substring(0, 7);
+}

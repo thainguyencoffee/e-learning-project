@@ -108,6 +108,9 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     public DiscountSearchDTO searchDiscountByCode(String code, MonetaryAmount originalPrice) {
         var discount = findByCode(code);
+        if (discount.isMismatchCurrency(originalPrice)) {
+            throw new ResourceNotFoundException();
+        }
         MonetaryAmount discountedPrice = discount.calculateDiscount(originalPrice);
         return new DiscountSearchDTO(discount.getCode(),
                 discount.getType(),

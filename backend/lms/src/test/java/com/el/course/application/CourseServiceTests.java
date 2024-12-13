@@ -61,9 +61,9 @@ class CourseServiceTests {
         courseDTO = TestFactory.createDefaultCourseDTO();
         courseUpdateDTO = TestFactory.createDefaultCourseUpdateDTO();
         course = TestFactory.createDefaultCourse();
-        courseWithSections = TestFactory.createCourseWithSections();
+        courseWithSections = spy(TestFactory.createCourseWithSections());
 
-        courseForPublish = new Course(
+        courseForPublish = spy(new Course(
                 courseDTO.title(),
                 courseDTO.description(),
                 courseDTO.thumbnailUrl(),
@@ -72,12 +72,17 @@ class CourseServiceTests {
                 courseDTO.prerequisites(),
                 courseDTO.subtitles(),
                 "teacher123"
-        );
+        ));
 
         CourseSection section = spy(new CourseSection("Billie Jean [4K] 30th Anniversary, 2001"));
         when(section.getId()).thenReturn(1L);
         courseForPublish.addSection(section);
         courseForPublish.addLessonToSection(1L, new Lesson("Lesson 1", Lesson.Type.TEXT, "https://example.com/lesson1"));
+
+        // (mock) course must have quizzes for changePrice
+        when(courseForPublish.isNoneQuizzes()).thenReturn(false);
+        when(courseWithSections.isNoneQuizzes()).thenReturn(false);
+
 
         // update validate updatePrice, Course.validSections return true
         courseForPublish.changePrice(Money.of(20000, Currencies.VND));
