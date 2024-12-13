@@ -239,22 +239,12 @@ abstract class AbstractLmsApplicationTests {
         if (sectionDTOs != null && !sectionDTOs.isEmpty()) {
             for (CourseSectionDTO sectionDTO : sectionDTOs) {
                 Long sectionId = postSection(sectionDTO, courseId);
-
                 Long lessonId = postLesson(courseId, sectionId);
 
-                Long quizId = postQuiz(courseId, sectionId, lessonId);
-                postQuestionToQuiz(courseId, sectionId, quizId);
-
-                webTestClient.post().uri("/courses/{courseId}/sections/{sectionId}/lessons", courseId, sectionId)
-                        .headers(header -> header.setBearerAuth(teacherToken.getAccessToken()))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromValue(new LessonDTO(
-                                "Donec facilisis vel tortor eget efficitur. Sed congue ante mi, sed tristique purus feugiat a",
-                                Lesson.Type.VIDEO,
-                                "https://www.youtube.com/watch?v=2")
-                        ))
-                        .exchange()
-                        .expectStatus().isOk();
+                if (hasPrice) {
+                    Long quizId = postQuiz(courseId, sectionId, lessonId);
+                    postQuestionToQuiz(courseId, sectionId, quizId);
+                }
             }
         }
 

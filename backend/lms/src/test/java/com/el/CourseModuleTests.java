@@ -1094,7 +1094,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         // Arrange
         var courseDTO = TestFactory.createDefaultCourseDTO();
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         CourseSection courseSection = course.getSections().iterator().next();
         Long sectionId = courseSection.getId();
@@ -1130,7 +1130,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         // Arrange
         var courseDTO = TestFactory.createDefaultCourseDTO();
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         CourseSection courseSection = course.getSections().iterator().next();
         Long sectionId = courseSection.getId();
@@ -1173,7 +1173,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         // Arrange
         var courseDTO = TestFactory.createDefaultCourseDTO();
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         CourseSection courseSection = course.getSections().iterator().next();
         Long sectionId = courseSection.getId();
@@ -1214,7 +1214,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         // Arrange
         var courseDTO = TestFactory.createDefaultCourseDTO();
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         CourseSection courseSection = course.getSections().iterator().next();
         Long sectionId = courseSection.getId();
@@ -1260,7 +1260,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         // Arrange
         var courseDTO = TestFactory.createDefaultCourseDTO();
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         CourseSection courseSection = course.getSections().iterator().next();
         Long sectionId = courseSection.getId();
@@ -1300,7 +1300,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         // Arrange
         var courseDTO = TestFactory.createDefaultCourseDTO();
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         CourseSection courseSection = course.getSections().iterator().next();
         Long sectionId = courseSection.getId();
@@ -1346,7 +1346,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         // Arrange
         var courseDTO = TestFactory.createDefaultCourseDTO();
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         CourseSection courseSection = course.getSections().iterator().next();
         Long sectionId = courseSection.getId();
@@ -1401,7 +1401,7 @@ class CourseModuleTests extends AbstractLmsApplicationTests {
         // Arrange
         var courseDTO = TestFactory.createDefaultCourseDTO();
         CourseSectionDTO sectionDTO = new CourseSectionDTO("Billie Jean [4K] 30th Anniversary, 2001");
-        Course course = createCourseWithParameters(teacherToken, courseDTO, true, Set.of(sectionDTO)); // admin has the same permission as teacher
+        Course course = createCourseWithParameters(teacherToken, courseDTO, false, Set.of(sectionDTO)); // admin has the same permission as teacher
 
         CourseSection courseSection = course.getSections().iterator().next();
         Long sectionId = courseSection.getId();
