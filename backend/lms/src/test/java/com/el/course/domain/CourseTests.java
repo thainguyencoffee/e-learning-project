@@ -31,7 +31,10 @@ class CourseTests {
         // Update for Course.java line 282
 //        courseSection.addLesson(new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com", null));
 
-        courseWithSections = TestFactory.createDefaultCourse();
+        courseWithSections = spy(TestFactory.createDefaultCourse());
+        // (mock) course must have quizzes for changePrice
+        when(courseWithSections.isNoneQuizzes()).thenReturn(false);
+
         Lesson lesson = new Lesson("LessonTitle", Lesson.Type.TEXT, "https://www.example.com");
         courseWithSections.addSection(courseSection);
         courseWithSections.addLessonToSection(courseSection.getId(), lesson);
@@ -351,10 +354,9 @@ class CourseTests {
 
     @Test
     void removeSection_PublishedCourse_ThrowsException() {
-        Course course = spy(courseWithSections);
-        when(course.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
+        when(courseWithSections.isPublishedAndNotUnpublishedOrDelete()).thenReturn(true);
 
-        assertThrows(InputInvalidException.class, () -> course.removeSection(1L));
+        assertThrows(InputInvalidException.class, () -> courseWithSections.removeSection(1L));
     }
 
     @Test

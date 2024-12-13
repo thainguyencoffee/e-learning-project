@@ -35,7 +35,11 @@ class CourseJdbcTests {
 
     @BeforeEach
     void setUp() {
-        courseWithSections = TestFactory.createCourseWithSections();
+        courseWithSections = spy(TestFactory.createCourseWithSections());
+        // (mock) course must have quizzes for changePrice
+        when(courseWithSections.isNoneQuizzes()).thenReturn(false);
+
+
         courseWithSections.changePrice(Money.of(23000, Currencies.VND));
     }
 
@@ -84,7 +88,7 @@ class CourseJdbcTests {
 
     @Test
     void testAddPost() {
-        Course savedCourse = spy(courseRepository.save(courseWithSections));
+        Course savedCourse = courseRepository.save(courseWithSections);
         Post post = new Post("Quisque vitae rutrum turpis. Mauris non mauris purus. Mauris consequat nunc bibendum aliquam pharetra.",
                 new UserInfo("thai", "nguyen", "user"),
                 Set.of("http://placekitten.com/1", "http://placekitten.com/2"));
@@ -109,7 +113,7 @@ class CourseJdbcTests {
 
     @Test
     void testAddComment() {
-        Course savedCourse = spy(courseRepository.save(courseWithSections));
+        Course savedCourse = courseRepository.save(courseWithSections);
         Post post = new Post("Quisque vitae rutrum turpis. Mauris non mauris purus. Mauris consequat nunc bibendum aliquam pharetra.",
                 new UserInfo("thai", "nguyen", "user"),
                 Set.of("http://placekitten.com/1", "http://placekitten.com/2"));
@@ -141,7 +145,7 @@ class CourseJdbcTests {
 
     @Test
     void testAddEmotion() {
-        Course savedCourse = spy(courseRepository.save(courseWithSections));
+        Course savedCourse = courseRepository.save(courseWithSections);
         Post post = new Post("Quisque vitae rutrum turpis. Mauris non mauris purus. Mauris consequat nunc bibendum aliquam pharetra.",
                 new UserInfo("thai", "nguyen", "user"),
                 Set.of("http://placekitten.com/1", "http://placekitten.com/2"));
@@ -165,7 +169,7 @@ class CourseJdbcTests {
 
     @Test
     void testAddQuizToSection() {
-        Course savedCourse = spy(courseRepository.save(courseWithSections));
+        Course savedCourse = courseRepository.save(courseWithSections);
         CourseSection section = savedCourse.getSections().iterator().next();
         Long lessonId = section.getLessons().iterator().next().getId();
 
