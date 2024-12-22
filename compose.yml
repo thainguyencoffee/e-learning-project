@@ -1,7 +1,7 @@
 services:
   nginx-reverse-proxy:
     container_name: el.nginx-reverse-proxy
-    image: el/nginx-reverse-proxy
+    image: nginx-reverse-proxy
     ports:
       - 7080:7080
     extra_hosts:
@@ -63,7 +63,7 @@ services:
 
   angular-ui:
     container_name: el.angular-ui
-    image: el/angular-ui
+    image: angular-ui
     ports:
       - 4201:80
     extra_hosts:
@@ -72,7 +72,7 @@ services:
 
   lms:
     container_name: el.lms
-    image: el/lms
+    image: lms
     ports:
       - 7084:7084
     environment:
@@ -91,7 +91,7 @@ services:
 
   bff:
     container_name: el.bff
-    image: el/bff
+    image: bff
     ports:
       - 7081:7081
     environment:
