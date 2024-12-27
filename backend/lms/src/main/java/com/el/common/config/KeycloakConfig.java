@@ -1,4 +1,4 @@
-package com.el.common.auth.application.impl;
+package com.el.common.config;
 
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
