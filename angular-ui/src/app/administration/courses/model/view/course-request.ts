@@ -8,4 +8,6 @@ export interface CourseRequest {
   message: string,
   rejectReason: string,
   approveMessage: string,
+  requestedDate: string,
+  resolvedDate: string,
 }

@@ -12,7 +12,12 @@ import java.util.List;
 
 public interface CourseQueryService {
 
+    // bypass, just called by event
+    Course findById(Long id);
+
     Page<Course> findAllCourses(Pageable pageable);
+
+    Page<Course> findAllCoursesPublished(Pageable pageable);
 
     Course findCourseById(Long courseId, Boolean deleted);
 
@@ -45,4 +50,6 @@ public interface CourseQueryService {
     Lesson findLessonByCourseIdAndLessonId(Long courseId, Long lessonId);
 
     List<PublishedCourseDTO> searchPublishedCoursesDTO(String query, Pageable pageable);
+
+    Integer getPurchaseCount(Long courseId);
 }

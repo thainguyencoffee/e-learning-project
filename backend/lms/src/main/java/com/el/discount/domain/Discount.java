@@ -84,7 +84,9 @@ public class Discount {
         }
 
         if (canIncreaseUsage()) {
-            checkCurrency(originalPrice);
+            if (isMismatchCurrency(originalPrice)) {
+                throw new InputInvalidException("Currency mismatch. Discount currency must be the same as the original price.");
+            }
             if (this.type == Type.PERCENTAGE) {
                 MonetaryAmount multiply = originalPrice.multiply(this.percentage / 100);
                 if (multiply.isGreaterThan(this.maxValue)) {
@@ -98,11 +100,10 @@ public class Discount {
         return Money.zero(originalPrice.getCurrency());
     }
 
-    private void checkCurrency(MonetaryAmount originalPrice) {
+
+    public boolean isMismatchCurrency(MonetaryAmount originalPrice) {
         CurrencyUnit currency = this.type == Type.PERCENTAGE ? this.maxValue.getCurrency() : this.fixedPrice.getCurrency();
-        if (!originalPrice.getCurrency().equals(currency)) {
-            throw new InputInvalidException("Currency mismatch. Discount currency must be the same as the original price.");
-        }
+        return !originalPrice.getCurrency().equals(currency);
     }
 
     public void increaseUsage() {

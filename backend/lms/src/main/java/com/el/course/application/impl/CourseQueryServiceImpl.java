@@ -30,6 +30,12 @@ public class CourseQueryServiceImpl implements CourseQueryService {
     }
 
     @Override
+    public Course findById(Long id) {
+        return courseRepository.findById(id)
+                .orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Override
     public Page<Course> findAllCourses(Pageable pageable) {
         if (rolesBaseUtil.isAdmin()) {
             return courseRepository.findAllByDeleted(false, pageable);
@@ -38,6 +44,15 @@ public class CourseQueryServiceImpl implements CourseQueryService {
         if(rolesBaseUtil.isTeacher()) {
             String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
             return courseRepository.findAllByTeacherAndDeleted(teacher, false, pageable);
+        }
+        throw new AccessDeniedException("Access denied");
+    }
+
+    @Override
+    public Page<Course> findAllCoursesPublished(Pageable pageable) {
+        if(rolesBaseUtil.isTeacher()) {
+            String teacher = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
+            return courseRepository.findAllByTeacherAndPublished(teacher, true, pageable);
         }
         throw new AccessDeniedException("Access denied");
     }
@@ -234,6 +249,11 @@ public class CourseQueryServiceImpl implements CourseQueryService {
         int size = pageable.getPageSize();
         List<Course> courses = courseRepository.searchPublishedCourses(query, page, size);
         return courses.stream().map(PublishedCourseDTO::fromCourse).toList();
+    }
+
+    @Override
+    public Integer getPurchaseCount(Long courseId) {
+        return enrollmentRepository.countByCourseId(courseId);
     }
 
     private boolean isUserEnrolled(Long courseId, String username) {

@@ -127,10 +127,13 @@ public class Quiz {
                             .map(AnswerOption::getId)
                             .collect(Collectors.toSet());
 
-                    long selectedCorrectAnswers = userAnswerOptions.stream()
-                            .filter(correctOptionIds::contains)
-                            .count();
-                    score += (int) ((double) selectedCorrectAnswers / correctOptionIds.size() * question.getScore());
+//                    long selectedCorrectAnswers = userAnswerOptions.stream()
+//                            .filter(correctOptionIds::contains)
+//                            .count();
+//                    score += (int) ((double) selectedCorrectAnswers / correctOptionIds.size() * question.getScore());
+                    if (correctOptionIds.equals(userAnswerOptions)) {
+                        score += question.getScore();
+                    }
                 } else {
                     throw new InputInvalidException("Quiz calculation error: Multiple choice question must have multiple answers.");
                 }
@@ -151,5 +154,13 @@ public class Quiz {
 
     public Boolean isPassed(Integer score) {
         return (double) score / this.totalScore * 100 >= this.passScorePercentage;
+    }
+
+    public boolean isValid() {
+        return !deleted
+                && title != null
+                && totalScore != null
+                && passScorePercentage != null
+                && questions != null && !questions.isEmpty();
     }
 }

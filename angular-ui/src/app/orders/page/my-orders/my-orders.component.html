@@ -14,8 +14,11 @@
       <tr>
         <th scope="col">Id</th>
         <th scope="col">Ordered date</th>
+        <th scope="col">Course</th>
         <th scope="col">Total price</th>
+        <th scope="col">Discounted price</th>
         <th scope="col">Status</th>
+        <th scope="col">Type</th>
         <th scope="col">Created by</th>
         <th><!-- --></th>
       </tr>
@@ -23,18 +26,25 @@
       <tbody>
         @for (order of orders; track order.id) {
           <tr>
-            <td>{{ order.id }}</td>
+            <td>{{ shortUUID(order.id) }}</td>
             <td>{{ order.orderDate | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
+            <td>
+              <ng-container *ngIf="getCourseIdAndTitle(order.items) as map">
+                <a [routerLink]="['/courses', map.id]">{{ map.title }}</a>
+              </ng-container>
+            </td>
             <td>{{ order.totalPrice }}</td>
+            <td><span class="text-success">{{ order.discountedPrice }}</span></td>
             <td>
               <span *ngIf="order.status === 'PAID'" class="badge bg-success">{{order.status}}</span>
               <span *ngIf="order.status === 'PENDING'" class="badge bg-warning">{{order.status}}</span>
               <span *ngIf="order.status === 'CANCELLED'" class="badge bg-secondary">{{order.status}}</span>
             </td>
+            <td>{{ order.orderType }}</td>
             <td>{{ order.createdBy }}</td>
             <td>
-              <a class="btn btn-secondary mx-2" *ngIf="order.status === 'PENDING'" [routerLink]="['/checkout/pay', order.id]">Pay now</a>
-              <a class="btn btn-secondary" [routerLink]="['/my-orders', order.id]">Detail</a>
+              <a class="btn btn-sm btn-secondary mx-2" *ngIf="order.status === 'PENDING'" [routerLink]="['/checkout/pay', order.id]">Pay now</a>
+              <a class="btn btn-sm btn-secondary" [routerLink]="['/my-orders', order.id]">Detail</a>
             </td>
           </tr>
         }

@@ -1,13 +1,19 @@
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-      <h2 class="text-primary fw-bold">Request Details</h2>
-      <a routerLink="/administration/courses" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i> Back to list
-      </a>
-    </div>
-    <div *ngIf="requestCourse" class="container ">
-    <div class="card shadow-sm p-4">
-  <!-- Request Details -->
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+  <h2 class="text-primary fw-bold">Request Details</h2>
+  <div>
+    <a [routerLink]="resourceUrl" class="btn btn-outline-secondary mx-2">
+      <i class="bi bi-arrow-left"></i> Back to list requests
+    </a>
+    <a routerLink="/administration/courses" class="btn btn-outline-secondary mx-2">
+      <i class="bi bi-arrow-left"></i> Back to list courses
+    </a>
+    <a [routerLink]="['/administration/courses', courseId]" class="btn btn-outline-secondary">View Course</a>
+  </div>
+</div>
+<div *ngIf="requestCourse" class="container ">
+  <div class="card shadow-sm p-4">
+    <!-- Request Details -->
     <div class="row gy-3">
       <div class="col-md-6">
         <h6 class="text-secondary fw-bold">ID:</h6>
@@ -28,34 +34,40 @@
           {{ requestCourse.status }}
         </span>
       </div>
+
       <div class="col-md-6">
         <h6 class="text-secondary fw-bold">Requested By:</h6>
         <p class="text-dark mb-0">
           {{ requestCourse.requestedBy === userService.current.name ? 'This account' : requestCourse.requestedBy }}
         </p>
       </div>
+
       <div class="col-12">
-        <h6 class="text-secondary fw-bold">Message:</h6>
-        <p class="text-dark">{{ requestCourse.message }}</p>
+        <h6 class="text-secondary fw-bold">Message of : {{ requestCourse.requestedBy }}
+          - {{ requestCourse.requestedDate | date:'HH:mm:ss' }}</h6>
+        <p class="bg-info-subtle rounded p-2" [innerHTML]="requestCourse.message"></p>
       </div>
-      <div class="col-12">
-        <h6 class="text-secondary fw-bold">Course Ref:</h6>
-        <a
-          [routerLink]="['/administration/courses', courseId]"
-          class="btn btn-outline-success">
-          View Course
-        </a>
+
+    </div>
+
+    <div *ngIf="requestCourse.resolved">
+      <span class="badge bg-success px-3 py-2">Resolved</span>
+      <div class="col-12" *ngIf="requestCourse.status === 'APPROVED';else rejected">
+        <h6 class="text-secondary fw-bold">Message of : {{ requestCourse.resolvedBy }}
+          - {{ requestCourse.resolvedDate | date:'HH:mm:ss' }}</h6>
+        <p class="bg-info-subtle rounded p-2" [innerHTML]="requestCourse.approveMessage"></p>
       </div>
+      <ng-template #rejected>
+        <div class="col-12">
+          <h6 class="text-secondary fw-bold">Reason of : {{ requestCourse.resolvedBy }}
+            - {{ requestCourse.resolvedDate | date:'HH:mm:ss' }}</h6>
+          <p class="bg-info-subtle rounded p-2" [innerHTML]="requestCourse.rejectReason"></p>
+        </div>
+      </ng-template>
     </div>
 
     <!-- Actions -->
     <div class="mt-4 d-flex align-items-center">
-      <span
-        *ngIf="requestCourse.resolved"
-        class="badge bg-success px-3 py-2">
-        Resolved
-      </span>
-
       <ng-container *ngIf="!requestCourse.resolved && canResolveRequest(requestCourse)">
         <a
           [routerLink]="['/administration/courses', courseId, 'requests', 'approve', requestCourse.id]"

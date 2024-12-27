@@ -20,8 +20,10 @@
 
 <ng-container *ngIf="quizDto as quizDetail; else quizNo">
 
-  <h3>Title: {{quizDetail.title}}</h3>
-  <p>Description: {{quizDetail.description}}</p>
+  <h3>{{quizDetail.title}}</h3>
+  <p>
+    <span [innerHTML]="quizDetail.description"></span>
+  </p>
   <p>This quiz will display after lessonID: {{quizDetail.afterLessonId}}</p>
   <p>Total score: {{quizDetail.totalScore}}</p>
   <p>Min {{quizDetail.passScorePercentage}} % to passed</p>

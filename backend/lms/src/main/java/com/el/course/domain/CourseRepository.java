@@ -4,7 +4,6 @@ import com.el.common.projection.MonthStats;
 import com.el.common.projection.RatingMonthStats;
 import com.el.course.application.dto.CourseInTrashDTO;
 import com.el.course.application.dto.PostInTrashDTO;
-import com.el.course.application.dto.PublishedCourseDTO;
 import com.el.course.application.dto.QuizInTrashDTO;
 import com.el.course.application.dto.teacher.CountDataDTO;
 import com.el.enrollment.application.dto.CourseInfoDTO;
@@ -24,6 +23,8 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
     Page<Course> findAllByDeleted(Boolean deleted, Pageable pageable);
 
     Page<Course> findAllByTeacherAndDeleted(String teacher, Boolean deleted, Pageable pageable);
+
+    Page<Course> findAllByTeacherAndPublished(String teacher, boolean published, Pageable pageable);
 
     Optional<Course> findByIdAndDeleted(Long courseId, Boolean deleted);
 
@@ -378,9 +379,9 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
             course c
         WHERE 
             to_tsvector('english', 
-                c.title || ' ' || 
-                c.teacher || ' ' || 
-                c.description) @@ plainto_tsquery(:query)
+                coalesce(c.title, '') || ' ' || 
+                coalesce(c.teacher, '') || ' ' || 
+                coalesce(c.description, '')) @@ plainto_tsquery(:query)
     """)
     List<Course> searchPublishedCourses(String query, int page, int size);
 }

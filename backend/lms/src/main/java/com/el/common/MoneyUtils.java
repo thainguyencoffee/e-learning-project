@@ -5,13 +5,11 @@ import org.javamoney.moneta.Money;
 
 import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
-import java.util.Set;
 
 public class MoneyUtils {
 
     public static void checkValidPrice(MonetaryAmount price) {
-        var validCurrencies = Set.of(Currencies.VND, Currencies.USD);
-        boolean isContainsCurrency = validCurrencies.contains(price.getCurrency());
+        boolean isContainsCurrency = Currencies.SUPPORTED_CURRENCIES.contains(price.getCurrency());
         if (!isContainsCurrency) {
             throw new InputInvalidException("Currency is not supported. We support VND and USD only.");
         }
@@ -44,8 +42,7 @@ public class MoneyUtils {
     }
 
     public static void checkValidPrice(MonetaryAmount price, CurrencyUnit currencyUnit) {
-        var validCurrencies = Set.of(Currencies.VND, Currencies.USD);
-        boolean isContainsCurrency = validCurrencies.contains(price.getCurrency()) && validCurrencies.contains(currencyUnit);
+        boolean isContainsCurrency = Currencies.SUPPORTED_CURRENCIES.contains(price.getCurrency()) && Currencies.SUPPORTED_CURRENCIES.contains(currencyUnit);
         if (!isContainsCurrency) {
             throw new InputInvalidException("Currency is not supported. We support VND and USD only.");
         }
@@ -60,5 +57,16 @@ public class MoneyUtils {
             }
         }
     }
+
+//    public static MonetaryAmount convertTo(MonetaryAmount price, CurrencyUnit currencyUnit) {
+//        boolean isContainsCurrency = Currencies.SUPPORTED_CURRENCIES.contains(price.getCurrency()) && Currencies.SUPPORTED_CURRENCIES.contains(currencyUnit);
+//        if (!isContainsCurrency) {
+//            throw new InputInvalidException("Currency is not supported. We support VND and USD only.");
+//        }
+//
+//        ExchangeRateProvider exchangeRateProvider = MonetaryConversions.getExchangeRateProvider();
+//        CurrencyConversion currencyConversion = exchangeRateProvider.getCurrencyConversion(currencyUnit);
+//        return price.with(currencyConversion);
+//    }
 
 }

@@ -1,0 +1,13 @@
+<div class="d-flex flex-wrap mb-4">
+  <h1 class="flex-grow-1">Create new Course path</h1>
+  <div>
+    <a routerLink="/administration/courses" class="btn btn-secondary">Back to list courses</a>
+    <a routerLink="/administration/course-paths" class="btn btn-secondary ms-2">Back to list course paths</a>
+  </div>
+</div>
+
+<form [formGroup]="addForm" (ngSubmit)="handleSubmit()">
+  <app-input-row [group]="addForm" field="title" label="Title" />
+  <app-input-row [group]="addForm" rowType="textarea" field="description" label="Description" />
+  <input type="submit" value="Create Course Path" class="btn btn-primary mt-4" />
+</form>

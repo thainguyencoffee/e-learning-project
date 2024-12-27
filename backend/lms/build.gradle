@@ -30,6 +30,8 @@ ext {
 }
 
 dependencies {
+    // Apache Commons Lang
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
     // Itext PDF
     implementation 'com.itextpdf:itext7-core:8.0.5'
     // Commons Validator

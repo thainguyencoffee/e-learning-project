@@ -2,26 +2,24 @@ import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {BrowseCourseService} from "../../service/browse-course.service";
 import {Subscription} from "rxjs";
 import {ErrorHandler} from "../../../common/error-handler.injectable";
-import {PageWrapper, PaginationUtils} from "../../../common/dto/page-wrapper";
-import {NavigationEnd, Router, RouterLink} from "@angular/router";
-import {NgForOf, NgIf} from "@angular/common";
+import {PaginationUtils} from "../../../common/dto/page-wrapper";
+import {NavigationEnd, Router} from "@angular/router";
+import {NgForOf} from "@angular/common";
 import {UserService} from "../../../common/auth/user.service";
 import {OrdersService} from "../../../orders/service/orders.service";
 import {CourseWithoutSections} from "../../model/course-without-sections";
-import {getStarsIcon} from "../../star-util";
 import {FormsModule} from "@angular/forms";
+import {CourseCardComponent} from "../../../common/component/course-card/course-card.component";
 
 @Component({
   selector: 'app-browse-courses',
   standalone: true,
   imports: [
     NgForOf,
-    RouterLink,
     FormsModule,
-    NgIf,
+    CourseCardComponent,
   ],
   templateUrl: './browse-courses.component.html',
-  styleUrl: 'browse-courses.component.css'
 })
 export class BrowseCoursesComponent implements OnInit, OnDestroy {
 
@@ -53,10 +51,11 @@ export class BrowseCoursesComponent implements OnInit, OnDestroy {
 
   onSearch(pageNumber: number = 0) {
     if (this.searchQuery && this.searchQuery.trim()) {
-      this.browseCourseService.searchPublishedCourses(this.searchQuery, pageNumber)
+      this.browseCourseService.getAllPublishedCoursesWithPurchaseStatus(this.browseCourseService.searchPublishedCourses(this.searchQuery, pageNumber))
         .subscribe({
-          next: pageWrapper => {
-            this.handleData(pageWrapper);
+          next: result => {
+            this.courses = result.courses;
+            this.paginationUtils = result.paginationUtils;
           },
           error: (error) => this.errorHandler.handleServerError(error.error)
         })
@@ -66,13 +65,14 @@ export class BrowseCoursesComponent implements OnInit, OnDestroy {
   }
 
   loadData(pageNumber: number): void {
-    this.browseCourseService.getAllPublishedCourses(pageNumber)
+    this.browseCourseService.getAllPublishedCoursesWithPurchaseStatus(this.browseCourseService.getAllPublishedCourses(pageNumber))
       .subscribe({
-        next: (pageWrapper) => {
-          this.handleData(pageWrapper);
+        next: result => {
+          this.courses = result.courses;
+          this.paginationUtils = result.paginationUtils;
         },
         error: (error) => this.errorHandler.handleServerError(error.error)
-      });
+      })
   }
 
   onPageChange(pageNumber: number): void {
@@ -91,30 +91,6 @@ export class BrowseCoursesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.navigationSubscription?.unsubscribe();
-  }
-
-  protected readonly getStarsIcon = getStarsIcon;
-
-
-  handleData(pageWrapper: PageWrapper<CourseWithoutSections>) {
-    this.paginationUtils = new PaginationUtils(pageWrapper.page);
-    if (this.userService.current.isAuthenticated) {
-      this.orderService.getAllCourseIdsHasPurchased().subscribe({
-        next: (purchasedCourses) => {
-          const allCourses = pageWrapper.content as CourseWithoutSections[];
-          this.courses = this.markListAsPurchased(allCourses, purchasedCourses);
-        }
-      })
-    } else {
-      this.courses = pageWrapper.content as CourseWithoutSections[];
-    }
-  }
-
-  private markListAsPurchased(allCourses: CourseWithoutSections[], purchasedCourses: number[]) {
-    return allCourses.map(course => {
-      course.hasPurchased = purchasedCourses.includes(course.id);
-      return course;
-    })
   }
 
 }

@@ -8,6 +8,7 @@ import {QuizDetailDto} from "../model/quiz-detail.dto";
 import {QuizSubmitDto} from "../model/quiz-submit.dto";
 import {QuizSubmission} from "../model/quiz-submission";
 import {LessonMarkRequest, MarkType} from "../model/lesson-mark-request";
+import {ChangeCourseResponse} from "../../browse-course/model/change-course-response";
 
 @Injectable({
   providedIn: 'root'
@@ -24,10 +25,6 @@ export class EnrollmentsService {
 
   getEnrollmentWithCourseByEnrollmentId(enrollmentId: number) {
     return this.http.get<EnrollmentWithCourseDto>(`${this.resourcePath}/${enrollmentId}/content`);
-  }
-
-  getEnrollmentById(enrollmentId: string) {
-    return this.http.get<EnrollmentDto>(`${this.resourcePath}/${enrollmentId}`);
   }
 
   getEnrollmentByCourseId(courseId: number) {
@@ -77,4 +74,15 @@ export class EnrollmentsService {
   deleteSubmission(enrollmentId: number, quizSubmissionId: number) {
     return this.http.delete(`${this.resourcePath}/${enrollmentId}/quizzes/${quizSubmissionId}/submission`);
   }
+
+  changeCourse(enrollmentId: number, courseId: number) {
+    return this.http.put<ChangeCourseResponse>(`${this.resourcePath}/${enrollmentId}/change-course`, {}, {
+      params: { courseId }
+    });
+  }
+
+  getPurchasedCourses() {
+    return this.http.get<number[]>(`${this.resourcePath}/purchased-courses`);
+  }
+
 }

@@ -58,7 +58,18 @@ import {QuizSubmitComponent} from "./enrollment/page/enrollment-content/quiz-sub
 import {UsageComponent} from "./usage/usage.component";
 import {AboutUnpublishComponent} from "./usage/about-unpublish/about-unpublish.component";
 import {ErrorComponent} from "./error/error.component";
-
+import {ChangeCourseComponent} from "./browse-course/page/change-course/change-course.component";
+import {
+  AddCoursePathComponent
+} from "./administration/course-path/page/add-course-path/add-course-path.component";
+import {ListCoursePathComponent} from "./administration/course-path/page/list-course-path/list-course-path.component";
+import {
+  AddCourseToPathComponent
+} from "./administration/course-path/page/add-course-to-path/add-course-to-path.component";
+import {
+  CoursePathTrashComponent
+} from "./administration/course-path/page/course-path-trash/course-path-trash.component";
+import {EditCoursePathComponent} from "./administration/course-path/page/edit-course-path/edit-course-path.component";
 export const routes: Routes = [
   {
     title: 'Welcome to E learning!',
@@ -87,6 +98,15 @@ export const routes: Routes = [
     title: 'Course detail',
     path: 'courses/:id',
     component: BrowseCourseDetailComponent
+  },
+  {
+    title: 'Change course',
+    path: 'change-course',
+    component: ChangeCourseComponent,
+    canActivate: [RoleGuard],
+    data: {
+      requiredRoles: ['ROLE_user'],
+    }
   },
   {
     title: 'Course content',
@@ -199,6 +219,32 @@ export const routes: Routes = [
       errorMessage: 'Only admin and teacher can access administration dashboard page'
     },
     children: [
+      // Course path management
+      {
+        title: 'List Course path',
+        path: 'course-paths',
+        component: ListCoursePathComponent,
+      },
+      {
+        title: 'List Course path in trash',
+        path: 'course-paths/trash',
+        component: CoursePathTrashComponent,
+      },
+      {
+        title: 'Add Course to Path',
+        path: 'course-paths/add-course/:coursePathId',
+        component: AddCourseToPathComponent
+      },
+      {
+        title: 'Create Course Path',
+        path: 'course-paths/add',
+        component: AddCoursePathComponent,
+      },
+      {
+        title: 'Create Course Path',
+        path: 'course-paths/edit/:coursePathId',
+        component: EditCoursePathComponent,
+      },
       // Teacher management
       {
         title: 'Teacher management center!',

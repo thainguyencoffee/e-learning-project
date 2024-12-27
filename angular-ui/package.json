@@ -27,8 +27,12 @@
     "chart.js": "^4.4.6",
     "flatpickr": "^4.6.13",
     "http-status-codes": "^2.3.0",
+    "mammoth": "^1.8.0",
+    "ngx-quill": "^25.3.3",
+    "quill": "^2.0.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "video.js": "^8.19.1",
     "zone.js": "~0.14.3"
   },
   "devDependencies": {

@@ -33,7 +33,10 @@
         </p>
         <p><strong>Participant: {{ participantNumber }} - <a
           [routerLink]="['/administration/enrollment-statistics', courseDto.id]">Enrollment statistic</a></strong></p>
-        <p><strong>Description: </strong> {{ courseDto.description || 'No description available' }}</p>
+        <p>
+          <strong>Description: </strong>
+          <span [innerHTML]="courseDto.description || 'No description available'"></span>
+        </p>
         <p><strong>Language: </strong> <span class="fw-bold">{{ courseDto.language }}</span></p>
         <p><strong>Price: </strong> {{ courseDto.price || 'Price not available' }}</p>
         <p class="badge {{ courseDto.published ? 'bg-success' : 'bg-primary' }}">

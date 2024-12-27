@@ -36,64 +36,7 @@
 
   <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
     @for (course of courses; track course.id) {
-      <div class="col">
-        <div class="card h-100 shadow border-0 hover-effect position-relative">
-          <!-- Thumbnail -->
-          <a [routerLink]="['courses', course.id]">
-            <img
-              [src]="course.thumbnailUrl || 'https://placehold.co/600x400/000000/FFF?text=No+Image'"
-              class="card-img-top"
-              alt="Course Thumbnail"
-              style="height: 200px; object-fit: cover; border-radius: 8px;">
-          </a>
-
-          <!-- Badge for Language -->
-          <div class="position-absolute top-0 start-0 p-2">
-            <span class="badge bg-white text-bg-light fs-12">{{ course.language }}</span>
-          </div>
-
-          <!-- Badge for "Has Purchased" -->
-          <div *ngIf="course.hasPurchased" class="position-absolute top-0 end-0 p-2">
-            <span class="badge bg-success text-white fs-12">Has Purchased</span>
-          </div>
-
-          <!-- Card Body -->
-          <div class="card-body d-flex flex-column">
-            <!-- Course Title -->
-            <h5 class="card-title" title="{{ course.title }}"
-                style="word-wrap: break-word; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">
-              {{ course.title }}
-            </h5>
-
-            <!-- Teacher Name -->
-            <p class="card-text text-muted"
-               style="word-wrap: break-word; white-space: normal;">
-              by {{ course.teacher }}
-            </p>
-
-            <!-- Rating -->
-            <div class="d-flex align-items-center">
-              <div class="star-rating">
-                <span *ngFor="let star of getStarsIcon(course.averageRating)" [innerHTML]="star"></span>
-              </div>
-              <span class="text-muted ms-2">({{course.reviews.length}} reviews)</span>
-            </div>
-
-            <!-- Price -->
-            <div>
-              <span class="text-muted">{{ course.price }}</span>
-            </div>
-
-            <!-- Buy Now Button -->
-            <a [routerLink]="['checkout', course.id]"
-               class="btn btn-primary btn-sm w-100"
-               *ngIf="!course.hasPurchased">
-              Buy now
-            </a>
-          </div>
-        </div>
-
-      </div>
+      <app-course-card [course]="course" [showCheckoutButton]="true"/>
     }
   </div>
   <br>

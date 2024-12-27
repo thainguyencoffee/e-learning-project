@@ -29,7 +29,9 @@
         @for (post of posts; track post.id) {
           <tr>
             <td>{{ post.id }}</td>
-            <td>{{ post.content | slice:0:50 }}...</td>
+            <td>
+              <span [innerHTML]="post.content"></span>
+            </td>
             <td>{{ post.info.firstName === userService.current.name ? 'This account': post.info.firstName}}</td>
             <td>{{ post.createdDate | date:'short' }}</td>
             <td>

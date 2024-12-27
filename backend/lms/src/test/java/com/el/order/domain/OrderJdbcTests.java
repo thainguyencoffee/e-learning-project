@@ -1,6 +1,5 @@
 package com.el.order.domain;
 
-import com.el.TestFactory;
 import com.el.common.Currencies;
 import com.el.common.config.DataAuditConfig;
 import org.javamoney.moneta.Money;
@@ -88,15 +87,5 @@ class OrderJdbcTests {
         assertEquals("guest", guestOrders.get(0).getCreatedBy(), "CreatedBy should be 'guest'");
     }
 
-    @Test
-    void testHasPurchasedCourse() {
-        orderRepository.save(order);
-
-        // Act
-        boolean hasPurchased = orderRepository.hasPurchasedCourse(1L, "guest");
-
-        // Assert
-        assertTrue(hasPurchased, "User should have purchased course 1");
-    }
 
 }

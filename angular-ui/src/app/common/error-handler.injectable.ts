@@ -81,6 +81,8 @@ export function getGlobalErrorMessage(key: string, details?: any) {
   let globalErrorMessage: Record<string, string> = {
     required: 'Please provide a value.',
     maxlength: 'Your value too long.',
+    min: 'Your value too small.',
+    max: 'Your value too big.',
     minlength: 'Your value too short.',
     validDouble: 'Please provide a valid floating point number.',
     validJson: 'Please follow the JSON format. Example array format: ["value1", "value2"]',

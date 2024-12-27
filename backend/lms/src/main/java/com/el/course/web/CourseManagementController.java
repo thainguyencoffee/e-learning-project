@@ -33,8 +33,12 @@ public class CourseManagementController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<Course>> getAllCourses(Pageable pageable) {
-        return ResponseEntity.ok(courseQueryService.findAllCourses(pageable));
+    public ResponseEntity<Page<Course>> getAllCourses(Pageable pageable, @RequestParam(required = false) String published) {
+        if (published != null && published.equals("true")) {
+            return ResponseEntity.ok(courseQueryService.findAllCoursesPublished(pageable));
+        } else {
+            return ResponseEntity.ok(courseQueryService.findAllCourses(pageable));
+        }
     }
 
     @GetMapping("/trash")

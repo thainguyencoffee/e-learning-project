@@ -6,6 +6,7 @@ import com.el.common.exception.InputInvalidException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.*;
 import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.relational.core.mapping.MappedCollection;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Getter
 @Table("course")
 @ToString
@@ -128,15 +130,23 @@ public class Course extends AbstractAggregateRoot<Course> {
         if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot change price of a published course.");
         }
-        if (validSections()) {
+        if (inValidSections()) {
             throw new InputInvalidException("Cannot change price of a course without sections or section without lessons");
+        }
+        if (isNoneQuizzes()) {
+            throw new InputInvalidException("Cannot change price of a course without quizzes or quiz is not valid");
         }
         MoneyUtils.checkValidPrice(newPrice);
         this.price = newPrice;
     }
 
-    private boolean validSections() {
+    private boolean inValidSections() {
         return this.sections.isEmpty() || !this.sections.stream().allMatch(CourseSection::hasLessons); // update later
+    }
+
+    public boolean isNoneQuizzes() {
+        return this.sections.stream()
+                .noneMatch(section -> section.hasQuizzes() && section.hasValidQuizzes());
     }
 
     public void assignTeacher(String teacher) {
@@ -156,8 +166,11 @@ public class Course extends AbstractAggregateRoot<Course> {
         if (isPublishedAndNotUnpublishedOrDelete()) {
             throw new InputInvalidException("Cannot request publish for a published course.");
         }
-        if (validSections() || this.getTeacher() == null) {
+        if (inValidSections() || this.getTeacher() == null) {
             throw new InputInvalidException("Cannot publish a course without sections or teacher.");
+        }
+        if (isNoneQuizzes()) {
+            throw new InputInvalidException("Cannot change price of a course without quizzes or quiz is not valid");
         }
         if (courseRequest.getType() != RequestType.PUBLISH) {
             throw new InputInvalidException("Request type invalid.");
@@ -635,10 +648,12 @@ public class Course extends AbstractAggregateRoot<Course> {
                 .orElseThrow(ResourceNotFoundException::new);
     }
 
-    public Map<Long, String> getLessonIdAndTitleMap() {
-        return this.sections.stream()
-                .flatMap(section -> section.getLessons().stream())
-                .collect(HashMap::new, (map, lesson) -> map.put(lesson.getId(), lesson.getTitle()), Map::putAll);
+    public List<Lesson> getLessonsOrdered() {
+        return this.getSections().stream()
+                .sorted(Comparator.comparingInt(CourseSection::getOrderIndex))
+                .flatMap(section -> section.getLessons().stream()
+                        .sorted(Comparator.comparingInt(Lesson::getOrderIndex)))
+                .toList();
     }
 
     /*Events*/

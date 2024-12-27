@@ -2,10 +2,12 @@ package com.el.order.domain;
 
 import com.el.common.Currencies;
 import com.el.common.exception.InputInvalidException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.javamoney.moneta.Money;
 import org.springframework.data.annotation.*;
 import org.springframework.data.domain.AbstractAggregateRoot;
+import org.springframework.data.relational.core.mapping.Embedded;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -25,6 +27,12 @@ public class Order extends AbstractAggregateRoot<Order> {
     private MonetaryAmount discountedPrice;
     private String discountCode;
     private Status status;
+
+    private OrderType orderType;
+
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
+    private ExchangeDetails exchangeDetails;
+
     @CreatedBy
     private String createdBy;
     @CreatedDate
@@ -34,13 +42,27 @@ public class Order extends AbstractAggregateRoot<Order> {
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
 
+    // Required by Spring Data
+    public Order() {}
+
     public Order(Set<OrderItem> items) {
         if (items.isEmpty()) throw new InputInvalidException("Order must contain at least one item.");
 
         this.orderDate = LocalDateTime.now();
+        this.orderType = OrderType.PURCHASE;
         this.status = Status.PENDING;
 
         items.forEach(this::addItem);
+    }
+
+    public Order(ExchangeDetails exchangeDetails) {
+        if (exchangeDetails == null) throw new InputInvalidException("Exchange details must not be null.");
+
+        this.orderDate = LocalDateTime.now();
+        this.orderType = OrderType.EXCHANGE;
+        this.status = Status.PENDING;
+        this.exchangeDetails = exchangeDetails;
+        this.totalPrice = exchangeDetails.additionalPrice();
     }
 
     public void addItem(OrderItem item) {
@@ -108,15 +130,15 @@ public class Order extends AbstractAggregateRoot<Order> {
 
     public void makePaid() {
         // Business rule: You can't pay for a completed order
-        if (isPaid()) {
+        if (status == Status.PAID) {
             throw new InputInvalidException("You can't pay for a completed order.");
         }
         this.status = Status.PAID;
-        registerEvent(new OrderPaidEvent(id, items.stream().map(OrderItem::getCourse).toList(), createdBy));
-    }
-
-    private boolean isPaid() {
-        return status == Status.PAID;
+        if (orderType == OrderType.PURCHASE) {
+            registerEvent(new OrderPaidEvent(id, items.stream().map(OrderItem::getCourse).toList(), createdBy));
+        } else {
+            registerEvent(new OrderExchangePaidEvent(id, exchangeDetails));
+        }
     }
 
     public void cancelOrder() {
@@ -124,10 +146,17 @@ public class Order extends AbstractAggregateRoot<Order> {
             throw new InputInvalidException("You can't cancel a paid order.");
         }
         this.status = Status.CANCELLED;
-        registerEvent(new OrderCancelledEvent(id));
     }
 
-    public record OrderPaidEvent(UUID orderId, List<Long> items, String createdBy) {}
+    @JsonIgnore
+    public Long getACourseIdOnly() {
+        // make it more safety
+        return this.getItems().stream().findFirst().map(OrderItem::getCourse)
+                .orElseThrow(() -> new InputInvalidException("Order type PURCHASE must contain at least one item."));
+    }
+
+    public record OrderPaidEvent(UUID id, List<Long> items, String createdBy) {}
+    public record OrderExchangePaidEvent(UUID id, ExchangeDetails exchangeDetails) {}
     public record OrderCancelledEvent(UUID orderId) {}
 
 }

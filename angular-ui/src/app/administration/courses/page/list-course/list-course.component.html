@@ -1,6 +1,7 @@
 <div class="d-flex flex-wrap mb-4">
   <h1 class="flex-grow-1">Courses</h1>
   <div>
+    <a routerLink="/administration/course-paths/add" class="btn btn-primary ms-2">Create new Course Path</a>
     <a routerLink="/administration/courses/add" class="btn btn-primary ms-2">Create new Course</a>
   </div>
 </div>
@@ -66,11 +67,11 @@
                    class="btn btn-sm btn-secondary me-2">Edit</a>
                 <a *ngIf="course.published" [routerLink]="['/administration/enrollment-statistics', course.id]"
                    class="btn btn-sm btn-secondary me-2">Enrollment statistic</a>
-                @if (isEditable(course) && isAdminCourseOwner(course.teacher)) {
+                @if (!course.published && isAdminCourseOwner(course.teacher)) {
                   <a *ngIf="isAdminCourseOwner(course.teacher)"
                      [routerLink]="['/administration/courses/assign-teacher', course.id]"
                      class="btn btn-sm btn-secondary me-2">Assign teacher</a>
-                } @else if (isEditable(course) && isAdmin()) {
+                } @else if (!course.published && isAdmin()) {
                   <div class="btn-group">
                     <button type="button" class="btn btn-sm btn-secondary me-2 dropdown-toggle"
                             data-bs-toggle="dropdown" aria-expanded="false">
@@ -92,7 +93,7 @@
                    class="btn btn-sm btn-secondary me-2">
                   Request list
                 </a>
-                <button *ngIf="isEditable(course)"
+                <button *ngIf="!course.published"
                         type="button" (click)="confirmDelete(course.id!)" class="btn btn-sm btn-secondary me-2">
                   Delete
                 </button>

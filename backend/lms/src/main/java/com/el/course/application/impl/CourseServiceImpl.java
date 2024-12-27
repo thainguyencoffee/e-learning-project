@@ -274,7 +274,7 @@ public class CourseServiceImpl implements CourseService {
         com.el.common.auth.web.dto.UserInfo userInfo = rolesBaseUtil.getCurrentUserInfoFromJwt();
 
         Comment comment = commentDTO.toComment(new UserInfo(userInfo.firstName(), userInfo.lastName(), userInfo.username()));
-        Course course = courseQueryService.findCourseById(courseId, false);
+        Course course = courseQueryService.findPublishedCourseById(courseId);
         course.addCommentToPost(postId, comment);
         courseRepository.save(course);
         return comment.getId();
@@ -282,7 +282,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void updateComment(Long courseId, Long postId, Long commentId, CommentDTO commentDTO) {
-        Course course = courseQueryService.findCourseById(courseId, false);
+        Course course = courseQueryService.findPublishedCourseById(courseId);
         course.updateComment(postId, commentId, commentDTO.content(), commentDTO.attachmentUrls());
         courseRepository.save(course);
     }
@@ -291,7 +291,7 @@ public class CourseServiceImpl implements CourseService {
     public void deleteComment(Long courseId, Long postId, Long commentId) {
         String username = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
 
-        Course course = courseQueryService.findCourseById(courseId, false);
+        Course course = courseQueryService.findPublishedCourseById(courseId);
         course.deleteCommentFromPost(postId, commentId, username);
         courseRepository.save(course);
     }
@@ -301,7 +301,7 @@ public class CourseServiceImpl implements CourseService {
         String username = rolesBaseUtil.getCurrentPreferredUsernameFromJwt();
 
         Emotion emotion = new Emotion(username);
-        Course course = courseQueryService.findCourseById(courseId, false);
+        Course course = courseQueryService.findPublishedCourseById(courseId);
         course.addEmotionToPost(postId, emotion);
         courseRepository.save(course);
         return emotion.getId();
@@ -397,7 +397,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void deleteReview(Long courseId, String student) {
-        Course course = courseQueryService.findCourseById(courseId, false);
+        Course course = courseQueryService.findById(courseId);
 
         course.deleteReview(student);
         courseRepository.save(course);

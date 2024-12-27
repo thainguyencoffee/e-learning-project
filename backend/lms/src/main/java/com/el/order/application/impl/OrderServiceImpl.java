@@ -2,23 +2,22 @@ package com.el.order.application.impl;
 
 import com.el.common.RolesBaseUtil;
 import com.el.common.exception.AccessDeniedException;
-import com.el.common.exception.InputInvalidException;
 import com.el.common.exception.ResourceNotFoundException;
 import com.el.course.application.CourseQueryService;
 import com.el.course.domain.Course;
 import com.el.discount.application.DiscountService;
 import com.el.order.application.OrderService;
+import com.el.order.domain.*;
 import com.el.order.web.dto.OrderItemDTO;
 import com.el.order.web.dto.OrderRequestDTO;
-import com.el.order.domain.Order;
-import com.el.order.domain.OrderItem;
-import com.el.order.domain.OrderRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.money.MonetaryAmount;
 import java.util.*;
 
+@Slf4j
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -71,14 +70,18 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
     }
 
-    @Override
-    public boolean hasPurchase(String createdBy, Long courseId) {
-        return orderRepository.hasPurchasedCourse(courseId, createdBy);
-    }
+    public void makeCancelledAllOrderByCourseId(UUID orderId) {
+        log.info("Cancelling all orders by id: {}", orderId);
 
-    @Override
-    public List<Long> purchasedCourses(String createdBy) {
-        return orderRepository.findPurchasedCourseIdsByUserId(createdBy);
+        // now only support order contain only one course
+        Order order = findOrderById(orderId);
+        Long courseId = order.getOrderType() == OrderType.PURCHASE ? order.getACourseIdOnly() : order.getExchangeDetails().courseId();
+
+        List<Order> ordersPending = orderRepository.findAllOrderPendingByCourseId(courseId);
+        for (Order orderPending : ordersPending) {
+            orderPending.cancelOrder();
+            orderRepository.save(orderPending);
+        }
     }
 
     @Override
@@ -89,9 +92,6 @@ public class OrderServiceImpl implements OrderService {
         Set<OrderItem> items = new LinkedHashSet<>();
 
         for (OrderItemDTO itemDto : orderRequestDTO.items()) {
-            if (orderRepository.hasPurchasedCourse(itemDto.id(), currentUsername)) {
-                throw new InputInvalidException("You cannot purchase the same course twice");
-            }
             Course course = courseQueryService.findPublishedCourseById(itemDto.id());
             items.add(new OrderItem(course.getId(), course.getPrice()));
         }
@@ -106,6 +106,15 @@ public class OrderServiceImpl implements OrderService {
             newOrder.applyDiscount(monetaryAmount, orderRequestDTO.discountCode());
         }
 
+        return orderRepository.save(newOrder);
+    }
+
+    public Order createOrderExchange(Long courseId, Long enrollmentId, MonetaryAmount additionalPrice) {
+        if (rolesBaseUtil.isAdmin() || rolesBaseUtil.isTeacher()) {
+            throw new AccessDeniedException("Only authenticated users can create orders");
+        }
+
+        Order newOrder = new Order(new ExchangeDetails(enrollmentId, courseId, additionalPrice));
         return orderRepository.save(newOrder);
     }
 

@@ -13,7 +13,6 @@ import {CourseRequest} from "../../model/view/course-request";
     RouterLink,
     NgIf,
     NgForOf,
-    SlicePipe,
     NgClass,
   ],
   templateUrl: './request-list.component.html',
@@ -24,17 +23,17 @@ export class RequestListComponent implements OnInit {
   courseService = inject(CourseService);
   userService = inject(UserService)
 
+  resourceUrl?: string;
   courseId?: number;
   course?: Course
-  expandMessageFlags: Record<number, boolean> = {};
 
   ngOnInit(): void {
     this.courseId = this.route.snapshot.params['courseId'];
+    this.resourceUrl = `/administration/courses/${this.courseId}/requests`
 
     this.courseService.getCourse(this.courseId!).subscribe({
       next: data => {
         this.course = data;
-        this.initFlagArrayForExpandMessage(this.course?.courseRequests);
       },
     })
   }
@@ -72,11 +71,4 @@ export class RequestListComponent implements OnInit {
     return false;
   }
 
-  private initFlagArrayForExpandMessage(courseRequests: CourseRequest[] | undefined) {
-    if (courseRequests) {
-      courseRequests.forEach(request => {
-        this.expandMessageFlags[request.id] = false;
-      });
-    }
-  }
 }

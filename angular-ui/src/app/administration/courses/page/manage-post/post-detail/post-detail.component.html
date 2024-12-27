@@ -31,7 +31,7 @@
   <!-- Post Content Section -->
   <section id="content" class="p-4 border rounded mb-4 bg-white">
     <h2 class="mb-4 border-bottom pb-2">Content</h2>
-    <p>{{ post.content || 'No content available' }}</p>
+    <p [innerHTML]="post.content"></p>
   </section>
 
   <!-- Photo Gallery Section -->

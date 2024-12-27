@@ -38,7 +38,6 @@ export class BrowseCourseDetailComponent implements OnInit, OnDestroy{
   course?: CourseWithoutSections;
   enrollment?: Enrollment;
   isAuthenticated= false;
-  showFullDescription: boolean = false;
 
   ngOnInit(): void {
     this.loadData()
