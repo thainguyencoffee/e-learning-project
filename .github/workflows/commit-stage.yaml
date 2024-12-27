@@ -4,9 +4,9 @@ on: push
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME_LMS: thainguyencoffee/lms-service
-  IMAGE_NAME_BFF: thainguyencoffee/bff-service
-  IMAGE_NAME_ANGULAR_UI: thainguyencoffee/angular-ui
+  IMAGE_NAME_LMS: thnguyen101/lms-service
+  IMAGE_NAME_BFF: thnguyen101/bff-service
+  IMAGE_NAME_ANGULAR_UI: thnguyen101/angular-ui
   VERSION: ${{ github.sha }}
 
 jobs:
