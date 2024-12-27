@@ -52,17 +52,17 @@ sh ./gradlew clean build
 
 echo ""
 echo "*****************************************************************************************************************************************"
-echo "sh ./gradlew :lms:bootBuildImage --imageName=el/lms $GRADLE_PROFILE_ARG"
+echo "sh ./gradlew :lms:bootBuildImage --imageName=lms $GRADLE_PROFILE_ARG"
 echo "*****************************************************************************************************************************************"
 echo ""
-sh ./gradlew :lms:bootBuildImage --imageName=el/lms $GRADLE_PROFILE_ARG
+sh ./gradlew :lms:bootBuildImage --imageName=lms $GRADLE_PROFILE_ARG
 
 echo ""
 echo "*****************************************************************************************************************************************"
-echo "sh ./gradlew :bff:bootBuildImage --imageName=el/bff $GRADLE_PROFILE_ARG"
+echo "sh ./gradlew :bff:bootBuildImage --imageName=bff $GRADLE_PROFILE_ARG"
 echo "*****************************************************************************************************************************************"
 echo ""
-sh ./gradlew :bff:bootBuildImage --imageName=el/bff $GRADLE_PROFILE_ARG
+sh ./gradlew :bff:bootBuildImage --imageName=bff $GRADLE_PROFILE_ARG
 
 cd ..
 
@@ -107,11 +107,11 @@ fi
 cd ..
 
 if $WITHOUT_ANGULAR; then
-  docker build -t el/nginx-reverse-proxy ./nginx-reverse-proxy
+  docker build -t nginx-reverse-proxy ./nginx-reverse-proxy
   docker compose -f compose-${host}.yml up -d nginx-reverse-proxy bff lms
 else
-  docker build -t el/nginx-reverse-proxy ./nginx-reverse-proxy
-  docker build -t el/angular-ui ./angular-ui
+  docker build -t nginx-reverse-proxy ./nginx-reverse-proxy
+  docker build -t angular-ui ./angular-ui
   docker compose -f compose-${host}.yml up -d
 fi
 

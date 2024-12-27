@@ -379,9 +379,9 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
             course c
         WHERE 
             to_tsvector('english', 
-                c.title || ' ' || 
-                c.teacher || ' ' || 
-                c.description) @@ plainto_tsquery(:query)
+                coalesce(c.title, '') || ' ' || 
+                coalesce(c.teacher, '') || ' ' || 
+                coalesce(c.description, '')) @@ plainto_tsquery(:query)
     """)
     List<Course> searchPublishedCourses(String query, int page, int size);
 }

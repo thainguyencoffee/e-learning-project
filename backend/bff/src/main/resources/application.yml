@@ -17,7 +17,7 @@ server:
 
 spring:
   application:
-    name: edge-service
+    name: bff
   cloud:
     gateway:
       routes:
