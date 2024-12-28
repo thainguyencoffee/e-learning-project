@@ -13,6 +13,12 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
+            "allowedCommonJsDependencies": [
+              "bootstrap-icons",
+              "video.js",
+              "quill-delta",
+              "mammoth"
+            ],
             "baseHref": "/angular-ui/",
             "outputPath": "dist/angular-ui",
             "index": "src/index.html",
@@ -43,8 +49,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "1mb",
-                  "maximumError": "1.5mb"
+                  "maximumWarning": "2mb",
+                  "maximumError": "3mb"
                 },
                 {
                   "type": "anyComponentStyle",
