@@ -19,7 +19,7 @@
               "quill-delta",
               "mammoth"
             ],
-            "baseHref": "/angular-ui/",
+            "baseHref": "",
             "outputPath": "dist/angular-ui",
             "index": "src/index.html",
             "browser": "src/main.ts",
