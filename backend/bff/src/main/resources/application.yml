@@ -21,7 +21,7 @@ spring:
         - id: angular
           uri: ${ANGULAR_URI:http://localhost:4200}
           predicates:
-            - Path=/,/*.css,/*.js,/favicon.ico
+            - Path=/,/*.css,/*.js,/favicon.ico,/angular-ui/**
   security:
     oauth2:
       client:
