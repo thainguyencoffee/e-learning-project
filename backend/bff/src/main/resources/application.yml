@@ -18,6 +18,10 @@ spring:
             - TokenRelay
             - SaveSession
             - StripPrefix=1
+        - id: angular
+          uri: ${ANGULAR_URI:http://localhost:4200}
+          predicates:
+            - Path=/,/*.css,/*.js,/favicon.ico
   security:
     oauth2:
       client:
