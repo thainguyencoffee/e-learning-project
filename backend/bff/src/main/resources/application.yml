@@ -1,3 +1,5 @@
+client-uri: http://localhost:7081
+
 server:
   port: 7081
 
@@ -13,7 +15,7 @@ spring:
             - Path=/api/**
           filters:
             - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
-            - TokenRelay=
+            - TokenRelay
             - SaveSession
             - StripPrefix=1
   security:
@@ -21,7 +23,7 @@ spring:
       client:
         provider:
           keycloak101:
-            issuer-uri: http://localhost:7080/auth/realms/keycloak101
+            issuer-uri: http://localhost:8080/realms/keycloak101
         registration:
           keycloak101:
             provider: keycloak101
@@ -29,44 +31,6 @@ spring:
             client-id: bff-client
             client-secret: secret
             scope: openid,profile,email,offline_access
-
-com:
-  c4-soft:
-    springaddons:
-      oidc:
-        ops:
-          - iss: ${spring.security.oauth2.client.provider.keycloak101.issuer-uri}
-            authorities:
-              - path: $.roles
-            aud:
-        client:
-          client-uri: http://localhost:7080/bff
-          security-matchers:
-            - /api/**
-            - /login/**
-            - /oauth2/**
-            - /logout/**
-          permit-all:
-            - /api/**
-            - /login/**
-            - /oauth2/**
-            - /logout/connect/back-channel/keycloak101
-          post-logout-redirect-host: localhost
-          csrf: cookie_accessible_from_js
-          oauth2-redirections:
-            rp-initiated-logout: accepted
-          back-channel-logout:
-            enabled: true
-            # internal-logout-uri: ${reverse-proxy-uri}${bff-prefix}/logout
-            # should work too, but there is no reason to go through the reverse proxy for this internal call
-        # SecurityFilterChain with oauth2ResourceServer() (sessions and CSRF protection disabled)
-        resourceserver:
-          permit-all:
-            - /login-options
-            - /error
-            - /actuator/health/readiness
-            - /actuator/health/liveness
-            - /greeting
 
 management:
   endpoint:

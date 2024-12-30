@@ -23,8 +23,7 @@ class KeycloakTestContainer {
     static void keycloakProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri",
                 () -> getInstance().getAuthServerUrl() + "/realms/keycloak101");
-        registry.add("reverse-proxy-uri", getInstance()::getAuthServerUrl);
-        registry.add("authorization-server-prefix", () -> "");
+        registry.add("lms.keycloak.server-url", getInstance()::getAuthServerUrl);
     }
 
 }

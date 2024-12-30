@@ -1,14 +1,3 @@
-scheme: http
-hostname: localhost
-reverse-proxy-port: 7080
-reverse-proxy-uri: ${scheme}://${hostname}:${reverse-proxy-port}
-authorization-server-prefix: /auth
-realm_name: keycloak101
-client_id: bff-client
-client_secret: secret
-issuer: ${reverse-proxy-uri}${authorization-server-prefix}/realms/${realm_name}
-#lms-port: 7084
-
 server:
   port: 7084
   shutdown: graceful
@@ -37,7 +26,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${issuer}
+          issuer-uri: http://localhost:8080/realms/keycloak101
   modulith:
     events:
       jdbc:
@@ -83,3 +72,8 @@ s3:
 
 lms:
   greeting: Welcome to LMS from Local!
+  keycloak:
+    server-url: http://localhost:8080
+    realm: keycloak101
+    client-id: bff-client
+    client-secret: secret

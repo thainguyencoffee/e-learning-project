@@ -16,5 +16,5 @@ export const appConfig: ApplicationConfig = {
       provideHttpClient()],
 };
 
-export const reverseProxyUri = '';
+export const reverseProxyUri = 'http://lenovo:7080';
 export const baseUri = `${reverseProxyUri}/angular-ui`;
