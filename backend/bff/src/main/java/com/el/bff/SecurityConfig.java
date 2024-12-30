@@ -44,7 +44,7 @@ public class SecurityConfig {
 
         http.authorizeExchange(exchange -> {
             exchange.pathMatchers("/", "/*.css", "/*.js", "/favicon.ico", "/assets/**").permitAll();
-            exchange.pathMatchers("/greeting", "/api", "/login-options", "/actuator/**").permitAll();
+            exchange.pathMatchers("/greeting", "/api/**", "/login-options", "/actuator/**").permitAll();
             exchange.anyExchange().authenticated();
         });
 
@@ -56,18 +56,6 @@ public class SecurityConfig {
         oidcLogoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}");
         return oidcLogoutSuccessHandler;
     }
-
-//    @Bean
-//    WebFilter csrfWebFilter() {
-//        // Required because of https://github.com/spring-projects/spring-security/issues/5766
-//        return (exchange, chain) -> {
-//            exchange.getResponse().beforeCommit(() -> Mono.defer(() -> {
-//                Mono<CsrfToken> csrfToken = exchange.getAttribute(CsrfToken.class.getName());
-//                return csrfToken != null ? csrfToken.then() : Mono.empty();
-//            }));
-//            return chain.filter(exchange);
-//        };
-//    }
 
     @Bean
     WebFilter csrfCookieWebFilter() {
