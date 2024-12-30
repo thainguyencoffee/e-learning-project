@@ -15,6 +15,7 @@ import org.springframework.security.web.server.authentication.HttpStatusServerEn
 import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
 import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.security.web.server.csrf.CsrfToken;
+import org.springframework.security.web.server.csrf.XorServerCsrfTokenRequestAttributeHandler;
 import org.springframework.web.server.WebFilter;
 import reactor.core.publisher.Mono;
 
@@ -31,15 +32,12 @@ public class SecurityConfig {
     SecurityWebFilterChain filterChain(ServerHttpSecurity http, ReactiveClientRegistrationRepository clientRegistrationRepository) {
         http.oauth2Login(Customizer.withDefaults());
 
-//        http.logout(logoutSpec -> {
-//            var logoutSuccessHandler = new OidcClientInitiatedServerLogoutSuccessHandler(clientRegistrationRepository);
-//            logoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}");
-//            logoutSpec.logoutSuccessHandler(logoutSuccessHandler);
-//        });
-
         http.logout(logout -> logout.logoutSuccessHandler(oidcLogoutSuccessHandler(clientRegistrationRepository)));
 
-        http.csrf(csrf -> csrf.csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse()));
+        http.csrf(csrf -> {
+            csrf.csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse());
+            csrf.csrfTokenRequestHandler(new XorServerCsrfTokenRequestAttributeHandler()::handle);
+        });
 
         http.exceptionHandling(exceptionHandling -> exceptionHandling
                 .authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED)));
@@ -61,14 +59,22 @@ public class SecurityConfig {
         return oidcLogoutSuccessHandler;
     }
 
+//    @Bean
+//    WebFilter csrfWebFilter() {
+//        // Required because of https://github.com/spring-projects/spring-security/issues/5766
+//        return (exchange, chain) -> {
+//            exchange.getResponse().beforeCommit(() -> Mono.defer(() -> {
+//                Mono<CsrfToken> csrfToken = exchange.getAttribute(CsrfToken.class.getName());
+//                return csrfToken != null ? csrfToken.then() : Mono.empty();
+//            }));
+//            return chain.filter(exchange);
+//        };
+//    }
+
     @Bean
-    WebFilter csrfWebFilter() {
-        // Required because of https://github.com/spring-projects/spring-security/issues/5766
+    WebFilter csrfCookieWebFilter() {
         return (exchange, chain) -> {
-            exchange.getResponse().beforeCommit(() -> Mono.defer(() -> {
-                Mono<CsrfToken> csrfToken = exchange.getAttribute(CsrfToken.class.getName());
-                return csrfToken != null ? csrfToken.then() : Mono.empty();
-            }));
+            exchange.getAttributeOrDefault(CsrfToken.class.getName(), Mono.empty()).subscribe();
             return chain.filter(exchange);
         };
     }
