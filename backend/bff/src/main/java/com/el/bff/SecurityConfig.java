@@ -8,8 +8,11 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.client.oidc.web.server.logout.OidcClientInitiatedServerLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.web.server.WebSessionServerOAuth2AuthorizedClientRepository;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
+import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
 import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.security.web.server.csrf.CsrfToken;
 import org.springframework.web.server.WebFilter;
@@ -20,14 +23,21 @@ import reactor.core.publisher.Mono;
 public class SecurityConfig {
 
     @Bean
+    ServerOAuth2AuthorizedClientRepository authorizedClientRepository() {
+        return new WebSessionServerOAuth2AuthorizedClientRepository();
+    }
+
+    @Bean
     SecurityWebFilterChain filterChain(ServerHttpSecurity http, ReactiveClientRegistrationRepository clientRegistrationRepository) {
         http.oauth2Login(Customizer.withDefaults());
 
-        http.logout(logoutSpec -> {
-            var logoutSuccessHandler = new OidcClientInitiatedServerLogoutSuccessHandler(clientRegistrationRepository);
-            logoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}");
-            logoutSpec.logoutSuccessHandler(logoutSuccessHandler);
-        });
+//        http.logout(logoutSpec -> {
+//            var logoutSuccessHandler = new OidcClientInitiatedServerLogoutSuccessHandler(clientRegistrationRepository);
+//            logoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}");
+//            logoutSpec.logoutSuccessHandler(logoutSuccessHandler);
+//        });
+
+        http.logout(logout -> logout.logoutSuccessHandler(oidcLogoutSuccessHandler(clientRegistrationRepository)));
 
         http.csrf(csrf -> csrf.csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse()));
 
@@ -36,14 +46,19 @@ public class SecurityConfig {
 
         http.authorizeExchange(exchange -> {
             exchange.pathMatchers("/greeting").permitAll();
-            exchange.pathMatchers("/angular-ui/**").permitAll();
-            exchange.pathMatchers("/", "/*.css", "/*.js", "/favicon.ico").permitAll();
+            exchange.pathMatchers("/", "/*.css", "/*.js", "/favicon.ico", "/assets/**").permitAll();
             exchange.pathMatchers("/actuator/**").permitAll();
             exchange.pathMatchers("/login-options").permitAll();
             exchange.anyExchange().authenticated();
         });
 
         return http.build();
+    }
+
+    private ServerLogoutSuccessHandler oidcLogoutSuccessHandler(ReactiveClientRegistrationRepository clientRegistrationRepository) {
+        var oidcLogoutSuccessHandler = new OidcClientInitiatedServerLogoutSuccessHandler(clientRegistrationRepository);
+        oidcLogoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}");
+        return oidcLogoutSuccessHandler;
     }
 
     @Bean

@@ -8,6 +8,9 @@ spring:
     name: bff
   cloud:
     gateway:
+      default-filters:
+        - TokenRelay
+        - SaveSession
       routes:
         - id: lms
           uri: ${LMS_SERVICE_URI:http://localhost:7084}
@@ -15,13 +18,11 @@ spring:
             - Path=/api/**
           filters:
             - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
-            - TokenRelay
-            - SaveSession
             - StripPrefix=1
         - id: angular
           uri: ${ANGULAR_URI:http://localhost:4200}
           predicates:
-            - Path=/,/*.css,/*.js,/favicon.ico,/angular-ui/**
+            - Path=/,/*.css,/*.js,/favicon.ico,/assets/**
   security:
     oauth2:
       client:
