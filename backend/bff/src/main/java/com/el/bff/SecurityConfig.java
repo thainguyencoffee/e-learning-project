@@ -43,10 +43,8 @@ public class SecurityConfig {
                 .authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED)));
 
         http.authorizeExchange(exchange -> {
-            exchange.pathMatchers("/greeting").permitAll();
             exchange.pathMatchers("/", "/*.css", "/*.js", "/favicon.ico", "/assets/**").permitAll();
-            exchange.pathMatchers("/actuator/**").permitAll();
-            exchange.pathMatchers("/login-options").permitAll();
+            exchange.pathMatchers("/greeting", "/api", "/login-options", "/actuator/**").permitAll();
             exchange.anyExchange().authenticated();
         });
 
