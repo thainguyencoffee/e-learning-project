@@ -1,6 +1,7 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable, Subscription, interval} from 'rxjs';
+import {environment} from "../../../environments/environment";
 
 interface UserInfoDto {
   username: string;
@@ -46,7 +47,7 @@ export class UserService {
 
   refresh(): void {
     this.refreshSub?.unsubscribe();
-    this.http.get('/bff/api/me').subscribe({
+    this.http.get(environment.apiPath + '/api/me').subscribe({
       next: (dto: any) => {
         const user = dto as UserInfoDto;
         if (
@@ -83,7 +84,7 @@ export class UserService {
   }
 
   getUser() {
-    return this.http.get<UserInfoDto>('/bff/api/me')
+    return this.http.get<UserInfoDto>(environment.apiPath + '/api/me')
   }
 
   get valueChanges(): Observable<User> {

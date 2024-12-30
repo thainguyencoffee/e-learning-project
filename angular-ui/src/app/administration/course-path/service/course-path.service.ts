@@ -4,6 +4,7 @@ import {CoursePathDto} from "../model/course-path.dto";
 import {PageWrapper} from "../../../common/dto/page-wrapper";
 import {CoursePath} from "../model/course-path";
 import {CoursePathInTrashDto} from "../model/course-path-in-trash.dto";
+import {environment} from "../../../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ import {CoursePathInTrashDto} from "../model/course-path-in-trash.dto";
 export class CoursePathService {
 
   http = inject(HttpClient);
-  resourcePath = '/bff/api/course-paths'
+  resourcePath = environment.apiPath + '/api/course-paths'
 
   createCoursePath(data: CoursePathDto) {
     return this.http.post(this.resourcePath, data);

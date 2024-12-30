@@ -3,6 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {PageWrapper} from "../../../common/dto/page-wrapper";
 import {TeacherDto} from "../model/teacher.dto";
 import {TeacherDetailDto} from "../model/teacher-detail.dto";
+import {environment} from "../../../../environments/environment";
 
 @Injectable(
   {providedIn: 'root'}
@@ -10,7 +11,7 @@ import {TeacherDetailDto} from "../model/teacher-detail.dto";
 export class TeacherService {
 
   http = inject(HttpClient);
-  resourcePath = '/bff/api/teachers'
+  resourcePath = environment.apiPath + '/api/teachers'
 
   getTeachers(pageNumber: number = 0, pageSize: number = 10) {
     const url = `${this.resourcePath}?page=${pageNumber}&size=${pageSize}`;

@@ -3,6 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {OrderRequestDto} from "../model/order-request.dto";
 import {Order} from "../model/order";
 import {PageWrapper} from "../../common/dto/page-wrapper";
+import {environment} from "../../../environments/environment";
 
 
 @Injectable({
@@ -11,7 +12,7 @@ import {PageWrapper} from "../../common/dto/page-wrapper";
 export class OrdersService {
 
   http = inject(HttpClient);
-  resourcePath = '/bff/api/orders'
+  resourcePath = environment.apiPath + '/api/orders'
 
   createOrder(data: OrderRequestDto) {
     return this.http.post<Order>(this.resourcePath, data);
