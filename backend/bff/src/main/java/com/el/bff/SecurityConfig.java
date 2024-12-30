@@ -36,7 +36,8 @@ public class SecurityConfig {
 
         http.authorizeExchange(exchange -> {
             exchange.pathMatchers("/greeting").permitAll();
-            exchange.pathMatchers("/", "/*.css", "/*.js", "/favicon.ico").permitAll();
+            exchange.pathMatchers("/angular-ui/**").permitAll();
+//            exchange.pathMatchers("/", "/*.css", "/*.js", "/favicon.ico").permitAll();
             exchange.pathMatchers("/actuator/**").permitAll();
             exchange.pathMatchers("/login-options").permitAll();
             exchange.anyExchange().authenticated();
