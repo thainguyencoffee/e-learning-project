@@ -1,12 +1,11 @@
 package com.el.common.auth.application.impl;
 
+import com.el.common.LmsProperties;
 import com.el.common.auth.application.UsersManagement;
 import com.el.common.exception.ResourceNotFoundException;
-import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +13,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class KeycloakUsersManagement implements UsersManagement {
 
-    @Value("${realm_name}")
-    private String realmName;
-
+    private final String realmName;
     private final Keycloak keycloak;
+
+    public KeycloakUsersManagement(LmsProperties properties, Keycloak keycloak) {
+        realmName = properties.keycloak().realm();
+        this.keycloak = keycloak;
+    }
 
     @Override
     public Integer count() {

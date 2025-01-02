@@ -1,5 +1,6 @@
 import {inject, Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
+import {environment} from "../../../environments/environment";
 
 interface ObjectUrl {
   url: string
@@ -15,11 +16,11 @@ export class UploadService {
     const formData = new FormData();
     formData.append('file', file);
 
-    return this.http.post<ObjectUrl>('/bff/api/upload', formData);
+    return this.http.post<ObjectUrl>(environment.apiPath +'/api/upload', formData);
   }
 
   deleteAll(imageUrls: string[]) {
-    return this.http.delete('/bff/api/upload/delete', { body: { urls: imageUrls }});
+    return this.http.delete(environment.apiPath +'/api/upload/delete', { body: { urls: imageUrls }});
   }
 
 }

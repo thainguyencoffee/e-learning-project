@@ -20,6 +20,7 @@ import {QuestionDto} from "../model/question.dto";
 import {Quiz} from "../model/view/quiz";
 import {CommentDto} from "../../../enrollment/model/comment.dto";
 import {ReviewDto} from "../model/review.dto";
+import {environment} from "../../../../environments/environment";
 
 @Injectable(
   {providedIn: 'root'}
@@ -29,7 +30,7 @@ export class CourseService {
   http = inject(HttpClient);
   uploadService = inject(UploadService);
 
-  resourcePath = '/bff/api/courses'
+  resourcePath = environment.apiPath + '/api/courses'
 
   getAllCourses(pageNumber: number = 0, pageSize: number = 10): Observable<PageWrapper<Course>> {
     const url = `${this.resourcePath}?page=${pageNumber}&size=${pageSize}`;

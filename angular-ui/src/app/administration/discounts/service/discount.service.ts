@@ -5,6 +5,7 @@ import {PageWrapper} from "../../../common/dto/page-wrapper";
 import {DiscountDto} from "../model/discount-dto";
 import {Discount} from "../model/view/discount";
 import {DiscountSearchDto} from "../../../orders/model/discount-search.dto";
+import {environment} from "../../../../environments/environment";
 
 @Injectable(
   {providedIn: 'root'}
@@ -13,7 +14,7 @@ export class DiscountService {
 
   http = inject(HttpClient);
 
-  resourcePath = '/bff/api/discounts'
+  resourcePath = environment.apiPath + '/api/discounts'
 
   getAllDiscounts(pageNumber: number = 0, pageSize: number = 10): Observable<PageWrapper<Discount>> {
     const url = `${this.resourcePath}?page=${pageNumber}&size=${pageSize}`;

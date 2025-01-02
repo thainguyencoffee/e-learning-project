@@ -13,7 +13,13 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "baseHref": "/angular-ui/",
+            "allowedCommonJsDependencies": [
+              "bootstrap-icons",
+              "video.js",
+              "quill-delta",
+              "mammoth"
+            ],
+            "baseHref": "",
             "outputPath": "dist/angular-ui",
             "index": "src/index.html",
             "browser": "src/main.ts",
@@ -43,8 +49,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "2mb",
+                  "maximumError": "3mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -57,7 +63,13 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.development.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -70,11 +82,6 @@
             },
             "development": {
               "buildTarget": "angular-ui:build:development"
-            },
-            "local": {
-              "buildTarget": "angular-ui:build:development",
-              "host": "0.0.0.0",
-              "port": 4201
             }
           },
           "defaultConfiguration": "development"

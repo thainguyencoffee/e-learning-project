@@ -21,6 +21,11 @@ public class SecurityConfig {
         return http
                         // Define authorization rules
                         .authorizeHttpRequests(authorize -> authorize
+
+                        // Actuator
+                        .requestMatchers("/actuator/**", "/greeting").permitAll()
+                        .requestMatchers("/me").permitAll()
+
                         // Allow all requests to /upload/** with any roles
                         .requestMatchers("/upload/**").authenticated()
 
@@ -47,9 +52,6 @@ public class SecurityConfig {
                         .requestMatchers("/users/search/**").hasAnyRole("admin", "teacher")
                         .requestMatchers("/users/count/**").hasRole("admin")
 
-                        .requestMatchers("/actuator/health/readiness").permitAll()
-                        .requestMatchers("/actuator/health/liveness").permitAll()
-                        .requestMatchers("/me").permitAll()
                         // Allow GET requests to /courses/** without authentication
                         .requestMatchers(HttpMethod.GET, "/published-courses/**").permitAll()
 //                        .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()

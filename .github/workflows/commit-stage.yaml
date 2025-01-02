@@ -2,13 +2,23 @@ name: Backend CI with Gradle
 
 on: push
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME_LMS: thnguyen101/lms-service
+  IMAGE_NAME_BFF: thnguyen101/bff-service
+  IMAGE_NAME_ANGULAR_UI: thnguyen101/angular-ui
+  VERSION: ${{ github.sha }}
+
 jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
 
     steps:
-      - name: Checkout code
+      - name: Checkout source code
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -18,7 +28,151 @@ jobs:
           java-version: 17
           cache: 'gradle'
 
-      - name: Build with Gradle
+      - name: Code vulnerability scanning
+        uses: anchore/scan-action@v3
+        id: scan
+        with:
+          path: "${{ github.workspace }}"
+          fail-build: false
+          severity-cutoff: high
+          acs-report-enable: true
+
+      - name: Upload vulnerability report
+        if: ${{ always() }}
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
+
+      - name: Build, unit tests and integration tests
         run: |
           cd backend/
-          ./gradlew build --info
+          chmod +x gradlew
+          ./gradlew build
+
+      - name: Setup tools
+        uses: alexellis/setup-arkade@v3
+      - name: Install tools
+        uses: alexellis/arkade-get@master
+        with:
+          kubeconform: latest
+
+      - name: Validate Kubernetes manifests for LMS
+        run: |
+          cd backend/lms
+          kustomize build k8s | kubeconform --strict -
+
+      - name: Validate Kubernetes manifests for BFF
+        run: |
+          cd backend/bff
+          kustomize build k8s | kubeconform --strict -
+
+  package:
+    name: Package and Publish
+    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/thainguyen101' }}
+    needs: [ build ]
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'gradle'
+
+      - name: Build container image for LMS
+        run: |
+          cd backend/
+          chmod +x gradlew
+          ./gradlew :lms:bootBuildImage \
+            --imageName ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LMS }}:${{ env.VERSION }}
+
+      - name: Build container image for BFF
+        run: |
+          cd backend/
+          chmod +x gradlew
+          ./gradlew :bff:bootBuildImage \
+            --imageName ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BFF }}:${{ env.VERSION }}
+
+      - name: Build container image for Angular UI
+        run: |
+          cd angular-ui/
+          npm i
+          npm run build
+          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_ANGULAR_UI }}:${{ env.VERSION }} .
+
+      - name: OCI image vulnerability scanning for LMS
+        uses: anchore/scan-action@v3
+        id: scan_lms
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LMS }}:${{ env.VERSION }}
+          fail-build: false
+          severity-cutoff: high
+          output-format: sarif
+
+      - name: OCI image vulnerability scanning for BFF
+        uses: anchore/scan-action@v3
+        id: scan_bff
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BFF }}:${{ env.VERSION }}
+          fail-build: false
+          severity-cutoff: high
+          output-format: sarif
+
+      - name: OCI image vulnerability scanning for Angular UI
+        uses: anchore/scan-action@v3
+        id: scan_angular_ui
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_ANGULAR_UI }}:${{ env.VERSION }}
+          fail-build: false
+          severity-cutoff: high
+          output-format: sarif
+
+      - name: Upload vulnerability report for LMS
+        if: ${{ always() }}
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ steps.scan_lms.outputs.sarif }}
+          category: "LMS Vulnerability Scan"
+
+      - name: Upload vulnerability report for BFF
+        if: ${{ always() }}
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ steps.scan_bff.outputs.sarif }}
+          category: "BFF Vulnerability Scan"
+
+      - name: Upload vulnerability report for Angular UI
+        if: ${{ always() }}
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ steps.scan_angular_ui.outputs.sarif }}
+          category: "Angular UI Vulnerability Scan"
+
+      - name: Log into container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish container image
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LMS }}:${{ env.VERSION }}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BFF }}:${{ env.VERSION }}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_ANGULAR_UI }}:${{ env.VERSION }}
+
+      - name: Publish container image (latest)
+        run: |
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LMS }}:${{ env.VERSION }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LMS }}:latest
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BFF }}:${{ env.VERSION }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BFF }}:latest
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_ANGULAR_UI }}:${{ env.VERSION }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_ANGULAR_UI }}:latest
+            docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_LMS }}:latest
+            docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BFF }}:latest
+            docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_ANGULAR_UI }}:latest

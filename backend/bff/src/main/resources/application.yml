@@ -1,85 +1,41 @@
-scheme: http
-hostname: localhost
-reverse-proxy-port: 7080
-reverse-proxy-uri: ${scheme}://${hostname}:${reverse-proxy-port}
-authorization-server-prefix: /auth
-realm_name: keycloak101
-issuer: ${reverse-proxy-uri}${authorization-server-prefix}/realms/${realm_name}
-client-id: bff-client
-client-secret: secret
-bff-port: 7081
-bff-prefix: /bff
-resource-server-port: 7084
-authorities-json-path: $.roles
+client-uri: http://localhost:7081
 
 server:
-  port: ${bff-port}
+  port: 7081
 
 spring:
   application:
     name: bff
   cloud:
     gateway:
+      default-filters:
+        - TokenRelay
+        - SaveSession
       routes:
-        - id: bff
-          uri: ${scheme}://${hostname}:${resource-server-port}
+        - id: lms
+          uri: ${LMS_SERVICE_URI:http://localhost:7084}
           predicates:
             - Path=/api/**
           filters:
             - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
-            - TokenRelay=
-            - SaveSession
             - StripPrefix=1
+        - id: angular
+          uri: ${ANGULAR_URI:http://localhost:4200}
+          predicates:
+            - Path=/,/*.css,/*.js,/favicon.ico,/assets/**
   security:
     oauth2:
       client:
         provider:
           keycloak101:
-            issuer-uri: ${issuer}
+            issuer-uri: http://localhost:8080/realms/keycloak101
         registration:
           keycloak101:
             provider: keycloak101
             authorization-grant-type: authorization_code
-            client-id: ${client-id}
-            client-secret: ${client-secret}
+            client-id: bff-client
+            client-secret: secret
             scope: openid,profile,email,offline_access
-
-com:
-  c4-soft:
-    springaddons:
-      oidc:
-        ops:
-          - iss: ${issuer}
-            authorities:
-              - path: ${authorities-json-path}
-            aud: ${audience}
-        client:
-          client-uri: ${reverse-proxy-uri}${bff-prefix}
-          security-matchers:
-            - /api/**
-            - /login/**
-            - /oauth2/**
-            - /logout/**
-          permit-all:
-            - /api/**
-            - /login/**
-            - /oauth2/**
-            - /logout/connect/back-channel/keycloak101
-          post-logout-redirect-host: ${hostname}
-          csrf: cookie_accessible_from_js
-          oauth2-redirections:
-            rp-initiated-logout: accepted
-          back-channel-logout:
-            enabled: true
-            # internal-logout-uri: ${reverse-proxy-uri}${bff-prefix}/logout
-            # should work too, but there is no reason to go through the reverse proxy for this internal call
-        # SecurityFilterChain with oauth2ResourceServer() (sessions and CSRF protection disabled)
-        resourceserver:
-          permit-all:
-            - /login-options
-            - /error
-            - /actuator/health/readiness
-            - /actuator/health/liveness
 
 management:
   endpoint:
@@ -95,3 +51,6 @@ management:
       enabled: true
     readinessstate:
       enabled: true
+
+bff:
+  greeting: Welcome to BFF from local!

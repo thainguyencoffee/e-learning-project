@@ -1,0 +1,2 @@
+lms:
+  greeting: Welcome to LMS from staging Kubernetes environment!

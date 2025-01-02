@@ -15,7 +15,6 @@ import videojs from "video.js";
   standalone: true,
   imports: [],
   templateUrl: './video-player.component.html',
-  styleUrl: './video-player.component.css'
 })
 export class VideoPlayerComponent implements AfterViewInit, OnDestroy, OnChanges {
 

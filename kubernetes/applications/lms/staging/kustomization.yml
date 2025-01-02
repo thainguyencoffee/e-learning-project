@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- github.com/thainguyencoffee/e-learning-project/backend/lms/k8s?ref=thainguyen101
+
+configMapGenerator:
+- behavior: merge
+  files:
+  - application-staging.yml
+  name: lms-config
+
+patches:
+  - path: patch-env.yml
+
+images:
+- name: lms-service
+  newName: ghcr.io/thainguyencoffee/lms-service
+  newTag: latest
+
+replicas:
+- count: 2
+  name: lms-service
+

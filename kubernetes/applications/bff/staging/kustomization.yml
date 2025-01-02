@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- github.com/thainguyencoffee/e-learning-project/backend/bff/k8s?ref=thainguyen101
+
+configMapGenerator:
+- behavior: merge
+  files:
+  - application-staging.yml
+  name: bff-config
+
+patches:
+  - path: patch-env.yml
+
+images:
+- name: bff-service
+  newName: ghcr.io/thainguyencoffee/bff-service
+  newTag: latest
+
+replicas:
+- count: 2
+  name: bff-service
+

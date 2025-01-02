@@ -9,6 +9,7 @@ import {QuizSubmitDto} from "../model/quiz-submit.dto";
 import {QuizSubmission} from "../model/quiz-submission";
 import {LessonMarkRequest, MarkType} from "../model/lesson-mark-request";
 import {ChangeCourseResponse} from "../../browse-course/model/change-course-response";
+import {environment} from "../../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ import {ChangeCourseResponse} from "../../browse-course/model/change-course-resp
 export class EnrollmentsService {
 
   http = inject(HttpClient);
-  resourcePath = '/bff/api/enrollments'
+  resourcePath = environment.apiPath + '/api/enrollments'
 
   getAllEnrollments(pageNumber: number = 0, pageSize: number = 10) {
     const url = `${this.resourcePath}?page=${pageNumber}&size=${pageSize}`;
